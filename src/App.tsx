@@ -19,6 +19,12 @@ import Login from "./pages/auth/Login";
 import Register from "./pages/auth/Register";
 import AddItem from "./pages/items/AddItem";
 
+// Seller Pages
+import SellerDashboard from "./pages/seller/Dashboard";
+import SellerProducts from "./pages/seller/Products";
+import SellerOrders from "./pages/seller/Orders";
+import SellerProfile from "./pages/seller/Profile";
+
 // Layout
 import DashboardLayout from "./components/layouts/DashboardLayout";
 import AuthLayout from "./components/layouts/AuthLayout";
@@ -57,11 +63,11 @@ const App = () => (
               {/* Seller Routes */}
               <Route path="/seller/*" element={
                 <SellerRoute>
-                  {/* These will be created later */}
                   <Routes>
-                    <Route path="dashboard" element={<Dashboard />} />
-                    <Route path="products" element={<Dashboard />} />
-                    <Route path="orders" element={<Dashboard />} />
+                    <Route path="dashboard" element={<SellerDashboard />} />
+                    <Route path="products" element={<SellerProducts />} />
+                    <Route path="orders" element={<SellerOrders />} />
+                    <Route path="profile" element={<SellerProfile />} />
                   </Routes>
                 </SellerRoute>
               } />

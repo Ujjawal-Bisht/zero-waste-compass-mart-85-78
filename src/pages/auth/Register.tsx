@@ -13,6 +13,7 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
+  CardDescription,
 } from '@/components/ui/card';
 import {
   Form,
@@ -21,10 +22,20 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
+  FormDescription,
 } from '@/components/ui/form';
 import { toast } from 'sonner';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Checkbox } from '@/components/ui/checkbox';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 
-const formSchema = z.object({
+const userSchema = z.object({
   name: z.string().min(2, { message: 'Name must be at least 2 characters long' }),
   email: z.string().email({ message: 'Please enter a valid email address' }),
   password: z.string().min(6, { message: 'Password must be at least 6 characters long' }),
@@ -34,13 +45,22 @@ const formSchema = z.object({
   path: ["confirmPassword"],
 });
 
+const sellerSchema = userSchema.extend({
+  businessName: z.string().min(2, { message: 'Business name is required' }),
+  businessType: z.enum(['retailer', 'distributor', 'manufacturer', 'individual'], {
+    required_error: 'Please select a business type',
+  }),
+  isSeller: z.boolean().default(true),
+});
+
 const Register: React.FC = () => {
-  const { register, googleLogin } = useAuth();
+  const { register: registerUser, googleLogin } = useAuth();
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
+  const [accountType, setAccountType] = useState('buyer'); // 'buyer' or 'seller'
 
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
+  const buyerForm = useForm<z.infer<typeof userSchema>>({
+    resolver: zodResolver(userSchema),
     defaultValues: {
       name: '',
       email: '',
@@ -49,14 +69,49 @@ const Register: React.FC = () => {
     },
   });
 
-  const onSubmit = async (values: z.infer<typeof formSchema>) => {
+  const sellerForm = useForm<z.infer<typeof sellerSchema>>({
+    resolver: zodResolver(sellerSchema),
+    defaultValues: {
+      name: '',
+      email: '',
+      password: '',
+      confirmPassword: '',
+      businessName: '',
+      businessType: 'retailer',
+      isSeller: true,
+    },
+  });
+
+  const onSubmitBuyer = async (values: z.infer<typeof userSchema>) => {
     try {
       setIsLoading(true);
-      await register(values.email, values.password, values.name);
+      await registerUser(values.email, values.password, values.name);
       navigate('/dashboard');
     } catch (error) {
       console.error('Registration error:', error);
       toast.error('Failed to create account. Please try again.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const onSubmitSeller = async (values: z.infer<typeof sellerSchema>) => {
+    try {
+      setIsLoading(true);
+      await registerUser(
+        values.email, 
+        values.password, 
+        values.name, 
+        {
+          businessName: values.businessName,
+          businessType: values.businessType,
+          isSeller: values.isSeller,
+        }
+      );
+      navigate('/seller/profile'); // Redirect to seller verification page
+    } catch (error) {
+      console.error('Seller registration error:', error);
+      toast.error('Failed to create seller account. Please try again.');
     } finally {
       setIsLoading(false);
     }
@@ -80,71 +135,188 @@ const Register: React.FC = () => {
       <Card>
         <CardHeader>
           <CardTitle className="text-center">Create an Account</CardTitle>
+          <CardDescription className="text-center">
+            Join Zero Waste Mart to buy and sell surplus goods
+          </CardDescription>
         </CardHeader>
         <CardContent>
-          <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-              <FormField
-                control={form.control}
-                name="name"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Name</FormLabel>
-                    <FormControl>
-                      <Input placeholder="John Doe" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="email"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Email</FormLabel>
-                    <FormControl>
-                      <Input placeholder="you@example.com" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="password"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Password</FormLabel>
-                    <FormControl>
-                      <Input type="password" placeholder="******" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="confirmPassword"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Confirm Password</FormLabel>
-                    <FormControl>
-                      <Input type="password" placeholder="******" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <Button
-                type="submit"
-                className="w-full zwm-gradient hover:opacity-90 transition-opacity"
-                disabled={isLoading}
-              >
-                {isLoading ? 'Creating Account...' : 'Sign Up'}
-              </Button>
-            </form>
-          </Form>
+          <Tabs value={accountType} onValueChange={setAccountType} className="mb-6">
+            <TabsList className="grid w-full grid-cols-2">
+              <TabsTrigger value="buyer">Buyer Account</TabsTrigger>
+              <TabsTrigger value="seller">Seller Account</TabsTrigger>
+            </TabsList>
+            
+            <TabsContent value="buyer">
+              <Form {...buyerForm}>
+                <form onSubmit={buyerForm.handleSubmit(onSubmitBuyer)} className="space-y-4">
+                  <FormField
+                    control={buyerForm.control}
+                    name="name"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Name</FormLabel>
+                        <FormControl>
+                          <Input placeholder="John Doe" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={buyerForm.control}
+                    name="email"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Email</FormLabel>
+                        <FormControl>
+                          <Input placeholder="you@example.com" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={buyerForm.control}
+                    name="password"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Password</FormLabel>
+                        <FormControl>
+                          <Input type="password" placeholder="******" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={buyerForm.control}
+                    name="confirmPassword"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Confirm Password</FormLabel>
+                        <FormControl>
+                          <Input type="password" placeholder="******" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <Button
+                    type="submit"
+                    className="w-full zwm-gradient hover:opacity-90 transition-opacity"
+                    disabled={isLoading}
+                  >
+                    {isLoading ? 'Creating Account...' : 'Sign Up as Buyer'}
+                  </Button>
+                </form>
+              </Form>
+            </TabsContent>
+            
+            <TabsContent value="seller">
+              <Form {...sellerForm}>
+                <form onSubmit={sellerForm.handleSubmit(onSubmitSeller)} className="space-y-4">
+                  <FormField
+                    control={sellerForm.control}
+                    name="name"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Contact Name</FormLabel>
+                        <FormControl>
+                          <Input placeholder="John Doe" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={sellerForm.control}
+                    name="businessName"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Business Name</FormLabel>
+                        <FormControl>
+                          <Input placeholder="Your Business Name" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={sellerForm.control}
+                    name="businessType"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Business Type</FormLabel>
+                        <Select onValueChange={field.onChange} defaultValue={field.value}>
+                          <FormControl>
+                            <SelectTrigger>
+                              <SelectValue placeholder="Select business type" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            <SelectItem value="retailer">Retailer</SelectItem>
+                            <SelectItem value="distributor">Distributor</SelectItem>
+                            <SelectItem value="manufacturer">Manufacturer</SelectItem>
+                            <SelectItem value="individual">Individual Seller</SelectItem>
+                          </SelectContent>
+                        </Select>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={sellerForm.control}
+                    name="email"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Business Email</FormLabel>
+                        <FormControl>
+                          <Input placeholder="business@example.com" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={sellerForm.control}
+                    name="password"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Password</FormLabel>
+                        <FormControl>
+                          <Input type="password" placeholder="******" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={sellerForm.control}
+                    name="confirmPassword"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Confirm Password</FormLabel>
+                        <FormControl>
+                          <Input type="password" placeholder="******" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <div className="text-sm text-gray-500 bg-gray-50 p-3 rounded-md">
+                    <p>By registering as a seller, you'll need to verify your business after sign-up.</p>
+                  </div>
+                  <Button
+                    type="submit"
+                    className="w-full zwm-gradient hover:opacity-90 transition-opacity"
+                    disabled={isLoading}
+                  >
+                    {isLoading ? 'Creating Account...' : 'Register as Seller'}
+                  </Button>
+                </form>
+              </Form>
+            </TabsContent>
+          </Tabs>
 
           <div className="mt-6">
             <div className="relative">

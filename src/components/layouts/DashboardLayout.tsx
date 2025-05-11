@@ -11,7 +11,10 @@ import {
   LayoutDashboard, 
   ShoppingCart, 
   Settings, 
-  LogOut
+  LogOut,
+  Package,
+  Truck,
+  Store
 } from 'lucide-react';
 import { toast } from 'sonner';
 
@@ -46,6 +49,32 @@ const DashboardLayout: React.FC = () => {
     { path: '/profile', label: 'Profile', icon: <Settings size={20} /> },
   ];
 
+  // Add seller items if user is seller
+  if (currentUser?.isSeller) {
+    sidebarItems.push(
+      { 
+        path: '/seller/dashboard', 
+        label: 'Seller Dashboard', 
+        icon: <Store size={20} /> 
+      },
+      { 
+        path: '/seller/products', 
+        label: 'My Products', 
+        icon: <Package size={20} /> 
+      },
+      { 
+        path: '/seller/orders', 
+        label: 'Orders', 
+        icon: <Truck size={20} /> 
+      },
+      { 
+        path: '/seller/profile', 
+        label: 'Seller Profile', 
+        icon: <Settings size={20} /> 
+      }
+    );
+  }
+
   // Add admin item if user is admin
   if (currentUser?.isAdmin) {
     sidebarItems.push({ 
@@ -77,7 +106,7 @@ const DashboardLayout: React.FC = () => {
           </div>
 
           {/* Navigation */}
-          <nav className="flex-1 pt-6">
+          <nav className="flex-1 pt-6 overflow-y-auto">
             <ul className="space-y-2 px-4">
               {sidebarItems.map((item, index) => (
                 <li key={index}>
@@ -144,12 +173,21 @@ const DashboardLayout: React.FC = () => {
               </div>
             </div>
             <div className="flex items-center space-x-4">
-              <Button 
-                onClick={() => navigate('/items/add')} 
-                className="zwm-gradient hover:opacity-90 transition-opacity"
-              >
-                <Plus className="h-4 w-4 mr-2" /> Add Item
-              </Button>
+              {currentUser?.isSeller ? (
+                <Button 
+                  onClick={() => navigate('/items/add')} 
+                  className="zwm-gradient hover:opacity-90 transition-opacity"
+                >
+                  <Plus className="h-4 w-4 mr-2" /> Add Product
+                </Button>
+              ) : (
+                <Button 
+                  onClick={() => navigate('/items/add')} 
+                  className="zwm-gradient hover:opacity-90 transition-opacity"
+                >
+                  <Plus className="h-4 w-4 mr-2" /> Add Item
+                </Button>
+              )}
               <div className="ml-2 flex items-center">
                 <Avatar>
                   <AvatarImage src={currentUser?.photoURL || undefined} />
@@ -157,6 +195,11 @@ const DashboardLayout: React.FC = () => {
                 </Avatar>
                 <div className="ml-2 hidden md:block">
                   <p className="text-sm font-medium">{currentUser?.displayName || 'User'}</p>
+                  {currentUser?.isSeller && (
+                    <p className="text-xs text-muted-foreground">
+                      {currentUser?.verified ? 'Verified Seller' : 'Seller'}
+                    </p>
+                  )}
                 </div>
               </div>
             </div>
