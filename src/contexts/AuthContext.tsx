@@ -1,14 +1,7 @@
 
 import React, { createContext, useContext, useState, useEffect } from "react";
 import { toast } from "sonner";
-
-interface User {
-  id: string;
-  email: string;
-  displayName: string | null;
-  photoURL: string | null;
-  isAdmin: boolean;
-}
+import { User } from "@/types";
 
 interface AuthContextType {
   currentUser: User | null;
@@ -16,9 +9,14 @@ interface AuthContextType {
   login: (email: string, password: string) => Promise<void>;
   googleLogin: () => Promise<void>;
   logout: () => Promise<void>;
-  register: (email: string, password: string, name: string) => Promise<void>;
+  register: (email: string, password: string, name: string, businessDetails?: { 
+    businessName?: string, 
+    businessType?: 'retailer' | 'distributor' | 'manufacturer' | 'individual',
+    isSeller?: boolean 
+  }) => Promise<void>;
   resetPassword: (email: string) => Promise<void>;
   updateProfile: (data: Partial<User>) => Promise<void>;
+  verifySellerAccount: (businessDocuments: File[]) => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -46,6 +44,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         displayName: "Demo User",
         photoURL: null,
         isAdmin: email.includes("admin"),
+        isSeller: email.includes("seller"),
+        businessName: email.includes("seller") ? "Demo Business" : undefined,
+        businessType: email.includes("seller") ? "retailer" as const : undefined,
+        trustScore: email.includes("seller") ? 4.5 : undefined,
+        verified: email.includes("seller") ? true : false,
       };
       
       localStorage.setItem("zwm_user", JSON.stringify(mockUser));
@@ -69,6 +72,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         displayName: "Google User",
         photoURL: "https://via.placeholder.com/150",
         isAdmin: false,
+        isSeller: false,
+        trustScore: undefined,
+        verified: false,
       };
       
       localStorage.setItem("zwm_user", JSON.stringify(mockUser));
@@ -82,7 +88,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
-  const register = async (email: string, password: string, name: string) => {
+  const register = async (email: string, password: string, name: string, businessDetails?: { 
+    businessName?: string, 
+    businessType?: 'retailer' | 'distributor' | 'manufacturer' | 'individual',
+    isSeller?: boolean 
+  }) => {
     try {
       setLoading(true);
       // Simulate registration
@@ -92,11 +102,20 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         displayName: name,
         photoURL: null,
         isAdmin: false,
+        isSeller: businessDetails?.isSeller || false,
+        businessName: businessDetails?.businessName,
+        businessType: businessDetails?.businessType,
+        trustScore: businessDetails?.isSeller ? 0 : undefined,
+        verified: false,
       };
       
       localStorage.setItem("zwm_user", JSON.stringify(mockUser));
       setCurrentUser(mockUser);
       toast.success("Account created successfully!");
+      
+      if (businessDetails?.isSeller) {
+        toast.info("Your seller account is pending verification. You'll be notified once approved.");
+      }
     } catch (error) {
       toast.error("Failed to create account");
       throw error;
@@ -145,6 +164,30 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
+  const verifySellerAccount = async (businessDocuments: File[]) => {
+    try {
+      setLoading(true);
+      // Simulate document verification process
+      await new Promise(resolve => setTimeout(resolve, 1500)); // Simulate processing time
+      
+      if (currentUser) {
+        const updatedUser = {
+          ...currentUser,
+          verified: true,
+          trustScore: 3.0 // Initial trust score
+        };
+        localStorage.setItem("zwm_user", JSON.stringify(updatedUser));
+        setCurrentUser(updatedUser);
+        toast.success("Your seller account has been verified!");
+      }
+    } catch (error) {
+      toast.error("Failed to verify seller account");
+      throw error;
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
     // Check for stored user on app load
     const storedUser = localStorage.getItem("zwm_user");
@@ -162,7 +205,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     logout,
     register,
     resetPassword,
-    updateProfile
+    updateProfile,
+    verifySellerAccount
   };
 
   return (

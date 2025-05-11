@@ -26,6 +26,7 @@ import AuthLayout from "./components/layouts/AuthLayout";
 // Utility Components
 import PrivateRoute from "./components/auth/PrivateRoute";
 import AdminRoute from "./components/auth/AdminRoute";
+import SellerRoute from "./components/auth/SellerRoute";
 
 const queryClient = new QueryClient();
 
@@ -52,6 +53,18 @@ const App = () => (
               <Route path="/marketplace" element={<Marketplace />} />
               <Route path="/profile" element={<Profile />} />
               <Route path="/items/add" element={<AddItem />} />
+              
+              {/* Seller Routes */}
+              <Route path="/seller/*" element={
+                <SellerRoute>
+                  {/* These will be created later */}
+                  <Routes>
+                    <Route path="dashboard" element={<Dashboard />} />
+                    <Route path="products" element={<Dashboard />} />
+                    <Route path="orders" element={<Dashboard />} />
+                  </Routes>
+                </SellerRoute>
+              } />
             </Route>
             
             {/* Admin Routes */}
