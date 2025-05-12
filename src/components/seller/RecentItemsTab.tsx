@@ -7,10 +7,10 @@ import { Package } from 'lucide-react';
 
 // Mock data for recent items
 const recentItems = [
-  { id: 1, name: 'Bamboo Cutlery Set', price: 19.99, date: '2025-05-10', image: '/placeholder.svg' },
-  { id: 2, name: 'Reusable Produce Bags (5-pack)', price: 12.50, date: '2025-05-09', image: '/placeholder.svg' },
-  { id: 3, name: 'Stainless Steel Water Bottle', price: 24.99, date: '2025-05-08', image: '/placeholder.svg' },
-  { id: 4, name: 'Compostable Phone Case', price: 29.99, date: '2025-05-07', image: '/placeholder.svg' },
+  { id: 1, name: 'Bamboo Cutlery Set', price: 1499.99, date: '2025-05-10', image: '/placeholder.svg' },
+  { id: 2, name: 'Reusable Produce Bags (5-pack)', price: 899.50, date: '2025-05-09', image: '/placeholder.svg' },
+  { id: 3, name: 'Stainless Steel Water Bottle', price: 1799.99, date: '2025-05-08', image: '/placeholder.svg' },
+  { id: 4, name: 'Compostable Phone Case', price: 2199.99, date: '2025-05-07', image: '/placeholder.svg' },
 ];
 
 const RecentItemsTab: React.FC = () => {
@@ -42,7 +42,7 @@ const RecentItemsTab: React.FC = () => {
                 </div>
                 <div className="flex-grow">
                   <h3 className="font-semibold">{item.name}</h3>
-                  <p className="text-zwm-primary font-medium">${item.price.toFixed(2)}</p>
+                  <p className="text-zwm-primary font-medium">₹{item.price.toFixed(2)}</p>
                   <p className="text-sm text-muted-foreground">Added on {item.date}</p>
                 </div>
                 <div className="flex flex-col justify-between items-end">

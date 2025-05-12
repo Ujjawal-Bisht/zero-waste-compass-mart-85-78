@@ -7,6 +7,7 @@ import { ItemCategory } from '@/types';
 import { UseFormReturn } from 'react-hook-form';
 import { ItemFormValues } from '../schemas/itemFormSchema';
 import { BarcodeScanner } from './BarcodeScanner';
+import { IndianRupee } from 'lucide-react';
 
 // Define the categories that can be selected
 const foodCategories: { value: ItemCategory; label: string }[] = [
@@ -104,14 +105,19 @@ const PriceQuantityInputs: React.FC<{ form: UseFormReturn<ItemFormValues, any, u
             <FormItem>
               <FormLabel>Original Price (₹)</FormLabel>
               <FormControl>
-                <Input 
-                  type="number" 
-                  step="0.01"
-                  placeholder="0.00" 
-                  onChange={e => field.onChange(parseFloat(e.target.value) || undefined)} 
-                  value={field.value === undefined ? '' : field.value}
-                  className="transition-all"
-                />
+                <div className="relative">
+                  <span className="absolute left-3 top-2.5 text-muted-foreground">
+                    <IndianRupee size={16} />
+                  </span>
+                  <Input 
+                    type="number" 
+                    step="0.01"
+                    placeholder="0.00" 
+                    onChange={e => field.onChange(parseFloat(e.target.value) || undefined)} 
+                    value={field.value === undefined ? '' : field.value}
+                    className="pl-8 transition-all"
+                  />
+                </div>
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -125,14 +131,19 @@ const PriceQuantityInputs: React.FC<{ form: UseFormReturn<ItemFormValues, any, u
             <FormItem>
               <FormLabel>Discounted Price (₹)</FormLabel>
               <FormControl>
-                <Input 
-                  type="number" 
-                  step="0.01" 
-                  placeholder="0.00" 
-                  onChange={e => field.onChange(parseFloat(e.target.value) || undefined)} 
-                  value={field.value === undefined ? '' : field.value}
-                  className="transition-all" 
-                />
+                <div className="relative">
+                  <span className="absolute left-3 top-2.5 text-muted-foreground">
+                    <IndianRupee size={16} />
+                  </span>
+                  <Input 
+                    type="number" 
+                    step="0.01" 
+                    placeholder="0.00" 
+                    onChange={e => field.onChange(parseFloat(e.target.value) || undefined)} 
+                    value={field.value === undefined ? '' : field.value}
+                    className="pl-8 transition-all" 
+                  />
+                </div>
               </FormControl>
               <FormMessage />
             </FormItem>

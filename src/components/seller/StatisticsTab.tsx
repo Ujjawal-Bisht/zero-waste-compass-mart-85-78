@@ -5,12 +5,12 @@ import { motion } from 'framer-motion';
 
 // Mock data for statistics
 const revenueData = [
-  { month: 'Jan', revenue: 4500, profit: 1200 },
-  { month: 'Feb', revenue: 5200, profit: 1500 },
-  { month: 'Mar', revenue: 6100, profit: 1800 },
-  { month: 'Apr', revenue: 5800, profit: 1600 },
-  { month: 'May', revenue: 7000, profit: 2100 },
-  { month: 'Jun', revenue: 8200, profit: 2400 },
+  { month: 'Jan', revenue: 450000, profit: 120000 },
+  { month: 'Feb', revenue: 520000, profit: 150000 },
+  { month: 'Mar', revenue: 610000, profit: 180000 },
+  { month: 'Apr', revenue: 580000, profit: 160000 },
+  { month: 'May', revenue: 700000, profit: 210000 },
+  { month: 'Jun', revenue: 820000, profit: 240000 },
 ];
 
 const StatisticsTab: React.FC = () => {
@@ -29,12 +29,12 @@ const StatisticsTab: React.FC = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="p-4 bg-muted rounded-lg shadow-sm">
               <h3 className="text-lg font-semibold mb-1">Last Month Revenue</h3>
-              <p className="text-3xl font-bold text-zwm-primary">$8,200</p>
+              <p className="text-3xl font-bold text-zwm-primary">₹8,20,000</p>
               <p className="text-sm text-muted-foreground">+14.7% from previous month</p>
             </div>
             <div className="p-4 bg-muted rounded-lg shadow-sm">
               <h3 className="text-lg font-semibold mb-1">Last Month Profit</h3>
-              <p className="text-3xl font-bold text-green-500">$2,400</p>
+              <p className="text-3xl font-bold text-green-500">₹2,40,000</p>
               <p className="text-sm text-muted-foreground">+12.5% from previous month</p>
             </div>
           </div>
@@ -48,13 +48,13 @@ const StatisticsTab: React.FC = () => {
                     <div className="w-full flex justify-center items-end gap-1 h-full">
                       <div 
                         className="w-5 bg-zwm-primary rounded-t-sm" 
-                        style={{ height: `${(item.revenue / 10000) * 100}%` }}
-                        title={`Revenue: $${item.revenue}`}
+                        style={{ height: `${(item.revenue / 1000000) * 100}%` }}
+                        title={`Revenue: ₹${(item.revenue/1000).toLocaleString('en-IN')}`}
                       />
                       <div 
                         className="w-5 bg-green-500 rounded-t-sm" 
-                        style={{ height: `${(item.profit / 10000) * 100}%` }}
-                        title={`Profit: $${item.profit}`}
+                        style={{ height: `${(item.profit / 1000000) * 100}%` }}
+                        title={`Profit: ₹${(item.profit/1000).toLocaleString('en-IN')}`}
                       />
                     </div>
                     <span className="text-xs">{item.month}</span>
@@ -63,11 +63,11 @@ const StatisticsTab: React.FC = () => {
                 
                 {/* Y-axis label */}
                 <div className="absolute -left-6 top-0 h-full flex flex-col justify-between text-xs text-muted-foreground">
-                  <span>$10K</span>
-                  <span>$7.5K</span>
-                  <span>$5K</span>
-                  <span>$2.5K</span>
-                  <span>$0</span>
+                  <span>₹10L</span>
+                  <span>₹7.5L</span>
+                  <span>₹5L</span>
+                  <span>₹2.5L</span>
+                  <span>₹0</span>
                 </div>
               </div>
               

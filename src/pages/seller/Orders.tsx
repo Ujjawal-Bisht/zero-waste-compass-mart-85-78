@@ -9,7 +9,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { Button } from '@/components/ui/button';
-import { Package, MoreVertical, ShoppingCart } from 'lucide-react';
+import { Package, MoreVertical, ShoppingCart, IndianRupee } from 'lucide-react';
 
 const SellerOrders: React.FC = () => {
   // This would be replaced with actual data from a database
@@ -19,11 +19,11 @@ const SellerOrders: React.FC = () => {
       buyerId: 'buyer123',
       buyerName: 'John Doe',
       items: [
-        { itemId: '1', name: 'Organic Bananas', quantity: 2, price: 3.99 },
+        { itemId: '1', name: 'Organic Bananas', quantity: 2, price: 299.99 },
       ],
       status: 'pending',
       paymentStatus: 'paid',
-      totalAmount: 7.98,
+      totalAmount: 599.98,
       createdAt: '2023-05-20T10:30:00',
     },
     {
@@ -31,11 +31,11 @@ const SellerOrders: React.FC = () => {
       buyerId: 'buyer456',
       buyerName: 'Jane Smith',
       items: [
-        { itemId: '2', name: 'T-shirts Pack', quantity: 1, price: 35.00 },
+        { itemId: '2', name: 'T-shirts Pack', quantity: 1, price: 2499.00 },
       ],
       status: 'shipped',
       paymentStatus: 'paid',
-      totalAmount: 35.00,
+      totalAmount: 2499.00,
       createdAt: '2023-05-19T14:15:00',
     },
   ];
@@ -134,7 +134,10 @@ const SellerOrders: React.FC = () => {
                         {formatDate(order.createdAt)}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                        ${order.totalAmount.toFixed(2)}
+                        <div className="flex items-center">
+                          <IndianRupee size={14} className="mr-1" />
+                          {order.totalAmount.toFixed(2)}
+                        </div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
                         <Badge className={getStatusBadgeColor(order.status)}>

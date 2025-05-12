@@ -1,9 +1,10 @@
+
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
 import { Item, ItemCategory } from '@/types';
-import { Plus, Package, MoreVertical } from 'lucide-react';
+import { Plus, Package, MoreVertical, IndianRupee } from 'lucide-react';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -34,8 +35,8 @@ const SellerProducts: React.FC = () => {
         lng: -74.006,
       },
       quantity: 20,
-      originalPrice: 5.99,
-      currentPrice: 3.99,
+      originalPrice: 399.99,
+      currentPrice: 299.99,
       dynamicPricingEnabled: true,
     },
     {
@@ -57,8 +58,8 @@ const SellerProducts: React.FC = () => {
         lng: -74.006,
       },
       quantity: 10,
-      originalPrice: 50.00,
-      currentPrice: 35.00,
+      originalPrice: 3499.00,
+      currentPrice: 2499.00,
       dynamicPricingEnabled: false,
     },
   ]);
@@ -177,7 +178,10 @@ const SellerProducts: React.FC = () => {
                         </Badge>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm">
-                        <div>${product.currentPrice.toFixed(2)}</div>
+                        <div className="flex items-center">
+                          <IndianRupee size={14} className="mr-1" />
+                          {product.currentPrice.toFixed(2)}
+                        </div>
                         {product.dynamicPricingEnabled && (
                           <div className="text-xs text-green-600">Dynamic pricing</div>
                         )}

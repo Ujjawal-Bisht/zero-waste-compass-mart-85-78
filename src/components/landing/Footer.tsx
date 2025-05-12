@@ -1,6 +1,7 @@
 
 import React from 'react';
 import { useIsMobile } from '@/hooks/use-mobile';
+import { Heart } from 'lucide-react';
 
 const Footer: React.FC = () => {
   const isMobile = useIsMobile();
@@ -67,6 +68,9 @@ const Footer: React.FC = () => {
         <div className="mt-10 md:mt-12 border-t border-gray-800 pt-6 md:pt-8">
           <p className="text-gray-400 text-sm text-center">
             &copy; {new Date().getFullYear()} Zero Waste Mart. All rights reserved.
+          </p>
+          <p className="text-gray-400 text-sm text-center mt-2 flex items-center justify-center">
+            Made with <Heart className="h-4 w-4 text-red-500 mx-1 fill-red-500" /> in India
           </p>
         </div>
       </div>
