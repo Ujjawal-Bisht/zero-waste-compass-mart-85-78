@@ -4,10 +4,27 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import Logo from '@/components/ui/logo';
+import { Menu } from 'lucide-react';
+import { useIsMobile } from '@/hooks/use-mobile';
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet";
 
 const Header: React.FC = () => {
   const navigate = useNavigate();
   const { currentUser } = useAuth();
+  const isMobile = useIsMobile();
+
+  const navigationItems = currentUser 
+    ? [{ label: 'Dashboard', onClick: () => navigate('/dashboard'), highlight: true }]
+    : [
+        { label: 'Login', onClick: () => navigate('/login'), highlight: false },
+        { label: 'Sign Up', onClick: () => navigate('/register'), highlight: true }
+      ];
 
   return (
     <header className="bg-white shadow-sm">
@@ -16,31 +33,46 @@ const Header: React.FC = () => {
           <div className="flex items-center">
             <Logo size="md" showText={true} animated={true} onClick={() => navigate('/')} />
           </div>
-          <div className="flex items-center space-x-4">
-            {currentUser ? (
-              <Button 
-                onClick={() => navigate('/dashboard')} 
-                className="zwm-gradient-hover"
-              >
-                Dashboard
-              </Button>
-            ) : (
-              <>
-                <Button 
-                  variant="ghost" 
-                  onClick={() => navigate('/login')}
-                >
-                  Login
+          
+          {isMobile ? (
+            <Sheet>
+              <SheetTrigger asChild>
+                <Button variant="ghost" size="icon">
+                  <Menu className="h-5 w-5" />
                 </Button>
+              </SheetTrigger>
+              <SheetContent>
+                <SheetHeader>
+                  <SheetTitle>Menu</SheetTitle>
+                </SheetHeader>
+                <div className="flex flex-col gap-4 mt-8">
+                  {navigationItems.map((item, index) => (
+                    <Button 
+                      key={index}
+                      onClick={item.onClick}
+                      className={item.highlight ? "zwm-gradient-hover w-full" : "w-full"}
+                      variant={item.highlight ? "default" : "ghost"}
+                    >
+                      {item.label}
+                    </Button>
+                  ))}
+                </div>
+              </SheetContent>
+            </Sheet>
+          ) : (
+            <div className="flex items-center space-x-4">
+              {navigationItems.map((item, index) => (
                 <Button 
-                  onClick={() => navigate('/register')} 
-                  className="zwm-gradient-hover"
+                  key={index}
+                  onClick={item.onClick} 
+                  className={item.highlight ? "zwm-gradient-hover" : ""}
+                  variant={item.highlight ? "default" : "ghost"}
                 >
-                  Sign Up
+                  {item.label}
                 </Button>
-              </>
-            )}
-          </div>
+              ))}
+            </div>
+          )}
         </div>
       </div>
     </header>
