@@ -14,9 +14,14 @@ import {
   LogOut,
   Package,
   Truck,
-  Store
+  Store,
+  ChevronLeft,
+  ChevronRight,
+  Bell
 } from 'lucide-react';
 import { toast } from 'sonner';
+import NotificationCenter from '@/components/NotificationCenter';
+import ChatBot from '@/components/ChatBot';
 
 const DashboardLayout: React.FC = () => {
   const { currentUser, logout } = useAuth();
@@ -100,14 +105,14 @@ const DashboardLayout: React.FC = () => {
                 Z
               </div>
               {!isCollapsed && (
-                <span className="ml-3 text-xl font-bold text-white">Zero Waste Mart</span>
+                <span className="ml-3 text-xl font-bold font-heading text-white">Zero Waste Mart</span>
               )}
             </Link>
           </div>
 
           {/* Navigation */}
           <nav className="flex-1 pt-6 overflow-y-auto">
-            <ul className="space-y-2 px-4">
+            <ul className="space-y-1 px-3">
               {sidebarItems.map((item, index) => (
                 <li key={index}>
                   <Link
@@ -142,16 +147,9 @@ const DashboardLayout: React.FC = () => {
             <button
               onClick={() => setIsCollapsed(!isCollapsed)}
               className="p-3 rounded-lg w-full flex justify-center hover:bg-sidebar-accent transition-colors"
+              aria-label={isCollapsed ? "Expand sidebar" : "Collapse sidebar"}
             >
-              {isCollapsed ? (
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <polyline points="15 18 9 12 15 6" />
-                </svg>
-              ) : (
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <polyline points="9 18 15 12 9 6" />
-                </svg>
-              )}
+              {isCollapsed ? <ChevronRight size={20} /> : <ChevronLeft size={20} />}
             </button>
           </div>
         </div>
@@ -173,25 +171,27 @@ const DashboardLayout: React.FC = () => {
               </div>
             </div>
             <div className="flex items-center space-x-4">
+              <NotificationCenter />
+              
               {currentUser?.isSeller ? (
                 <Button 
                   onClick={() => navigate('/items/add')} 
-                  className="zwm-gradient hover:opacity-90 transition-opacity"
+                  className="zwm-gradient-hover"
                 >
                   <Plus className="h-4 w-4 mr-2" /> Add Product
                 </Button>
               ) : (
                 <Button 
                   onClick={() => navigate('/items/add')} 
-                  className="zwm-gradient hover:opacity-90 transition-opacity"
+                  className="zwm-gradient-hover"
                 >
                   <Plus className="h-4 w-4 mr-2" /> Add Item
                 </Button>
               )}
               <div className="ml-2 flex items-center">
-                <Avatar>
+                <Avatar className="border-2 border-zwm-primary/20">
                   <AvatarImage src={currentUser?.photoURL || undefined} />
-                  <AvatarFallback>{getInitials(currentUser?.displayName)}</AvatarFallback>
+                  <AvatarFallback className="bg-zwm-primary/10 text-zwm-primary font-medium">{getInitials(currentUser?.displayName)}</AvatarFallback>
                 </Avatar>
                 <div className="ml-2 hidden md:block">
                   <p className="text-sm font-medium">{currentUser?.displayName || 'User'}</p>
@@ -210,6 +210,9 @@ const DashboardLayout: React.FC = () => {
         <main className="p-6">
           <Outlet />
         </main>
+        
+        {/* Chat Bot */}
+        <ChatBot />
       </div>
     </div>
   );

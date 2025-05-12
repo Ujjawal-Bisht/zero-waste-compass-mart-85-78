@@ -1,4 +1,6 @@
 
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Montserrat:wght@400;500;600;700&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -33,7 +35,7 @@
     --input: 214.3 31.8% 91.4%;
     --ring: 306 60% 49%;
 
-    --radius: 0.5rem;
+    --radius: 0.75rem;
 
     --sidebar-background: 220 33% 15%;
     --sidebar-foreground: 0 0% 100%;
@@ -89,14 +91,55 @@
     @apply border-border;
   }
 
+  html {
+    font-family: 'Poppins', sans-serif;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'Montserrat', sans-serif;
+  }
+
   body {
     @apply bg-background text-foreground;
   }
 }
 
+/* Custom animations */
+@keyframes float {
+  0% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+  100% {
+    transform: translateY(0px);
+  }
+}
+
+.animate-float {
+  animation: float 3s ease-in-out infinite;
+}
+
 /* Custom styles for Zero Waste Mart */
 .zwm-gradient {
   @apply bg-gradient-to-r from-zwm-primary to-zwm-secondary;
+}
+
+.zwm-gradient-hover {
+  @apply transition-all duration-300;
+  background-size: 200% auto;
+  @apply bg-gradient-to-r from-zwm-primary via-zwm-secondary to-zwm-primary;
+  background-position: right center;
+}
+
+.zwm-gradient-hover:hover {
+  background-position: left center;
+  @apply shadow-lg;
+}
+
+.zwm-card {
+  @apply bg-white rounded-xl shadow-md hover:shadow-lg transition-all duration-300 overflow-hidden border border-gray-100;
 }
 
 .zwm-status-donated {
