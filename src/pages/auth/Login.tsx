@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
@@ -36,7 +35,7 @@ const emailFormSchema = z.object({
 });
 
 const Login: React.FC = () => {
-  const { login, googleLogin } = useAuth();
+  const { login, googleLogin, phoneLogin } = useAuth();
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
   const [captchaValue, setCaptchaValue] = useState<string | null>(null);
@@ -96,9 +95,7 @@ const Login: React.FC = () => {
   const handlePhoneLogin = async (phoneNumber: string) => {
     try {
       setIsLoading(true);
-      // Simulate phone authentication login
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      toast.success('Successfully signed in with phone number!');
+      await phoneLogin(phoneNumber);
       navigate('/dashboard');
     } catch (error) {
       console.error('Phone login error:', error);

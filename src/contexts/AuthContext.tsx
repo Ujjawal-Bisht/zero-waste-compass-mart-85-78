@@ -97,7 +97,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         id: "phone123",
         email: null,
         phoneNumber: phoneNumber,
-        displayName: "Mobile User",
+        displayName: `User ${phoneNumber.slice(-4)}`,
         photoURL: null,
         isAdmin: false,
         isSeller: false,

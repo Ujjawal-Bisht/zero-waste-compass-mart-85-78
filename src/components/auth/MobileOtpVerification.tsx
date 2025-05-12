@@ -11,9 +11,18 @@ import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { motion } from 'framer-motion';
 import { toast } from 'sonner';
+import { 
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue
+} from '@/components/ui/select';
+import { COUNTRY_CODES } from '@/utils/countryCodes';
 
 const phoneSchema = z.object({
-  phoneNumber: z.string().min(10, { message: 'Phone number must be at least 10 characters' })
+  countryCode: z.string().min(1, { message: 'Country code is required' }),
+  phoneNumber: z.string().min(5, { message: 'Phone number must be at least 5 characters' })
 });
 
 const otpSchema = z.object({
@@ -30,12 +39,15 @@ const MobileOtpVerification: React.FC<MobileOtpVerificationProps> = ({
   onCancel 
 }) => {
   const [step, setStep] = useState<'phone' | 'otp'>('phone');
-  const [phoneNumber, setPhoneNumber] = useState('');
+  const [formattedPhoneNumber, setFormattedPhoneNumber] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [resendDisabled, setResendDisabled] = useState(false);
+  const [countdownTime, setCountdownTime] = useState(0);
 
   const phoneForm = useForm<z.infer<typeof phoneSchema>>({
     resolver: zodResolver(phoneSchema),
     defaultValues: {
+      countryCode: '+1', // Default to US
       phoneNumber: ''
     }
   });
@@ -50,12 +62,19 @@ const MobileOtpVerification: React.FC<MobileOtpVerificationProps> = ({
   const handleSendOtp = async (values: z.infer<typeof phoneSchema>) => {
     setIsSubmitting(true);
     try {
+      // Format the phone number with country code
+      const fullPhoneNumber = `${values.countryCode}${values.phoneNumber}`;
+      
       // In a real implementation, this would call an API to send the OTP
       // Simulate API call with a timeout
       await new Promise(resolve => setTimeout(resolve, 1500));
-      setPhoneNumber(values.phoneNumber);
+      
+      setFormattedPhoneNumber(fullPhoneNumber);
       setStep('otp');
-      toast.success(`OTP sent to ${values.phoneNumber}`);
+      toast.success(`OTP sent to ${fullPhoneNumber}`);
+      
+      // Start countdown for resend button
+      startResendCountdown();
     } catch (error) {
       toast.error('Failed to send OTP. Please try again.');
     } finally {
@@ -72,7 +91,7 @@ const MobileOtpVerification: React.FC<MobileOtpVerificationProps> = ({
       
       // For this mock, we'll consider any 6-digit OTP as valid
       if (values.otp.length === 6) {
-        onVerificationComplete(phoneNumber);
+        onVerificationComplete(formattedPhoneNumber);
         toast.success('Phone number verified successfully!');
       } else {
         toast.error('Invalid OTP. Please try again.');
@@ -82,6 +101,46 @@ const MobileOtpVerification: React.FC<MobileOtpVerificationProps> = ({
     } finally {
       setIsSubmitting(false);
     }
+  };
+
+  const startResendCountdown = () => {
+    setResendDisabled(true);
+    setCountdownTime(30);
+    
+    const timer = setInterval(() => {
+      setCountdownTime((prevTime) => {
+        if (prevTime <= 1) {
+          clearInterval(timer);
+          setResendDisabled(false);
+          return 0;
+        }
+        return prevTime - 1;
+      });
+    }, 1000);
+  };
+
+  const handleResendOtp = async () => {
+    if (resendDisabled) return;
+    
+    toast.info('Resending code...');
+    
+    // Get current values from phone form
+    const countryCode = phoneForm.getValues('countryCode');
+    const phoneNumber = phoneForm.getValues('phoneNumber');
+    
+    try {
+      // Simulate API call
+      await new Promise(resolve => setTimeout(resolve, 1500));
+      toast.success('New code sent!');
+      startResendCountdown();
+    } catch (error) {
+      toast.error('Failed to resend OTP. Please try again.');
+    }
+  };
+
+  const formatPhoneNumberForDisplay = (countryCode: string, phoneNumber: string) => {
+    const country = COUNTRY_CODES.find(c => c.dialCode === countryCode);
+    return `${countryCode} ${phoneNumber}${country ? ` (${country.name})` : ''}`;
   };
 
   return (
@@ -100,7 +159,7 @@ const MobileOtpVerification: React.FC<MobileOtpVerificationProps> = ({
           <CardDescription>
             {step === 'phone' 
               ? 'Enter your phone number to receive a verification code' 
-              : `Enter the 6-digit code sent to ${phoneNumber}`}
+              : `Enter the 6-digit code sent to ${formattedPhoneNumber}`}
           </CardDescription>
         </CardHeader>
         
@@ -110,26 +169,56 @@ const MobileOtpVerification: React.FC<MobileOtpVerificationProps> = ({
               <form onSubmit={phoneForm.handleSubmit(handleSendOtp)} className="space-y-4">
                 <FormField
                   control={phoneForm.control}
+                  name="countryCode"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Country Code</FormLabel>
+                      <Select 
+                        onValueChange={field.onChange} 
+                        defaultValue={field.value}
+                      >
+                        <FormControl>
+                          <SelectTrigger className="w-full">
+                            <SelectValue placeholder="Select country code" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent className="max-h-[300px]">
+                          {COUNTRY_CODES.map((country) => (
+                            <SelectItem 
+                              key={country.code} 
+                              value={country.dialCode}
+                              className="flex items-center gap-2"
+                            >
+                              <span className="font-medium">{country.dialCode}</span>
+                              <span className="text-muted-foreground">{country.name}</span>
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={phoneForm.control}
                   name="phoneNumber"
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Phone Number</FormLabel>
                       <FormControl>
-                        <div className="flex">
-                          <span className="inline-flex items-center px-3 border border-r-0 border-input rounded-l-md bg-muted">
-                            +1
-                          </span>
-                          <Input 
-                            className="rounded-l-none" 
-                            placeholder="(555) 123-4567" 
-                            {...field} 
-                          />
-                        </div>
+                        <Input 
+                          placeholder="123-456-7890" 
+                          {...field}
+                          className="w-full" 
+                          type="tel"
+                        />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
                   )}
                 />
+                
                 <div className="flex justify-between">
                   <Button 
                     variant="outline" 
@@ -205,14 +294,11 @@ const MobileOtpVerification: React.FC<MobileOtpVerificationProps> = ({
           {step === 'otp' && (
             <button 
               type="button"
-              className="text-zwm-primary hover:underline ml-1"
-              onClick={() => {
-                toast.info('Resending code...');
-                // Simulate resending OTP
-                setTimeout(() => toast.success('New code sent!'), 1500);
-              }}
+              className={`text-zwm-primary ml-1 ${resendDisabled ? 'opacity-50 cursor-not-allowed' : 'hover:underline'}`}
+              onClick={handleResendOtp}
+              disabled={resendDisabled}
             >
-              Resend
+              {resendDisabled ? `Resend in ${countdownTime}s` : 'Resend'}
             </button>
           )}
         </CardFooter>
