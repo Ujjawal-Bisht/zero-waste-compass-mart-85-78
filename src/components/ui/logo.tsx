@@ -82,7 +82,7 @@ const Logo: React.FC<LogoProps> = ({
           className={cn(
             "font-bold font-heading",
             textSizeClasses[size],
-            animated ? "text-white drop-shadow-md" : "text-white"
+            animated ? "text-black" : "text-black"
           )}
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
