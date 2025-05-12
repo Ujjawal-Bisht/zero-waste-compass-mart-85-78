@@ -23,6 +23,8 @@ import {
   FormMessage,
 } from '@/components/ui/form';
 import { toast } from 'sonner';
+import { motion } from 'framer-motion';
+import ReCAPTCHA from 'react-google-recaptcha';
 
 const formSchema = z.object({
   email: z.string().email({ message: 'Please enter a valid email address' }),
@@ -33,6 +35,7 @@ const Login: React.FC = () => {
   const { login, googleLogin } = useAuth();
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
+  const [captchaValue, setCaptchaValue] = useState<string | null>(null);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -42,10 +45,20 @@ const Login: React.FC = () => {
     },
   });
 
+  const onCaptchaChange = (value: string | null) => {
+    setCaptchaValue(value);
+  };
+
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
+    if (!captchaValue) {
+      toast.error('Please verify that you are not a robot');
+      return;
+    }
+
     try {
       setIsLoading(true);
       await login(values.email, values.password);
+      toast.success('Successfully signed in!');
       navigate('/dashboard');
     } catch (error) {
       console.error('Login error:', error);
@@ -56,9 +69,15 @@ const Login: React.FC = () => {
   };
 
   const handleGoogleLogin = async () => {
+    if (!captchaValue) {
+      toast.error('Please verify that you are not a robot');
+      return;
+    }
+    
     try {
       setIsLoading(true);
       await googleLogin();
+      toast.success('Successfully signed in with Google!');
       navigate('/dashboard');
     } catch (error) {
       console.error('Google login error:', error);
@@ -69,10 +88,27 @@ const Login: React.FC = () => {
   };
 
   return (
-    <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
+    <motion.div 
+      className="mt-8 sm:mx-auto sm:w-full sm:max-w-md"
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5 }}
+    >
       <Card>
         <CardHeader>
-          <CardTitle className="text-center">Sign In</CardTitle>
+          <motion.div
+            initial={{ scale: 0.8, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            transition={{ delay: 0.2, duration: 0.5 }}
+            className="text-center mb-4"
+          >
+            <div className="flex justify-center">
+              <motion.div whileHover={{ scale: 1.1, rotate: [0, -5, 5, 0] }}>
+                <div className="h-16 w-16 rounded-full zwm-gradient flex items-center justify-center text-white font-bold text-2xl mb-2">ZW</div>
+              </motion.div>
+            </div>
+            <CardTitle className="text-center">Sign In</CardTitle>
+          </motion.div>
         </CardHeader>
         <CardContent>
           <Form {...form}>
@@ -103,13 +139,31 @@ const Login: React.FC = () => {
                   </FormItem>
                 )}
               />
-              <Button
-                type="submit"
-                className="w-full zwm-gradient hover:opacity-90 transition-opacity"
-                disabled={isLoading}
+              
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.4, duration: 0.5 }}
+                className="flex justify-center"
               >
-                {isLoading ? 'Signing In...' : 'Sign In'}
-              </Button>
+                <ReCAPTCHA
+                  sitekey="6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI" // This is a test key
+                  onChange={onCaptchaChange}
+                />
+              </motion.div>
+              
+              <motion.div
+                whileHover={{ scale: 1.03 }}
+                whileTap={{ scale: 0.97 }}
+              >
+                <Button
+                  type="submit"
+                  className="w-full zwm-gradient hover:opacity-90 transition-opacity"
+                  disabled={isLoading || !captchaValue}
+                >
+                  {isLoading ? 'Signing In...' : 'Sign In'}
+                </Button>
+              </motion.div>
             </form>
           </Form>
 
@@ -123,13 +177,17 @@ const Login: React.FC = () => {
               </div>
             </div>
 
-            <div className="mt-6">
+            <motion.div 
+              className="mt-6"
+              whileHover={{ scale: 1.03 }}
+              whileTap={{ scale: 0.97 }}
+            >
               <Button
                 type="button"
                 variant="outline"
                 className="w-full"
                 onClick={handleGoogleLogin}
-                disabled={isLoading}
+                disabled={isLoading || !captchaValue}
               >
                 <svg className="h-5 w-5 mr-2" viewBox="0 0 24 24">
                   <path
@@ -151,19 +209,34 @@ const Login: React.FC = () => {
                 </svg>
                 Google
               </Button>
-            </div>
+            </motion.div>
           </div>
         </CardContent>
         <CardFooter className="flex justify-center">
-          <p className="text-sm text-gray-600">
+          <motion.p 
+            className="text-sm text-gray-600"
+            whileHover={{ scale: 1.05 }}
+          >
             Don't have an account?{' '}
             <Link to="/register" className="text-zwm-primary hover:underline">
               Sign up
             </Link>
-          </p>
+          </motion.p>
         </CardFooter>
       </Card>
-    </div>
+      
+      <motion.div 
+        className="mt-4 text-center text-sm text-gray-500"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 0.6, duration: 0.5 }}
+      >
+        By signing in, you agree to our{' '}
+        <Link to="#" className="text-zwm-primary hover:underline">Terms of Service</Link>{' '}
+        and{' '}
+        <Link to="#" className="text-zwm-primary hover:underline">Privacy Policy</Link>
+      </motion.div>
+    </motion.div>
   );
 };
 

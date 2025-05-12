@@ -127,9 +127,10 @@ const DashboardLayout: React.FC = () => {
             initial={{ y: -20, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             transition={{ duration: 0.5, delay: 0.2 }}
+            whileHover={{ scale: 1.05 }}
           >
             <Link to="/" className="flex items-center">
-              <Logo size={isCollapsed ? 'sm' : 'md'} showText={!isCollapsed} />
+              <Logo size={isCollapsed ? 'sm' : 'md'} showText={!isCollapsed} animated={true} />
             </Link>
           </motion.div>
 
@@ -157,7 +158,13 @@ const DashboardLayout: React.FC = () => {
                       location.pathname === item.path ? 'bg-sidebar-accent shadow-md' : ''
                     }`}
                   >
-                    <div className="text-sidebar-foreground">{item.icon}</div>
+                    <motion.div 
+                      className="text-sidebar-foreground"
+                      whileHover={{ rotate: [0, -10, 10, 0] }}
+                      transition={{ duration: 0.5 }}
+                    >
+                      {item.icon}
+                    </motion.div>
                     {!isCollapsed && (
                       <motion.span 
                         className="ml-3"
@@ -179,7 +186,7 @@ const DashboardLayout: React.FC = () => {
             <motion.button
               onClick={handleLogout}
               className="flex items-center p-3 rounded-lg w-full hover:bg-sidebar-accent transition-all duration-300"
-              whileHover={{ scale: 1.05 }}
+              whileHover={{ scale: 1.05, backgroundColor: "rgba(255,255,255,0.1)" }}
               whileTap={{ scale: 0.95 }}
             >
               <LogOut size={20} className="animate-pulse" />
@@ -193,7 +200,7 @@ const DashboardLayout: React.FC = () => {
               onClick={() => setIsCollapsed(!isCollapsed)}
               className="p-3 rounded-lg w-full flex justify-center hover:bg-sidebar-accent transition-all duration-300"
               aria-label={isCollapsed ? "Expand sidebar" : "Collapse sidebar"}
-              whileHover={{ scale: 1.1 }}
+              whileHover={{ scale: 1.1, backgroundColor: "rgba(255,255,255,0.1)" }}
               whileTap={{ scale: 0.9 }}
             >
               {isCollapsed ? <ChevronRight size={20} /> : <ChevronLeft size={20} />}
@@ -223,7 +230,12 @@ const DashboardLayout: React.FC = () => {
               </div>
             </div>
             <div className="flex items-center space-x-4">
-              <NotificationCenter />
+              <motion.div
+                whileHover={{ rotate: [0, -5, 5, 0], scale: 1.1 }}
+                transition={{ duration: 0.5 }}
+              >
+                <NotificationCenter />
+              </motion.div>
               
               <motion.div
                 whileHover={{ scale: 1.05 }}
@@ -238,12 +250,12 @@ const DashboardLayout: React.FC = () => {
               </motion.div>
               
               <motion.div 
-                className="ml-2 flex items-center"
+                className="ml-2 flex items-center cursor-pointer"
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
                 onClick={() => navigate('/profile')}
               >
-                <Avatar className="border-2 border-zwm-primary/20 hover-scale cursor-pointer">
+                <Avatar className="border-2 border-zwm-primary/20 hover:border-zwm-primary hover:shadow-lg transition-all duration-300">
                   <AvatarImage src={currentUser?.photoURL || undefined} />
                   <AvatarFallback className="bg-zwm-primary/10 text-zwm-primary font-medium">{getInitials(currentUser?.displayName)}</AvatarFallback>
                 </Avatar>
@@ -261,9 +273,14 @@ const DashboardLayout: React.FC = () => {
         </header>
 
         {/* Page Content */}
-        <main className="p-6">
+        <motion.main 
+          className="p-6"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.5 }}
+        >
           <Outlet />
-        </main>
+        </motion.main>
         
         {/* Chat Bot */}
         <ChatBot />
