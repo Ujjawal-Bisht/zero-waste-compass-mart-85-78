@@ -22,18 +22,39 @@ const CTASection: React.FC = () => {
   };
 
   return (
-    <section className="bg-gradient-to-r from-zwm-primary to-zwm-secondary py-12 md:py-16">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+    <section className="bg-gradient-to-r from-zwm-primary to-zwm-secondary py-16 md:py-24 relative overflow-hidden">
+      {/* Decorative elements */}
+      <div className="absolute inset-0 overflow-hidden">
+        <motion.div 
+          className="absolute -right-20 top-20 w-64 h-64 rounded-full bg-white opacity-10"
+          animate={{ 
+            y: [0, -20, 0], 
+            scale: [1, 1.1, 1],
+          }}
+          transition={{ duration: 6, repeat: Infinity, repeatType: "reverse" }}
+        />
+        <motion.div 
+          className="absolute left-10 bottom-10 w-40 h-40 rounded-full bg-white opacity-5"
+          animate={{ 
+            y: [0, 20, 0], 
+            scale: [1, 1.05, 1],
+          }}
+          transition={{ duration: 8, repeat: Infinity, repeatType: "reverse", delay: 1 }}
+        />
+      </div>
+      
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10">
         <motion.div 
           initial={{ scale: 0.9, opacity: 0 }}
           whileInView={{ scale: 1, opacity: 1 }}
           viewport={{ once: true }}
           transition={{ duration: 0.6 }}
+          className="mb-6"
         >
           <Logo size={isMobile ? "lg" : "xl"} showText={true} />
         </motion.div>
         <motion.h2 
-          className="mt-6 md:mt-8 text-2xl md:text-3xl font-bold font-heading text-white"
+          className="mt-6 md:mt-8 text-2xl md:text-4xl font-bold font-heading text-white"
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
@@ -51,17 +72,15 @@ const CTASection: React.FC = () => {
           Start sharing, reducing waste, and making a difference in your community.
         </motion.p>
         <motion.div 
-          className="mt-6 md:mt-8"
+          className="mt-8 md:mt-10"
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.6, delay: 0.7 }}
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.95 }}
         >
           <Button
             onClick={handleGetStarted}
-            className="bg-white text-zwm-primary hover:bg-gray-100 text-base md:text-lg px-6 py-5 md:px-8 md:py-6 shadow-lg"
+            className="bg-white text-zwm-primary hover:bg-gray-100 text-base md:text-lg px-8 py-6 rounded-full shadow-lg hover:shadow-xl transition-all duration-300"
           >
             Get Started <ArrowRight className="ml-2 h-5 w-5" />
           </Button>

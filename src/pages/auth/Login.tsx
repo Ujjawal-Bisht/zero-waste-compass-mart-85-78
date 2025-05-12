@@ -7,6 +7,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import {
   Card,
   CardContent,
@@ -25,6 +26,7 @@ import {
 import { toast } from 'sonner';
 import { motion } from 'framer-motion';
 import ReCAPTCHA from 'react-google-recaptcha';
+import { Eye, EyeOff, Mail, Lock } from 'lucide-react';
 
 const formSchema = z.object({
   email: z.string().email({ message: 'Please enter a valid email address' }),
@@ -36,6 +38,7 @@ const Login: React.FC = () => {
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
   const [captchaValue, setCaptchaValue] = useState<string | null>(null);
+  const [showPassword, setShowPassword] = useState(false);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -94,51 +97,101 @@ const Login: React.FC = () => {
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
     >
-      <Card>
-        <CardHeader>
+      <Card className="border-0 shadow-xl overflow-hidden bg-white rounded-xl">
+        <div className="absolute inset-0 bg-gradient-to-r from-zwm-primary/5 to-zwm-secondary/5 z-0"></div>
+        
+        <CardHeader className="relative z-10">
           <motion.div
             initial={{ scale: 0.8, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             transition={{ delay: 0.2, duration: 0.5 }}
-            className="text-center mb-4"
+            className="text-center mb-2"
           >
-            <div className="flex justify-center">
-              <motion.div whileHover={{ scale: 1.1, rotate: [0, -5, 5, 0] }}>
-                <div className="h-16 w-16 rounded-full zwm-gradient flex items-center justify-center text-white font-bold text-2xl mb-2">ZW</div>
-              </motion.div>
-            </div>
-            <CardTitle className="text-center">Sign In</CardTitle>
+            <CardTitle className="text-2xl font-bold mb-2">Welcome Back</CardTitle>
+            <div className="h-1 w-12 bg-gradient-to-r from-zwm-primary to-zwm-secondary mx-auto rounded-full"></div>
           </motion.div>
         </CardHeader>
-        <CardContent>
+        
+        <CardContent className="relative z-10">
           <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-5">
               <FormField
                 control={form.control}
                 name="email"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Email</FormLabel>
-                    <FormControl>
-                      <Input placeholder="you@example.com" {...field} />
-                    </FormControl>
+                    <FormLabel className="text-gray-700">Email</FormLabel>
+                    <div className="relative">
+                      <FormControl>
+                        <div className="relative">
+                          <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                            <Mail className="h-5 w-5 text-gray-400" />
+                          </div>
+                          <Input 
+                            placeholder="you@example.com" 
+                            className="pl-10" 
+                            {...field} 
+                          />
+                        </div>
+                      </FormControl>
+                    </div>
                     <FormMessage />
                   </FormItem>
                 )}
               />
+              
               <FormField
                 control={form.control}
                 name="password"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Password</FormLabel>
-                    <FormControl>
-                      <Input type="password" placeholder="******" {...field} />
-                    </FormControl>
+                    <FormLabel className="text-gray-700">Password</FormLabel>
+                    <div className="relative">
+                      <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                        <Lock className="h-5 w-5 text-gray-400" />
+                      </div>
+                      <Input 
+                        type={showPassword ? "text" : "password"} 
+                        placeholder="******" 
+                        className="pl-10 pr-10" 
+                        {...field} 
+                      />
+                      <div 
+                        className="absolute inset-y-0 right-0 flex items-center pr-3 cursor-pointer"
+                        onClick={() => setShowPassword(!showPassword)}
+                      >
+                        {showPassword ? (
+                          <EyeOff className="h-5 w-5 text-gray-400 hover:text-gray-700" />
+                        ) : (
+                          <Eye className="h-5 w-5 text-gray-400 hover:text-gray-700" />
+                        )}
+                      </div>
+                    </div>
                     <FormMessage />
                   </FormItem>
                 )}
               />
+              
+              <div className="flex justify-between items-center">
+                <div className="flex items-center">
+                  <input
+                    type="checkbox"
+                    id="remember"
+                    className="h-4 w-4 text-zwm-primary focus:ring-zwm-primary border-gray-300 rounded"
+                  />
+                  <Label
+                    htmlFor="remember"
+                    className="ml-2 block text-sm text-gray-700"
+                  >
+                    Remember me
+                  </Label>
+                </div>
+                <div className="text-sm">
+                  <Link to="#" className="text-zwm-primary hover:text-zwm-secondary">
+                    Forgot your password?
+                  </Link>
+                </div>
+              </div>
               
               <motion.div
                 initial={{ opacity: 0 }}
@@ -153,12 +206,12 @@ const Login: React.FC = () => {
               </motion.div>
               
               <motion.div
-                whileHover={{ scale: 1.03 }}
-                whileTap={{ scale: 0.97 }}
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
               >
                 <Button
                   type="submit"
-                  className="w-full zwm-gradient hover:opacity-90 transition-opacity"
+                  className="w-full zwm-gradient hover:opacity-90 transition-opacity h-12 text-lg font-medium"
                   disabled={isLoading || !captchaValue}
                 >
                   {isLoading ? 'Signing In...' : 'Sign In'}
@@ -179,13 +232,13 @@ const Login: React.FC = () => {
 
             <motion.div 
               className="mt-6"
-              whileHover={{ scale: 1.03 }}
-              whileTap={{ scale: 0.97 }}
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
             >
               <Button
                 type="button"
                 variant="outline"
-                className="w-full"
+                className="w-full border-2 h-12 text-gray-700 hover:bg-gray-50"
                 onClick={handleGoogleLogin}
                 disabled={isLoading || !captchaValue}
               >
@@ -207,18 +260,19 @@ const Login: React.FC = () => {
                     fill="#EA4335"
                   />
                 </svg>
-                Google
+                Sign in with Google
               </Button>
             </motion.div>
           </div>
         </CardContent>
-        <CardFooter className="flex justify-center">
+        
+        <CardFooter className="flex justify-center relative z-10">
           <motion.p 
             className="text-sm text-gray-600"
             whileHover={{ scale: 1.05 }}
           >
             Don't have an account?{' '}
-            <Link to="/register" className="text-zwm-primary hover:underline">
+            <Link to="/register" className="text-zwm-primary hover:text-zwm-secondary font-medium">
               Sign up
             </Link>
           </motion.p>
@@ -232,9 +286,9 @@ const Login: React.FC = () => {
         transition={{ delay: 0.6, duration: 0.5 }}
       >
         By signing in, you agree to our{' '}
-        <Link to="#" className="text-zwm-primary hover:underline">Terms of Service</Link>{' '}
+        <Link to="#" className="text-zwm-primary hover:text-zwm-secondary">Terms of Service</Link>{' '}
         and{' '}
-        <Link to="#" className="text-zwm-primary hover:underline">Privacy Policy</Link>
+        <Link to="#" className="text-zwm-primary hover:text-zwm-secondary">Privacy Policy</Link>
       </motion.div>
     </motion.div>
   );
