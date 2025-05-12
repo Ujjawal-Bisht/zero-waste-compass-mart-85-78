@@ -10,6 +10,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import Quagga from 'quagga';
 
 interface BarcodeScannerProps {
   onBarcodeDetected: (barcode: string) => void;
@@ -19,8 +20,8 @@ export const BarcodeScanner: React.FC<BarcodeScannerProps> = ({ onBarcodeDetecte
   const [isScanning, setIsScanning] = useState(false);
   const [barcodeResult, setBarcodeResult] = useState<string | null>(null);
   const [scanFeedback, setScanFeedback] = useState('');
-  const videoRef = useRef<HTMLVideoElement>(null);
-  const scannerIntervalRef = useRef<number | null>(null);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const scannerRef = useRef<HTMLDivElement>(null);
   const scanLineRef = useRef<HTMLDivElement>(null);
 
   // Animate the scan line
@@ -45,76 +46,135 @@ export const BarcodeScanner: React.FC<BarcodeScannerProps> = ({ onBarcodeDetecte
     }
   }, [isScanning]);
 
-  const startScanner = async () => {
+  // Initialize and clean up Quagga when dialog opens/closes
+  useEffect(() => {
+    if (isDialogOpen && isScanning) {
+      startScanner();
+    }
+    
+    return () => {
+      if (Quagga) {
+        Quagga.stop();
+      }
+    };
+  }, [isDialogOpen, isScanning]);
+
+  const startScanner = () => {
     setIsScanning(true);
     setScanFeedback('Initializing camera...');
     
-    try {
-      if (videoRef.current) {
-        const constraints = {
-          video: { 
-            facingMode: 'environment',
-            width: { ideal: 1280 },
-            height: { ideal: 720 }
-          }
-        };
+    if (scannerRef.current) {
+      Quagga.init({
+        inputStream: {
+          name: "Live",
+          type: "LiveStream",
+          target: scannerRef.current,
+          constraints: {
+            width: { min: 640 },
+            height: { min: 480 },
+            facingMode: "environment", // Use the rear camera
+            aspectRatio: { min: 1, max: 2 }
+          },
+        },
+        locator: {
+          patchSize: "medium",
+          halfSample: true
+        },
+        numOfWorkers: navigator.hardwareConcurrency || 2,
+        frequency: 10,
+        decoder: {
+          readers: [
+            "ean_reader",
+            "ean_8_reader", 
+            "code_128_reader",
+            "code_39_reader",
+            "code_93_reader",
+            "upc_reader",
+            "upc_e_reader"
+          ]
+        },
+        locate: true
+      }, (err) => {
+        if (err) {
+          console.error("Error initializing Quagga:", err);
+          setScanFeedback('Camera access denied. Please check permissions.');
+          toast.error('Could not access camera. Please check permissions.');
+          setIsScanning(false);
+          return;
+        }
+
+        setScanFeedback('Camera ready. Scanning for barcode...');
         
-        const stream = await navigator.mediaDevices.getUserMedia(constraints);
-        videoRef.current.srcObject = stream;
-        setScanFeedback('Scanning for barcode...');
-        
-        // In a real app, we would use a real barcode scanning library like QuaggaJS
-        // For demo purposes, we'll simulate detecting a barcode after a delay
-        let scanProgress = 0;
-        const scanSimulation = setInterval(() => {
-          scanProgress += 10;
-          setScanFeedback(`Scanning... ${scanProgress}%`);
-          
-          if (scanProgress >= 100) {
-            clearInterval(scanSimulation);
+        // Start Quagga
+        Quagga.start();
+
+        // Set up barcode detection event
+        Quagga.onDetected((result) => {
+          if (result && result.codeResult && result.codeResult.code) {
+            const code = result.codeResult.code;
+            setBarcodeResult(code);
+            setScanFeedback(`Barcode detected: ${code}`);
             
-            // Pick a random barcode from our mock database
-            const barcodes = ['9780140157376', '7350053850019', '5901234123457'];
-            const randomBarcode = barcodes[Math.floor(Math.random() * barcodes.length)];
-            setBarcodeResult(randomBarcode);
-            setScanFeedback(`Barcode detected: ${randomBarcode}`);
+            // Stop scanning
+            Quagga.stop();
+            setIsScanning(false);
             
-            // Use a slight delay to show the detected barcode before applying data
+            // Use a slight delay to show the detected barcode before closing
             setTimeout(() => {
-              onBarcodeDetected(randomBarcode);
-              stopScanner();
+              onBarcodeDetected(code);
+              setIsDialogOpen(false);
             }, 1500);
           }
-        }, 200);
-        
-        scannerIntervalRef.current = scanSimulation as unknown as number;
-      }
-    } catch (error) {
-      console.error('Error accessing camera:', error);
-      setScanFeedback('Camera access denied. Please check permissions.');
-      toast.error('Could not access camera. Please check permissions.');
-      setIsScanning(false);
+        });
+
+        // Set up processing event to show scanning feedback
+        Quagga.onProcessed((result) => {
+          const drawingCtx = Quagga.canvas.ctx.overlay;
+          const drawingCanvas = Quagga.canvas.dom.overlay;
+
+          if (result) {
+            // Clear the canvas
+            if (drawingCtx) {
+              drawingCtx.clearRect(0, 0, parseInt(drawingCanvas.getAttribute("width") || "0"), parseInt(drawingCanvas.getAttribute("height") || "0"));
+            
+              // Draw box if barcode is detected
+              if (result.boxes) {
+                drawingCtx.strokeStyle = 'green';
+                drawingCtx.lineWidth = 2;
+                
+                for (let box of result.boxes) {
+                  drawingCtx.beginPath();
+                  drawingCtx.moveTo(box[0][0], box[0][1]);
+                  drawingCtx.lineTo(box[1][0], box[1][1]);
+                  drawingCtx.lineTo(box[2][0], box[2][1]);
+                  drawingCtx.lineTo(box[3][0], box[3][1]);
+                  drawingCtx.lineTo(box[0][0], box[0][1]);
+                  drawingCtx.stroke();
+                }
+              }
+
+              // Draw focused box if result is found
+              if (result.codeResult && result.codeResult.code) {
+                drawingCtx.strokeStyle = '#00FF00';
+                drawingCtx.lineWidth = 5;
+                drawingCtx.strokeRect(result.box.x, result.box.y, result.box.width, result.box.height);
+              }
+            }
+          }
+        });
+      });
     }
   };
 
   const stopScanner = () => {
-    if (videoRef.current && videoRef.current.srcObject) {
-      const stream = videoRef.current.srcObject as MediaStream;
-      const tracks = stream.getTracks();
-      tracks.forEach(track => track.stop());
-      videoRef.current.srcObject = null;
+    if (Quagga) {
+      Quagga.stop();
     }
-    
-    if (scannerIntervalRef.current) {
-      clearInterval(scannerIntervalRef.current);
-      scannerIntervalRef.current = null;
-    }
-    
     setIsScanning(false);
   };
 
   return (
-    <Dialog>
+    <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
       <DialogTrigger asChild>
         <Button 
           type="button" 
@@ -132,24 +192,26 @@ export const BarcodeScanner: React.FC<BarcodeScannerProps> = ({ onBarcodeDetecte
         <div className="flex flex-col items-center justify-center space-y-4">
           {isScanning ? (
             <div className="relative w-full aspect-video bg-black rounded-md overflow-hidden">
-              <video 
-                ref={videoRef} 
-                className="w-full h-full object-cover"
-                autoPlay 
-                playsInline
-              />
-              <div className="absolute inset-0 flex items-center justify-center">
+              <div 
+                ref={scannerRef} 
+                className="w-full h-full"
+              >
+                {/* Quagga will inject video here */}
+              </div>
+              
+              <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
                 <div className="w-2/3 h-1/3 border-2 border-zwm-primary/70 rounded-md"></div>
                 <div 
                   ref={scanLineRef}
                   className="absolute top-1/2 left-0 w-full h-0.5 bg-zwm-primary opacity-70"
                 ></div>
               </div>
+              
               <Button 
                 type="button"
                 variant="outline" 
                 size="sm" 
-                className="absolute top-2 right-2 bg-white/80"
+                className="absolute top-2 right-2 bg-white/80 z-10"
                 onClick={stopScanner}
               >
                 <X className="h-4 w-4" />
