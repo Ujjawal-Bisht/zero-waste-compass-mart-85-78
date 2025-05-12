@@ -10,6 +10,16 @@ export interface User {
   isSeller?: boolean;
   trustScore?: number;
   verified?: boolean;
+  phoneNumber?: string;
+  address?: string;
+  city?: string;
+  state?: string;
+  zipCode?: string;
+  country?: string;
+  bio?: string;
+  dob?: string;
+  occupation?: string;
+  organization?: string;
 }
 
 export type ItemStatus = 'available' | 'donated' | 'expired' | 'flagged' | 'sold';
@@ -22,6 +32,7 @@ export type ItemCategory =
   | 'household'
   | 'books'
   | 'toys'
+  | 'medicine'
   | 'other';
 
 export interface ItemLocation {
