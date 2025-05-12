@@ -1,8 +1,9 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
-import { ArrowRight, Upload, MessageCircle, ShoppingBag, IndianRupee, Medicine, Package } from 'lucide-react';
+import { ArrowRight, Upload, MessageCircle, ShoppingBag, IndianRupee, PillBottle, Package } from 'lucide-react';
 import Logo from '@/components/ui/logo';
 import { motion } from 'framer-motion';
 
@@ -19,7 +20,7 @@ const LandingPage: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen font-sans">
+    <div className="min-h-screen flex flex-col">
       {/* Header/Navigation */}
       <header className="bg-white shadow-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -228,7 +229,7 @@ const LandingPage: React.FC = () => {
                 className="mx-auto h-16 w-16 rounded-full bg-zwm-primary bg-opacity-10 flex items-center justify-center mb-6"
                 whileHover={{ rotate: [0, -10, 10, 0], transition: { duration: 0.5 } }}
               >
-                <Medicine className="h-8 w-8 text-zwm-primary" />
+                <PillBottle className="h-8 w-8 text-zwm-primary" />
               </motion.div>
               <h3 className="mt-2 text-xl font-medium font-heading text-gray-900">Medicines</h3>
               <p className="mt-3 text-gray-600">

@@ -1,8 +1,7 @@
-
 import React from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Package, ShoppingCart, TrendingUp, Users, IndianRupee, Medicine } from 'lucide-react';
+import { Package, ShoppingCart, TrendingUp, Users, IndianRupee, PillBottle } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 const SellerDashboard: React.FC = () => {
@@ -58,9 +57,9 @@ const SellerDashboard: React.FC = () => {
       description: "Food items listed"
     },
     {
-      title: "Medicine Items",
+      title: "Healthcare Items",
       value: "4",
-      icon: <Medicine className="h-8 w-8 text-zwm-primary" />,
+      icon: <PillBottle className="h-8 w-8 text-zwm-primary" />,
       description: "Healthcare items listed"
     }
   ];
