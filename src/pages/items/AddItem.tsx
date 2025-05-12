@@ -6,6 +6,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { format } from 'date-fns';
 import { CalendarIcon, Barcode, X, Scan } from 'lucide-react';
+import { motion } from 'framer-motion';
 
 import { Button } from '@/components/ui/button';
 import {
