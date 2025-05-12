@@ -143,6 +143,7 @@
   @apply bg-white rounded-xl shadow-md hover:shadow-lg transition-all duration-300 overflow-hidden border border-gray-100;
 }
 
+/* Status badges */
 .zwm-status-donated {
   @apply bg-zwm-success text-white rounded-full px-3 py-1 text-xs font-semibold;
 }
@@ -181,7 +182,7 @@
   @apply opacity-100;
 }
 
-/* New enhanced UI effects */
+/* Enhanced UI effects */
 .shimmer {
   background: linear-gradient(
     90deg, 
@@ -223,6 +224,83 @@
   @apply text-transparent bg-clip-text;
   background-image: linear-gradient(to right, var(--tw-gradient-stops));
   @apply bg-gradient-to-r from-zwm-primary to-zwm-secondary;
+}
+
+/* New animations */
+@keyframes pulsate {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+  100% { transform: scale(1); }
+}
+
+.animate-pulsate {
+  animation: pulsate 2s ease-in-out infinite;
+}
+
+@keyframes slide-in-bottom {
+  from { transform: translateY(30px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+.animate-slide-in-bottom {
+  animation: slide-in-bottom 0.5s ease-out forwards;
+}
+
+@keyframes slide-in-left {
+  from { transform: translateX(-30px); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
+}
+
+.animate-slide-in-left {
+  animation: slide-in-left 0.5s ease-out forwards;
+}
+
+@keyframes slide-in-right {
+  from { transform: translateX(30px); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
+}
+
+.animate-slide-in-right {
+  animation: slide-in-right 0.5s ease-out forwards;
+}
+
+@keyframes bounce-light {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-5px); }
+}
+
+.animate-bounce-light {
+  animation: bounce-light 2s infinite ease-in-out;
+}
+
+@keyframes rotate {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.animate-rotate {
+  animation: rotate 8s linear infinite;
+}
+
+@keyframes gradient-shift {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+.animate-gradient {
+  background-size: 200% 200%;
+  animation: gradient-shift 3s ease infinite;
+}
+
+/* 3D hover effect */
+.hover-3d {
+  transition: transform 0.3s ease-out;
+  transform-style: preserve-3d;
+}
+
+.hover-3d:hover {
+  transform: perspective(1000px) rotateX(5deg) rotateY(5deg);
 }
 
 /* Price tag animation */

@@ -1,16 +1,17 @@
 
 import React from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import VerificationForm from '@/components/seller/VerificationForm';
 import { useAuth } from '@/contexts/AuthContext';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { z } from 'zod';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { toast } from 'sonner';
+import { motion } from 'framer-motion';
+import { Building, User, Shield, Store } from 'lucide-react';
 import {
   Form,
   FormControl,
@@ -19,12 +20,15 @@ import {
   FormLabel,
   FormMessage,
 } from '@/components/ui/form';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 const profileSchema = z.object({
   displayName: z.string().min(2, { message: 'Name must be at least 2 characters' }),
   email: z.string().email({ message: 'Please enter a valid email' }),
-  businessName: z.string().optional(),
-  businessType: z.enum(['retailer', 'distributor', 'manufacturer', 'individual']).optional(),
+  businessName: z.string().min(1, { message: 'Business name is required' }),
+  businessType: z.enum(['retailer', 'distributor', 'manufacturer', 'individual'], { 
+    required_error: 'Please select a business type' 
+  }),
 });
 
 type ProfileFormValues = z.infer<typeof profileSchema>;
@@ -52,108 +56,191 @@ const SellerProfile: React.FC = () => {
     }
   };
 
+  const fadeInVariants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: { opacity: 1, y: 0, transition: { duration: 0.5 } }
+  };
+
   return (
-    <div className="space-y-6">
+    <motion.div 
+      className="space-y-6"
+      initial="hidden"
+      animate="visible"
+      variants={fadeInVariants}
+    >
       <div>
-        <h2 className="text-3xl font-bold tracking-tight">Seller Profile</h2>
+        <h2 className="text-3xl font-bold tracking-tight gradient-text bg-gradient-to-r from-zwm-primary via-zwm-secondary to-zwm-accent">Seller Profile</h2>
         <p className="text-muted-foreground">
-          Manage your account settings and verification status
+          Manage your business settings and verification status
         </p>
       </div>
       
-      <Tabs defaultValue="profile" className="space-y-4">
-        <TabsList>
-          <TabsTrigger value="profile">Profile</TabsTrigger>
-          <TabsTrigger value="verification">Verification</TabsTrigger>
+      <Tabs defaultValue="profile" className="space-y-6">
+        <TabsList className="grid w-full max-w-md grid-cols-2 mb-8">
+          <TabsTrigger value="profile" className="flex items-center gap-2">
+            <Store size={16} /> Profile
+          </TabsTrigger>
+          <TabsTrigger value="verification" className="flex items-center gap-2">
+            <Shield size={16} /> Verification
+          </TabsTrigger>
         </TabsList>
         
-        <TabsContent value="profile" className="space-y-4">
-          <Card>
-            <CardHeader>
-              <CardTitle>Profile Information</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <Form {...form}>
-                <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-                  <FormField
-                    control={form.control}
-                    name="displayName"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Display Name</FormLabel>
-                        <FormControl>
-                          <Input {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  
-                  <FormField
-                    control={form.control}
-                    name="email"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Email</FormLabel>
-                        <FormControl>
-                          <Input {...field} disabled />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  
-                  <FormField
-                    control={form.control}
-                    name="businessName"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Business Name</FormLabel>
-                        <FormControl>
-                          <Input {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  
-                  <div className="flex gap-2 justify-end">
-                    <Button type="submit">Save Changes</Button>
-                  </div>
-                </form>
-              </Form>
-            </CardContent>
-          </Card>
+        <TabsContent value="profile" className="space-y-6">
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.3 }}
+          >
+            <Card className="shadow-pop hover:shadow-lg transition-all duration-300">
+              <CardHeader>
+                <CardTitle>Business Information</CardTitle>
+                <CardDescription>Manage your business details</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <Form {...form}>
+                  <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      <FormField
+                        control={form.control}
+                        name="displayName"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Contact Person</FormLabel>
+                            <FormControl>
+                              <div className="relative">
+                                <User className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                                <Input {...field} className="pl-10" />
+                              </div>
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      
+                      <FormField
+                        control={form.control}
+                        name="email"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Email</FormLabel>
+                            <FormControl>
+                              <Input {...field} disabled className="bg-muted" />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      
+                      <FormField
+                        control={form.control}
+                        name="businessName"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Business Name</FormLabel>
+                            <FormControl>
+                              <div className="relative">
+                                <Building className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                                <Input {...field} className="pl-10" />
+                              </div>
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      
+                      <FormField
+                        control={form.control}
+                        name="businessType"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Business Type</FormLabel>
+                            <FormControl>
+                              <Select 
+                                value={field.value} 
+                                onValueChange={(value: 'retailer' | 'distributor' | 'manufacturer' | 'individual') => field.onChange(value)}
+                              >
+                                <SelectTrigger>
+                                  <SelectValue placeholder="Select business type" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  <SelectItem value="retailer">Retailer</SelectItem>
+                                  <SelectItem value="distributor">Distributor</SelectItem>
+                                  <SelectItem value="manufacturer">Manufacturer</SelectItem>
+                                  <SelectItem value="individual">Individual</SelectItem>
+                                </SelectContent>
+                              </Select>
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </div>
+                    
+                    <div className="flex gap-2 justify-end">
+                      <Button 
+                        type="submit" 
+                        className="zwm-gradient-hover"
+                      >
+                        Save Changes
+                      </Button>
+                    </div>
+                  </form>
+                </Form>
+              </CardContent>
+            </Card>
+          </motion.div>
           
-          <Card>
-            <CardHeader>
-              <CardTitle>Security</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                <div className="space-y-1">
-                  <Label htmlFor="current-password">Current Password</Label>
-                  <Input id="current-password" type="password" />
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.3, delay: 0.2 }}
+          >
+            <Card className="shadow-pop hover:shadow-lg transition-all duration-300">
+              <CardHeader>
+                <CardTitle>Security</CardTitle>
+                <CardDescription>Manage your account security</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  <div className="space-y-2">
+                    <FormLabel htmlFor="current-password">Current Password</FormLabel>
+                    <div className="relative">
+                      <Shield className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                      <Input id="current-password" type="password" className="pl-10" />
+                    </div>
+                  </div>
+                  <div className="space-y-2">
+                    <FormLabel htmlFor="new-password">New Password</FormLabel>
+                    <div className="relative">
+                      <Shield className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                      <Input id="new-password" type="password" className="pl-10" />
+                    </div>
+                  </div>
+                  <div className="space-y-2">
+                    <FormLabel htmlFor="confirm-password">Confirm Password</FormLabel>
+                    <div className="relative">
+                      <Shield className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                      <Input id="confirm-password" type="password" className="pl-10" />
+                    </div>
+                  </div>
+                  <Button className="zwm-gradient-hover">Change Password</Button>
                 </div>
-                <div className="space-y-1">
-                  <Label htmlFor="new-password">New Password</Label>
-                  <Input id="new-password" type="password" />
-                </div>
-                <div className="space-y-1">
-                  <Label htmlFor="confirm-password">Confirm Password</Label>
-                  <Input id="confirm-password" type="password" />
-                </div>
-                <Button>Change Password</Button>
-              </div>
-            </CardContent>
-          </Card>
+              </CardContent>
+            </Card>
+          </motion.div>
         </TabsContent>
         
         <TabsContent value="verification">
-          <VerificationForm />
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.3 }}
+          >
+            <VerificationForm />
+          </motion.div>
         </TabsContent>
       </Tabs>
-    </div>
+    </motion.div>
   );
 };
 

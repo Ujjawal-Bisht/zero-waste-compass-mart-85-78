@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Outlet, Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
@@ -22,6 +21,7 @@ import {
 import { toast } from 'sonner';
 import NotificationCenter from '@/components/NotificationCenter';
 import ChatBot from '@/components/ChatBot';
+import Logo from '@/components/ui/logo';
 
 const DashboardLayout: React.FC = () => {
   const { currentUser, logout } = useAuth();
@@ -101,12 +101,7 @@ const DashboardLayout: React.FC = () => {
           {/* Logo */}
           <div className="p-4 flex items-center">
             <Link to="/" className="flex items-center">
-              <div className="h-10 w-10 rounded-full bg-zwm-primary flex items-center justify-center text-white font-bold text-xl">
-                Z
-              </div>
-              {!isCollapsed && (
-                <span className="ml-3 text-xl font-bold font-heading text-white">Zero Waste Mart</span>
-              )}
+              <Logo size={isCollapsed ? 'sm' : 'md'} showText={!isCollapsed} />
             </Link>
           </div>
 
@@ -114,11 +109,11 @@ const DashboardLayout: React.FC = () => {
           <nav className="flex-1 pt-6 overflow-y-auto">
             <ul className="space-y-1 px-3">
               {sidebarItems.map((item, index) => (
-                <li key={index}>
+                <li key={index} className="hover-scale">
                   <Link
                     to={item.path}
-                    className={`flex items-center p-3 rounded-lg hover:bg-sidebar-accent transition-colors ${
-                      location.pathname === item.path ? 'bg-sidebar-accent' : ''
+                    className={`flex items-center p-3 rounded-lg hover:bg-sidebar-accent transition-all duration-300 ${
+                      location.pathname === item.path ? 'bg-sidebar-accent shadow-md' : ''
                     }`}
                   >
                     <div className="text-sidebar-foreground">{item.icon}</div>
@@ -135,9 +130,9 @@ const DashboardLayout: React.FC = () => {
           <div className="p-4 mt-auto">
             <button
               onClick={handleLogout}
-              className="flex items-center p-3 rounded-lg w-full hover:bg-sidebar-accent transition-colors"
+              className="flex items-center p-3 rounded-lg w-full hover:bg-sidebar-accent transition-all duration-300"
             >
-              <LogOut size={20} />
+              <LogOut size={20} className="animate-pulse" />
               {!isCollapsed && <span className="ml-3">Logout</span>}
             </button>
           </div>
@@ -146,7 +141,7 @@ const DashboardLayout: React.FC = () => {
           <div className="p-4">
             <button
               onClick={() => setIsCollapsed(!isCollapsed)}
-              className="p-3 rounded-lg w-full flex justify-center hover:bg-sidebar-accent transition-colors"
+              className="p-3 rounded-lg w-full flex justify-center hover:bg-sidebar-accent transition-all duration-300"
               aria-label={isCollapsed ? "Expand sidebar" : "Collapse sidebar"}
             >
               {isCollapsed ? <ChevronRight size={20} /> : <ChevronLeft size={20} />}
@@ -173,23 +168,15 @@ const DashboardLayout: React.FC = () => {
             <div className="flex items-center space-x-4">
               <NotificationCenter />
               
-              {currentUser?.isSeller ? (
-                <Button 
-                  onClick={() => navigate('/items/add')} 
-                  className="zwm-gradient-hover"
-                >
-                  <Plus className="h-4 w-4 mr-2" /> Add Product
-                </Button>
-              ) : (
-                <Button 
-                  onClick={() => navigate('/items/add')} 
-                  className="zwm-gradient-hover"
-                >
-                  <Plus className="h-4 w-4 mr-2" /> Add Item
-                </Button>
-              )}
+              <Button 
+                onClick={() => navigate('/items/add')} 
+                className="zwm-gradient-hover shadow-pop"
+              >
+                <Plus className="h-4 w-4 mr-2" /> Add Item
+              </Button>
+              
               <div className="ml-2 flex items-center">
-                <Avatar className="border-2 border-zwm-primary/20">
+                <Avatar className="border-2 border-zwm-primary/20 hover-scale">
                   <AvatarImage src={currentUser?.photoURL || undefined} />
                   <AvatarFallback className="bg-zwm-primary/10 text-zwm-primary font-medium">{getInitials(currentUser?.displayName)}</AvatarFallback>
                 </Avatar>
