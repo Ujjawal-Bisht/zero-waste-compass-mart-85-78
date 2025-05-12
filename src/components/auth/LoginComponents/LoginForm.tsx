@@ -1,8 +1,6 @@
-
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { z } from 'zod';
 import { useAuth } from '@/contexts/auth';
 import { toast } from 'sonner';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -10,11 +8,7 @@ import { ShoppingBag, Store, Mail, Smartphone } from 'lucide-react';
 import BuyerEmailLogin from './BuyerEmailLogin';
 import SellerLogin from './SellerLogin';
 import MobileOtpVerification from '@/components/auth/MobileOtpVerification';
-
-const emailFormSchema = z.object({
-  email: z.string().email({ message: 'Please enter a valid email address' }),
-  password: z.string().min(6, { message: 'Password must be at least 6 characters long' }),
-});
+import { EmailFormValues } from '@/components/auth/schemas/emailLoginSchema';
 
 const LoginForm: React.FC = () => {
   const { login, googleLogin, phoneLogin } = useAuth();
@@ -28,7 +22,7 @@ const LoginForm: React.FC = () => {
     setCaptchaValue(value);
   };
 
-  const onSubmit = async (values: z.infer<typeof emailFormSchema>) => {
+  const onSubmit = async (values: EmailFormValues) => {
     if (!captchaValue) {
       toast.error('Please verify that you are not a robot');
       return;

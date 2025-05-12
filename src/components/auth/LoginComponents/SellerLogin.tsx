@@ -1,7 +1,5 @@
-
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { z } from 'zod';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Button } from '@/components/ui/button';
@@ -18,14 +16,10 @@ import {
 import { motion } from 'framer-motion';
 import ReCAPTCHA from 'react-google-recaptcha';
 import { Eye, EyeOff, Mail, Lock } from 'lucide-react';
-
-const emailFormSchema = z.object({
-  email: z.string().email({ message: 'Please enter a valid email address' }),
-  password: z.string().min(6, { message: 'Password must be at least 6 characters long' }),
-});
+import { emailFormSchema, EmailFormValues } from '@/components/auth/schemas/emailLoginSchema';
 
 interface SellerLoginProps {
-  onSubmit: (values: z.infer<typeof emailFormSchema>) => Promise<void>;
+  onSubmit: (values: EmailFormValues) => Promise<void>;
   isLoading: boolean;
   captchaValue: string | null;
   onCaptchaChange: (value: string | null) => void;
@@ -39,7 +33,7 @@ const SellerLogin: React.FC<SellerLoginProps> = ({
 }) => {
   const [showPassword, setShowPassword] = useState(false);
   
-  const form = useForm<z.infer<typeof emailFormSchema>>({
+  const form = useForm<EmailFormValues>({
     resolver: zodResolver(emailFormSchema),
     defaultValues: {
       email: '',
