@@ -12,8 +12,20 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { AlertCircle, Phone, Mail, MapPin, Clock, Contact } from 'lucide-react';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+  DialogFooter,
+  DialogDescription,
+} from "@/components/ui/dialog";
+import { differenceInDays } from 'date-fns';
+import { toast } from 'sonner';
 
-// Mock data for marketplace items
+// Mock data for marketplace items - only food and household items
 const mockItems: Item[] = [
   {
     id: '1',
@@ -33,6 +45,9 @@ const mockItems: Item[] = [
       lat: 40.7128,
       lng: -74.006,
     },
+    originalPrice: 5.99,
+    currentPrice: 3.99,
+    quantity: 12
   },
   {
     id: '2',
@@ -52,25 +67,9 @@ const mockItems: Item[] = [
       lat: 40.7129,
       lng: -74.007,
     },
-  },
-  {
-    id: '3',
-    name: 'Winter Jacket',
-    description: 'Barely used winter jacket, size L',
-    category: 'clothing',
-    imageUrl: 'https://images.unsplash.com/photo-1551816230-ef5deaed4a26?auto=format&fit=crop&q=80&w=2565&ixlib=rb-4.0.3',
-    expiryDate: '2025-12-31',
-    createdAt: '2025-05-03',
-    updatedAt: '2025-05-03',
-    status: 'available',
-    userId: 'user789',
-    userName: 'Chris Johnson',
-    userPhoto: null,
-    location: {
-      address: '789 Pine St, City',
-      lat: 40.713,
-      lng: -74.008,
-    },
+    originalPrice: 4.50,
+    currentPrice: 2.25,
+    quantity: 5
   },
   {
     id: '4',
@@ -90,13 +89,16 @@ const mockItems: Item[] = [
       lat: 40.7131,
       lng: -74.009,
     },
+    originalPrice: 25.99,
+    currentPrice: 25.99,
+    quantity: 3
   },
   {
     id: '5',
-    name: 'Table Lamp',
-    description: 'Working table lamp, no longer needed',
+    name: 'Eco-friendly Cleaning Supplies',
+    description: 'Set of organic cleaning products, unopened',
     category: 'household',
-    imageUrl: 'https://images.unsplash.com/photo-1507473885765-e6ed057f782c?auto=format&fit=crop&q=80&w=2574&ixlib=rb-4.0.3',
+    imageUrl: 'https://images.unsplash.com/photo-1622560480605-d83c853bc5c3?auto=format&fit=crop&q=80&w=2532&ixlib=rb-4.0.3',
     expiryDate: '2025-12-31',
     createdAt: '2025-05-05',
     updatedAt: '2025-05-05',
@@ -109,14 +111,17 @@ const mockItems: Item[] = [
       lat: 40.7132,
       lng: -74.01,
     },
+    originalPrice: 32.50,
+    currentPrice: 28.99,
+    quantity: 2
   },
   {
     id: '6',
-    name: 'Kids Books',
-    description: 'Collection of children\'s books in good condition',
-    category: 'books',
-    imageUrl: 'https://images.unsplash.com/photo-1512820790803-83ca734da794?auto=format&fit=crop&q=80&w=2574&ixlib=rb-4.0.3',
-    expiryDate: '2025-12-31',
+    name: 'Organic Pasta',
+    description: 'Italian organic pasta, multiple varieties',
+    category: 'food',
+    imageUrl: 'https://images.unsplash.com/photo-1556761223-4c4282c73f77?auto=format&fit=crop&q=80&w=2565&ixlib=rb-4.0.3',
+    expiryDate: '2025-10-31',
     createdAt: '2025-05-06',
     updatedAt: '2025-05-06',
     status: 'available',
@@ -128,23 +133,21 @@ const mockItems: Item[] = [
       lat: 40.7133,
       lng: -74.011,
     },
+    originalPrice: 8.99,
+    currentPrice: 6.75,
+    quantity: 15
   },
 ];
 
 const categories: { value: ItemCategory; label: string }[] = [
   { value: 'food', label: 'Food' },
-  { value: 'clothing', label: 'Clothing' },
-  { value: 'electronics', label: 'Electronics' },
-  { value: 'furniture', label: 'Furniture' },
   { value: 'household', label: 'Household' },
-  { value: 'books', label: 'Books' },
-  { value: 'toys', label: 'Toys' },
-  { value: 'other', label: 'Other' },
 ];
 
 const Marketplace: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<ItemCategory | 'all'>('all');
+  const [selectedItem, setSelectedItem] = useState<Item | null>(null);
 
   const filteredItems = mockItems.filter(item => {
     const matchesSearch = searchQuery === '' || 
@@ -164,8 +167,37 @@ const Marketplace: React.FC = () => {
     });
   };
 
+  const getDaysUntilExpiry = (expiryDate: string): number => {
+    const today = new Date();
+    const expiry = new Date(expiryDate);
+    return differenceInDays(expiry, today);
+  };
+
+  const getDiscountPercentage = (originalPrice?: number, currentPrice?: number): number => {
+    if (!originalPrice || !currentPrice || originalPrice <= currentPrice) {
+      return 0;
+    }
+    return Math.round(((originalPrice - currentPrice) / originalPrice) * 100);
+  };
+
+  const isNearExpiry = (expiryDate: string): boolean => {
+    const daysUntil = getDaysUntilExpiry(expiryDate);
+    return daysUntil <= 7 && daysUntil >= 0;
+  };
+
+  const handleContact = (item: Item) => {
+    setSelectedItem(item);
+  };
+
+  const handleContactSend = (method: 'phone' | 'email') => {
+    if (selectedItem) {
+      toast.success(`Contact request sent to ${selectedItem.userName} via ${method}`);
+      setSelectedItem(null);
+    }
+  };
+
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 animate-fade-in">
       <div>
         <h1 className="text-3xl font-bold">Marketplace</h1>
         <p className="text-muted-foreground">Browse available items</p>
@@ -177,7 +209,7 @@ const Marketplace: React.FC = () => {
             placeholder="Search items..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full"
+            className="w-full transition-all focus:ring-2 focus:ring-zwm-primary focus:border-transparent"
           />
         </div>
         <div className="w-full md:w-1/3">
@@ -185,7 +217,7 @@ const Marketplace: React.FC = () => {
             value={selectedCategory}
             onValueChange={(value) => setSelectedCategory(value as ItemCategory | 'all')}
           >
-            <SelectTrigger>
+            <SelectTrigger className="transition-all">
               <SelectValue placeholder="Filter by category" />
             </SelectTrigger>
             <SelectContent>
@@ -201,55 +233,137 @@ const Marketplace: React.FC = () => {
       </div>
 
       {filteredItems.length === 0 ? (
-        <div className="text-center py-12">
+        <div className="text-center py-12 animate-fade-in">
+          <AlertCircle className="mx-auto h-12 w-12 text-gray-400 mb-3" />
           <h3 className="text-lg font-medium">No items found</h3>
           <p className="text-muted-foreground">Try adjusting your search or filters</p>
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {filteredItems.map((item) => (
-            <Card key={item.id} className="overflow-hidden flex flex-col">
-              <div className="aspect-video w-full overflow-hidden">
-                <img
-                  src={item.imageUrl}
-                  alt={item.name}
-                  className="w-full h-full object-cover transition-all hover:scale-105"
-                />
-              </div>
-              <CardHeader>
-                <div className="flex justify-between items-start">
-                  <CardTitle>{item.name}</CardTitle>
-                  <Badge className="bg-zwm-primary hover:bg-zwm-secondary">
-                    {item.category.charAt(0).toUpperCase() + item.category.slice(1)}
-                  </Badge>
+          {filteredItems.map((item) => {
+            const discountPercent = getDiscountPercentage(item.originalPrice, item.currentPrice);
+            const isItemNearExpiry = isNearExpiry(item.expiryDate);
+            const daysUntilExpiry = getDaysUntilExpiry(item.expiryDate);
+            
+            return (
+              <Card key={item.id} className="overflow-hidden flex flex-col card-hover">
+                <div className="aspect-video w-full overflow-hidden relative">
+                  <img
+                    src={item.imageUrl}
+                    alt={item.name}
+                    className="w-full h-full object-cover transition-all hover:scale-105 duration-300"
+                  />
+                  {discountPercent > 0 && (
+                    <div className="absolute top-2 left-2 bg-zwm-primary text-white rounded-full px-2 py-1 text-xs font-bold animate-pulse-slow">
+                      {discountPercent}% OFF
+                    </div>
+                  )}
+                  {isItemNearExpiry && (
+                    <div className="absolute bottom-2 right-2 bg-zwm-warning/90 text-white rounded-full px-3 py-1 text-xs font-bold flex items-center gap-1">
+                      <Clock className="h-3 w-3" /> 
+                      {daysUntilExpiry === 0 ? 'Expires today!' : `${daysUntilExpiry} days left`}
+                    </div>
+                  )}
                 </div>
-              </CardHeader>
-              <CardContent className="flex-grow">
-                <p className="text-muted-foreground line-clamp-2">{item.description}</p>
-                <div className="mt-4 space-y-2">
-                  <div className="flex items-center text-sm">
-                    <span className="font-medium mr-2">Location:</span>
-                    <span className="text-muted-foreground">{item.location.address}</span>
+                <CardHeader>
+                  <div className="flex justify-between items-start">
+                    <CardTitle>{item.name}</CardTitle>
+                    <Badge className="bg-zwm-primary hover:bg-zwm-secondary transition-colors">
+                      {item.category.charAt(0).toUpperCase() + item.category.slice(1)}
+                    </Badge>
                   </div>
-                  <div className="flex items-center text-sm">
-                    <span className="font-medium mr-2">Expires:</span>
-                    <span className="text-muted-foreground">{formatDate(item.expiryDate)}</span>
+                </CardHeader>
+                <CardContent className="flex-grow">
+                  <p className="text-muted-foreground line-clamp-2">{item.description}</p>
+                  <div className="mt-4 space-y-2">
+                    <div className="flex items-center text-sm gap-1.5">
+                      <MapPin className="h-4 w-4 text-zwm-primary" />
+                      <span className="text-muted-foreground">{item.location.address}</span>
+                    </div>
+                    <div className="flex items-center text-sm gap-1.5">
+                      <Clock className="h-4 w-4 text-zwm-secondary" />
+                      <span className="text-muted-foreground">{formatDate(item.expiryDate)}</span>
+                    </div>
+                    <div className="flex items-center text-sm gap-1.5">
+                      <Contact className="h-4 w-4 text-zwm-accent" />
+                      <span className="text-muted-foreground">{item.userName}</span>
+                    </div>
+                    <div className="flex items-center mt-3 gap-2">
+                      {item.originalPrice !== item.currentPrice && item.originalPrice ? (
+                        <div className="flex items-baseline">
+                          <span className="text-sm line-through text-muted-foreground">
+                            ${item.originalPrice.toFixed(2)}
+                          </span>
+                          <span className="ml-1.5 text-lg font-bold text-zwm-primary">
+                            ${item.currentPrice?.toFixed(2)}
+                          </span>
+                        </div>
+                      ) : (
+                        <span className="text-lg font-bold text-zwm-primary">
+                          ${item.currentPrice?.toFixed(2)}
+                        </span>
+                      )}
+                      <span className="text-sm text-muted-foreground">
+                        • {item.quantity} available
+                      </span>
+                    </div>
                   </div>
-                  <div className="flex items-center text-sm">
-                    <span className="font-medium mr-2">Added by:</span>
-                    <span className="text-muted-foreground">{item.userName}</span>
-                  </div>
-                </div>
-              </CardContent>
-              <CardFooter>
-                <Button variant="default" className="w-full zwm-gradient hover:opacity-90">
-                  Contact
-                </Button>
-              </CardFooter>
-            </Card>
-          ))}
+                </CardContent>
+                <CardFooter>
+                  <Button 
+                    variant="default" 
+                    className="w-full zwm-gradient-hover button-glow transition-all"
+                    onClick={() => handleContact(item)}
+                  >
+                    Contact Seller
+                  </Button>
+                </CardFooter>
+              </Card>
+            );
+          })}
         </div>
       )}
+
+      <Dialog open={!!selectedItem} onOpenChange={(open) => !open && setSelectedItem(null)}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Contact {selectedItem?.userName}</DialogTitle>
+            <DialogDescription>
+              Select how you would like to contact the seller about "{selectedItem?.name}"
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="grid grid-cols-1 gap-4 py-4">
+            <Button 
+              onClick={() => handleContactSend('phone')}
+              variant="outline" 
+              className="w-full flex justify-center items-center gap-2 py-6 hover:bg-zwm-primary/10 transition-all"
+            >
+              <Phone className="h-5 w-5 text-zwm-primary" />
+              <span>Call Seller</span>
+            </Button>
+            
+            <Button 
+              onClick={() => handleContactSend('email')}
+              variant="outline" 
+              className="w-full flex justify-center items-center gap-2 py-6 hover:bg-zwm-secondary/10 transition-all"
+            >
+              <Mail className="h-5 w-5 text-zwm-secondary" />
+              <span>Email Seller</span>
+            </Button>
+          </div>
+          
+          <DialogFooter>
+            <Button 
+              variant="outline" 
+              onClick={() => setSelectedItem(null)}
+              className="w-full sm:w-auto"
+            >
+              Cancel
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

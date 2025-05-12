@@ -1,11 +1,11 @@
 
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { z } from 'zod';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { format } from 'date-fns';
-import { CalendarIcon } from 'lucide-react';
+import { CalendarIcon, Barcode, X, Scan } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
 import {
@@ -31,6 +31,13 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from '@/components/ui/popover';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import { cn } from '@/lib/utils';
 import { ItemCategory } from '@/types';
 import { toast } from 'sonner';
@@ -49,23 +56,50 @@ const formSchema = z.object({
   address: z.string().min(5, {
     message: 'Address must be at least 5 characters.',
   }),
+  originalPrice: z.number().optional(),
+  currentPrice: z.number().optional(),
+  quantity: z.number().optional(),
 });
 
-const categories: { value: ItemCategory; label: string }[] = [
+const foodCategories: { value: ItemCategory; label: string }[] = [
   { value: 'food', label: 'Food' },
-  { value: 'clothing', label: 'Clothing' },
-  { value: 'electronics', label: 'Electronics' },
-  { value: 'furniture', label: 'Furniture' },
   { value: 'household', label: 'Household' },
-  { value: 'books', label: 'Books' },
-  { value: 'toys', label: 'Toys' },
   { value: 'other', label: 'Other' },
 ];
+
+// Mock barcode data for demonstration
+const barcodeDatabase = {
+  '9780140157376': {
+    name: 'Organic Milk',
+    description: 'Fresh organic milk from local farms',
+    category: 'food',
+    originalPrice: 4.99,
+    currentPrice: 3.99,
+  },
+  '7350053850019': {
+    name: 'Whole Wheat Bread',
+    description: 'Freshly baked whole wheat bread',
+    category: 'food',
+    originalPrice: 3.49,
+    currentPrice: 2.99,
+  },
+  '5901234123457': {
+    name: 'Bananas (Bunch)',
+    description: 'Organic fair trade bananas',
+    category: 'food',
+    originalPrice: 2.99,
+    currentPrice: 2.49,
+  }
+};
 
 const AddItem: React.FC = () => {
   const navigate = useNavigate();
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isScanning, setIsScanning] = useState(false);
+  const [barcodeResult, setBarcodeResult] = useState<string | null>(null);
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const scannerIntervalRef = useRef<number | null>(null);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -73,6 +107,9 @@ const AddItem: React.FC = () => {
       name: '',
       description: '',
       address: '',
+      originalPrice: undefined,
+      currentPrice: undefined,
+      quantity: 1,
     },
   });
 
@@ -85,6 +122,61 @@ const AddItem: React.FC = () => {
       };
       reader.readAsDataURL(file);
     }
+  };
+
+  const startScanner = async () => {
+    setIsScanning(true);
+    
+    try {
+      if (videoRef.current) {
+        const stream = await navigator.mediaDevices.getUserMedia({ 
+          video: { facingMode: 'environment' } 
+        });
+        videoRef.current.srcObject = stream;
+        
+        // In a real app, we would use a real barcode scanning library
+        // For demo purposes, we'll simulate a successful scan after 3 seconds
+        setTimeout(() => {
+          // Pick a random barcode from our mock database
+          const barcodes = Object.keys(barcodeDatabase);
+          const randomBarcode = barcodes[Math.floor(Math.random() * barcodes.length)];
+          setBarcodeResult(randomBarcode);
+          
+          if (randomBarcode && barcodeDatabase[randomBarcode as keyof typeof barcodeDatabase]) {
+            const item = barcodeDatabase[randomBarcode as keyof typeof barcodeDatabase];
+            form.setValue('name', item.name);
+            form.setValue('description', item.description);
+            form.setValue('category', item.category as any);
+            form.setValue('originalPrice', item.originalPrice);
+            form.setValue('currentPrice', item.currentPrice);
+            
+            toast.success(`Scanned item: ${item.name}`);
+          }
+          
+          stopScanner();
+        }, 3000);
+      }
+    } catch (error) {
+      console.error('Error accessing camera:', error);
+      toast.error('Could not access camera. Please check permissions.');
+      setIsScanning(false);
+    }
+  };
+
+  const stopScanner = () => {
+    if (videoRef.current && videoRef.current.srcObject) {
+      const stream = videoRef.current.srcObject as MediaStream;
+      const tracks = stream.getTracks();
+      tracks.forEach(track => track.stop());
+      videoRef.current.srcObject = null;
+    }
+    
+    if (scannerIntervalRef.current) {
+      clearInterval(scannerIntervalRef.current);
+      scannerIntervalRef.current = null;
+    }
+    
+    setIsScanning(false);
   };
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
@@ -109,30 +201,95 @@ const AddItem: React.FC = () => {
   };
 
   return (
-    <div className="max-w-3xl mx-auto">
+    <div className="max-w-3xl mx-auto animate-fade-in">
       <div className="mb-8">
         <h1 className="text-3xl font-bold">Add New Item</h1>
         <p className="text-muted-foreground">List an item for donation or discount</p>
       </div>
 
-      <div className="bg-white p-6 rounded-lg shadow-sm border">
+      <div className="bg-white p-6 rounded-lg shadow-sm border card-hover">
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="space-y-6">
-                <FormField
-                  control={form.control}
-                  name="name"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Item Name</FormLabel>
-                      <FormControl>
-                        <Input placeholder="Enter item name" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+                <div className="flex items-center gap-2">
+                  <FormField
+                    control={form.control}
+                    name="name"
+                    render={({ field }) => (
+                      <FormItem className="flex-1">
+                        <FormLabel>Item Name</FormLabel>
+                        <FormControl>
+                          <Input placeholder="Enter item name" {...field} className="transition-all" />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  
+                  <Dialog>
+                    <DialogTrigger asChild>
+                      <Button 
+                        type="button" 
+                        variant="outline" 
+                        className="mt-8 button-glow"
+                        title="Scan Barcode"
+                      >
+                        <Barcode className="h-4 w-4" />
+                      </Button>
+                    </DialogTrigger>
+                    <DialogContent className="sm:max-w-md">
+                      <DialogHeader>
+                        <DialogTitle>Scan Barcode</DialogTitle>
+                      </DialogHeader>
+                      <div className="flex flex-col items-center justify-center space-y-4">
+                        {isScanning ? (
+                          <div className="relative w-full aspect-video bg-black rounded-md overflow-hidden">
+                            <video 
+                              ref={videoRef} 
+                              className="w-full h-full object-cover"
+                              autoPlay 
+                              playsInline
+                            />
+                            <div className="absolute inset-0 flex items-center justify-center">
+                              <div className="w-2/3 h-1/3 border-2 border-zwm-primary animate-pulse-slow opacity-70"></div>
+                              <div className="absolute top-1/2 left-0 w-full h-0.5 bg-zwm-primary opacity-70"></div>
+                            </div>
+                            <Button 
+                              type="button"
+                              variant="outline" 
+                              size="sm" 
+                              className="absolute top-2 right-2 bg-white/80"
+                              onClick={stopScanner}
+                            >
+                              <X className="h-4 w-4" />
+                            </Button>
+                          </div>
+                        ) : (
+                          <div className="flex flex-col items-center space-y-4 p-8">
+                            <Scan className="h-16 w-16 text-zwm-primary animate-pulse-slow" />
+                            <p className="text-center text-sm text-muted-foreground">
+                              Position the barcode in front of your camera to scan automatically
+                            </p>
+                            <Button 
+                              type="button"
+                              onClick={startScanner}
+                              className="zwm-gradient hover:opacity-90"
+                            >
+                              Start Scanner
+                            </Button>
+                          </div>
+                        )}
+                        
+                        {barcodeResult && (
+                          <div className="text-center p-2 bg-muted rounded w-full">
+                            <p className="text-sm font-semibold">Barcode detected: {barcodeResult}</p>
+                          </div>
+                        )}
+                      </div>
+                    </DialogContent>
+                  </Dialog>
+                </div>
 
                 <FormField
                   control={form.control}
@@ -145,12 +302,12 @@ const AddItem: React.FC = () => {
                         defaultValue={field.value}
                       >
                         <FormControl>
-                          <SelectTrigger>
+                          <SelectTrigger className="transition-all">
                             <SelectValue placeholder="Select a category" />
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
-                          {categories.map((category) => (
+                          {foodCategories.map((category) => (
                             <SelectItem key={category.value} value={category.value}>
                               {category.label}
                             </SelectItem>
@@ -174,7 +331,7 @@ const AddItem: React.FC = () => {
                             <Button
                               variant={"outline"}
                               className={cn(
-                                "w-full pl-3 text-left font-normal",
+                                "w-full pl-3 text-left font-normal transition-all",
                                 !field.value && "text-muted-foreground"
                               )}
                             >
@@ -210,7 +367,72 @@ const AddItem: React.FC = () => {
                     <FormItem>
                       <FormLabel>Location</FormLabel>
                       <FormControl>
-                        <Input placeholder="Enter address" {...field} />
+                        <Input placeholder="Enter address" {...field} className="transition-all" />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <div className="grid grid-cols-2 gap-4">
+                  <FormField
+                    control={form.control}
+                    name="originalPrice"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Original Price ($)</FormLabel>
+                        <FormControl>
+                          <Input 
+                            type="number" 
+                            step="0.01"
+                            placeholder="0.00" 
+                            onChange={e => field.onChange(parseFloat(e.target.value) || undefined)} 
+                            value={field.value === undefined ? '' : field.value}
+                            className="transition-all"
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name="currentPrice"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Discounted Price ($)</FormLabel>
+                        <FormControl>
+                          <Input 
+                            type="number" 
+                            step="0.01" 
+                            placeholder="0.00" 
+                            onChange={e => field.onChange(parseFloat(e.target.value) || undefined)} 
+                            value={field.value === undefined ? '' : field.value}
+                            className="transition-all" 
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+
+                <FormField
+                  control={form.control}
+                  name="quantity"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Quantity</FormLabel>
+                      <FormControl>
+                        <Input 
+                          type="number" 
+                          min="1" 
+                          placeholder="1" 
+                          onChange={e => field.onChange(parseInt(e.target.value) || undefined)} 
+                          value={field.value === undefined ? '' : field.value}
+                          className="transition-all" 
+                        />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -228,7 +450,7 @@ const AddItem: React.FC = () => {
                       <FormControl>
                         <Textarea 
                           placeholder="Enter a detailed description of the item" 
-                          className="h-32"
+                          className="h-32 transition-all"
                           {...field} 
                         />
                       </FormControl>
@@ -239,19 +461,19 @@ const AddItem: React.FC = () => {
 
                 <div className="space-y-2">
                   <FormLabel>Item Image</FormLabel>
-                  <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center">
+                  <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center transition-all hover:border-zwm-primary">
                     {imagePreview ? (
                       <div className="relative">
                         <img
                           src={imagePreview}
                           alt="Preview"
-                          className="mx-auto h-48 object-cover rounded-md"
+                          className="mx-auto h-48 object-cover rounded-md animate-fade-in"
                         />
                         <Button
                           type="button"
                           variant="outline"
                           size="sm"
-                          className="absolute top-2 right-2 bg-white"
+                          className="absolute top-2 right-2 bg-white/80 hover:bg-white transition-colors"
                           onClick={() => setImagePreview(null)}
                         >
                           Remove
@@ -259,7 +481,7 @@ const AddItem: React.FC = () => {
                       </div>
                     ) : (
                       <>
-                        <div className="text-gray-500 mb-2">
+                        <div className="text-zwm-primary mb-2 animate-float">
                           <svg className="mx-auto h-12 w-12" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
                           </svg>
@@ -280,7 +502,7 @@ const AddItem: React.FC = () => {
                         <Button
                           type="button"
                           variant="outline"
-                          className="mt-4"
+                          className="mt-4 transition-all hover:border-zwm-primary"
                           onClick={() => document.getElementById('image-upload')?.click()}
                         >
                           Select Image
@@ -298,12 +520,13 @@ const AddItem: React.FC = () => {
                 variant="outline"
                 onClick={() => navigate('/dashboard')}
                 disabled={isSubmitting}
+                className="transition-all hover:bg-gray-100"
               >
                 Cancel
               </Button>
               <Button 
                 type="submit" 
-                className="zwm-gradient hover:opacity-90 transition-opacity"
+                className="zwm-gradient-hover transition-all"
                 disabled={isSubmitting}
               >
                 {isSubmitting ? 'Adding...' : 'Add Item'}
