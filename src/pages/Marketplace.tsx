@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { Item, ItemCategory } from '@/types';
+import { Item } from '@/types';
 import { 
   Card, 
   CardContent, 
@@ -12,7 +12,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { AlertCircle, Phone, Mail, MapPin, Clock, Contact, IndianRupee, PillBottle } from 'lucide-react';
+import { AlertCircle, Phone, Mail, MapPin, Clock, Contact, PillBottle } from 'lucide-react';
 import {
   Dialog,
   DialogContent,
@@ -24,9 +24,13 @@ import {
 } from "@/components/ui/dialog";
 import { differenceInDays } from 'date-fns';
 import { toast } from 'sonner';
+import { motion } from 'framer-motion';
+
+// Use this for type definitions
+type ItemCategory = 'food' | 'clothing' | 'electronics' | 'furniture' | 'household' | 'books' | 'toys' | 'other' | 'medicine';
 
 // Mock data for marketplace items - including food, household items, and medicines
-const mockItems: Item[] = [
+const mockItems: (Item & { category: ItemCategory })[] = [
   {
     id: '1',
     name: 'Canned Vegetables',
@@ -260,6 +264,10 @@ const Marketplace: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<ItemCategory | 'all'>('all');
   const [selectedItem, setSelectedItem] = useState<Item | null>(null);
+  const [hoveredItemId, setHoveredItemId] = useState<string | null>(null);
+  const [contactDialogOpen, setContactDialogOpen] = useState(false);
+  const [viewDetailsOpen, setViewDetailsOpen] = useState(false);
+  const [contactDetails, setContactDetails] = useState({ phone: '', email: '' });
 
   const filteredItems = mockItems.filter(item => {
     const matchesSearch = searchQuery === '' || 
@@ -299,13 +307,25 @@ const Marketplace: React.FC = () => {
 
   const handleContact = (item: Item) => {
     setSelectedItem(item);
+    setContactDetails({
+      phone: `+91 ${Math.floor(1000000000 + Math.random() * 9000000000)}`,
+      email: `${item.userName.toLowerCase().replace(' ', '.')}@example.com`
+    });
+    setContactDialogOpen(true);
   };
 
   const handleContactSend = (method: 'phone' | 'email') => {
     if (selectedItem) {
-      toast.success(`Contact request sent to ${selectedItem.userName} via ${method}`);
-      setSelectedItem(null);
+      toast.success(`Contact request sent to ${selectedItem.userName} via ${method}`, {
+        description: method === 'phone' ? `Connecting to ${contactDetails.phone}` : `Email sent to ${contactDetails.email}`,
+      });
+      setContactDialogOpen(false);
     }
+  };
+
+  const handleViewDetails = (item: Item) => {
+    setSelectedItem(item);
+    setViewDetailsOpen(true);
   };
 
   const getCategoryIcon = (category: string) => {
@@ -315,14 +335,45 @@ const Marketplace: React.FC = () => {
     return null;
   };
 
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: { 
+      opacity: 1,
+      transition: { staggerChildren: 0.1 }
+    }
+  };
+
+  const itemVariants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: { 
+      opacity: 1, 
+      y: 0,
+      transition: { type: "spring", stiffness: 300, damping: 24 }
+    },
+    hover: { 
+      y: -5, 
+      boxShadow: "0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)",
+      transition: { type: "spring", stiffness: 400, damping: 10 }
+    }
+  };
+
   return (
     <div className="space-y-6 animate-fade-in">
-      <div>
+      <motion.div 
+        initial={{ opacity: 0, y: -20 }} 
+        animate={{ opacity: 1, y: 0 }} 
+        transition={{ duration: 0.5 }}
+      >
         <h1 className="text-3xl font-bold">Marketplace</h1>
         <p className="text-muted-foreground">Browse available items</p>
-      </div>
+      </motion.div>
 
-      <div className="flex flex-col md:flex-row gap-4">
+      <motion.div 
+        className="flex flex-col md:flex-row gap-4"
+        initial={{ opacity: 0, y: 20 }} 
+        animate={{ opacity: 1, y: 0 }} 
+        transition={{ duration: 0.5, delay: 0.2 }}
+      >
         <div className="w-full md:w-2/3">
           <Input
             placeholder="Search items..."
@@ -349,102 +400,148 @@ const Marketplace: React.FC = () => {
             </SelectContent>
           </Select>
         </div>
-      </div>
+      </motion.div>
 
       {filteredItems.length === 0 ? (
-        <div className="text-center py-12 animate-fade-in">
+        <motion.div 
+          className="text-center py-12 animate-fade-in"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.5, delay: 0.3 }}
+        >
           <AlertCircle className="mx-auto h-12 w-12 text-gray-400 mb-3" />
           <h3 className="text-lg font-medium">No items found</h3>
           <p className="text-muted-foreground">Try adjusting your search or filters</p>
-        </div>
+        </motion.div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <motion.div 
+          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
+          variants={containerVariants}
+          initial="hidden"
+          animate="visible"
+        >
           {filteredItems.map((item) => {
             const discountPercent = getDiscountPercentage(item.originalPrice, item.currentPrice);
             const isItemNearExpiry = isNearExpiry(item.expiryDate);
             const daysUntilExpiry = getDaysUntilExpiry(item.expiryDate);
+            const isHovered = hoveredItemId === item.id;
             
             return (
-              <Card key={item.id} className="overflow-hidden flex flex-col card-hover animate-fade-in hover:shadow-lg transition-all duration-300 hover:-translate-y-1">
-                <div className="aspect-video w-full overflow-hidden relative">
-                  <img
-                    src={item.imageUrl}
-                    alt={item.name}
-                    className="w-full h-full object-cover transition-all hover:scale-105 duration-300"
-                  />
-                  {discountPercent > 0 && (
-                    <div className="absolute top-2 left-2 bg-zwm-primary text-white rounded-full px-2 py-1 text-xs font-bold animate-pulse-slow">
-                      {discountPercent}% OFF
-                    </div>
-                  )}
-                  {isItemNearExpiry && (
-                    <div className="absolute bottom-2 right-2 bg-zwm-warning/90 text-white rounded-full px-3 py-1 text-xs font-bold flex items-center gap-1">
-                      <Clock className="h-3 w-3" /> 
-                      {daysUntilExpiry === 0 ? 'Expires today!' : `${daysUntilExpiry} days left`}
-                    </div>
-                  )}
-                </div>
-                <CardHeader>
-                  <div className="flex justify-between items-start">
-                    <CardTitle>{item.name}</CardTitle>
-                    <Badge className={`flex items-center ${item.category === 'medicine' ? 'bg-blue-500' : item.category === 'food' ? 'bg-green-500' : 'bg-amber-500'} hover:bg-opacity-90 transition-colors`}>
-                      {getCategoryIcon(item.category)}
-                      {item.category.charAt(0).toUpperCase() + item.category.slice(1)}
-                    </Badge>
-                  </div>
-                </CardHeader>
-                <CardContent className="flex-grow">
-                  <p className="text-muted-foreground line-clamp-2">{item.description}</p>
-                  <div className="mt-4 space-y-2">
-                    <div className="flex items-center text-sm gap-1.5">
-                      <MapPin className="h-4 w-4 text-zwm-primary" />
-                      <span className="text-muted-foreground">{item.location.address}</span>
-                    </div>
-                    <div className="flex items-center text-sm gap-1.5">
-                      <Clock className="h-4 w-4 text-zwm-secondary" />
-                      <span className="text-muted-foreground">{formatDate(item.expiryDate)}</span>
-                    </div>
-                    <div className="flex items-center text-sm gap-1.5">
-                      <Contact className="h-4 w-4 text-zwm-accent" />
-                      <span className="text-muted-foreground">{item.userName}</span>
-                    </div>
-                    <div className="flex items-center mt-3 gap-2">
-                      {item.originalPrice !== item.currentPrice && item.originalPrice ? (
-                        <div className="flex items-baseline">
-                          <span className="text-sm line-through text-muted-foreground flex items-center">
-                            <IndianRupee className="h-3 w-3 mr-0.5" />{item.originalPrice.toFixed(2)}
-                          </span>
-                          <span className="ml-1.5 text-lg font-bold text-zwm-primary flex items-center">
-                            <IndianRupee className="h-3.5 w-3.5 mr-0.5" />{item.currentPrice?.toFixed(2)}
-                          </span>
-                        </div>
-                      ) : (
-                        <span className="text-lg font-bold text-zwm-primary flex items-center">
-                          <IndianRupee className="h-3.5 w-3.5 mr-0.5" />{item.currentPrice?.toFixed(2)}
-                        </span>
-                      )}
-                      <span className="text-sm text-muted-foreground">
-                        • {item.quantity} available
-                      </span>
-                    </div>
-                  </div>
-                </CardContent>
-                <CardFooter>
-                  <Button 
-                    variant="default" 
-                    className="w-full zwm-gradient-hover button-glow transition-all"
-                    onClick={() => handleContact(item)}
+              <motion.div
+                key={item.id}
+                variants={itemVariants}
+                whileHover="hover"
+                onMouseEnter={() => setHoveredItemId(item.id)}
+                onMouseLeave={() => setHoveredItemId(null)}
+              >
+                <Card className="overflow-hidden flex flex-col card-hover hover:shadow-lg transition-all duration-300">
+                  <div 
+                    className="aspect-video w-full overflow-hidden relative cursor-pointer"
+                    onClick={() => handleViewDetails(item)}
                   >
-                    Contact Seller
-                  </Button>
-                </CardFooter>
-              </Card>
+                    <motion.img
+                      src={item.imageUrl}
+                      alt={item.name}
+                      className="w-full h-full object-cover"
+                      animate={{ scale: isHovered ? 1.05 : 1 }}
+                      transition={{ duration: 0.3 }}
+                    />
+                    {discountPercent > 0 && (
+                      <div className="absolute top-2 left-2 bg-zwm-primary text-white rounded-full px-2 py-1 text-xs font-bold animate-pulse-slow">
+                        {discountPercent}% OFF
+                      </div>
+                    )}
+                    {isItemNearExpiry && (
+                      <div className="absolute bottom-2 right-2 bg-zwm-warning/90 text-white rounded-full px-3 py-1 text-xs font-bold flex items-center gap-1">
+                        <Clock className="h-3 w-3" /> 
+                        {daysUntilExpiry === 0 ? 'Expires today!' : `${daysUntilExpiry} days left`}
+                      </div>
+                    )}
+                  </div>
+                  <CardHeader>
+                    <div className="flex justify-between items-start">
+                      <CardTitle className="cursor-pointer hover:text-zwm-primary transition-colors" onClick={() => handleViewDetails(item)}>
+                        {item.name}
+                      </CardTitle>
+                      <Badge className={`flex items-center ${item.category === 'medicine' ? 'bg-blue-500' : item.category === 'food' ? 'bg-green-500' : 'bg-amber-500'} hover:bg-opacity-90 transition-colors`}>
+                        {getCategoryIcon(item.category)}
+                        {item.category.charAt(0).toUpperCase() + item.category.slice(1)}
+                      </Badge>
+                    </div>
+                  </CardHeader>
+                  <CardContent className="flex-grow">
+                    <p className="text-muted-foreground line-clamp-2">{item.description}</p>
+                    <div className="mt-4 space-y-2">
+                      <motion.button 
+                        className="flex items-center text-sm gap-1.5 w-full text-left hover:text-zwm-primary transition-colors"
+                        whileHover={{ x: 3 }}
+                        onClick={() => {
+                          navigator.clipboard.writeText(item.location.address);
+                          toast.success("Address copied to clipboard");
+                        }}
+                      >
+                        <MapPin className="h-4 w-4 text-zwm-primary" />
+                        <span className="text-muted-foreground">{item.location.address}</span>
+                      </motion.button>
+                      <div className="flex items-center text-sm gap-1.5">
+                        <Clock className="h-4 w-4 text-zwm-secondary" />
+                        <span className="text-muted-foreground">{formatDate(item.expiryDate)}</span>
+                      </div>
+                      <button 
+                        className="flex items-center text-sm gap-1.5 w-full text-left hover:text-zwm-primary transition-colors"
+                        onClick={() => handleContact(item)}
+                      >
+                        <Contact className="h-4 w-4 text-zwm-accent" />
+                        <span className="text-muted-foreground">{item.userName}</span>
+                      </button>
+                      <div className="flex items-center mt-3 gap-2">
+                        {item.originalPrice !== item.currentPrice && item.originalPrice ? (
+                          <div className="flex items-baseline">
+                            <span className="text-sm line-through text-muted-foreground flex items-center">
+                              ₹{item.originalPrice.toFixed(2)}
+                            </span>
+                            <span className="ml-1.5 text-lg font-bold text-zwm-primary flex items-center">
+                              ₹{item.currentPrice?.toFixed(2)}
+                            </span>
+                          </div>
+                        ) : (
+                          <span className="text-lg font-bold text-zwm-primary flex items-center">
+                            ₹{item.currentPrice?.toFixed(2)}
+                          </span>
+                        )}
+                        <button 
+                          onClick={() => toast.info(`${item.quantity} ${item.name} available from ${item.userName}`)}
+                          className="text-sm text-muted-foreground hover:text-zwm-primary transition-colors"
+                        >
+                          • {item.quantity} available
+                        </button>
+                      </div>
+                    </div>
+                  </CardContent>
+                  <CardFooter>
+                    <motion.div 
+                      className="w-full"
+                      whileHover={{ scale: 1.02 }}
+                      whileTap={{ scale: 0.98 }}
+                    >
+                      <Button 
+                        variant="default" 
+                        className="w-full zwm-gradient-hover button-glow transition-all"
+                        onClick={() => handleContact(item)}
+                      >
+                        Contact Seller
+                      </Button>
+                    </motion.div>
+                  </CardFooter>
+                </Card>
+              </motion.div>
             );
           })}
-        </div>
+        </motion.div>
       )}
 
-      <Dialog open={!!selectedItem} onOpenChange={(open) => !open && setSelectedItem(null)}>
+      {/* Contact Dialog */}
+      <Dialog open={contactDialogOpen} onOpenChange={setContactDialogOpen}>
         <DialogContent className="sm:max-w-md animate-scale-in">
           <DialogHeader>
             <DialogTitle>Contact {selectedItem?.userName}</DialogTitle>
@@ -454,32 +551,149 @@ const Marketplace: React.FC = () => {
           </DialogHeader>
           
           <div className="grid grid-cols-1 gap-4 py-4">
-            <Button 
-              onClick={() => handleContactSend('phone')}
-              variant="outline" 
-              className="w-full flex justify-center items-center gap-2 py-6 hover:bg-zwm-primary/10 transition-all"
+            <motion.div 
+              whileHover={{ scale: 1.02 }} 
+              whileTap={{ scale: 0.98 }}
             >
-              <Phone className="h-5 w-5 text-zwm-primary" />
-              <span>Call Seller</span>
-            </Button>
+              <Button 
+                onClick={() => handleContactSend('phone')}
+                variant="outline" 
+                className="w-full flex justify-between items-center gap-2 py-6 hover:bg-zwm-primary/10 transition-all"
+              >
+                <div className="flex items-center gap-2">
+                  <Phone className="h-5 w-5 text-zwm-primary" />
+                  <span>Call Seller</span>
+                </div>
+                {contactDetails.phone && (
+                  <span className="text-sm text-muted-foreground">{contactDetails.phone}</span>
+                )}
+              </Button>
+            </motion.div>
             
-            <Button 
-              onClick={() => handleContactSend('email')}
-              variant="outline" 
-              className="w-full flex justify-center items-center gap-2 py-6 hover:bg-zwm-secondary/10 transition-all"
+            <motion.div 
+              whileHover={{ scale: 1.02 }} 
+              whileTap={{ scale: 0.98 }}
             >
-              <Mail className="h-5 w-5 text-zwm-secondary" />
-              <span>Email Seller</span>
-            </Button>
+              <Button 
+                onClick={() => handleContactSend('email')}
+                variant="outline" 
+                className="w-full flex justify-between items-center gap-2 py-6 hover:bg-zwm-secondary/10 transition-all"
+              >
+                <div className="flex items-center gap-2">
+                  <Mail className="h-5 w-5 text-zwm-secondary" />
+                  <span>Email Seller</span>
+                </div>
+                {contactDetails.email && (
+                  <span className="text-sm text-muted-foreground">{contactDetails.email}</span>
+                )}
+              </Button>
+            </motion.div>
           </div>
           
           <DialogFooter>
             <Button 
               variant="outline" 
-              onClick={() => setSelectedItem(null)}
+              onClick={() => setContactDialogOpen(false)}
               className="w-full sm:w-auto"
             >
               Cancel
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* View Details Dialog */}
+      <Dialog open={viewDetailsOpen} onOpenChange={setViewDetailsOpen}>
+        <DialogContent className="sm:max-w-3xl">
+          <DialogHeader>
+            <DialogTitle>{selectedItem?.name}</DialogTitle>
+            <DialogDescription>
+              Item details and information
+            </DialogDescription>
+          </DialogHeader>
+          
+          {selectedItem && (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <motion.div 
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.3 }}
+                className="aspect-square w-full overflow-hidden rounded-md"
+              >
+                <img
+                  src={selectedItem.imageUrl}
+                  alt={selectedItem.name}
+                  className="w-full h-full object-cover"
+                />
+              </motion.div>
+              
+              <motion.div 
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.3 }}
+                className="space-y-4"
+              >
+                <div className="flex justify-between items-start">
+                  <h3 className="text-xl font-bold">{selectedItem.name}</h3>
+                  <Badge className={`${selectedItem.category === 'medicine' ? 'bg-blue-500' : selectedItem.category === 'food' ? 'bg-green-500' : 'bg-amber-500'}`}>
+                    {selectedItem.category.charAt(0).toUpperCase() + selectedItem.category.slice(1)}
+                  </Badge>
+                </div>
+                
+                <p className="text-gray-600">{selectedItem.description}</p>
+                
+                <div className="space-y-2">
+                  <div className="flex items-center gap-2">
+                    <MapPin className="h-4 w-4 text-zwm-primary" />
+                    <span>{selectedItem.location.address}</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Clock className="h-4 w-4 text-zwm-secondary" />
+                    <span>Expires on {formatDate(selectedItem.expiryDate)}</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Contact className="h-4 w-4 text-zwm-accent" />
+                    <span>Sold by {selectedItem.userName}</span>
+                  </div>
+                </div>
+                
+                <div className="pt-2">
+                  <p className="text-sm text-gray-500">Pricing</p>
+                  <div className="flex items-center gap-4">
+                    {selectedItem.originalPrice !== selectedItem.currentPrice && (
+                      <span className="text-lg line-through text-gray-400">₹{selectedItem.originalPrice.toFixed(2)}</span>
+                    )}
+                    <span className="text-2xl font-bold text-zwm-primary">₹{selectedItem.currentPrice.toFixed(2)}</span>
+                  </div>
+                  <p className="text-sm text-gray-500 mt-2">{selectedItem.quantity} items available</p>
+                </div>
+                
+                <motion.div 
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                  className="pt-4"
+                >
+                  <Button 
+                    onClick={() => {
+                      setViewDetailsOpen(false);
+                      handleContact(selectedItem);
+                    }}
+                    className="w-full zwm-gradient-hover"
+                  >
+                    Contact Seller
+                  </Button>
+                </motion.div>
+              </motion.div>
+            </div>
+          )}
+          
+          <DialogFooter>
+            <Button 
+              variant="outline" 
+              onClick={() => setViewDetailsOpen(false)}
+              className="w-full sm:w-auto"
+            >
+              Close
             </Button>
           </DialogFooter>
         </DialogContent>
