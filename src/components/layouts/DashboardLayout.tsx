@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Outlet, Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
@@ -16,12 +17,16 @@ import {
   Store,
   ChevronLeft,
   ChevronRight,
-  Bell
+  Bell,
+  User,
+  IndianRupee,
+  Medicine
 } from 'lucide-react';
 import { toast } from 'sonner';
 import NotificationCenter from '@/components/NotificationCenter';
 import ChatBot from '@/components/ChatBot';
 import Logo from '@/components/ui/logo';
+import { motion } from 'framer-motion';
 
 const DashboardLayout: React.FC = () => {
   const { currentUser, logout } = useAuth();
@@ -51,7 +56,7 @@ const DashboardLayout: React.FC = () => {
   const sidebarItems = [
     { path: '/dashboard', label: 'Dashboard', icon: <LayoutDashboard size={20} /> },
     { path: '/marketplace', label: 'Marketplace', icon: <ShoppingCart size={20} /> },
-    { path: '/profile', label: 'Profile', icon: <Settings size={20} /> },
+    { path: '/profile', label: 'Profile', icon: <User size={20} /> },
   ];
 
   // Add seller items if user is seller
@@ -88,28 +93,64 @@ const DashboardLayout: React.FC = () => {
       icon: <Settings size={20} /> 
     });
   }
+  
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: { 
+      opacity: 1,
+      transition: { 
+        staggerChildren: 0.05,
+      } 
+    }
+  };
+
+  const itemVariants = {
+    hidden: { x: -10, opacity: 0 },
+    visible: { x: 0, opacity: 1 }
+  };
 
   return (
     <div className="flex h-screen bg-gray-50">
       {/* Sidebar */}
-      <aside
+      <motion.aside
         className={`bg-sidebar text-sidebar-foreground transition-all duration-300 ${
           isCollapsed ? 'w-20' : 'w-64'
         }`}
+        initial={{ x: -40, opacity: 0 }}
+        animate={{ x: 0, opacity: 1 }}
+        transition={{ duration: 0.5 }}
       >
         <div className="h-full flex flex-col">
           {/* Logo */}
-          <div className="p-4 flex items-center">
+          <motion.div 
+            className="p-4 flex items-center"
+            initial={{ y: -20, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            transition={{ duration: 0.5, delay: 0.2 }}
+          >
             <Link to="/" className="flex items-center">
               <Logo size={isCollapsed ? 'sm' : 'md'} showText={!isCollapsed} />
             </Link>
-          </div>
+          </motion.div>
 
           {/* Navigation */}
           <nav className="flex-1 pt-6 overflow-y-auto">
-            <ul className="space-y-1 px-3">
+            <motion.ul 
+              className="space-y-1 px-3"
+              variants={containerVariants}
+              initial="hidden"
+              animate="visible"
+            >
               {sidebarItems.map((item, index) => (
-                <li key={index} className="hover-scale">
+                <motion.li 
+                  key={index} 
+                  className="hover-scale"
+                  variants={itemVariants}
+                  whileHover={{ 
+                    scale: 1.05,
+                    transition: { duration: 0.2 } 
+                  }}
+                >
                   <Link
                     to={item.path}
                     className={`flex items-center p-3 rounded-lg hover:bg-sidebar-accent transition-all duration-300 ${
@@ -118,43 +159,59 @@ const DashboardLayout: React.FC = () => {
                   >
                     <div className="text-sidebar-foreground">{item.icon}</div>
                     {!isCollapsed && (
-                      <span className="ml-3">{item.label}</span>
+                      <motion.span 
+                        className="ml-3"
+                        initial={{ opacity: 0, x: -10 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ duration: 0.3 }}
+                      >
+                        {item.label}
+                      </motion.span>
                     )}
                   </Link>
-                </li>
+                </motion.li>
               ))}
-            </ul>
+            </motion.ul>
           </nav>
 
           {/* Logout */}
           <div className="p-4 mt-auto">
-            <button
+            <motion.button
               onClick={handleLogout}
               className="flex items-center p-3 rounded-lg w-full hover:bg-sidebar-accent transition-all duration-300"
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
             >
               <LogOut size={20} className="animate-pulse" />
               {!isCollapsed && <span className="ml-3">Logout</span>}
-            </button>
+            </motion.button>
           </div>
 
           {/* Collapse Button */}
           <div className="p-4">
-            <button
+            <motion.button
               onClick={() => setIsCollapsed(!isCollapsed)}
               className="p-3 rounded-lg w-full flex justify-center hover:bg-sidebar-accent transition-all duration-300"
               aria-label={isCollapsed ? "Expand sidebar" : "Collapse sidebar"}
+              whileHover={{ scale: 1.1 }}
+              whileTap={{ scale: 0.9 }}
             >
               {isCollapsed ? <ChevronRight size={20} /> : <ChevronLeft size={20} />}
-            </button>
+            </motion.button>
           </div>
         </div>
-      </aside>
+      </motion.aside>
 
       {/* Main Content */}
       <div className="flex-1 overflow-auto">
         {/* Header */}
         <header className="bg-white shadow-sm z-10 sticky top-0">
-          <div className="flex justify-between items-center px-6 py-4">
+          <motion.div 
+            className="flex justify-between items-center px-6 py-4"
+            initial={{ y: -20, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            transition={{ duration: 0.5 }}
+          >
             <div className="flex-1">
               <div className="relative w-full max-w-md">
                 <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
@@ -168,15 +225,25 @@ const DashboardLayout: React.FC = () => {
             <div className="flex items-center space-x-4">
               <NotificationCenter />
               
-              <Button 
-                onClick={() => navigate('/items/add')} 
-                className="zwm-gradient-hover shadow-pop"
+              <motion.div
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
               >
-                <Plus className="h-4 w-4 mr-2" /> Add Item
-              </Button>
+                <Button 
+                  onClick={() => navigate('/items/add')} 
+                  className="zwm-gradient-hover shadow-pop"
+                >
+                  <Plus className="h-4 w-4 mr-2" /> Add Item
+                </Button>
+              </motion.div>
               
-              <div className="ml-2 flex items-center">
-                <Avatar className="border-2 border-zwm-primary/20 hover-scale">
+              <motion.div 
+                className="ml-2 flex items-center"
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                onClick={() => navigate('/profile')}
+              >
+                <Avatar className="border-2 border-zwm-primary/20 hover-scale cursor-pointer">
                   <AvatarImage src={currentUser?.photoURL || undefined} />
                   <AvatarFallback className="bg-zwm-primary/10 text-zwm-primary font-medium">{getInitials(currentUser?.displayName)}</AvatarFallback>
                 </Avatar>
@@ -188,9 +255,9 @@ const DashboardLayout: React.FC = () => {
                     </p>
                   )}
                 </div>
-              </div>
+              </motion.div>
             </div>
-          </div>
+          </motion.div>
         </header>
 
         {/* Page Content */}
