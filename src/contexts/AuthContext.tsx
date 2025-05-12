@@ -8,6 +8,7 @@ interface AuthContextType {
   loading: boolean;
   login: (email: string, password: string) => Promise<void>;
   googleLogin: () => Promise<void>;
+  phoneLogin: (phoneNumber: string) => Promise<void>;
   logout: () => Promise<void>;
   register: (email: string, password: string, name: string, businessDetails?: { 
     businessName?: string, 
@@ -82,6 +83,33 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       toast.success("Logged in with Google successfully!");
     } catch (error) {
       toast.error("Failed to log in with Google");
+      throw error;
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const phoneLogin = async (phoneNumber: string) => {
+    try {
+      setLoading(true);
+      // Simulate phone login
+      const mockUser = {
+        id: "phone123",
+        email: null,
+        phoneNumber: phoneNumber,
+        displayName: "Mobile User",
+        photoURL: null,
+        isAdmin: false,
+        isSeller: false,
+        trustScore: undefined,
+        verified: true,  // Phone numbers are considered verified since they received OTP
+      };
+      
+      localStorage.setItem("zwm_user", JSON.stringify(mockUser));
+      setCurrentUser(mockUser);
+      toast.success("Logged in with phone successfully!");
+    } catch (error) {
+      toast.error("Failed to log in with phone");
       throw error;
     } finally {
       setLoading(false);
@@ -202,6 +230,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     loading,
     login,
     googleLogin,
+    phoneLogin,
     logout,
     register,
     resetPassword,

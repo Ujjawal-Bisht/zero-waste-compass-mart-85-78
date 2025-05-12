@@ -26,9 +26,11 @@ import {
 import { toast } from 'sonner';
 import { motion } from 'framer-motion';
 import ReCAPTCHA from 'react-google-recaptcha';
-import { Eye, EyeOff, Mail, Lock } from 'lucide-react';
+import { Eye, EyeOff, Mail, Lock, Smartphone } from 'lucide-react';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import MobileOtpVerification from '@/components/auth/MobileOtpVerification';
 
-const formSchema = z.object({
+const emailFormSchema = z.object({
   email: z.string().email({ message: 'Please enter a valid email address' }),
   password: z.string().min(6, { message: 'Password must be at least 6 characters long' }),
 });
@@ -39,9 +41,10 @@ const Login: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [captchaValue, setCaptchaValue] = useState<string | null>(null);
   const [showPassword, setShowPassword] = useState(false);
+  const [loginMethod, setLoginMethod] = useState<'email' | 'phone'>('email');
 
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
+  const form = useForm<z.infer<typeof emailFormSchema>>({
+    resolver: zodResolver(emailFormSchema),
     defaultValues: {
       email: '',
       password: '',
@@ -52,7 +55,7 @@ const Login: React.FC = () => {
     setCaptchaValue(value);
   };
 
-  const onSubmit = async (values: z.infer<typeof formSchema>) => {
+  const onSubmit = async (values: z.infer<typeof emailFormSchema>) => {
     if (!captchaValue) {
       toast.error('Please verify that you are not a robot');
       return;
@@ -90,6 +93,21 @@ const Login: React.FC = () => {
     }
   };
 
+  const handlePhoneLogin = async (phoneNumber: string) => {
+    try {
+      setIsLoading(true);
+      // Simulate phone authentication login
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      toast.success('Successfully signed in with phone number!');
+      navigate('/dashboard');
+    } catch (error) {
+      console.error('Phone login error:', error);
+      toast.error('Failed to sign in with phone number.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   return (
     <motion.div 
       className="mt-8 sm:mx-auto sm:w-full sm:max-w-md"
@@ -113,112 +131,132 @@ const Login: React.FC = () => {
         </CardHeader>
         
         <CardContent className="relative z-10">
-          <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-5">
-              <FormField
-                control={form.control}
-                name="email"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel className="text-gray-700">Email</FormLabel>
-                    <div className="relative">
-                      <FormControl>
+          <Tabs value={loginMethod} onValueChange={(value) => setLoginMethod(value as 'email' | 'phone')} className="mb-6">
+            <TabsList className="grid w-full grid-cols-2">
+              <TabsTrigger value="email" className="flex items-center gap-2">
+                <Mail size={16} /> Email
+              </TabsTrigger>
+              <TabsTrigger value="phone" className="flex items-center gap-2">
+                <Smartphone size={16} /> Phone
+              </TabsTrigger>
+            </TabsList>
+            
+            <TabsContent value="email">
+              <Form {...form}>
+                <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-5">
+                  <FormField
+                    control={form.control}
+                    name="email"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="text-gray-700">Email</FormLabel>
+                        <div className="relative">
+                          <FormControl>
+                            <div className="relative">
+                              <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                                <Mail className="h-5 w-5 text-gray-400" />
+                              </div>
+                              <Input 
+                                placeholder="you@example.com" 
+                                className="pl-10" 
+                                {...field} 
+                              />
+                            </div>
+                          </FormControl>
+                        </div>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  
+                  <FormField
+                    control={form.control}
+                    name="password"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="text-gray-700">Password</FormLabel>
                         <div className="relative">
                           <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-                            <Mail className="h-5 w-5 text-gray-400" />
+                            <Lock className="h-5 w-5 text-gray-400" />
                           </div>
                           <Input 
-                            placeholder="you@example.com" 
-                            className="pl-10" 
+                            type={showPassword ? "text" : "password"} 
+                            placeholder="******" 
+                            className="pl-10 pr-10" 
                             {...field} 
                           />
+                          <div 
+                            className="absolute inset-y-0 right-0 flex items-center pr-3 cursor-pointer"
+                            onClick={() => setShowPassword(!showPassword)}
+                          >
+                            {showPassword ? (
+                              <EyeOff className="h-5 w-5 text-gray-400 hover:text-gray-700" />
+                            ) : (
+                              <Eye className="h-5 w-5 text-gray-400 hover:text-gray-700" />
+                            )}
+                          </div>
                         </div>
-                      </FormControl>
-                    </div>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              
-              <FormField
-                control={form.control}
-                name="password"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel className="text-gray-700">Password</FormLabel>
-                    <div className="relative">
-                      <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-                        <Lock className="h-5 w-5 text-gray-400" />
-                      </div>
-                      <Input 
-                        type={showPassword ? "text" : "password"} 
-                        placeholder="******" 
-                        className="pl-10 pr-10" 
-                        {...field} 
-                      />
-                      <div 
-                        className="absolute inset-y-0 right-0 flex items-center pr-3 cursor-pointer"
-                        onClick={() => setShowPassword(!showPassword)}
-                      >
-                        {showPassword ? (
-                          <EyeOff className="h-5 w-5 text-gray-400 hover:text-gray-700" />
-                        ) : (
-                          <Eye className="h-5 w-5 text-gray-400 hover:text-gray-700" />
-                        )}
-                      </div>
-                    </div>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              
-              <div className="flex justify-between items-center">
-                <div className="flex items-center">
-                  <input
-                    type="checkbox"
-                    id="remember"
-                    className="h-4 w-4 text-zwm-primary focus:ring-zwm-primary border-gray-300 rounded"
+                        <FormMessage />
+                      </FormItem>
+                    )}
                   />
-                  <Label
-                    htmlFor="remember"
-                    className="ml-2 block text-sm text-gray-700"
+                  
+                  <div className="flex justify-between items-center">
+                    <div className="flex items-center">
+                      <input
+                        type="checkbox"
+                        id="remember"
+                        className="h-4 w-4 text-zwm-primary focus:ring-zwm-primary border-gray-300 rounded"
+                      />
+                      <Label
+                        htmlFor="remember"
+                        className="ml-2 block text-sm text-gray-700"
+                      >
+                        Remember me
+                      </Label>
+                    </div>
+                    <div className="text-sm">
+                      <Link to="#" className="text-zwm-primary hover:text-zwm-secondary">
+                        Forgot your password?
+                      </Link>
+                    </div>
+                  </div>
+                  
+                  <motion.div
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ delay: 0.4, duration: 0.5 }}
+                    className="flex justify-center"
                   >
-                    Remember me
-                  </Label>
-                </div>
-                <div className="text-sm">
-                  <Link to="#" className="text-zwm-primary hover:text-zwm-secondary">
-                    Forgot your password?
-                  </Link>
-                </div>
-              </div>
-              
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ delay: 0.4, duration: 0.5 }}
-                className="flex justify-center"
-              >
-                <ReCAPTCHA
-                  sitekey="6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI" // This is a test key
-                  onChange={onCaptchaChange}
-                />
-              </motion.div>
-              
-              <motion.div
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
-              >
-                <Button
-                  type="submit"
-                  className="w-full zwm-gradient hover:opacity-90 transition-opacity h-12 text-lg font-medium"
-                  disabled={isLoading || !captchaValue}
-                >
-                  {isLoading ? 'Signing In...' : 'Sign In'}
-                </Button>
-              </motion.div>
-            </form>
-          </Form>
+                    <ReCAPTCHA
+                      sitekey="6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI" // This is a test key
+                      onChange={onCaptchaChange}
+                    />
+                  </motion.div>
+                  
+                  <motion.div
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                  >
+                    <Button
+                      type="submit"
+                      className="w-full zwm-gradient hover:opacity-90 transition-opacity h-12 text-lg font-medium"
+                      disabled={isLoading || !captchaValue}
+                    >
+                      {isLoading ? 'Signing In...' : 'Sign In'}
+                    </Button>
+                  </motion.div>
+                </form>
+              </Form>
+            </TabsContent>
+            
+            <TabsContent value="phone">
+              <MobileOtpVerification 
+                onVerificationComplete={handlePhoneLogin}
+                onCancel={() => setLoginMethod('email')}
+              />
+            </TabsContent>
+          </Tabs>
 
           <div className="mt-6">
             <div className="relative">

@@ -1,7 +1,8 @@
 
 export interface User {
   id: string;
-  email: string;
+  email: string | null;
+  phoneNumber?: string;
   displayName: string | null;
   photoURL: string | null;
   isAdmin: boolean;
@@ -10,7 +11,6 @@ export interface User {
   isSeller?: boolean;
   trustScore?: number;
   verified?: boolean;
-  phoneNumber?: string;
   address?: string;
   city?: string;
   state?: string;

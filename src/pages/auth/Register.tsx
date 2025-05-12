@@ -36,6 +36,8 @@ import {
 } from '@/components/ui/select';
 import { motion } from 'framer-motion';
 import ReCAPTCHA from 'react-google-recaptcha';
+import MobileOtpVerification from '@/components/auth/MobileOtpVerification';
+import { Mail, Smartphone, User, Lock, UserPlus } from 'lucide-react';
 
 // Base schema for common fields
 const baseUserSchema = z.object({
@@ -68,10 +70,11 @@ const sellerSchema = z.object({
 });
 
 const Register: React.FC = () => {
-  const { register: registerUser, googleLogin } = useAuth();
+  const { register: registerUser, googleLogin, phoneLogin } = useAuth();
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
   const [accountType, setAccountType] = useState('buyer'); // 'buyer' or 'seller'
+  const [registrationMethod, setRegistrationMethod] = useState<'email' | 'phone'>('email');
   const [captchaValue, setCaptchaValue] = useState<string | null>(null);
 
   const buyerForm = useForm<z.infer<typeof userSchema>>({
@@ -167,6 +170,20 @@ const Register: React.FC = () => {
     }
   };
 
+  const handlePhoneRegistration = (phoneNumber: string) => {
+    try {
+      setIsLoading(true);
+      phoneLogin(phoneNumber);
+      toast.success('Account created successfully with phone verification!');
+      navigate('/dashboard');
+    } catch (error) {
+      console.error('Phone registration error:', error);
+      toast.error('Failed to create account with phone. Please try again.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   return (
     <motion.div 
       className="mt-8 sm:mx-auto sm:w-full sm:max-w-md"
@@ -196,120 +213,186 @@ const Register: React.FC = () => {
         <CardContent>
           <Tabs value={accountType} onValueChange={setAccountType} className="mb-6">
             <TabsList className="grid w-full grid-cols-2">
-              <TabsTrigger value="buyer">Buyer Account</TabsTrigger>
-              <TabsTrigger value="seller">Seller Account</TabsTrigger>
+              <TabsTrigger value="buyer" className="flex items-center justify-center gap-2">
+                <User size={16} /> Buyer Account
+              </TabsTrigger>
+              <TabsTrigger value="seller" className="flex items-center justify-center gap-2">
+                <UserPlus size={16} /> Seller Account
+              </TabsTrigger>
             </TabsList>
             
             <TabsContent value="buyer" className="animate-fade-in">
-              <Form {...buyerForm}>
-                <form onSubmit={buyerForm.handleSubmit(onSubmitBuyer)} className="space-y-4">
-                  <FormField
-                    control={buyerForm.control}
-                    name="name"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Name</FormLabel>
-                        <FormControl>
-                          <Input placeholder="John Doe" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={buyerForm.control}
-                    name="email"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Email</FormLabel>
-                        <FormControl>
-                          <Input placeholder="you@example.com" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={buyerForm.control}
-                    name="password"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Password</FormLabel>
-                        <FormControl>
-                          <Input type="password" placeholder="******" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={buyerForm.control}
-                    name="confirmPassword"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Confirm Password</FormLabel>
-                        <FormControl>
-                          <Input type="password" placeholder="******" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  
-                  <motion.div
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    transition={{ delay: 0.4, duration: 0.5 }}
-                    className="flex justify-center"
-                  >
-                    <ReCAPTCHA
-                      sitekey="6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI" // This is a test key
-                      onChange={onCaptchaChange}
+              <Tabs value={registrationMethod} onValueChange={(v) => setRegistrationMethod(v as 'email' | 'phone')} className="mb-4">
+                <TabsList className="grid w-full grid-cols-2 mb-4">
+                  <TabsTrigger value="email" className="flex items-center gap-2">
+                    <Mail size={16} /> Email
+                  </TabsTrigger>
+                  <TabsTrigger value="phone" className="flex items-center gap-2">
+                    <Smartphone size={16} /> Phone
+                  </TabsTrigger>
+                </TabsList>
+                
+                <TabsContent value="email">
+                  <Form {...buyerForm}>
+                    <form onSubmit={buyerForm.handleSubmit(onSubmitBuyer)} className="space-y-4">
+                      <FormField
+                        control={buyerForm.control}
+                        name="name"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Name</FormLabel>
+                            <FormControl>
+                              <div className="relative">
+                                <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                                  <User size={16} className="text-gray-400" />
+                                </div>
+                                <Input placeholder="John Doe" className="pl-10" {...field} />
+                              </div>
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      <FormField
+                        control={buyerForm.control}
+                        name="email"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Email</FormLabel>
+                            <FormControl>
+                              <div className="relative">
+                                <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                                  <Mail size={16} className="text-gray-400" />
+                                </div>
+                                <Input placeholder="you@example.com" className="pl-10" {...field} />
+                              </div>
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      <FormField
+                        control={buyerForm.control}
+                        name="password"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Password</FormLabel>
+                            <FormControl>
+                              <div className="relative">
+                                <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                                  <Lock size={16} className="text-gray-400" />
+                                </div>
+                                <Input type="password" placeholder="******" className="pl-10" {...field} />
+                              </div>
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      <FormField
+                        control={buyerForm.control}
+                        name="confirmPassword"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Confirm Password</FormLabel>
+                            <FormControl>
+                              <div className="relative">
+                                <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                                  <Lock size={16} className="text-gray-400" />
+                                </div>
+                                <Input type="password" placeholder="******" className="pl-10" {...field} />
+                              </div>
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      
+                      <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        transition={{ delay: 0.4, duration: 0.5 }}
+                        className="flex justify-center"
+                      >
+                        <ReCAPTCHA
+                          sitekey="6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI" // This is a test key
+                          onChange={onCaptchaChange}
+                        />
+                      </motion.div>
+                      
+                      <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+                        <Button
+                          type="submit"
+                          className="w-full zwm-gradient hover:opacity-90 transition-opacity"
+                          disabled={isLoading || !captchaValue}
+                        >
+                          {isLoading ? 'Creating Account...' : 'Sign Up as Buyer'}
+                        </Button>
+                      </motion.div>
+                    </form>
+                  </Form>
+                </TabsContent>
+                
+                <TabsContent value="phone">
+                  <div className="space-y-4">
+                    <div className="bg-yellow-50 p-4 rounded-lg border border-yellow-200 mb-4">
+                      <p className="text-sm text-yellow-800">
+                        By registering with your phone number, you'll be able to securely sign in 
+                        without a password in the future.
+                      </p>
+                    </div>
+                    
+                    <MobileOtpVerification
+                      onVerificationComplete={handlePhoneRegistration}
+                      onCancel={() => setRegistrationMethod('email')}
                     />
-                  </motion.div>
-                  
-                  <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
-                    <Button
-                      type="submit"
-                      className="w-full zwm-gradient hover:opacity-90 transition-opacity"
-                      disabled={isLoading || !captchaValue}
-                    >
-                      {isLoading ? 'Creating Account...' : 'Sign Up as Buyer'}
-                    </Button>
-                  </motion.div>
-                </form>
-              </Form>
+                  </div>
+                </TabsContent>
+              </Tabs>
             </TabsContent>
             
             <TabsContent value="seller" className="animate-fade-in">
               <Form {...sellerForm}>
                 <form onSubmit={sellerForm.handleSubmit(onSubmitSeller)} className="space-y-4">
-                  <FormField
-                    control={sellerForm.control}
-                    name="name"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Contact Name</FormLabel>
-                        <FormControl>
-                          <Input placeholder="John Doe" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={sellerForm.control}
-                    name="businessName"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Business Name</FormLabel>
-                        <FormControl>
-                          <Input placeholder="Your Business Name" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
+                  <div className="p-4 bg-blue-50 border border-blue-100 rounded-md mb-4">
+                    <h3 className="font-medium text-blue-800">Seller Account Benefits</h3>
+                    <ul className="mt-2 text-sm text-blue-700 list-disc pl-5 space-y-1">
+                      <li>List your surplus goods and products</li>
+                      <li>Reach customers interested in sustainable shopping</li>
+                      <li>Reduce waste and increase revenue</li>
+                      <li>Track sales and analytics</li>
+                    </ul>
+                  </div>
+                
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <FormField
+                      control={sellerForm.control}
+                      name="name"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Contact Name</FormLabel>
+                          <FormControl>
+                            <Input placeholder="John Doe" {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={sellerForm.control}
+                      name="businessName"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Business Name</FormLabel>
+                          <FormControl>
+                            <Input placeholder="Your Business Name" {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+                  
                   <FormField
                     control={sellerForm.control}
                     name="businessType"
@@ -329,10 +412,14 @@ const Register: React.FC = () => {
                             <SelectItem value="individual">Individual Seller</SelectItem>
                           </SelectContent>
                         </Select>
+                        <FormDescription>
+                          This helps us customize your selling experience
+                        </FormDescription>
                         <FormMessage />
                       </FormItem>
                     )}
                   />
+                  
                   <FormField
                     control={sellerForm.control}
                     name="email"
@@ -346,32 +433,35 @@ const Register: React.FC = () => {
                       </FormItem>
                     )}
                   />
-                  <FormField
-                    control={sellerForm.control}
-                    name="password"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Password</FormLabel>
-                        <FormControl>
-                          <Input type="password" placeholder="******" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={sellerForm.control}
-                    name="confirmPassword"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Confirm Password</FormLabel>
-                        <FormControl>
-                          <Input type="password" placeholder="******" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
+                  
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <FormField
+                      control={sellerForm.control}
+                      name="password"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Password</FormLabel>
+                          <FormControl>
+                            <Input type="password" placeholder="******" {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={sellerForm.control}
+                      name="confirmPassword"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Confirm Password</FormLabel>
+                          <FormControl>
+                            <Input type="password" placeholder="******" {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
                   
                   <motion.div
                     initial={{ opacity: 0 }}
