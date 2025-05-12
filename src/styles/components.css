@@ -1,0 +1,125 @@
+
+/* Zero Waste Mart specific components */
+.zwm-gradient {
+  @apply bg-gradient-to-r from-zwm-primary to-zwm-secondary;
+}
+
+.zwm-gradient-hover {
+  @apply transition-all duration-300;
+  background-size: 200% auto;
+  @apply bg-gradient-to-r from-zwm-primary via-zwm-secondary to-zwm-primary;
+  background-position: right center;
+}
+
+.zwm-gradient-hover:hover {
+  background-position: left center;
+  @apply shadow-lg;
+}
+
+.zwm-card {
+  @apply bg-white rounded-xl shadow-md hover:shadow-lg transition-all duration-300 overflow-hidden border border-gray-100;
+}
+
+/* Status badges */
+.zwm-status-donated {
+  @apply bg-zwm-success text-white rounded-full px-3 py-1 text-xs font-semibold;
+}
+
+.zwm-status-available {
+  @apply bg-zwm-info text-white rounded-full px-3 py-1 text-xs font-semibold;
+}
+
+.zwm-status-expired {
+  @apply bg-zwm-error text-white rounded-full px-3 py-1 text-xs font-semibold;
+}
+
+.zwm-status-pending {
+  @apply bg-zwm-warning text-white rounded-full px-3 py-1 text-xs font-semibold;
+}
+
+/* Enhanced UI elements */
+.card-hover {
+  @apply transition-all duration-300 hover:shadow-lg hover:translate-y-[-5px];
+}
+
+.glass-effect {
+  @apply bg-white/70 backdrop-blur-md border border-white/20 shadow-md;
+}
+
+.button-glow {
+  @apply relative overflow-hidden;
+}
+
+.button-glow::after {
+  content: "";
+  @apply absolute inset-0 bg-white/20 opacity-0 transition-opacity duration-300;
+}
+
+.button-glow:hover::after {
+  @apply opacity-100;
+}
+
+/* Text effects */
+.gradient-text {
+  @apply text-transparent bg-clip-text;
+  background-image: linear-gradient(to right, var(--tw-gradient-stops));
+  @apply bg-gradient-to-r from-zwm-primary to-zwm-secondary;
+}
+
+.text-shadow {
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Hover effects */
+.hover-scale {
+  @apply transition-transform duration-200;
+}
+
+.hover-scale:hover {
+  transform: scale(1.05);
+}
+
+.shadow-pop {
+  @apply transition-shadow duration-300;
+}
+
+.shadow-pop:hover {
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 
+              0 10px 10px -5px rgba(0, 0, 0, 0.04);
+}
+
+.hover-glow {
+  transition: all 0.3s ease;
+}
+
+.hover-glow:hover {
+  box-shadow: 0 0 10px 5px rgba(79, 70, 229, 0.3);
+}
+
+.hover-3d {
+  transition: transform 0.3s ease-out;
+  transform-style: preserve-3d;
+}
+
+.hover-3d:hover {
+  transform: perspective(1000px) rotateX(5deg) rotateY(5deg);
+}
+
+/* Ripple effect */
+.ripple {
+  position: relative;
+  overflow: hidden;
+}
+
+.ripple::after {
+  content: "";
+  position: absolute;
+  border-radius: 50%;
+  background-color: rgba(255, 255, 255, 0.3);
+  width: 100px;
+  height: 100px;
+  margin-top: -50px;
+  margin-left: -50px;
+  animation: ripple 1s;
+  opacity: 0;
+}
