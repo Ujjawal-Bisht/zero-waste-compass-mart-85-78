@@ -1,5 +1,6 @@
 
 import { z } from 'zod';
+import { ItemCategory } from '@/types';
 
 export const itemFormSchema = z.object({
   name: z.string().min(2, {
@@ -8,7 +9,7 @@ export const itemFormSchema = z.object({
   description: z.string().min(10, {
     message: 'Description must be at least 10 characters.',
   }),
-  category: z.enum(['food', 'clothing', 'electronics', 'furniture', 'household', 'books', 'toys', 'other'] as const),
+  category: z.enum(['food', 'clothing', 'electronics', 'furniture', 'household', 'books', 'toys', 'medicine', 'other'] as const),
   expiryDate: z.date({
     required_error: 'Expiry date is required.',
   }),

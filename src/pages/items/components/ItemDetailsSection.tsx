@@ -1,34 +1,22 @@
-
 import React from 'react';
 import { FormField, FormItem, FormLabel, FormControl, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { ItemCategory } from '@/types';
 import { UseFormReturn } from 'react-hook-form';
-import { z } from 'zod';
+import { ItemFormValues } from '../schemas/itemFormSchema';
 import { BarcodeScanner } from './BarcodeScanner';
 
 // Define the categories that can be selected
 const foodCategories: { value: ItemCategory; label: string }[] = [
   { value: 'food', label: 'Food' },
   { value: 'household', label: 'Household' },
+  { value: 'medicine', label: 'Medicine' },
   { value: 'other', label: 'Other' },
 ];
 
-// Define the form schema interface for TypeScript
-interface FormSchema {
-  name: string;
-  description: string;
-  category: ItemCategory;
-  expiryDate: Date;
-  address: string;
-  originalPrice: number | undefined;
-  currentPrice: number | undefined;
-  quantity: number | undefined;
-}
-
 interface ItemDetailsSectionProps {
-  form: UseFormReturn<FormSchema, any, undefined>;
+  form: UseFormReturn<ItemFormValues, any, undefined>;
   handleBarcodeDetected: (barcode: string) => void;
 }
 
@@ -103,7 +91,7 @@ const ItemDetailsSection: React.FC<ItemDetailsSectionProps> = ({ form, handleBar
 };
 
 // Price and quantity inputs section
-const PriceQuantityInputs: React.FC<{ form: UseFormReturn<FormSchema, any, undefined> }> = ({ form }) => {
+const PriceQuantityInputs: React.FC<{ form: UseFormReturn<ItemFormValues, any, undefined> }> = ({ form }) => {
   return (
     <>
       <div className="grid grid-cols-2 gap-4">

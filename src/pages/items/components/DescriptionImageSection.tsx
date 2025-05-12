@@ -4,9 +4,10 @@ import { FormField, FormItem, FormLabel, FormControl, FormMessage } from '@/comp
 import { Textarea } from '@/components/ui/textarea';
 import { ImageUploader } from './ImageUploader';
 import { UseFormReturn } from 'react-hook-form';
+import { ItemFormValues } from '../schemas/itemFormSchema';
 
 interface DescriptionImageSectionProps {
-  form: UseFormReturn<any, any, undefined>;
+  form: UseFormReturn<ItemFormValues, any, undefined>;
   imagePreview: string | null;
   setImagePreview: React.Dispatch<React.SetStateAction<string | null>>;
 }

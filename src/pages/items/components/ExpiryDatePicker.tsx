@@ -8,9 +8,10 @@ import { Calendar } from '@/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { cn } from '@/lib/utils';
 import { UseFormReturn } from 'react-hook-form';
+import { ItemFormValues } from '../schemas/itemFormSchema';
 
 interface ExpiryDatePickerProps {
-  form: UseFormReturn<any, any, undefined>;
+  form: UseFormReturn<ItemFormValues, any, undefined>;
 }
 
 const ExpiryDatePicker: React.FC<ExpiryDatePickerProps> = ({ form }) => {
