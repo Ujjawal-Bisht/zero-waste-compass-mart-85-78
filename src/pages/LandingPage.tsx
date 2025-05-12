@@ -1,15 +1,18 @@
-import React from 'react';
+
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
-import { ArrowRight, Upload, MessageCircle, ShoppingBag, IndianRupee, PillBottle, Package } from 'lucide-react';
+import { ArrowRight, Upload, MessageCircle, Package, PillBottle, IndianRupee } from 'lucide-react';
 import Logo from '@/components/ui/logo';
 import { motion } from 'framer-motion';
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 
 const LandingPage: React.FC = () => {
   const navigate = useNavigate();
   const { currentUser } = useAuth();
+  const [activeTab, setActiveTab] = useState("upload");
 
   const handleGetStarted = () => {
     if (currentUser) {
@@ -136,7 +139,7 @@ const LandingPage: React.FC = () => {
         </div>
       </section>
 
-      {/* Features Section */}
+      {/* Features Section with Tabs */}
       <section className="py-16 md:py-24 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <motion.div 
@@ -152,90 +155,147 @@ const LandingPage: React.FC = () => {
             </p>
           </motion.div>
 
-          <div className="mt-16 grid gap-8 md:grid-cols-4">
-            {/* Feature 1 */}
-            <motion.div 
-              className="zwm-card p-8 text-center"
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.6, delay: 0.2 }}
-              whileHover={{ y: -10, boxShadow: "0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)" }}
-            >
-              <motion.div 
-                className="mx-auto h-16 w-16 rounded-full bg-zwm-primary bg-opacity-10 flex items-center justify-center mb-6"
-                whileHover={{ rotate: [0, 10, -10, 0], transition: { duration: 0.5 } }}
-              >
-                <Upload className="h-8 w-8 text-zwm-primary" />
-              </motion.div>
-              <h3 className="mt-2 text-xl font-medium font-heading text-gray-900">Upload Items</h3>
-              <p className="mt-3 text-gray-600">
-                Add items you no longer need with details, photos, and location.
-              </p>
-            </motion.div>
+          <div className="mt-10">
+            <Tabs defaultValue="upload" className="w-full" onValueChange={setActiveTab}>
+              <div className="flex justify-center">
+                <TabsList className="bg-gray-100/80 p-1.5">
+                  <TabsTrigger 
+                    value="upload" 
+                    className={`px-6 py-2.5 rounded-md transition-all duration-200 ${activeTab === "upload" ? "bg-white shadow-sm" : "hover:bg-gray-200/50"}`}
+                  >
+                    Upload Items
+                  </TabsTrigger>
+                  <TabsTrigger 
+                    value="connect" 
+                    className={`px-6 py-2.5 rounded-md transition-all duration-200 ${activeTab === "connect" ? "bg-white shadow-sm" : "hover:bg-gray-200/50"}`}
+                  >
+                    Connect
+                  </TabsTrigger>
+                  <TabsTrigger 
+                    value="packaged" 
+                    className={`px-6 py-2.5 rounded-md transition-all duration-200 ${activeTab === "packaged" ? "bg-white shadow-sm" : "hover:bg-gray-200/50"}`}
+                  >
+                    Packaged Food
+                  </TabsTrigger>
+                  <TabsTrigger 
+                    value="medicines" 
+                    className={`px-6 py-2.5 rounded-md transition-all duration-200 ${activeTab === "medicines" ? "bg-white shadow-sm" : "hover:bg-gray-200/50"}`}
+                  >
+                    Medicines
+                  </TabsTrigger>
+                </TabsList>
+              </div>
 
-            {/* Feature 2 */}
-            <motion.div 
-              className="zwm-card p-8 text-center"
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.6, delay: 0.4 }}
-              whileHover={{ y: -10, boxShadow: "0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)" }}
-            >
-              <motion.div 
-                className="mx-auto h-16 w-16 rounded-full bg-zwm-secondary bg-opacity-10 flex items-center justify-center mb-6"
-                whileHover={{ scale: [1, 1.2, 1], transition: { duration: 0.5 } }}
-              >
-                <MessageCircle className="h-8 w-8 text-zwm-secondary" />
-              </motion.div>
-              <h3 className="mt-2 text-xl font-medium font-heading text-gray-900">Connect</h3>
-              <p className="mt-3 text-gray-600">
-                Our platform matches your items with nearby people or organizations.
-              </p>
-            </motion.div>
+              <div className="mt-10">
+                <TabsContent value="upload" className="mt-6">
+                  <div className="grid md:grid-cols-1 gap-8 max-w-2xl mx-auto">
+                    <motion.div 
+                      className="zwm-card p-8 text-center flex flex-col items-center"
+                      initial={{ opacity: 0, y: 20 }}
+                      whileInView={{ opacity: 1, y: 0 }}
+                      viewport={{ once: true }}
+                      transition={{ duration: 0.6 }}
+                      whileHover={{ y: -10, boxShadow: "0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)" }}
+                    >
+                      <motion.div 
+                        className="h-20 w-20 rounded-full bg-indigo-100 flex items-center justify-center mb-6"
+                        whileHover={{ rotate: [0, 10, -10, 0], transition: { duration: 0.5 } }}
+                      >
+                        <Upload className="h-10 w-10 text-indigo-600" />
+                      </motion.div>
+                      <h3 className="mt-2 text-2xl font-medium font-heading text-gray-900">Upload Items</h3>
+                      <p className="mt-3 text-gray-600 max-w-md">
+                        Add items you no longer need with details, photos, and location.
+                      </p>
+                      <Button variant="outline" className="mt-6" onClick={() => navigate('/items/add')}>
+                        Add New Item
+                      </Button>
+                    </motion.div>
+                  </div>
+                </TabsContent>
 
-            {/* Feature 3 - Packaged Food */}
-            <motion.div 
-              className="zwm-card p-8 text-center"
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.6, delay: 0.6 }}
-              whileHover={{ y: -10, boxShadow: "0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)" }}
-            >
-              <motion.div 
-                className="mx-auto h-16 w-16 rounded-full bg-zwm-accent bg-opacity-10 flex items-center justify-center mb-6"
-                whileHover={{ y: [0, -5, 0], transition: { duration: 0.5, repeat: 1 } }}
-              >
-                <Package className="h-8 w-8 text-zwm-accent" />
-              </motion.div>
-              <h3 className="mt-2 text-xl font-medium font-heading text-gray-900">Packaged Food</h3>
-              <p className="mt-3 text-gray-600">
-                Find quality packaged food items near expiry at discounted prices in <IndianRupee className="inline h-4 w-4" />.
-              </p>
-            </motion.div>
+                <TabsContent value="connect" className="mt-6">
+                  <div className="grid md:grid-cols-1 gap-8 max-w-2xl mx-auto">
+                    <motion.div 
+                      className="zwm-card p-8 text-center flex flex-col items-center"
+                      initial={{ opacity: 0, y: 20 }}
+                      whileInView={{ opacity: 1, y: 0 }}
+                      viewport={{ once: true }}
+                      transition={{ duration: 0.6 }}
+                      whileHover={{ y: -10, boxShadow: "0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)" }}
+                    >
+                      <motion.div 
+                        className="h-20 w-20 rounded-full bg-purple-100 flex items-center justify-center mb-6"
+                        whileHover={{ scale: [1, 1.2, 1], transition: { duration: 0.5 } }}
+                      >
+                        <MessageCircle className="h-10 w-10 text-purple-600" />
+                      </motion.div>
+                      <h3 className="mt-2 text-2xl font-medium font-heading text-gray-900">Connect</h3>
+                      <p className="mt-3 text-gray-600 max-w-md">
+                        Our platform matches your items with nearby people or organizations.
+                      </p>
+                      <Button variant="outline" className="mt-6" onClick={() => navigate('/marketplace')}>
+                        Go to Marketplace
+                      </Button>
+                    </motion.div>
+                  </div>
+                </TabsContent>
 
-            {/* Feature 4 - Medicines */}
-            <motion.div 
-              className="zwm-card p-8 text-center"
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.6, delay: 0.8 }}
-              whileHover={{ y: -10, boxShadow: "0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)" }}
-            >
-              <motion.div 
-                className="mx-auto h-16 w-16 rounded-full bg-zwm-primary bg-opacity-10 flex items-center justify-center mb-6"
-                whileHover={{ rotate: [0, -10, 10, 0], transition: { duration: 0.5 } }}
-              >
-                <PillBottle className="h-8 w-8 text-zwm-primary" />
-              </motion.div>
-              <h3 className="mt-2 text-xl font-medium font-heading text-gray-900">Medicines</h3>
-              <p className="mt-3 text-gray-600">
-                Access unexpired medicines at affordable prices in <IndianRupee className="inline h-4 w-4" /> from verified sellers.
-              </p>
-            </motion.div>
+                <TabsContent value="packaged" className="mt-6">
+                  <div className="grid md:grid-cols-1 gap-8 max-w-2xl mx-auto">
+                    <motion.div 
+                      className="zwm-card p-8 text-center flex flex-col items-center"
+                      initial={{ opacity: 0, y: 20 }}
+                      whileInView={{ opacity: 1, y: 0 }}
+                      viewport={{ once: true }}
+                      transition={{ duration: 0.6 }}
+                      whileHover={{ y: -10, boxShadow: "0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)" }}
+                    >
+                      <motion.div 
+                        className="h-20 w-20 rounded-full bg-green-100 flex items-center justify-center mb-6"
+                        whileHover={{ y: [0, -5, 0], transition: { duration: 0.5, repeat: 1 } }}
+                      >
+                        <Package className="h-10 w-10 text-green-600" />
+                      </motion.div>
+                      <h3 className="mt-2 text-2xl font-medium font-heading text-gray-900">Packaged Food</h3>
+                      <p className="mt-3 text-gray-600 max-w-md">
+                        Find quality packaged food items near expiry at discounted prices in <IndianRupee className="inline h-4 w-4" />.
+                      </p>
+                      <Button variant="outline" className="mt-6" onClick={() => navigate('/marketplace?category=food')}>
+                        Browse Food Items
+                      </Button>
+                    </motion.div>
+                  </div>
+                </TabsContent>
+
+                <TabsContent value="medicines" className="mt-6">
+                  <div className="grid md:grid-cols-1 gap-8 max-w-2xl mx-auto">
+                    <motion.div 
+                      className="zwm-card p-8 text-center flex flex-col items-center"
+                      initial={{ opacity: 0, y: 20 }}
+                      whileInView={{ opacity: 1, y: 0 }}
+                      viewport={{ once: true }}
+                      transition={{ duration: 0.6 }}
+                      whileHover={{ y: -10, boxShadow: "0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)" }}
+                    >
+                      <motion.div 
+                        className="h-20 w-20 rounded-full bg-blue-100 flex items-center justify-center mb-6"
+                        whileHover={{ rotate: [0, -10, 10, 0], transition: { duration: 0.5 } }}
+                      >
+                        <PillBottle className="h-10 w-10 text-blue-600" />
+                      </motion.div>
+                      <h3 className="mt-2 text-2xl font-medium font-heading text-gray-900">Medicines</h3>
+                      <p className="mt-3 text-gray-600 max-w-md">
+                        Access unexpired medicines at affordable prices in <IndianRupee className="inline h-4 w-4" /> from verified sellers.
+                      </p>
+                      <Button variant="outline" className="mt-6" onClick={() => navigate('/marketplace?category=medicine')}>
+                        Browse Medicines
+                      </Button>
+                    </motion.div>
+                  </div>
+                </TabsContent>
+              </div>
+            </Tabs>
           </div>
         </div>
       </section>
