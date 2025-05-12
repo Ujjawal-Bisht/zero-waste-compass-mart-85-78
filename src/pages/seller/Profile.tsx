@@ -11,7 +11,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { toast } from 'sonner';
 import { motion } from 'framer-motion';
-import { Building, User, Shield, Store } from 'lucide-react';
+import { Building, User, Shield, Store, Package, LineChart } from 'lucide-react';
 import {
   Form,
   FormControl,
@@ -32,6 +32,24 @@ const profileSchema = z.object({
 });
 
 type ProfileFormValues = z.infer<typeof profileSchema>;
+
+// Mock data for statistics
+const revenueData = [
+  { month: 'Jan', revenue: 4500, profit: 1200 },
+  { month: 'Feb', revenue: 5200, profit: 1500 },
+  { month: 'Mar', revenue: 6100, profit: 1800 },
+  { month: 'Apr', revenue: 5800, profit: 1600 },
+  { month: 'May', revenue: 7000, profit: 2100 },
+  { month: 'Jun', revenue: 8200, profit: 2400 },
+];
+
+// Mock data for recent items
+const recentItems = [
+  { id: 1, name: 'Bamboo Cutlery Set', price: 19.99, date: '2025-05-10', image: '/placeholder.svg' },
+  { id: 2, name: 'Reusable Produce Bags (5-pack)', price: 12.50, date: '2025-05-09', image: '/placeholder.svg' },
+  { id: 3, name: 'Stainless Steel Water Bottle', price: 24.99, date: '2025-05-08', image: '/placeholder.svg' },
+  { id: 4, name: 'Compostable Phone Case', price: 29.99, date: '2025-05-07', image: '/placeholder.svg' },
+];
 
 const SellerProfile: React.FC = () => {
   const { currentUser, updateProfile } = useAuth();
@@ -76,9 +94,15 @@ const SellerProfile: React.FC = () => {
       </div>
       
       <Tabs defaultValue="profile" className="space-y-6">
-        <TabsList className="grid w-full max-w-md grid-cols-2 mb-8">
+        <TabsList className="grid w-full max-w-md grid-cols-4 mb-8">
           <TabsTrigger value="profile" className="flex items-center gap-2">
             <Store size={16} /> Profile
+          </TabsTrigger>
+          <TabsTrigger value="statistics" className="flex items-center gap-2">
+            <LineChart size={16} /> Statistics
+          </TabsTrigger>
+          <TabsTrigger value="recent" className="flex items-center gap-2">
+            <Package size={16} /> Recent Items
           </TabsTrigger>
           <TabsTrigger value="verification" className="flex items-center gap-2">
             <Shield size={16} /> Verification
@@ -224,6 +248,130 @@ const SellerProfile: React.FC = () => {
                     </div>
                   </div>
                   <Button className="zwm-gradient-hover">Change Password</Button>
+                </div>
+              </CardContent>
+            </Card>
+          </motion.div>
+        </TabsContent>
+        
+        <TabsContent value="statistics">
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.3 }}
+          >
+            <Card className="shadow-pop hover:shadow-lg transition-all duration-300">
+              <CardHeader>
+                <CardTitle>Revenue & Profit Statistics</CardTitle>
+                <CardDescription>Performance overview for your business</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="p-4 bg-muted rounded-lg shadow-sm">
+                    <h3 className="text-lg font-semibold mb-1">Last Month Revenue</h3>
+                    <p className="text-3xl font-bold text-zwm-primary">$8,200</p>
+                    <p className="text-sm text-muted-foreground">+14.7% from previous month</p>
+                  </div>
+                  <div className="p-4 bg-muted rounded-lg shadow-sm">
+                    <h3 className="text-lg font-semibold mb-1">Last Month Profit</h3>
+                    <p className="text-3xl font-bold text-green-500">$2,400</p>
+                    <p className="text-sm text-muted-foreground">+12.5% from previous month</p>
+                  </div>
+                </div>
+
+                <div className="mt-8 h-80">
+                  <h3 className="text-lg font-semibold mb-4">6-Month Performance</h3>
+                  <div className="h-full w-full">
+                    <div className="grid grid-cols-6 h-64 gap-1 relative">
+                      {revenueData.map((item, index) => (
+                        <div key={index} className="flex flex-col justify-end items-center gap-1">
+                          <div className="w-full flex justify-center items-end gap-1 h-full">
+                            <div 
+                              className="w-5 bg-zwm-primary rounded-t-sm" 
+                              style={{ height: `${(item.revenue / 10000) * 100}%` }}
+                              title={`Revenue: $${item.revenue}`}
+                            />
+                            <div 
+                              className="w-5 bg-green-500 rounded-t-sm" 
+                              style={{ height: `${(item.profit / 10000) * 100}%` }}
+                              title={`Profit: $${item.profit}`}
+                            />
+                          </div>
+                          <span className="text-xs">{item.month}</span>
+                        </div>
+                      ))}
+                      
+                      {/* Y-axis label */}
+                      <div className="absolute -left-6 top-0 h-full flex flex-col justify-between text-xs text-muted-foreground">
+                        <span>$10K</span>
+                        <span>$7.5K</span>
+                        <span>$5K</span>
+                        <span>$2.5K</span>
+                        <span>$0</span>
+                      </div>
+                    </div>
+                    
+                    <div className="flex justify-center gap-6 mt-4">
+                      <div className="flex items-center gap-2">
+                        <div className="w-3 h-3 bg-zwm-primary rounded-full"></div>
+                        <span className="text-sm">Revenue</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <div className="w-3 h-3 bg-green-500 rounded-full"></div>
+                        <span className="text-sm">Profit</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </motion.div>
+        </TabsContent>
+        
+        <TabsContent value="recent">
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.3 }}
+          >
+            <Card className="shadow-pop hover:shadow-lg transition-all duration-300">
+              <CardHeader>
+                <CardTitle>Recently Added Items</CardTitle>
+                <CardDescription>Products you've added to your inventory</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {recentItems.map((item) => (
+                    <motion.div 
+                      key={item.id}
+                      className="flex gap-4 p-4 border rounded-lg hover:shadow-md transition-all duration-300"
+                      whileHover={{ scale: 1.02 }}
+                    >
+                      <div className="flex-shrink-0">
+                        <img 
+                          src={item.image} 
+                          alt={item.name} 
+                          className="h-16 w-16 object-cover rounded-md"
+                        />
+                      </div>
+                      <div className="flex-grow">
+                        <h3 className="font-semibold">{item.name}</h3>
+                        <p className="text-zwm-primary font-medium">${item.price.toFixed(2)}</p>
+                        <p className="text-sm text-muted-foreground">Added on {item.date}</p>
+                      </div>
+                      <div className="flex flex-col justify-between items-end">
+                        <Button variant="ghost" size="icon" className="h-8 w-8">
+                          <Package size={16} />
+                        </Button>
+                      </div>
+                    </motion.div>
+                  ))}
+                </div>
+                
+                <div className="mt-4 flex justify-center">
+                  <Button variant="outline" className="zwm-gradient-hover">
+                    View All Items
+                  </Button>
                 </div>
               </CardContent>
             </Card>
