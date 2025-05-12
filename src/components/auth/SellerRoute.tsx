@@ -1,28 +1,30 @@
 
-import { Navigate } from "react-router-dom";
-import { useAuth } from "@/contexts/auth";
-import { Loader2 } from "lucide-react";
+import React from 'react';
+import { Navigate, useLocation } from 'react-router-dom';
+import { useAuth } from '@/contexts/auth';
 
-const SellerRoute = ({ children }: { children: React.ReactNode }) => {
+interface SellerRouteProps {
+  children: React.ReactNode;
+}
+
+const SellerRoute: React.FC<SellerRouteProps> = ({ children }) => {
   const { currentUser, loading } = useAuth();
+  const location = useLocation();
 
+  // Block sellers from accessing the marketplace
+  if (location.pathname === '/marketplace' && currentUser?.isSeller) {
+    return <Navigate to="/seller/dashboard" state={{ from: location }} replace />;
+  }
+  
   if (loading) {
-    return (
-      <div className="flex items-center justify-center h-screen">
-        <div className="flex flex-col items-center gap-4">
-          <Loader2 className="h-12 w-12 animate-spin text-zwm-primary" />
-          <p className="text-muted-foreground">Loading your account...</p>
-        </div>
-      </div>
-    );
+    return <div>Loading...</div>;
   }
 
-  // Redirect to dashboard if user is not a seller
-  if (!currentUser || !currentUser.isSeller) {
-    return <Navigate to="/dashboard" replace />;
-  }
-
-  return <>{children}</>;
+  return currentUser?.isSeller ? (
+    <>{children}</>
+  ) : (
+    <Navigate to="/login" state={{ from: location }} replace />
+  );
 };
 
 export default SellerRoute;

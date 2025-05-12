@@ -3,7 +3,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 
 // Authentication Context
 import { AuthProvider } from "./contexts/auth";
@@ -56,7 +56,11 @@ const App = () => (
             {/* Protected Dashboard Routes */}
             <Route element={<PrivateRoute><DashboardLayout /></PrivateRoute>}>
               <Route path="/dashboard" element={<Dashboard />} />
-              <Route path="/marketplace" element={<Marketplace />} />
+              <Route path="/marketplace" element={
+                <SellerRoute>
+                  <Navigate to="/seller/dashboard" replace />
+                </SellerRoute>
+              } />
               <Route path="/profile" element={<Profile />} />
               <Route path="/items/add" element={<AddItem />} />
               
