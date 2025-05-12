@@ -68,9 +68,9 @@ export default {
 					ring: 'hsl(var(--sidebar-ring))'
 				},
 				zwm: {
-					primary: "#c532a0",
-					secondary: "#8932c5",
-					accent: "#32c58e",
+					primary: "#4F46E5",    // Changed to indigo
+					secondary: "#8B5CF6",  // Changed to violet
+					accent: "#10B981",     // Changed to emerald
 					success: "#10b981",
 					warning: "#f59e0b",
 					error: "#ef4444",
@@ -103,6 +103,15 @@ export default {
 				'slide-in': {
 					'0%': { transform: 'translateY(-10px)', opacity: '0' },
 					'100%': { transform: 'translateY(0)', opacity: '1' }
+				},
+				'pulse-slow': {
+					'0%, 100%': { opacity: '1' },
+					'50%': { opacity: '0.8' }
+				},
+				'float': {
+					'0%': { transform: 'translateY(0)' },
+					'50%': { transform: 'translateY(-10px)' },
+					'100%': { transform: 'translateY(0)' }
 				}
 			},
 			animation: {
@@ -110,7 +119,9 @@ export default {
 				'accordion-up': 'accordion-up 0.2s ease-out',
 				'fade-in': 'fade-in 0.3s ease-out',
 				'fade-out': 'fade-out 0.3s ease-out',
-				'slide-in': 'slide-in 0.4s ease-out'
+				'slide-in': 'slide-in 0.4s ease-out',
+				'pulse-slow': 'pulse-slow 3s infinite ease-in-out',
+				'float': 'float 3s infinite ease-in-out'
 			}
 		}
 	},
