@@ -19,6 +19,7 @@ export const BarcodeScanner: React.FC<BarcodeScannerProps> = ({ onBarcodeDetecte
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const scannerRef = useRef<HTMLDivElement>(null);
   const scanLineRef = useRef<HTMLDivElement>(null);
+  const quaggaInitialized = useRef(false);
 
   // Animate the scan line
   useEffect(() => {
@@ -48,9 +49,17 @@ export const BarcodeScanner: React.FC<BarcodeScannerProps> = ({ onBarcodeDetecte
       startScanner();
     }
     
+    // Clean up function
     return () => {
-      if (Quagga) {
-        Quagga.stop();
+      if (quaggaInitialized.current && Quagga) {
+        try {
+          Quagga.offDetected(handleDetected);
+          Quagga.stop();
+        } catch (error) {
+          console.error("Error stopping Quagga:", error);
+        } finally {
+          quaggaInitialized.current = false;
+        }
       }
     };
   }, [isDialogOpen, isScanning]);
@@ -61,8 +70,16 @@ export const BarcodeScanner: React.FC<BarcodeScannerProps> = ({ onBarcodeDetecte
       setBarcodeResult(code);
       setScanFeedback(`Barcode detected: ${code}`);
       
-      // Stop scanning
-      Quagga.stop();
+      // Stop scanning safely
+      if (quaggaInitialized.current) {
+        try {
+          Quagga.stop();
+          quaggaInitialized.current = false;
+        } catch (error) {
+          console.error("Error stopping Quagga after detection:", error);
+        }
+      }
+      
       setIsScanning(false);
       
       // Use a slight delay to show the detected barcode before closing
@@ -82,31 +99,48 @@ export const BarcodeScanner: React.FC<BarcodeScannerProps> = ({ onBarcodeDetecte
     setScanFeedback('Camera access denied. Please check permissions.');
     toast.error('Could not access camera. Please check permissions.');
     setIsScanning(false);
+    quaggaInitialized.current = false;
   };
 
   const startScanner = () => {
     setIsScanning(true);
     setScanFeedback('Initializing camera...');
     
-    initializeScanner(
-      scannerRef,
-      handleDetected,
-      handleProcessed,
-      handleScannerError
-    );
-
-    setScanFeedback('Camera ready. Scanning for barcode...');
+    if (scannerRef.current) {
+      initializeScanner(
+        scannerRef,
+        handleDetected,
+        handleProcessed,
+        handleScannerError,
+        () => {
+          // On successful initialization
+          quaggaInitialized.current = true;
+          setScanFeedback('Camera ready. Scanning for barcode...');
+        }
+      );
+    }
   };
 
   const stopScanner = () => {
-    if (Quagga) {
-      Quagga.stop();
+    if (quaggaInitialized.current && Quagga) {
+      try {
+        Quagga.offDetected(handleDetected);
+        Quagga.stop();
+        quaggaInitialized.current = false;
+      } catch (error) {
+        console.error("Error stopping Quagga:", error);
+      }
     }
     setIsScanning(false);
   };
 
   return (
-    <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+    <Dialog open={isDialogOpen} onOpenChange={(open) => {
+      if (!open && isScanning) {
+        stopScanner();
+      }
+      setIsDialogOpen(open);
+    }}>
       <DialogTrigger asChild>
         <Button 
           type="button" 
