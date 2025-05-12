@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -73,6 +72,7 @@ const SellerProducts: React.FC = () => {
       household: 'bg-cyan-100 text-cyan-800',
       books: 'bg-indigo-100 text-indigo-800',
       toys: 'bg-pink-100 text-pink-800',
+      medicine: 'bg-red-100 text-red-800', // Added missing medicine category
       other: 'bg-gray-100 text-gray-800',
     };
     return colors[category];
