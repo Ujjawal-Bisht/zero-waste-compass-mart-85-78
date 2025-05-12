@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Outlet, Navigate, Link } from 'react-router-dom';
-import { useAuth } from '@/contexts/AuthContext';
+import { useAuth } from '@/contexts/auth';
 import { Leaf } from 'lucide-react';
 import { motion } from 'framer-motion';
 
