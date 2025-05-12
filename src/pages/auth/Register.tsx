@@ -34,6 +34,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import { motion } from 'framer-motion';
+import ReCAPTCHA from 'react-google-recaptcha';
 
 // Base schema for common fields
 const baseUserSchema = z.object({
@@ -70,6 +72,7 @@ const Register: React.FC = () => {
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
   const [accountType, setAccountType] = useState('buyer'); // 'buyer' or 'seller'
+  const [captchaValue, setCaptchaValue] = useState<string | null>(null);
 
   const buyerForm = useForm<z.infer<typeof userSchema>>({
     resolver: zodResolver(userSchema),
@@ -94,10 +97,20 @@ const Register: React.FC = () => {
     },
   });
 
+  const onCaptchaChange = (value: string | null) => {
+    setCaptchaValue(value);
+  };
+
   const onSubmitBuyer = async (values: z.infer<typeof userSchema>) => {
+    if (!captchaValue) {
+      toast.error('Please verify that you are not a robot');
+      return;
+    }
+
     try {
       setIsLoading(true);
       await registerUser(values.email, values.password, values.name);
+      toast.success('Account created successfully!');
       navigate('/dashboard');
     } catch (error) {
       console.error('Registration error:', error);
@@ -108,6 +121,11 @@ const Register: React.FC = () => {
   };
 
   const onSubmitSeller = async (values: z.infer<typeof sellerSchema>) => {
+    if (!captchaValue) {
+      toast.error('Please verify that you are not a robot');
+      return;
+    }
+
     try {
       setIsLoading(true);
       await registerUser(
@@ -120,6 +138,7 @@ const Register: React.FC = () => {
           isSeller: values.isSeller,
         }
       );
+      toast.success('Seller account created successfully!');
       navigate('/seller/profile'); // Redirect to seller verification page
     } catch (error) {
       console.error('Seller registration error:', error);
@@ -130,9 +149,15 @@ const Register: React.FC = () => {
   };
 
   const handleGoogleLogin = async () => {
+    if (!captchaValue) {
+      toast.error('Please verify that you are not a robot');
+      return;
+    }
+    
     try {
       setIsLoading(true);
       await googleLogin();
+      toast.success('Successfully signed in with Google!');
       navigate('/dashboard');
     } catch (error) {
       console.error('Google login error:', error);
@@ -143,13 +168,30 @@ const Register: React.FC = () => {
   };
 
   return (
-    <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
+    <motion.div 
+      className="mt-8 sm:mx-auto sm:w-full sm:max-w-md"
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5 }}
+    >
       <Card>
         <CardHeader>
-          <CardTitle className="text-center">Create an Account</CardTitle>
-          <CardDescription className="text-center">
-            Join Zero Waste Mart to buy and sell surplus goods
-          </CardDescription>
+          <motion.div
+            initial={{ scale: 0.8, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            transition={{ delay: 0.2, duration: 0.5 }}
+            className="text-center mb-2"
+          >
+            <div className="flex justify-center">
+              <motion.div whileHover={{ scale: 1.1, rotate: [0, -5, 5, 0] }}>
+                <div className="h-16 w-16 rounded-full zwm-gradient flex items-center justify-center text-white font-bold text-2xl mb-2">ZW</div>
+              </motion.div>
+            </div>
+            <CardTitle className="text-center">Create an Account</CardTitle>
+            <CardDescription className="text-center">
+              Join Zero Waste Mart to buy and sell surplus goods
+            </CardDescription>
+          </motion.div>
         </CardHeader>
         <CardContent>
           <Tabs value={accountType} onValueChange={setAccountType} className="mb-6">
@@ -158,7 +200,7 @@ const Register: React.FC = () => {
               <TabsTrigger value="seller">Seller Account</TabsTrigger>
             </TabsList>
             
-            <TabsContent value="buyer">
+            <TabsContent value="buyer" className="animate-fade-in">
               <Form {...buyerForm}>
                 <form onSubmit={buyerForm.handleSubmit(onSubmitBuyer)} className="space-y-4">
                   <FormField
@@ -213,18 +255,33 @@ const Register: React.FC = () => {
                       </FormItem>
                     )}
                   />
-                  <Button
-                    type="submit"
-                    className="w-full zwm-gradient hover:opacity-90 transition-opacity"
-                    disabled={isLoading}
+                  
+                  <motion.div
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ delay: 0.4, duration: 0.5 }}
+                    className="flex justify-center"
                   >
-                    {isLoading ? 'Creating Account...' : 'Sign Up as Buyer'}
-                  </Button>
+                    <ReCAPTCHA
+                      sitekey="6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI" // This is a test key
+                      onChange={onCaptchaChange}
+                    />
+                  </motion.div>
+                  
+                  <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+                    <Button
+                      type="submit"
+                      className="w-full zwm-gradient hover:opacity-90 transition-opacity"
+                      disabled={isLoading || !captchaValue}
+                    >
+                      {isLoading ? 'Creating Account...' : 'Sign Up as Buyer'}
+                    </Button>
+                  </motion.div>
                 </form>
               </Form>
             </TabsContent>
             
-            <TabsContent value="seller">
+            <TabsContent value="seller" className="animate-fade-in">
               <Form {...sellerForm}>
                 <form onSubmit={sellerForm.handleSubmit(onSubmitSeller)} className="space-y-4">
                   <FormField
@@ -315,16 +372,32 @@ const Register: React.FC = () => {
                       </FormItem>
                     )}
                   />
+                  
+                  <motion.div
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ delay: 0.4, duration: 0.5 }}
+                    className="flex justify-center"
+                  >
+                    <ReCAPTCHA
+                      sitekey="6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI" // This is a test key
+                      onChange={onCaptchaChange}
+                    />
+                  </motion.div>
+                  
                   <div className="text-sm text-gray-500 bg-gray-50 p-3 rounded-md">
                     <p>By registering as a seller, you'll need to verify your business after sign-up.</p>
                   </div>
-                  <Button
-                    type="submit"
-                    className="w-full zwm-gradient hover:opacity-90 transition-opacity"
-                    disabled={isLoading}
-                  >
-                    {isLoading ? 'Creating Account...' : 'Register as Seller'}
-                  </Button>
+                  
+                  <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+                    <Button
+                      type="submit"
+                      className="w-full zwm-gradient hover:opacity-90 transition-opacity"
+                      disabled={isLoading || !captchaValue}
+                    >
+                      {isLoading ? 'Creating Account...' : 'Register as Seller'}
+                    </Button>
+                  </motion.div>
                 </form>
               </Form>
             </TabsContent>
@@ -340,13 +413,17 @@ const Register: React.FC = () => {
               </div>
             </div>
 
-            <div className="mt-6">
+            <motion.div 
+              className="mt-6"
+              whileHover={{ scale: 1.03 }}
+              whileTap={{ scale: 0.97 }}
+            >
               <Button
                 type="button"
                 variant="outline"
                 className="w-full"
                 onClick={handleGoogleLogin}
-                disabled={isLoading}
+                disabled={isLoading || !captchaValue}
               >
                 <svg className="h-5 w-5 mr-2" viewBox="0 0 24 24">
                   <path
@@ -368,19 +445,34 @@ const Register: React.FC = () => {
                 </svg>
                 Google
               </Button>
-            </div>
+            </motion.div>
           </div>
         </CardContent>
         <CardFooter className="flex justify-center">
-          <p className="text-sm text-gray-600">
+          <motion.p 
+            className="text-sm text-gray-600"
+            whileHover={{ scale: 1.05 }}
+          >
             Already have an account?{' '}
             <Link to="/login" className="text-zwm-primary hover:underline">
               Sign in
             </Link>
-          </p>
+          </motion.p>
         </CardFooter>
       </Card>
-    </div>
+      
+      <motion.div 
+        className="mt-4 text-center text-sm text-gray-500"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 0.6, duration: 0.5 }}
+      >
+        By signing up, you agree to our{' '}
+        <Link to="#" className="text-zwm-primary hover:underline">Terms of Service</Link>{' '}
+        and{' '}
+        <Link to="#" className="text-zwm-primary hover:underline">Privacy Policy</Link>
+      </motion.div>
+    </motion.div>
   );
 };
 

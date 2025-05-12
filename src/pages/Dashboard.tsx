@@ -5,8 +5,9 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { ItemStatus, Item } from '@/types';
+import { IndianRupee } from 'lucide-react';
 
-// Mock data for dashboard
+// Extended mock data for dashboard (100+ entries)
 const mockItems: Item[] = [
   {
     id: '1',
@@ -105,10 +106,100 @@ const mockItems: Item[] = [
   },
 ];
 
+// Generate additional mock items (for a total of 100+ entries)
+for (let i = 6; i <= 105; i++) {
+  const categories = ['food', 'household', 'medicine', 'clothing'] as const;
+  const statuses = ['available', 'donated', 'expired', 'flagged'] as const;
+  const category = categories[Math.floor(Math.random() * categories.length)];
+  const status = statuses[Math.floor(Math.random() * statuses.length)];
+  
+  // Generate random expiration date (between today and 6 months from now)
+  const today = new Date();
+  const futureDate = new Date();
+  futureDate.setMonth(today.getMonth() + 6);
+  const expiryDate = new Date(
+    today.getTime() + Math.random() * (futureDate.getTime() - today.getTime())
+  ).toISOString().split('T')[0];
+  
+  // Generate random creation date (between 3 months ago and today)
+  const pastDate = new Date();
+  pastDate.setMonth(today.getMonth() - 3);
+  const createdAt = new Date(
+    pastDate.getTime() + Math.random() * (today.getTime() - pastDate.getTime())
+  ).toISOString().split('T')[0];
+  
+  // Generate random price data
+  const originalPrice = Math.floor(Math.random() * 5000) + 100; // Between ₹100 - ₹5000
+  const discountPercent = Math.random() < 0.7 ? Math.floor(Math.random() * 50) + 5 : 0; // 70% chance of discount (5-50%)
+  const currentPrice = discountPercent > 0 
+    ? Math.floor(originalPrice * (1 - discountPercent / 100)) 
+    : originalPrice;
+
+  const locations = [
+    { address: 'Mumbai, Maharashtra', lat: 19.0760, lng: 72.8777 },
+    { address: 'Delhi, Delhi', lat: 28.6139, lng: 77.2090 },
+    { address: 'Bangalore, Karnataka', lat: 12.9716, lng: 77.5946 },
+    { address: 'Hyderabad, Telangana', lat: 17.3850, lng: 78.4867 },
+    { address: 'Chennai, Tamil Nadu', lat: 13.0827, lng: 80.2707 },
+    { address: 'Kolkata, West Bengal', lat: 22.5726, lng: 88.3639 }
+  ];
+  const randomLocation = locations[Math.floor(Math.random() * locations.length)];
+
+  const userNames = ['Raj Kumar', 'Priya Singh', 'Amit Patel', 'Divya Sharma', 'Vikram Mehta', 'Meera Reddy'];
+
+  // Generate item name based on category
+  let name = '';
+  let description = '';
+  let imageUrl = '';
+  
+  if (category === 'food') {
+    const foodItems = ['Rice Bag', 'Wheat Flour', 'Cooking Oil', 'Dal', 'Sugar', 'Tea Leaves', 'Packaged Spices', 'Canned Food', 'Packaged Snacks', 'Dairy Products'];
+    name = foodItems[Math.floor(Math.random() * foodItems.length)];
+    description = `Unused ${name.toLowerCase()}, in good condition`;
+    imageUrl = 'https://images.unsplash.com/photo-1584269600464-37b1b58a9fe7?auto=format&fit=crop&q=80&w=2532&ixlib=rb-4.0.3';
+  } else if (category === 'household') {
+    const householdItems = ['Table Lamp', 'Kitchen Utensils', 'Bedsheets', 'Curtains', 'Wall Clock', 'Storage Containers', 'Cushions', 'Floor Mat', 'Cleaning Supplies'];
+    name = householdItems[Math.floor(Math.random() * householdItems.length)];
+    description = `Lightly used ${name.toLowerCase()}, still in good condition`;
+    imageUrl = 'https://images.unsplash.com/photo-1584269600464-37b1b58a9fe7?auto=format&fit=crop&q=80&w=2532&ixlib=rb-4.0.3';
+  } else if (category === 'medicine') {
+    const medicineItems = ['Paracetamol', 'Vitamin Supplements', 'First Aid Kit', 'Antiseptic Cream', 'Cough Syrup', 'Insulin', 'Antibiotics', 'Pain Relievers'];
+    name = medicineItems[Math.floor(Math.random() * medicineItems.length)];
+    description = `Sealed ${name.toLowerCase()}, not expired`;
+    imageUrl = 'https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?auto=format&fit=crop&q=80&w=2532&ixlib=rb-4.0.3';
+  } else {
+    const clothingItems = ['Winter Jacket', 'Cotton Shirts', 'Formal Wear', 'Traditional Clothes', 'Woolen Sweaters', 'Kids Clothes', 'School Uniforms'];
+    name = clothingItems[Math.floor(Math.random() * clothingItems.length)];
+    description = `Gently used ${name.toLowerCase()}, clean and ready to wear`;
+    imageUrl = 'https://images.unsplash.com/photo-1551488831-00ddcb6c6bd3?auto=format&fit=crop&q=80&w=2532&ixlib=rb-4.0.3';
+  }
+  
+  mockItems.push({
+    id: `${i}`,
+    name: name,
+    description: description,
+    category: category,
+    imageUrl: imageUrl,
+    expiryDate: expiryDate,
+    createdAt: createdAt,
+    updatedAt: createdAt,
+    status: status,
+    userId: `user${Math.floor(Math.random() * 999) + 100}`,
+    userName: userNames[Math.floor(Math.random() * userNames.length)],
+    userPhoto: null,
+    location: randomLocation,
+    originalPrice: originalPrice,
+    currentPrice: currentPrice,
+    quantity: Math.floor(Math.random() * 20) + 1
+  });
+}
+
 const Dashboard = () => {
   const navigate = useNavigate();
   const [selectedStatus, setSelectedStatus] = useState<ItemStatus | 'all'>('all');
   const [searchQuery, setSearchQuery] = useState('');
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage] = useState(10);
 
   const filterItems = (items: Item[]) => {
     // Filter by status if not 'all'
@@ -129,6 +220,12 @@ const Dashboard = () => {
   };
 
   const filteredItems = filterItems(mockItems);
+  
+  // Pagination
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentItems = filteredItems.slice(indexOfFirstItem, indexOfLastItem);
+  const totalPages = Math.ceil(filteredItems.length / itemsPerPage);
   
   const getStatusClass = (status: ItemStatus) => {
     switch (status) {
@@ -151,10 +248,14 @@ const Dashboard = () => {
   const getCategoryText = (category: string) => {
     return category.charAt(0).toUpperCase() + category.slice(1);
   };
+
+  const handlePageChange = (pageNumber: number) => {
+    setCurrentPage(pageNumber);
+  };
   
   return (
     <div className="space-y-6">
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 animate-fade-in">
         <div>
           <h1 className="text-3xl font-bold">Dashboard</h1>
           <p className="text-muted-foreground">Manage your items and donations</p>
@@ -168,7 +269,7 @@ const Dashboard = () => {
       </div>
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        <Card>
+        <Card className="hover:shadow-md transition-all duration-300 hover:-translate-y-1 animate-fade-in">
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium text-muted-foreground">
               Total Items
@@ -178,7 +279,7 @@ const Dashboard = () => {
             <div className="text-2xl font-bold">{mockItems.length}</div>
           </CardContent>
         </Card>
-        <Card>
+        <Card className="hover:shadow-md transition-all duration-300 hover:-translate-y-1 animate-fade-in" style={{ animationDelay: "100ms" }}>
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium text-muted-foreground">
               Available Items
@@ -190,7 +291,7 @@ const Dashboard = () => {
             </div>
           </CardContent>
         </Card>
-        <Card>
+        <Card className="hover:shadow-md transition-all duration-300 hover:-translate-y-1 animate-fade-in" style={{ animationDelay: "200ms" }}>
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium text-muted-foreground">
               Donated Items
@@ -202,7 +303,7 @@ const Dashboard = () => {
             </div>
           </CardContent>
         </Card>
-        <Card>
+        <Card className="hover:shadow-md transition-all duration-300 hover:-translate-y-1 animate-fade-in" style={{ animationDelay: "300ms" }}>
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium text-muted-foreground">
               Expiring Soon
@@ -223,7 +324,10 @@ const Dashboard = () => {
         </Card>
       </div>
 
-      <Tabs defaultValue="all" className="w-full" onValueChange={(value) => setSelectedStatus(value as ItemStatus | 'all')}>
+      <Tabs defaultValue="all" className="w-full animate-fade-in" style={{ animationDelay: "400ms" }} onValueChange={(value) => {
+        setSelectedStatus(value as ItemStatus | 'all');
+        setCurrentPage(1);
+      }}>
         <div className="flex justify-between items-center">
           <TabsList>
             <TabsTrigger value="all">All Items</TabsTrigger>
@@ -234,30 +338,55 @@ const Dashboard = () => {
         </div>
 
         <TabsContent value="all" className="mt-6">
-          <ItemsTable items={filteredItems} getStatusClass={getStatusClass} formatDate={formatDate} getCategoryText={getCategoryText} />
+          <ItemsTable 
+            items={currentItems} 
+            getStatusClass={getStatusClass} 
+            formatDate={formatDate}
+            getCategoryText={getCategoryText} 
+          />
+          <Pagination 
+            currentPage={currentPage} 
+            totalPages={totalPages} 
+            onPageChange={handlePageChange} 
+          />
         </TabsContent>
         <TabsContent value="available" className="mt-6">
           <ItemsTable 
-            items={filteredItems} 
+            items={currentItems}
             getStatusClass={getStatusClass} 
             formatDate={formatDate}
             getCategoryText={getCategoryText}
+          />
+          <Pagination 
+            currentPage={currentPage} 
+            totalPages={totalPages} 
+            onPageChange={handlePageChange} 
           />
         </TabsContent>
         <TabsContent value="donated" className="mt-6">
           <ItemsTable 
-            items={filteredItems} 
+            items={currentItems}
             getStatusClass={getStatusClass} 
             formatDate={formatDate}
             getCategoryText={getCategoryText}
           />
+          <Pagination 
+            currentPage={currentPage} 
+            totalPages={totalPages} 
+            onPageChange={handlePageChange} 
+          />
         </TabsContent>
         <TabsContent value="expired" className="mt-6">
           <ItemsTable 
-            items={filteredItems} 
+            items={currentItems}
             getStatusClass={getStatusClass} 
             formatDate={formatDate}
             getCategoryText={getCategoryText}
+          />
+          <Pagination 
+            currentPage={currentPage} 
+            totalPages={totalPages} 
+            onPageChange={handlePageChange} 
           />
         </TabsContent>
       </Tabs>
@@ -301,6 +430,9 @@ const ItemsTable: React.FC<ItemsTableProps> = ({
                   Expiry Date
                 </th>
                 <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Price
+                </th>
+                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Location
                 </th>
                 <th scope="col" className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -311,7 +443,7 @@ const ItemsTable: React.FC<ItemsTableProps> = ({
             <tbody className="bg-white divide-y divide-gray-200">
               {items.length > 0 ? (
                 items.map((item) => (
-                  <tr key={item.id}>
+                  <tr key={item.id} className="hover:bg-gray-50 transition-colors">
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
                       {item.id}
                     </td>
@@ -329,15 +461,18 @@ const ItemsTable: React.FC<ItemsTableProps> = ({
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                       {formatDate(item.expiryDate)}
                     </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 flex items-center">
+                      <IndianRupee className="h-3 w-3 mr-1" />{item.currentPrice?.toFixed(2)}
+                    </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                       {item.location.address}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                       <div className="flex justify-end space-x-2">
-                        <Button size="sm" variant="outline">
+                        <Button size="sm" variant="outline" className="hover:bg-gray-100 transition-colors">
                           View
                         </Button>
-                        <Button size="sm" variant="outline" className="border-zwm-primary text-zwm-primary">
+                        <Button size="sm" variant="outline" className="border-zwm-primary text-zwm-primary hover:bg-zwm-primary/10 transition-colors">
                           Edit
                         </Button>
                       </div>
@@ -346,7 +481,7 @@ const ItemsTable: React.FC<ItemsTableProps> = ({
                 ))
               ) : (
                 <tr>
-                  <td colSpan={7} className="px-6 py-4 whitespace-nowrap text-center text-sm text-gray-500">
+                  <td colSpan={8} className="px-6 py-4 whitespace-nowrap text-center text-sm text-gray-500">
                     No items found
                   </td>
                 </tr>
@@ -355,6 +490,107 @@ const ItemsTable: React.FC<ItemsTableProps> = ({
           </table>
         </div>
       </div>
+    </div>
+  );
+};
+
+// Pagination component
+interface PaginationProps {
+  currentPage: number;
+  totalPages: number;
+  onPageChange: (page: number) => void;
+}
+
+const Pagination: React.FC<PaginationProps> = ({
+  currentPage,
+  totalPages,
+  onPageChange,
+}) => {
+  const pageNumbers = [];
+  
+  // Logic to display page numbers
+  const maxPagesToShow = 5;
+  let startPage: number;
+  let endPage: number;
+  
+  if (totalPages <= maxPagesToShow) {
+    startPage = 1;
+    endPage = totalPages;
+  } else {
+    const maxPagesBeforeCurrentPage = Math.floor(maxPagesToShow / 2);
+    const maxPagesAfterCurrentPage = Math.ceil(maxPagesToShow / 2) - 1;
+    
+    if (currentPage <= maxPagesBeforeCurrentPage) {
+      startPage = 1;
+      endPage = maxPagesToShow;
+    } else if (currentPage + maxPagesAfterCurrentPage >= totalPages) {
+      startPage = totalPages - maxPagesToShow + 1;
+      endPage = totalPages;
+    } else {
+      startPage = currentPage - maxPagesBeforeCurrentPage;
+      endPage = currentPage + maxPagesAfterCurrentPage;
+    }
+  }
+  
+  for (let i = startPage; i <= endPage; i++) {
+    pageNumbers.push(i);
+  }
+  
+  return (
+    <div className="flex justify-center mt-6 items-center space-x-2">
+      <Button
+        variant="outline"
+        size="sm"
+        onClick={() => onPageChange(1)}
+        disabled={currentPage === 1}
+        className="hidden sm:block"
+      >
+        First
+      </Button>
+      <Button
+        variant="outline"
+        size="sm"
+        onClick={() => onPageChange(currentPage - 1)}
+        disabled={currentPage === 1}
+      >
+        Previous
+      </Button>
+      
+      <div className="flex items-center space-x-1">
+        {pageNumbers.map(number => (
+          <Button
+            key={number}
+            variant={currentPage === number ? "default" : "outline"}
+            size="sm"
+            onClick={() => onPageChange(number)}
+            className={currentPage === number ? "bg-zwm-primary text-white" : ""}
+          >
+            {number}
+          </Button>
+        ))}
+      </div>
+      
+      <Button
+        variant="outline"
+        size="sm"
+        onClick={() => onPageChange(currentPage + 1)}
+        disabled={currentPage === totalPages}
+      >
+        Next
+      </Button>
+      <Button
+        variant="outline"
+        size="sm"
+        onClick={() => onPageChange(totalPages)}
+        disabled={currentPage === totalPages}
+        className="hidden sm:block"
+      >
+        Last
+      </Button>
+      
+      <span className="text-sm text-muted-foreground ml-2">
+        Page {currentPage} of {totalPages}
+      </span>
     </div>
   );
 };

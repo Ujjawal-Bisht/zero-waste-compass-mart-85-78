@@ -12,7 +12,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { AlertCircle, Phone, Mail, MapPin, Clock, Contact } from 'lucide-react';
+import { AlertCircle, Phone, Mail, MapPin, Clock, Contact, IndianRupee, PillBottle } from 'lucide-react';
 import {
   Dialog,
   DialogContent,
@@ -25,7 +25,7 @@ import {
 import { differenceInDays } from 'date-fns';
 import { toast } from 'sonner';
 
-// Mock data for marketplace items - only food and household items
+// Mock data for marketplace items - including food, household items, and medicines
 const mockItems: Item[] = [
   {
     id: '1',
@@ -41,12 +41,12 @@ const mockItems: Item[] = [
     userName: 'John Doe',
     userPhoto: null,
     location: {
-      address: '123 Main St, City',
-      lat: 40.7128,
-      lng: -74.006,
+      address: 'Mumbai, Maharashtra',
+      lat: 19.0760,
+      lng: 72.8777,
     },
-    originalPrice: 5.99,
-    currentPrice: 3.99,
+    originalPrice: 399,
+    currentPrice: 299,
     quantity: 12
   },
   {
@@ -63,12 +63,12 @@ const mockItems: Item[] = [
     userName: 'Jane Smith',
     userPhoto: null,
     location: {
-      address: '456 Oak St, City',
-      lat: 40.7129,
-      lng: -74.007,
+      address: 'Delhi, Delhi',
+      lat: 28.6139,
+      lng: 77.2090,
     },
-    originalPrice: 4.50,
-    currentPrice: 2.25,
+    originalPrice: 150,
+    currentPrice: 99,
     quantity: 5
   },
   {
@@ -85,12 +85,12 @@ const mockItems: Item[] = [
     userName: 'Mike Wilson',
     userPhoto: null,
     location: {
-      address: '101 Elm St, City',
-      lat: 40.7131,
-      lng: -74.009,
+      address: 'Bangalore, Karnataka',
+      lat: 12.9716,
+      lng: 77.5946,
     },
-    originalPrice: 25.99,
-    currentPrice: 25.99,
+    originalPrice: 1199,
+    currentPrice: 1199,
     quantity: 3
   },
   {
@@ -107,12 +107,12 @@ const mockItems: Item[] = [
     userName: 'Sarah Brown',
     userPhoto: null,
     location: {
-      address: '202 Cedar St, City',
-      lat: 40.7132,
-      lng: -74.01,
+      address: 'Hyderabad, Telangana',
+      lat: 17.3850,
+      lng: 78.4867,
     },
-    originalPrice: 32.50,
-    currentPrice: 28.99,
+    originalPrice: 1250,
+    currentPrice: 999,
     quantity: 2
   },
   {
@@ -129,19 +129,131 @@ const mockItems: Item[] = [
     userName: 'Emma Davis',
     userPhoto: null,
     location: {
-      address: '303 Maple St, City',
-      lat: 40.7133,
-      lng: -74.011,
+      address: 'Chennai, Tamil Nadu',
+      lat: 13.0827,
+      lng: 80.2707,
     },
-    originalPrice: 8.99,
-    currentPrice: 6.75,
+    originalPrice: 450,
+    currentPrice: 350,
     quantity: 15
   },
+  // Adding new items - Medicines
+  {
+    id: '7',
+    name: 'Paracetamol Tablets',
+    description: 'Sealed pack of paracetamol tablets, fever and pain relief',
+    category: 'medicine',
+    imageUrl: 'https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?auto=format&fit=crop&q=80&w=2532&ixlib=rb-4.0.3',
+    expiryDate: '2025-08-15',
+    createdAt: '2025-05-07',
+    updatedAt: '2025-05-07',
+    status: 'available',
+    userId: 'user404',
+    userName: 'Dr. Rajeev Kumar',
+    userPhoto: null,
+    location: {
+      address: 'Mumbai, Maharashtra',
+      lat: 19.0760,
+      lng: 72.8777,
+    },
+    originalPrice: 120,
+    currentPrice: 99,
+    quantity: 20
+  },
+  {
+    id: '8',
+    name: 'Vitamin C Supplements',
+    description: 'Immunity boosting vitamin C tablets, sealed bottle',
+    category: 'medicine',
+    imageUrl: 'https://images.unsplash.com/photo-1576602976047-174e57a47881?auto=format&fit=crop&q=80&w=2532&ixlib=rb-4.0.3',
+    expiryDate: '2026-01-10',
+    createdAt: '2025-05-08',
+    updatedAt: '2025-05-08',
+    status: 'available',
+    userId: 'user505',
+    userName: 'Priya Sharma',
+    userPhoto: null,
+    location: {
+      address: 'Delhi, Delhi',
+      lat: 28.6139,
+      lng: 77.2090,
+    },
+    originalPrice: 550,
+    currentPrice: 450,
+    quantity: 8
+  },
+  {
+    id: '9',
+    name: 'First Aid Kit',
+    description: 'Complete first aid kit with bandages, antiseptics and more',
+    category: 'medicine',
+    imageUrl: 'https://images.unsplash.com/photo-1603398938378-e54eab446dde?auto=format&fit=crop&q=80&w=2532&ixlib=rb-4.0.3',
+    expiryDate: '2026-05-20',
+    createdAt: '2025-05-09',
+    updatedAt: '2025-05-09',
+    status: 'available',
+    userId: 'user606',
+    userName: 'Amit Patel',
+    userPhoto: null,
+    location: {
+      address: 'Bangalore, Karnataka',
+      lat: 12.9716,
+      lng: 77.5946,
+    },
+    originalPrice: 1500,
+    currentPrice: 1299,
+    quantity: 5
+  },
+  {
+    id: '10',
+    name: 'Diabetic Glucose Monitor',
+    description: 'Unused blood glucose monitoring system with test strips',
+    category: 'medicine',
+    imageUrl: 'https://images.unsplash.com/photo-1595435934249-5df7ed86e1c0?auto=format&fit=crop&q=80&w=2532&ixlib=rb-4.0.3',
+    expiryDate: '2025-12-31',
+    createdAt: '2025-05-10',
+    updatedAt: '2025-05-10',
+    status: 'available',
+    userId: 'user707',
+    userName: 'Divya Reddy',
+    userPhoto: null,
+    location: {
+      address: 'Chennai, Tamil Nadu',
+      lat: 13.0827,
+      lng: 80.2707,
+    },
+    originalPrice: 3500,
+    currentPrice: 2999,
+    quantity: 2
+  },
+  {
+    id: '11',
+    name: 'Ayurvedic Supplements',
+    description: 'Traditional Ayurvedic health supplements, sealed bottles',
+    category: 'medicine',
+    imageUrl: 'https://images.unsplash.com/photo-1577174881658-0f30ed549adc?auto=format&fit=crop&q=80&w=2532&ixlib=rb-4.0.3',
+    expiryDate: '2025-11-15',
+    createdAt: '2025-05-11',
+    updatedAt: '2025-05-11',
+    status: 'available',
+    userId: 'user808',
+    userName: 'Vikram Mehta',
+    userPhoto: null,
+    location: {
+      address: 'Kolkata, West Bengal',
+      lat: 22.5726, 
+      lng: 88.3639,
+    },
+    originalPrice: 850,
+    currentPrice: 699,
+    quantity: 10
+  }
 ];
 
 const categories: { value: ItemCategory; label: string }[] = [
   { value: 'food', label: 'Food' },
   { value: 'household', label: 'Household' },
+  { value: 'medicine', label: 'Medicines' },
 ];
 
 const Marketplace: React.FC = () => {
@@ -196,6 +308,13 @@ const Marketplace: React.FC = () => {
     }
   };
 
+  const getCategoryIcon = (category: string) => {
+    if (category === 'medicine') {
+      return <PillBottle className="h-4 w-4 mr-1" />;
+    }
+    return null;
+  };
+
   return (
     <div className="space-y-6 animate-fade-in">
       <div>
@@ -223,7 +342,7 @@ const Marketplace: React.FC = () => {
             <SelectContent>
               <SelectItem value="all">All Categories</SelectItem>
               {categories.map((category) => (
-                <SelectItem key={category.value} value={category.value}>
+                <SelectItem key={category.value} value={category.value} className="flex items-center">
                   {category.label}
                 </SelectItem>
               ))}
@@ -246,7 +365,7 @@ const Marketplace: React.FC = () => {
             const daysUntilExpiry = getDaysUntilExpiry(item.expiryDate);
             
             return (
-              <Card key={item.id} className="overflow-hidden flex flex-col card-hover">
+              <Card key={item.id} className="overflow-hidden flex flex-col card-hover animate-fade-in hover:shadow-lg transition-all duration-300 hover:-translate-y-1">
                 <div className="aspect-video w-full overflow-hidden relative">
                   <img
                     src={item.imageUrl}
@@ -268,7 +387,8 @@ const Marketplace: React.FC = () => {
                 <CardHeader>
                   <div className="flex justify-between items-start">
                     <CardTitle>{item.name}</CardTitle>
-                    <Badge className="bg-zwm-primary hover:bg-zwm-secondary transition-colors">
+                    <Badge className={`flex items-center ${item.category === 'medicine' ? 'bg-blue-500' : item.category === 'food' ? 'bg-green-500' : 'bg-amber-500'} hover:bg-opacity-90 transition-colors`}>
+                      {getCategoryIcon(item.category)}
                       {item.category.charAt(0).toUpperCase() + item.category.slice(1)}
                     </Badge>
                   </div>
@@ -291,16 +411,16 @@ const Marketplace: React.FC = () => {
                     <div className="flex items-center mt-3 gap-2">
                       {item.originalPrice !== item.currentPrice && item.originalPrice ? (
                         <div className="flex items-baseline">
-                          <span className="text-sm line-through text-muted-foreground">
-                            ${item.originalPrice.toFixed(2)}
+                          <span className="text-sm line-through text-muted-foreground flex items-center">
+                            <IndianRupee className="h-3 w-3 mr-0.5" />{item.originalPrice.toFixed(2)}
                           </span>
-                          <span className="ml-1.5 text-lg font-bold text-zwm-primary">
-                            ${item.currentPrice?.toFixed(2)}
+                          <span className="ml-1.5 text-lg font-bold text-zwm-primary flex items-center">
+                            <IndianRupee className="h-3.5 w-3.5 mr-0.5" />{item.currentPrice?.toFixed(2)}
                           </span>
                         </div>
                       ) : (
-                        <span className="text-lg font-bold text-zwm-primary">
-                          ${item.currentPrice?.toFixed(2)}
+                        <span className="text-lg font-bold text-zwm-primary flex items-center">
+                          <IndianRupee className="h-3.5 w-3.5 mr-0.5" />{item.currentPrice?.toFixed(2)}
                         </span>
                       )}
                       <span className="text-sm text-muted-foreground">
@@ -325,7 +445,7 @@ const Marketplace: React.FC = () => {
       )}
 
       <Dialog open={!!selectedItem} onOpenChange={(open) => !open && setSelectedItem(null)}>
-        <DialogContent className="sm:max-w-md">
+        <DialogContent className="sm:max-w-md animate-scale-in">
           <DialogHeader>
             <DialogTitle>Contact {selectedItem?.userName}</DialogTitle>
             <DialogDescription>
