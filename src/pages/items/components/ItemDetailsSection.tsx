@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { FormField, FormItem, FormLabel, FormControl, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
@@ -50,6 +51,7 @@ const ItemDetailsSection: React.FC<ItemDetailsSectionProps> = ({ form, handleBar
             <Select 
               onValueChange={field.onChange} 
               defaultValue={field.value}
+              value={field.value}
             >
               <FormControl>
                 <SelectTrigger className="transition-all">

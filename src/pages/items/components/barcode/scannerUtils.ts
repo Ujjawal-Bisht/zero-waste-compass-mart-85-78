@@ -6,7 +6,8 @@ export const initializeScanner = (
   onDetected: (result: any) => void,
   onProcessed: (result: any) => void,
   onError: (err: Error) => void,
-  onInitSuccess?: () => void
+  onInitSuccess?: () => void,
+  enableTorch: boolean = false
 ) => {
   if (scannerRef.current) {
     try {
@@ -19,7 +20,8 @@ export const initializeScanner = (
             width: { min: 640 },
             height: { min: 480 },
             facingMode: "environment", // Use the rear camera
-            aspectRatio: { min: 1, max: 2 }
+            aspectRatio: { min: 1, max: 2 },
+            torch: enableTorch, // Enable or disable flashlight
           },
         },
         locator: {
@@ -69,6 +71,23 @@ export const initializeScanner = (
       console.error("Error during Quagga initialization:", initError);
       onError(new Error("Failed to initialize the scanner"));
     }
+  }
+};
+
+// Helper function to toggle torch/flashlight
+export const toggleTorch = (enable: boolean): boolean => {
+  try {
+    const track = Quagga.CameraAccess.getActiveTrack();
+    if (track && typeof track.applyConstraints === 'function') {
+      track.applyConstraints({
+        advanced: [{ torch: enable }]
+      });
+      return true;
+    }
+    return false;
+  } catch (error) {
+    console.error("Error toggling torch:", error);
+    return false;
   }
 };
 
