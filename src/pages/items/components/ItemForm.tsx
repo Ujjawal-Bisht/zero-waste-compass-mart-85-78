@@ -52,6 +52,10 @@ const ItemForm: React.FC<ItemFormProps> = ({ onBarcodeDetected }) => {
       if (onBarcodeDetected) {
         onBarcodeDetected(barcode, item);
       }
+    } else {
+      toast.error("Barcode not found in database", {
+        description: "This barcode is not in our system."
+      });
     }
   };
 
