@@ -1,8 +1,9 @@
+
 // Update this page (the content is just a fallback if you fail to update the page)
 
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '@/contexts/AuthContext';
+import { useAuth } from '@/contexts/auth';
 import { Button } from '@/components/ui/button';
 import { ArrowRight, Upload, MessageCircle, ShoppingBag, IndianRupee } from 'lucide-react';
 import Logo from '@/components/ui/logo';
