@@ -1,125 +1,96 @@
 
-/* Zero Waste Mart specific components */
+/* Components */
 .zwm-gradient {
-  @apply bg-gradient-to-r from-zwm-primary to-zwm-secondary;
+  background: linear-gradient(to right, #3b82f6, #8b5cf6);
 }
 
-.zwm-gradient-hover {
-  @apply transition-all duration-300;
-  background-size: 200% auto;
-  @apply bg-gradient-to-r from-zwm-primary via-zwm-secondary to-zwm-primary;
-  background-position: right center;
+.zwm-seller-gradient {
+  background: linear-gradient(to right, #f59e0b, #d97706, #b45309);
 }
 
-.zwm-gradient-hover:hover {
-  background-position: left center;
-  @apply shadow-lg;
-}
-
-.zwm-card {
-  @apply bg-white rounded-xl shadow-md hover:shadow-lg transition-all duration-300 overflow-hidden border border-gray-100;
-}
-
-/* Status badges */
-.zwm-status-donated {
-  @apply bg-zwm-success text-white rounded-full px-3 py-1 text-xs font-semibold;
-}
-
-.zwm-status-available {
-  @apply bg-zwm-info text-white rounded-full px-3 py-1 text-xs font-semibold;
-}
-
-.zwm-status-expired {
-  @apply bg-zwm-error text-white rounded-full px-3 py-1 text-xs font-semibold;
-}
-
-.zwm-status-pending {
-  @apply bg-zwm-warning text-white rounded-full px-3 py-1 text-xs font-semibold;
-}
-
-/* Enhanced UI elements */
-.card-hover {
-  @apply transition-all duration-300 hover:shadow-lg hover:translate-y-[-5px];
-}
-
-.glass-effect {
-  @apply bg-white/70 backdrop-blur-md border border-white/20 shadow-md;
-}
-
-.button-glow {
-  @apply relative overflow-hidden;
-}
-
-.button-glow::after {
-  content: "";
-  @apply absolute inset-0 bg-white/20 opacity-0 transition-opacity duration-300;
-}
-
-.button-glow:hover::after {
-  @apply opacity-100;
-}
-
-/* Text effects */
 .gradient-text {
-  @apply text-transparent bg-clip-text;
-  background-image: linear-gradient(to right, var(--tw-gradient-stops));
-  @apply bg-gradient-to-r from-zwm-primary to-zwm-secondary;
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
 }
 
-.text-shadow {
-  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-
-/* Hover effects */
-.hover-scale {
-  @apply transition-transform duration-200;
-}
-
-.hover-scale:hover {
-  transform: scale(1.05);
-}
-
-.shadow-pop {
-  @apply transition-shadow duration-300;
-}
-
-.shadow-pop:hover {
-  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 
-              0 10px 10px -5px rgba(0, 0, 0, 0.04);
-}
-
-.hover-glow {
+/* Different gradients for seller and buyer */
+.buyer-button-gradient {
+  background: linear-gradient(to right, #3b82f6, #8b5cf6);
+  color: white;
   transition: all 0.3s ease;
 }
 
-.hover-glow:hover {
-  box-shadow: 0 0 10px 5px rgba(79, 70, 229, 0.3);
+.buyer-button-gradient:hover {
+  background: linear-gradient(to right, #2563eb, #7c3aed);
+  box-shadow: 0 10px 15px -3px rgba(59, 130, 246, 0.3);
 }
 
-.hover-3d {
-  transition: transform 0.3s ease-out;
-  transform-style: preserve-3d;
+.seller-button-gradient {
+  background: linear-gradient(to right, #f59e0b, #ea580c);
+  color: white;
+  transition: all 0.3s ease;
 }
 
-.hover-3d:hover {
-  transform: perspective(1000px) rotateX(5deg) rotateY(5deg);
+.seller-button-gradient:hover {
+  background: linear-gradient(to right, #d97706, #c2410c);
+  box-shadow: 0 10px 15px -3px rgba(245, 158, 11, 0.3);
 }
 
-/* Ripple effect */
-.ripple {
-  position: relative;
-  overflow: hidden;
+/* Card styling */
+.card-hover {
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
-.ripple::after {
-  content: "";
-  position: absolute;
-  border-radius: 50%;
-  background-color: rgba(255, 255, 255, 0.3);
-  width: 100px;
-  height: 100px;
-  margin-top: -50px;
-  margin-left: -50px;
-  animation: ripple 1s;
-  opacity: 0;
+.card-hover:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+}
+
+/* Improve button styles */
+.social-login-button {
+  transition: all 0.2s ease;
+  border: 1px solid #e5e7eb;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1rem;
+  border-radius: 0.375rem;
+  font-weight: 500;
+  background-color: white;
+}
+
+.social-login-button:hover {
+  background-color: #f9fafb;
+  border-color: #d1d5db;
+  transform: translateY(-1px);
+}
+
+.social-login-button:active {
+  transform: translateY(1px);
+}
+
+/* Badge for verified sellers */
+.verified-badge {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 9999px;
+  background-color: #ecfdf5;
+  color: #059669;
+  font-size: 0.75rem;
+  font-weight: 500;
+  padding: 0.25rem 0.75rem;
+  gap: 0.25rem;
+}
+
+/* Seller profile specific styling */
+.seller-section {
+  border-left: 4px solid #f59e0b;
+  padding-left: 1rem;
+}
+
+.buyer-section {
+  border-left: 4px solid #3b82f6;
+  padding-left: 1rem;
 }

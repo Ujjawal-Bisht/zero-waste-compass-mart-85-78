@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
@@ -85,15 +86,26 @@ const LoginForm: React.FC = () => {
   return (
     <Tabs value={accountType} onValueChange={(value) => setAccountType(value as 'buyer' | 'seller')} className="mb-6">
       <TabsList className="grid w-full grid-cols-2">
-        <TabsTrigger value="buyer" className="flex items-center gap-2">
-          <ShoppingBag size={16} /> Buyer
+        <TabsTrigger value="buyer" className="flex items-center gap-2 py-3">
+          <ShoppingBag size={16} /> 
+          <span className="text-base">
+            Buyer
+          </span>
         </TabsTrigger>
-        <TabsTrigger value="seller" className="flex items-center gap-2">
-          <Store size={16} /> Seller
+        <TabsTrigger value="seller" className="flex items-center gap-2 py-3 bg-gradient-to-r from-indigo-500 data-[state=active]:from-orange-500 data-[state=active]:to-amber-500 data-[state=active]:text-white">
+          <Store size={16} />
+          <span className="text-base">
+            Seller
+          </span>
         </TabsTrigger>
       </TabsList>
       
-      <TabsContent value="buyer">
+      <TabsContent value="buyer" className="animate-fade-in mt-4">
+        <div className="bg-gradient-to-r from-blue-50 to-indigo-50 p-3 rounded-lg border border-blue-100 mb-4">
+          <p className="text-sm text-blue-700">
+            Welcome back! Sign in to your buyer account to explore sustainable products.
+          </p>
+        </div>
         <Tabs value={loginMethod} onValueChange={(value) => setLoginMethod(value as 'email' | 'phone')} className="mb-6">
           <TabsList className="grid w-full grid-cols-2">
             <TabsTrigger value="email" className="flex items-center gap-2">
@@ -104,7 +116,7 @@ const LoginForm: React.FC = () => {
             </TabsTrigger>
           </TabsList>
           
-          <TabsContent value="email">
+          <TabsContent value="email" className="mt-4">
             <BuyerEmailLogin 
               onSubmit={onSubmit}
               onGoogleLogin={handleGoogleLogin}
@@ -114,7 +126,7 @@ const LoginForm: React.FC = () => {
             />
           </TabsContent>
           
-          <TabsContent value="phone">
+          <TabsContent value="phone" className="mt-4">
             <MobileOtpVerification 
               onVerificationComplete={handlePhoneLogin}
               onCancel={() => setLoginMethod('email')}
@@ -123,7 +135,12 @@ const LoginForm: React.FC = () => {
         </Tabs>
       </TabsContent>
       
-      <TabsContent value="seller">
+      <TabsContent value="seller" className="animate-fade-in mt-4">
+        <div className="bg-gradient-to-r from-amber-50 to-orange-50 p-3 rounded-lg border border-amber-200 mb-4">
+          <p className="text-sm text-amber-700">
+            Welcome back, seller! Sign in to manage your sustainable business.
+          </p>
+        </div>
         <SellerLogin 
           onSubmit={onSubmit}
           isLoading={isLoading}
