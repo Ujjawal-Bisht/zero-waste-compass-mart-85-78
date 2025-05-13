@@ -47,7 +47,7 @@ const BuyerEmailLogin: React.FC<BuyerEmailLoginProps> = ({
   return (
     <>
       <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-5">
+        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
           <FormField
             control={form.control}
             name="email"
@@ -126,18 +126,21 @@ const BuyerEmailLogin: React.FC<BuyerEmailLoginProps> = ({
             </div>
           </div>
           
+          {/* Redesigned compact reCAPTCHA */}
           <motion.div
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ delay: 0.3, duration: 0.5 }}
             className="flex justify-center"
           >
-            <div className="captcha-container w-full max-w-xs mx-auto relative overflow-hidden rounded-lg border border-gray-200 shadow-sm bg-gradient-to-r from-blue-50 to-indigo-50 p-1 transform transition-all hover:shadow-md scale-90">
-              <ReCAPTCHA
-                sitekey="6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI" // This is a test key
-                onChange={onCaptchaChange}
-                size="compact"
-              />
+            <div className="captcha-container w-full max-w-xs mx-auto relative overflow-hidden rounded-md border border-gray-200 shadow-sm bg-gradient-to-r from-blue-50 to-indigo-50 transform transition-all hover:shadow-md scale-80">
+              <div className="compact-captcha">
+                <ReCAPTCHA
+                  sitekey="6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI" // This is a test key
+                  onChange={onCaptchaChange}
+                  size="compact"
+                />
+              </div>
               <motion.div 
                 className="absolute inset-0 bg-blue-400 opacity-10"
                 animate={{ 
@@ -159,7 +162,7 @@ const BuyerEmailLogin: React.FC<BuyerEmailLoginProps> = ({
           >
             <Button
               type="submit"
-              className="w-full zwm-gradient hover:opacity-90 transition-opacity h-12 text-lg font-medium"
+              className="w-full zwm-gradient hover:opacity-90 transition-opacity h-11 text-lg font-medium"
               disabled={isLoading || !captchaValue}
             >
               {isLoading ? 'Signing In...' : 'Sign In as Buyer'}
