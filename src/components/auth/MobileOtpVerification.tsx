@@ -1,11 +1,11 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { InputOTP, InputOTPGroup, InputOTPSlot } from '@/components/ui/input-otp';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from '@/components/ui/card';
 import { Form, FormField, FormItem, FormLabel, FormControl, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
-import { Smartphone } from 'lucide-react';
+import { Smartphone, Search } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -19,6 +19,8 @@ import {
   SelectValue
 } from '@/components/ui/select';
 import { COUNTRY_CODES } from '@/utils/countryCodes';
+import { Command, CommandInput, CommandEmpty, CommandGroup, CommandItem } from '@/components/ui/command';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 
 const phoneSchema = z.object({
   countryCode: z.string().min(1, { message: 'Country code is required' }),
@@ -43,6 +45,9 @@ const MobileOtpVerification: React.FC<MobileOtpVerificationProps> = ({
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [resendDisabled, setResendDisabled] = useState(false);
   const [countdownTime, setCountdownTime] = useState(0);
+  const [open, setOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [filteredCountries, setFilteredCountries] = useState(COUNTRY_CODES);
 
   const phoneForm = useForm<z.infer<typeof phoneSchema>>({
     resolver: zodResolver(phoneSchema),
@@ -59,15 +64,37 @@ const MobileOtpVerification: React.FC<MobileOtpVerificationProps> = ({
     }
   });
 
+  useEffect(() => {
+    // Filter countries based on search query
+    if (searchQuery) {
+      const filtered = COUNTRY_CODES.filter(country => 
+        country.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
+        country.dialCode.includes(searchQuery)
+      );
+      setFilteredCountries(filtered);
+    } else {
+      setFilteredCountries(COUNTRY_CODES);
+    }
+  }, [searchQuery]);
+
   const handleSendOtp = async (values: z.infer<typeof phoneSchema>) => {
     setIsSubmitting(true);
     try {
       // Format the phone number with country code
       const fullPhoneNumber = `${values.countryCode}${values.phoneNumber}`;
       
-      // In a real implementation, this would call an API to send the OTP
-      // Simulate API call with a timeout
+      // In a real implementation, we would call an API to send the OTP
+      // For now, simulate the API call with a toast notification
       await new Promise(resolve => setTimeout(resolve, 1500));
+      
+      // Generate a random 6-digit code for demo purposes
+      const randomCode = Math.floor(100000 + Math.random() * 900000).toString();
+      
+      // Show the code in a toast - in a real app this would be sent via SMS
+      toast.info(`Demo: Your OTP is ${randomCode}`, {
+        description: "In a real app, this would be sent via SMS",
+        duration: 8000
+      });
       
       setFormattedPhoneNumber(fullPhoneNumber);
       setStep('otp');
@@ -131,6 +158,16 @@ const MobileOtpVerification: React.FC<MobileOtpVerificationProps> = ({
     try {
       // Simulate API call
       await new Promise(resolve => setTimeout(resolve, 1500));
+      
+      // Generate a new random 6-digit code for demo purposes
+      const randomCode = Math.floor(100000 + Math.random() * 900000).toString();
+      
+      // Show the code in a toast - in a real app this would be sent via SMS
+      toast.info(`Demo: Your new OTP is ${randomCode}`, {
+        description: "In a real app, this would be sent via SMS",
+        duration: 8000
+      });
+      
       toast.success('New code sent!');
       startResendCountdown();
     } catch (error) {
@@ -173,28 +210,50 @@ const MobileOtpVerification: React.FC<MobileOtpVerificationProps> = ({
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Country Code</FormLabel>
-                      <Select 
-                        onValueChange={field.onChange} 
-                        defaultValue={field.value}
-                      >
-                        <FormControl>
-                          <SelectTrigger className="w-full">
-                            <SelectValue placeholder="Select country code" />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent className="max-h-[300px]">
-                          {COUNTRY_CODES.map((country) => (
-                            <SelectItem 
-                              key={country.code} 
-                              value={country.dialCode}
-                              className="flex items-center gap-2"
+                      <Popover open={open} onOpenChange={setOpen}>
+                        <PopoverTrigger asChild>
+                          <FormControl>
+                            <Button
+                              variant="outline"
+                              role="combobox"
+                              className="w-full justify-between"
                             >
-                              <span className="font-medium">{country.dialCode}</span>
-                              <span className="text-muted-foreground">{country.name}</span>
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
+                              {field.value ? 
+                                `${field.value} ${COUNTRY_CODES.find(country => country.dialCode === field.value)?.name || ''}` : 
+                                "Select country code"}
+                            </Button>
+                          </FormControl>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-full p-0" align="start">
+                          <Command>
+                            <div className="flex items-center border-b px-3">
+                              <Search className="mr-2 h-4 w-4 shrink-0 opacity-50" />
+                              <CommandInput 
+                                placeholder="Search country..." 
+                                className="flex h-10 w-full rounded-md bg-transparent py-3 text-sm outline-none placeholder:text-muted-foreground focus:placeholder:text-muted-foreground disabled:cursor-not-allowed disabled:opacity-50"
+                                value={searchQuery}
+                                onValueChange={setSearchQuery}
+                              />
+                            </div>
+                            <CommandEmpty>No country found.</CommandEmpty>
+                            <CommandGroup className="max-h-[300px] overflow-auto">
+                              {filteredCountries.map((country) => (
+                                <CommandItem
+                                  key={country.code}
+                                  value={`${country.dialCode}-${country.name}`}
+                                  onSelect={() => {
+                                    field.onChange(country.dialCode);
+                                    setOpen(false);
+                                  }}
+                                >
+                                  <span className="font-medium">{country.dialCode}</span>
+                                  <span className="ml-2 text-muted-foreground">{country.name}</span>
+                                </CommandItem>
+                              ))}
+                            </CommandGroup>
+                          </Command>
+                        </PopoverContent>
+                      </Popover>
                       <FormMessage />
                     </FormItem>
                   )}
