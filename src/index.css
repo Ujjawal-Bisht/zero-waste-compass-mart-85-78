@@ -12,13 +12,11 @@
 
 /* Redesigned reCAPTCHA container */
 .compact-captcha {
-  transform: scale(0.85);
-  transform-origin: left top;
-  height: 62px;
+  transform-origin: center;
   overflow: hidden;
   display: flex;
   align-items: center;
-  margin: -6px -12px;
+  justify-content: center;
 }
 
 .captcha-container:hover {
@@ -104,6 +102,10 @@
 /* Scale utility for captcha */
 .scale-80 {
   transform: scale(0.8);
+}
+
+.scale-95 {
+  transform: scale(0.95);
 }
 
 /* Compressed layout styles */

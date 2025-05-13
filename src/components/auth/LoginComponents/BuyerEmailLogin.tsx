@@ -126,33 +126,42 @@ const BuyerEmailLogin: React.FC<BuyerEmailLoginProps> = ({
             </div>
           </div>
           
-          {/* Redesigned compact reCAPTCHA */}
+          {/* Redesigned elegant reCAPTCHA */}
           <motion.div
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.3, duration: 0.5 }}
-            className="flex justify-center"
+            className="flex justify-center my-3"
           >
-            <div className="captcha-container w-full max-w-xs mx-auto relative overflow-hidden rounded-md border border-gray-200 shadow-sm bg-gradient-to-r from-blue-50 to-indigo-50 transform transition-all hover:shadow-md scale-80">
-              <div className="compact-captcha">
-                <ReCAPTCHA
-                  sitekey="6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI" // This is a test key
-                  onChange={onCaptchaChange}
-                  size="compact"
+            <div className="captcha-container w-full max-w-md mx-auto overflow-hidden rounded-lg shadow-sm bg-gradient-to-br from-blue-50 via-white to-indigo-50 border border-blue-100 p-3 transform hover:shadow-md transition-all duration-300 ease-in-out">
+              <motion.div
+                className="relative"
+                whileHover={{ scale: 1.02 }}
+                transition={{ duration: 0.2 }}
+              >
+                <div className="flex items-center justify-center">
+                  <div className="compact-captcha scale-95 origin-center">
+                    <ReCAPTCHA
+                      sitekey="6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI" // This is a test key
+                      onChange={onCaptchaChange}
+                      size="normal"
+                      theme="light"
+                    />
+                  </div>
+                </div>
+                <motion.div 
+                  className="absolute inset-0 bg-blue-400 opacity-5 rounded-lg"
+                  animate={{ 
+                    opacity: [0.05, 0.1, 0.05],
+                    scale: [1, 1.01, 1]
+                  }}
+                  transition={{ 
+                    repeat: Infinity, 
+                    duration: 3,
+                    ease: "easeInOut"
+                  }}
                 />
-              </div>
-              <motion.div 
-                className="absolute inset-0 bg-blue-400 opacity-10"
-                animate={{ 
-                  opacity: [0.05, 0.1, 0.05],
-                  scale: [1, 1.02, 1]
-                }}
-                transition={{ 
-                  repeat: Infinity, 
-                  duration: 3,
-                  ease: "easeInOut"
-                }}
-              />
+              </motion.div>
             </div>
           </motion.div>
           
