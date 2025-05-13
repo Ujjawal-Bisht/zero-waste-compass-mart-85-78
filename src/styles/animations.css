@@ -164,3 +164,156 @@
 .skew-hover:hover {
   transform: skew(-3deg) scale(1.03);
 }
+
+/* NEW ANIMATIONS */
+
+/* Particles floating effect */
+@keyframes particle-float {
+  0%, 100% {
+    transform: translate(0, 0) rotate(0deg);
+  }
+  25% {
+    transform: translate(10px, -15px) rotate(5deg);
+  }
+  50% {
+    transform: translate(20px, 0) rotate(10deg);
+  }
+  75% {
+    transform: translate(10px, 15px) rotate(5deg);
+  }
+}
+
+.particle-float {
+  animation: particle-float 15s ease-in-out infinite;
+}
+
+/* Color shift animation */
+@keyframes color-shift {
+  0%, 100% {
+    filter: hue-rotate(0deg);
+  }
+  50% {
+    filter: hue-rotate(30deg);
+  }
+}
+
+.color-shift {
+  animation: color-shift 8s infinite;
+}
+
+/* Glowing pulsate */
+@keyframes glow-pulse {
+  0%, 100% {
+    box-shadow: 0 0 5px rgba(139, 92, 246, 0.3),
+                0 0 20px rgba(139, 92, 246, 0.1);
+  }
+  50% {
+    box-shadow: 0 0 10px rgba(59, 130, 246, 0.5),
+                0 0 30px rgba(59, 130, 246, 0.2);
+  }
+}
+
+.glow-pulse {
+  animation: glow-pulse 4s infinite;
+}
+
+/* Spiral float animation */
+@keyframes spiral-float {
+  0% {
+    transform: translateY(0) rotate(0deg) translateX(0);
+  }
+  25% {
+    transform: translateY(-15px) rotate(90deg) translateX(5px);
+  }
+  50% {
+    transform: translateY(0) rotate(180deg) translateX(0);
+  }
+  75% {
+    transform: translateY(15px) rotate(270deg) translateX(-5px);
+  }
+  100% {
+    transform: translateY(0) rotate(360deg) translateX(0);
+  }
+}
+
+.spiral-float {
+  animation: spiral-float 20s infinite ease-in-out;
+}
+
+/* Wave animation */
+@keyframes wave {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  25% {
+    transform: translateY(-8px);
+  }
+  50% {
+    transform: translateY(0);
+  }
+  75% {
+    transform: translateY(8px);
+  }
+}
+
+.wave {
+  animation: wave 5s infinite ease-in-out;
+}
+
+/* Delayed wave group animations */
+.wave-group-1 { animation-delay: 0s; }
+.wave-group-2 { animation-delay: 1s; }
+.wave-group-3 { animation-delay: 2s; }
+.wave-group-4 { animation-delay: 3s; }
+.wave-group-5 { animation-delay: 4s; }
+
+/* Blur in and out */
+@keyframes blur-breathe {
+  0%, 100% {
+    filter: blur(0px);
+  }
+  50% {
+    filter: blur(3px);
+  }
+}
+
+.blur-breathe {
+  animation: blur-breathe 8s infinite ease-in-out;
+}
+
+/* Shimmering radiance animation */
+@keyframes radiance {
+  0% {
+    box-shadow: 0 0 5px rgba(255, 255, 255, 0.1),
+                0 0 10px rgba(255, 255, 255, 0.1);
+    opacity: 0.8;
+  }
+  50% {
+    box-shadow: 0 0 10px rgba(255, 255, 255, 0.3),
+                0 0 20px rgba(255, 255, 255, 0.2);
+    opacity: 1;
+  }
+  100% {
+    box-shadow: 0 0 5px rgba(255, 255, 255, 0.1),
+                0 0 10px rgba(255, 255, 255, 0.1);
+    opacity: 0.8;
+  }
+}
+
+.radiance {
+  animation: radiance 5s infinite;
+}
+
+/* Orbit animation */
+@keyframes orbit {
+  0% {
+    transform: rotate(0deg) translateX(50px) rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg) translateX(50px) rotate(-360deg);
+  }
+}
+
+.orbit {
+  animation: orbit 20s linear infinite;
+}
