@@ -1,4 +1,4 @@
 
-export { AuthContextProvider } from './auth-context';
+export { AuthContextProvider as AuthProvider } from './auth-context';
 export { useAuth } from './use-auth';
 export type { AuthContextType } from './auth-types';

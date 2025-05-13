@@ -14,10 +14,7 @@ const DashboardLayout: React.FC = () => {
   return (
     <div className="flex h-screen bg-gray-50">
       {/* Sidebar */}
-      <DashboardSidebar 
-        isCollapsed={isCollapsed}
-        setIsCollapsed={setIsCollapsed}
-      />
+      <DashboardSidebar />
 
       {/* Main Content */}
       <div className="flex-1 overflow-auto">
