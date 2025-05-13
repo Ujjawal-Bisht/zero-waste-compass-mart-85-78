@@ -17,7 +17,6 @@ export const BarcodeScanner: React.FC<BarcodeScannerProps> = ({ onBarcodeDetecte
   const [barcodeResult, setBarcodeResult] = useState<string | null>(null);
   const [scanFeedback, setScanFeedback] = useState('');
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [torchEnabled, setTorchEnabled] = useState(false);
   const scannerRef = useRef<HTMLDivElement>(null);
   const scanLineRef = useRef<HTMLDivElement>(null);
   const quaggaInitialized = useRef(false);
@@ -53,16 +52,7 @@ export const BarcodeScanner: React.FC<BarcodeScannerProps> = ({ onBarcodeDetecte
     
     // Clean up function
     return () => {
-      if (quaggaInitialized.current && Quagga) {
-        try {
-          Quagga.offDetected(handleDetected);
-          Quagga.stop();
-        } catch (error) {
-          console.error("Error stopping Quagga:", error);
-        } finally {
-          quaggaInitialized.current = false;
-        }
-      }
+      cleanupScanner();
     };
   }, [isDialogOpen, isScanning]);
 
@@ -79,16 +69,7 @@ export const BarcodeScanner: React.FC<BarcodeScannerProps> = ({ onBarcodeDetecte
         setScanFeedback(`Barcode detected: ${code}`);
         
         // Stop scanning safely
-        if (quaggaInitialized.current) {
-          try {
-            Quagga.offDetected(handleDetected);
-            Quagga.stop();
-            quaggaInitialized.current = false;
-          } catch (error) {
-            console.error("Error stopping Quagga after detection:", error);
-          }
-        }
-        
+        cleanupScanner();
         setIsScanning(false);
         
         // Use a slight delay to show the detected barcode before closing
@@ -114,6 +95,18 @@ export const BarcodeScanner: React.FC<BarcodeScannerProps> = ({ onBarcodeDetecte
     quaggaInitialized.current = false;
   };
 
+  const cleanupScanner = () => {
+    if (quaggaInitialized.current && Quagga) {
+      try {
+        Quagga.offDetected(handleDetected);
+        Quagga.stop();
+        quaggaInitialized.current = false;
+      } catch (error) {
+        console.error("Error stopping Quagga:", error);
+      }
+    }
+  };
+
   const startScanner = () => {
     setIsScanning(true);
     setScanFeedback('Initializing camera...');
@@ -130,23 +123,14 @@ export const BarcodeScanner: React.FC<BarcodeScannerProps> = ({ onBarcodeDetecte
           quaggaInitialized.current = true;
           setScanFeedback('Camera ready. Scanning for barcode...');
         },
-        torchEnabled
+        false // torch initially disabled
       );
     }
   };
 
   const stopScanner = () => {
-    if (quaggaInitialized.current && Quagga) {
-      try {
-        Quagga.offDetected(handleDetected);
-        Quagga.stop();
-        quaggaInitialized.current = false;
-      } catch (error) {
-        console.error("Error stopping Quagga:", error);
-      }
-    }
+    cleanupScanner();
     setIsScanning(false);
-    setTorchEnabled(false);
   };
 
   return (
