@@ -123,7 +123,7 @@ const LoginCard: React.FC = () => {
             className="text-center mb-2"
           >
             <CardTitle className="text-2xl font-bold mb-2">
-              {accountType === 'buyer' ? 'Welcome Back' : 'Seller Login'}
+              {accountType === 'buyer' ? 'Buyer Login' : 'Seller Login'}
             </CardTitle>
             <motion.div 
               className={`h-1 w-12 bg-gradient-to-r ${accentColor} mx-auto rounded-full`}
