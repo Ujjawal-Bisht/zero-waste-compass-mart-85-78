@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { ShoppingBag, Truck, Users, LineChart, Leaf, Star } from 'lucide-react';
+import { ShoppingBag, Truck, Users, LineChart, Leaf, Star, Upload, MessageCircle, Box, Pill } from 'lucide-react';
 import FeatureCard from './FeatureCard';
 
 const FeaturesTabs: React.FC = () => {
@@ -69,7 +69,7 @@ const FeaturesTabs: React.FC = () => {
             />
 
             <TabsContent value="buyers" className="mt-8">
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                 <FeatureCard 
                   title="Find Deals" 
                   description="Discover discounted products nearing expiry dates, helping reduce waste and save money."
@@ -81,59 +81,79 @@ const FeaturesTabs: React.FC = () => {
                   delay={0.1}
                 />
                 <FeatureCard 
-                  title="Community Impact" 
-                  description="Track your environmental impact through a dashboard showing waste reduction metrics."
-                  icon={Users}
-                  buttonText="View Impact"
-                  buttonAction={() => console.log("Community Impact clicked")}
+                  title="Connect with Sellers" 
+                  description="Directly communicate with sellers to arrange pickups or deliveries."
+                  icon={MessageCircle}
+                  buttonText="Start Connecting"
+                  buttonAction={() => console.log("Connect clicked")}
                   iconBgColor="bg-purple-50"
                   animationType="rotate"
                   delay={0.2}
                 />
                 <FeatureCard 
-                  title="Sustainability Rewards" 
-                  description="Earn points for sustainable choices that can be redeemed for eco-friendly products."
-                  icon={Leaf}
-                  buttonText="View Rewards"
-                  buttonAction={() => console.log("Sustainability Rewards clicked")}
-                  iconBgColor="bg-green-50"
+                  title="Packaged Food" 
+                  description="Browse a wide selection of packaged food items nearing their best-before date at great discounts."
+                  icon={Box}
+                  buttonText="Browse Food"
+                  buttonAction={() => console.log("Packaged Food clicked")}
+                  iconBgColor="bg-amber-50"
                   animationType="vertical"
                   delay={0.3}
+                />
+                <FeatureCard 
+                  title="Medicines" 
+                  description="Find essential medicines at discounted prices while ensuring they're still effective and safe."
+                  icon={Pill}
+                  buttonText="Browse Medicines"
+                  buttonAction={() => console.log("Medicines clicked")}
+                  iconBgColor="bg-green-50"
+                  animationType="scale"
+                  delay={0.4}
                 />
               </div>
             </TabsContent>
 
             <TabsContent value="sellers" className="mt-8">
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                 <FeatureCard 
-                  title="Inventory Management" 
-                  description="Manage products nearing expiry with automated discounting and promotion tools."
-                  icon={LineChart}
-                  buttonText="Explore Tools"
-                  buttonAction={() => console.log("Inventory Management clicked")}
+                  title="Add Item" 
+                  description="Easily list your products that are approaching expiry date for sale at discounted prices."
+                  icon={Upload}
+                  buttonText="Add Now"
+                  buttonAction={() => console.log("Add Item clicked")}
                   iconBgColor="bg-indigo-50"
                   animationType="scale"
                   delay={0.1}
                 />
                 <FeatureCard 
-                  title="Business Analytics" 
-                  description="Access detailed analytics on waste reduction, sales, and sustainability metrics."
-                  icon={Star}
-                  buttonText="View Analytics"
-                  buttonAction={() => console.log("Business Analytics clicked")}
-                  iconBgColor="bg-amber-50"
+                  title="Connect with Buyers" 
+                  description="Communicate directly with interested buyers through our integrated messaging system."
+                  icon={MessageCircle}
+                  buttonText="Connect"
+                  buttonAction={() => console.log("Connect with Buyers clicked")}
+                  iconBgColor="bg-purple-50"
                   animationType="rotate"
                   delay={0.2}
                 />
                 <FeatureCard 
-                  title="Brand Reputation" 
-                  description="Enhance your brand's sustainability profile with badges and metrics to share."
-                  icon={Leaf}
-                  buttonText="Boost Reputation"
-                  buttonAction={() => console.log("Brand Reputation clicked")}
-                  iconBgColor="bg-green-50"
+                  title="Manage Food Items" 
+                  description="Special tools to manage packaged food inventory and set dynamic pricing based on expiry dates."
+                  icon={Box}
+                  buttonText="Manage Inventory"
+                  buttonAction={() => console.log("Manage Food Items clicked")}
+                  iconBgColor="bg-amber-50"
                   animationType="vertical"
                   delay={0.3}
+                />
+                <FeatureCard 
+                  title="Pharmacy Solutions" 
+                  description="Specialized features for pharmacies to manage medicine inventory and comply with regulations."
+                  icon={Pill}
+                  buttonText="Explore Solutions"
+                  buttonAction={() => console.log("Pharmacy Solutions clicked")}
+                  iconBgColor="bg-green-50"
+                  animationType="scale"
+                  delay={0.4}
                 />
               </div>
             </TabsContent>

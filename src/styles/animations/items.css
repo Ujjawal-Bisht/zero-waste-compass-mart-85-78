@@ -118,3 +118,52 @@
 .animate-bounce-subtle {
   animation: bounce-subtle 2s infinite;
 }
+
+/* Feature card hover effects */
+@keyframes card-float {
+  0% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-8px);
+  }
+  100% {
+    transform: translateY(0);
+  }
+}
+
+.card-float {
+  animation: card-float 3s ease-in-out infinite;
+}
+
+/* Icon pulse animation */
+@keyframes icon-pulse {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.15);
+    opacity: 0.8;
+  }
+}
+
+.icon-pulse {
+  animation: icon-pulse 2s ease-in-out infinite;
+}
+
+/* Feature badge animation */
+@keyframes badge-glow {
+  0%, 100% {
+    box-shadow: 0 0 5px rgba(99, 102, 241, 0.5);
+    opacity: 0.8;
+  }
+  50% {
+    box-shadow: 0 0 15px rgba(99, 102, 241, 0.8);
+    opacity: 1;
+  }
+}
+
+.badge-glow {
+  animation: badge-glow 2.5s infinite;
+}
