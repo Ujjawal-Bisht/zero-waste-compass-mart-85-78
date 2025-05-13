@@ -1,0 +1,120 @@
+
+/* Item form specific animations */
+
+@keyframes scan-line {
+  0% {
+    transform: translateY(-100%);
+    opacity: 0.7;
+  }
+  50% {
+    transform: translateY(100%);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(300%);
+    opacity: 0.7;
+  }
+}
+
+.scan-line {
+  animation: scan-line 2s ease-in-out infinite;
+}
+
+/* Success pulse animation for barcode detection */
+@keyframes success-pulse {
+  0%, 100% {
+    transform: scale(1);
+    box-shadow: 0 0 0 rgba(72, 187, 120, 0);
+  }
+  50% {
+    transform: scale(1.05);
+    box-shadow: 0 0 20px rgba(72, 187, 120, 0.7);
+  }
+}
+
+.success-pulse {
+  animation: success-pulse 1.5s ease-in-out infinite;
+}
+
+/* Form element entrance animations */
+@keyframes slide-in-right {
+  from {
+    opacity: 0;
+    transform: translateX(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.slide-in-right {
+  animation: slide-in-right 0.4s ease-out forwards;
+}
+
+/* Staggered animation delays */
+.stagger-1 { animation-delay: 0.1s; }
+.stagger-2 { animation-delay: 0.2s; }
+.stagger-3 { animation-delay: 0.3s; }
+.stagger-4 { animation-delay: 0.4s; }
+.stagger-5 { animation-delay: 0.5s; }
+
+/* Button hover animation */
+.button-glow {
+  transition: all 0.3s ease;
+}
+
+.button-glow:hover {
+  box-shadow: 0 0 15px rgba(59, 130, 246, 0.6);
+  transform: translateY(-2px);
+}
+
+/* Scan target animation */
+@keyframes scan-target-pulse {
+  0%, 100% {
+    border-color: rgba(59, 130, 246, 0.6);
+    box-shadow: 0 0 0 rgba(59, 130, 246, 0);
+  }
+  50% {
+    border-color: rgba(99, 102, 241, 0.9);
+    box-shadow: 0 0 8px rgba(99, 102, 241, 0.6);
+  }
+}
+
+.scan-target {
+  animation: scan-target-pulse 2s infinite;
+}
+
+/* Barcode scan animation */
+@keyframes barcode-detected {
+  0% {
+    background-color: rgba(72, 187, 120, 0);
+  }
+  50% {
+    background-color: rgba(72, 187, 120, 0.2);
+  }
+  100% {
+    background-color: rgba(72, 187, 120, 0);
+  }
+}
+
+.barcode-detected {
+  animation: barcode-detected 1.5s ease-in-out;
+}
+
+/* Bounce subtle animation */
+@keyframes bounce-subtle {
+  0%, 20%, 50%, 80%, 100% {
+    transform: translateY(0);
+  }
+  40% {
+    transform: translateY(-3px);
+  }
+  60% {
+    transform: translateY(-1.5px);
+  }
+}
+
+.animate-bounce-subtle {
+  animation: bounce-subtle 2s infinite;
+}

@@ -39,11 +39,12 @@ const ItemForm: React.FC<ItemFormProps> = ({ onBarcodeDetected }) => {
     if (barcode && barcodeDatabase[barcode]) {
       const item = barcodeDatabase[barcode];
       
-      form.setValue('name', item.name);
-      form.setValue('description', item.description);
-      form.setValue('category', item.category as any);
-      form.setValue('originalPrice', item.originalPrice);
-      form.setValue('currentPrice', item.currentPrice);
+      // Animate the form filling with a slight delay between fields
+      setTimeout(() => form.setValue('name', item.name), 100);
+      setTimeout(() => form.setValue('description', item.description), 200);
+      setTimeout(() => form.setValue('category', item.category as any), 300);
+      setTimeout(() => form.setValue('originalPrice', item.originalPrice), 400);
+      setTimeout(() => form.setValue('currentPrice', item.currentPrice), 500);
       
       toast.success(`Scanned item: ${item.name}`, {
         description: 'Item details have been filled automatically'
@@ -63,12 +64,17 @@ const ItemForm: React.FC<ItemFormProps> = ({ onBarcodeDetected }) => {
     try {
       setIsSubmitting(true);
       
-      // Simulate API call
+      // Simulate API call with a delay to show the loading state
       console.log('Form values:', values);
       console.log('Image:', imagePreview);
       
-      // Show success message
-      toast.success('Item added successfully');
+      // Artificial delay to show loading state
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      // Show success message with confetti effect
+      toast.success('Item added successfully', {
+        description: 'Your item has been added to your inventory'
+      });
       
       // Navigate back to dashboard
       navigate('/dashboard');
@@ -80,23 +86,58 @@ const ItemForm: React.FC<ItemFormProps> = ({ onBarcodeDetected }) => {
     }
   };
 
+  const formVariants = {
+    hidden: { opacity: 0 },
+    show: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.1
+      }
+    }
+  };
+  
+  const sectionVariants = {
+    hidden: { opacity: 0, y: 20 },
+    show: { 
+      opacity: 1, 
+      y: 0, 
+      transition: { 
+        type: "spring",
+        stiffness: 100,
+        duration: 0.5
+      } 
+    }
+  };
+
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div className="space-y-6">
+        <motion.div 
+          className="grid grid-cols-1 md:grid-cols-2 gap-6"
+          variants={formVariants}
+          initial="hidden"
+          animate="show"
+        >
+          <motion.div variants={sectionVariants} className="space-y-6">
             <ItemDetailsSection form={form} handleBarcodeDetected={handleBarcodeDetected} />
             <ExpiryDatePicker form={form} />
-          </div>
+          </motion.div>
 
-          <DescriptionImageSection 
-            form={form}
-            imagePreview={imagePreview}
-            setImagePreview={setImagePreview}
-          />
-        </div>
+          <motion.div variants={sectionVariants}>
+            <DescriptionImageSection 
+              form={form}
+              imagePreview={imagePreview}
+              setImagePreview={setImagePreview}
+            />
+          </motion.div>
+        </motion.div>
 
-        <div className="flex items-center justify-end space-x-4 pt-4">
+        <motion.div 
+          className="flex items-center justify-end space-x-4 pt-4"
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.5, duration: 0.3 }}
+        >
           <Button
             type="button"
             variant="outline"
@@ -108,17 +149,22 @@ const ItemForm: React.FC<ItemFormProps> = ({ onBarcodeDetected }) => {
           </Button>
           <motion.div
             whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.98 }}
+            whileTap={{ scale: 0.95 }}
           >
             <Button 
               type="submit" 
               className="zwm-gradient-hover transition-all"
               disabled={isSubmitting}
             >
-              {isSubmitting ? 'Adding...' : 'Add Item'}
+              {isSubmitting ? (
+                <>
+                  <span className="animate-pulse">Adding...</span>
+                  <span className="loading-dots"></span>
+                </>
+              ) : 'Add Item'}
             </Button>
           </motion.div>
-        </div>
+        </motion.div>
       </form>
     </Form>
   );

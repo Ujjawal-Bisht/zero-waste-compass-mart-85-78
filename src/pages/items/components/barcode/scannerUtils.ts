@@ -28,8 +28,8 @@ export const initializeScanner = (
           patchSize: "medium",
           halfSample: true
         },
-        numOfWorkers: navigator.hardwareConcurrency || 2,
-        frequency: 10,
+        numOfWorkers: navigator.hardwareConcurrency ? Math.min(navigator.hardwareConcurrency, 4) : 2,
+        frequency: 15, // Increased frequency for faster detection
         decoder: {
           readers: [
             "ean_reader",
@@ -39,9 +39,22 @@ export const initializeScanner = (
             "code_93_reader",
             "upc_reader",
             "upc_e_reader"
-          ]
+          ],
+          multiple: false, // Focus on finding one barcode at a time
+          debug: {
+            showCanvas: true,
+            showPatches: true,
+            showFoundPatches: true,
+            showSkeleton: true,
+            showLabels: true,
+            showPatchLabels: true,
+            showRemainingPatchLabels: true
+          }
         },
-        locate: true
+        locate: true,
+        visual: {
+          showPattern: true
+        }
       }, (err) => {
         if (err) {
           onError(err);
@@ -91,6 +104,7 @@ export const toggleTorch = (enable: boolean): boolean => {
   }
 };
 
+// Improved drawing function with better visual feedback
 export const drawBarcodeBox = (result: any) => {
   if (!result) return;
   
@@ -105,9 +119,9 @@ export const drawBarcodeBox = (result: any) => {
     if (width && height) {
       drawingCtx.clearRect(0, 0, width, height);
     
-      // Draw box if barcode is detected
+      // Draw boxes for all potential barcodes (in yellow)
       if (result.boxes) {
-        drawingCtx.strokeStyle = 'green';
+        drawingCtx.strokeStyle = 'rgba(255, 204, 0, 0.8)';
         drawingCtx.lineWidth = 2;
         
         for (let box of result.boxes) {
@@ -121,12 +135,63 @@ export const drawBarcodeBox = (result: any) => {
         }
       }
 
-      // Draw focused box if result is found
+      // Draw focused box if result is found (in green with animation effect)
       if (result.codeResult && result.codeResult.code) {
+        // Draw a more prominent box
         drawingCtx.strokeStyle = '#00FF00';
         drawingCtx.lineWidth = 5;
+        
+        // Add a pulsing effect by varying opacity
+        const currentTime = Date.now() % 1000;
+        const opacity = 0.6 + 0.4 * Math.sin(currentTime / 1000 * Math.PI * 2);
+        
+        drawingCtx.strokeStyle = `rgba(0, 255, 0, ${opacity})`;
         drawingCtx.strokeRect(result.box.x, result.box.y, result.box.width, result.box.height);
+        
+        // Add text with the barcode number
+        drawingCtx.font = '16px Arial';
+        drawingCtx.fillStyle = 'white';
+        drawingCtx.fillRect(result.box.x, result.box.y - 25, result.codeResult.code.length * 10 + 20, 25);
+        drawingCtx.fillStyle = 'black';
+        drawingCtx.fillText(result.codeResult.code, result.box.x + 10, result.box.y - 7);
+        
+        // Add highlight behind the barcode
+        drawingCtx.fillStyle = 'rgba(0, 255, 0, 0.2)';
+        drawingCtx.fillRect(result.box.x, result.box.y, result.box.width, result.box.height);
       }
     }
+  }
+};
+
+// New function to improve camera selection
+export const selectOptimalCamera = async (): Promise<string | undefined> => {
+  try {
+    const devices = await navigator.mediaDevices.enumerateDevices();
+    const videoDevices = devices.filter(device => device.kind === 'videoinput');
+    
+    // Try to find a back camera
+    const backCamera = videoDevices.find(device => 
+      device.label.toLowerCase().includes('back') || 
+      device.label.toLowerCase().includes('rear')
+    );
+    
+    if (backCamera) {
+      return backCamera.deviceId;
+    }
+    
+    // If no back camera found, use the last device (often the back camera on mobile)
+    if (videoDevices.length > 1) {
+      return videoDevices[videoDevices.length - 1].deviceId;
+    }
+    
+    // Fall back to the first camera
+    if (videoDevices.length > 0) {
+      return videoDevices[0].deviceId;
+    }
+    
+    return undefined;
+  } catch (error) {
+    console.error("Error selecting camera:", error);
+    return undefined;
   }
 };

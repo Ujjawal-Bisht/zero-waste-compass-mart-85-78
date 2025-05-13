@@ -5,6 +5,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { ImageUploader } from './ImageUploader';
 import { UseFormReturn } from 'react-hook-form';
 import { ItemFormValues } from '../schemas/itemFormSchema';
+import { motion } from 'framer-motion';
 
 interface DescriptionImageSectionProps {
   form: UseFormReturn<ItemFormValues, any, undefined>;
@@ -17,31 +18,56 @@ const DescriptionImageSection: React.FC<DescriptionImageSectionProps> = ({
   imagePreview, 
   setImagePreview 
 }) => {
-  return (
-    <div className="space-y-6">
-      <FormField
-        control={form.control}
-        name="description"
-        render={({ field }) => (
-          <FormItem>
-            <FormLabel>Description</FormLabel>
-            <FormControl>
-              <Textarea 
-                placeholder="Enter a detailed description of the item" 
-                className="h-32 transition-all"
-                {...field} 
-              />
-            </FormControl>
-            <FormMessage />
-          </FormItem>
-        )}
-      />
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    show: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.1,
+        delayChildren: 0.2
+      }
+    }
+  };
+  
+  const itemVariants = {
+    hidden: { opacity: 0, x: 20 },
+    show: { opacity: 1, x: 0, transition: { duration: 0.3 } }
+  };
 
-      <ImageUploader 
-        imagePreview={imagePreview} 
-        setImagePreview={setImagePreview} 
-      />
-    </div>
+  return (
+    <motion.div 
+      className="space-y-6"
+      variants={containerVariants}
+      initial="hidden"
+      animate="show"
+    >
+      <motion.div variants={itemVariants}>
+        <FormField
+          control={form.control}
+          name="description"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Description</FormLabel>
+              <FormControl>
+                <Textarea 
+                  placeholder="Enter a detailed description of the item" 
+                  className="h-32 transition-all hover:border-zwm-primary focus:border-zwm-primary"
+                  {...field} 
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+      </motion.div>
+
+      <motion.div variants={itemVariants}>
+        <ImageUploader 
+          imagePreview={imagePreview} 
+          setImagePreview={setImagePreview} 
+        />
+      </motion.div>
+    </motion.div>
   );
 };
 
