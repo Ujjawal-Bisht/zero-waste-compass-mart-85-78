@@ -132,10 +132,11 @@ const BuyerEmailLogin: React.FC<BuyerEmailLoginProps> = ({
             transition={{ delay: 0.3, duration: 0.5 }}
             className="flex justify-center"
           >
-            <div className="captcha-container w-full max-w-md relative overflow-hidden rounded-lg border border-gray-200 shadow-sm bg-gradient-to-r from-blue-50 to-indigo-50 p-2 transform transition-all hover:shadow-md">
+            <div className="captcha-container w-full max-w-xs mx-auto relative overflow-hidden rounded-lg border border-gray-200 shadow-sm bg-gradient-to-r from-blue-50 to-indigo-50 p-1 transform transition-all hover:shadow-md scale-90">
               <ReCAPTCHA
                 sitekey="6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI" // This is a test key
                 onChange={onCaptchaChange}
+                size="compact"
               />
               <motion.div 
                 className="absolute inset-0 bg-blue-400 opacity-10"
@@ -166,7 +167,6 @@ const BuyerEmailLogin: React.FC<BuyerEmailLoginProps> = ({
           </motion.div>
         </form>
       </Form>
-      {/* Removed the duplicate sign up button here */}
     </>
   );
 };

@@ -3,11 +3,10 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import LoginCard from '@/components/auth/LoginComponents/LoginCard';
-import Logo from '@/components/ui/logo';
 
 const Login: React.FC = () => {
   return (
-    <div className="flex flex-col items-center relative">
+    <div className="flex flex-col items-center justify-center min-h-screen relative px-4">
       {/* Animated background shapes */}
       <div className="absolute inset-0 overflow-hidden -z-10 pointer-events-none">
         <motion.div
@@ -52,20 +51,6 @@ const Login: React.FC = () => {
               delay: 1,
             }}
           />
-        </motion.div>
-      </div>
-      
-      {/* Logo Section */}
-      <div className="w-full max-w-md mb-4">
-        <motion.div 
-          className="flex justify-center my-8"
-          initial={{ y: -50, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          transition={{ duration: 0.6, ease: "easeOut" }}
-        >
-          <Link to="/">
-            <Logo size="lg" animated={true} />
-          </Link>
         </motion.div>
       </div>
       

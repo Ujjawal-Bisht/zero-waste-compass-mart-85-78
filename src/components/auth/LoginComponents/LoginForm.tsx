@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { useAuth } from '@/contexts/auth';
@@ -11,14 +11,25 @@ import SellerLogin from './SellerLogin';
 import MobileOtpVerification from '@/components/auth/MobileOtpVerification';
 import { EmailFormValues } from '@/components/auth/schemas/emailLoginSchema';
 
-const LoginForm: React.FC = () => {
+interface LoginFormProps {
+  onAccountTypeChange?: (type: 'buyer' | 'seller') => void;
+}
+
+const LoginForm: React.FC<LoginFormProps> = ({ onAccountTypeChange }) => {
   const { login, googleLogin, phoneLogin } = useAuth();
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
   const [captchaValue, setCaptchaValue] = useState<string | null>(null);
-  const [loginMethod, setLoginMethod] = useState<'email' | 'phone'>('email');
+  const [loginMethod, setLoginMethod] = useState<'email' | 'phone' | 'google'>('email');
   const [accountType, setAccountType] = useState<'buyer' | 'seller'>('buyer');
   const [sellerLoginMethod, setSellerLoginMethod] = useState<'email' | 'phone' | 'google'>('email');
+
+  // Notify parent component when account type changes
+  useEffect(() => {
+    if (onAccountTypeChange) {
+      onAccountTypeChange(accountType);
+    }
+  }, [accountType, onAccountTypeChange]);
 
   const onCaptchaChange = (value: string | null) => {
     setCaptchaValue(value);
@@ -118,12 +129,17 @@ const LoginForm: React.FC = () => {
         </TabsList>
         
         <TabsContent value="buyer" className="animate-fade-in mt-4">
-          <div className="bg-gradient-to-r from-blue-50 to-indigo-50 p-4 rounded-lg border border-blue-100 mb-4 shadow-sm">
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4 }}
+            className="bg-gradient-to-r from-blue-50 to-indigo-50 p-4 rounded-lg border border-blue-100 mb-4 shadow-sm"
+          >
             <p className="text-sm text-blue-700">
               Welcome back! Sign in to your buyer account to explore sustainable products.
             </p>
-          </div>
-          <Tabs value={loginMethod} onValueChange={(value) => setLoginMethod(value as 'email' | 'phone')} className="mb-6">
+          </motion.div>
+          <Tabs value={loginMethod} onValueChange={(value) => setLoginMethod(value as 'email' | 'phone' | 'google')} className="mb-6">
             <TabsList className="grid w-full grid-cols-3">
               <TabsTrigger value="email" className="flex items-center gap-2">
                 <Mail size={16} /> Email
@@ -188,11 +204,16 @@ const LoginForm: React.FC = () => {
         </TabsContent>
         
         <TabsContent value="seller" className="animate-fade-in mt-4">
-          <div className="bg-gradient-to-r from-amber-50 to-orange-50 p-4 rounded-lg border border-amber-200 mb-4 shadow-sm">
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4 }}
+            className="bg-gradient-to-r from-amber-50 to-orange-50 p-4 rounded-lg border border-amber-200 mb-4 shadow-sm"
+          >
             <p className="text-sm text-amber-700">
               Welcome back, seller! Sign in to manage your sustainable business.
             </p>
-          </div>
+          </motion.div>
           
           <Tabs value={sellerLoginMethod} onValueChange={(value) => setSellerLoginMethod(value as 'email' | 'phone' | 'google')} className="mb-6">
             <TabsList className="grid w-full grid-cols-3">

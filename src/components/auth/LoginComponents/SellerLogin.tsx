@@ -130,10 +130,25 @@ const SellerLogin: React.FC<SellerLoginProps> = ({
             transition={{ delay: 0.4, duration: 0.5 }}
             className="flex justify-center"
           >
-            <ReCAPTCHA
-              sitekey="6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI" // This is a test key
-              onChange={onCaptchaChange}
-            />
+            <div className="captcha-container w-full max-w-xs mx-auto relative overflow-hidden rounded-lg border border-gray-200 shadow-sm bg-gradient-to-r from-amber-50 to-orange-50 p-1 transform transition-all hover:shadow-md scale-90">
+              <ReCAPTCHA
+                sitekey="6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI" // This is a test key
+                onChange={onCaptchaChange}
+                size="compact"
+              />
+              <motion.div 
+                className="absolute inset-0 bg-amber-400 opacity-10"
+                animate={{ 
+                  opacity: [0.05, 0.1, 0.05],
+                  scale: [1, 1.02, 1]
+                }}
+                transition={{ 
+                  repeat: Infinity, 
+                  duration: 3,
+                  ease: "easeInOut"
+                }}
+              />
+            </div>
           </motion.div>
           
           <motion.div

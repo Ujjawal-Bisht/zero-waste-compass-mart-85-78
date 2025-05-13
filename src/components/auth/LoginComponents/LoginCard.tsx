@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import {
@@ -10,6 +10,7 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import LoginForm from './LoginForm';
+import Logo from '@/components/ui/logo';
 
 const floatingElements = {
   hidden: { opacity: 0 },
@@ -28,6 +29,22 @@ const item = {
 };
 
 const LoginCard: React.FC = () => {
+  const [accountType, setAccountType] = useState<'buyer' | 'seller'>('buyer');
+  
+  // Listen for account type changes from the LoginForm
+  const handleAccountTypeChange = (type: 'buyer' | 'seller') => {
+    setAccountType(type);
+  };
+  
+  // Dynamic styling based on account type
+  const gradientStyle = accountType === 'buyer' 
+    ? 'from-zwm-primary/5 to-zwm-secondary/5' 
+    : 'from-amber-500/5 to-orange-500/5';
+    
+  const accentColor = accountType === 'buyer'
+    ? 'from-zwm-primary to-zwm-secondary'
+    : 'from-amber-500 to-orange-500';
+
   return (
     <motion.div 
       className="mt-8 sm:mx-auto sm:w-full sm:max-w-md relative z-10"
@@ -35,6 +52,18 @@ const LoginCard: React.FC = () => {
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
     >
+      {/* Logo Section */}
+      <motion.div 
+        className="flex justify-center mb-6"
+        initial={{ y: -50, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        transition={{ duration: 0.6, ease: "easeOut" }}
+      >
+        <Link to="/">
+          <Logo size="lg" animated={true} />
+        </Link>
+      </motion.div>
+      
       {/* Decorative elements */}
       <motion.div 
         variants={floatingElements}
@@ -84,7 +113,7 @@ const LoginCard: React.FC = () => {
       </motion.div>
       
       <Card className="border-0 shadow-xl overflow-hidden bg-white rounded-xl">
-        <div className="absolute inset-0 bg-gradient-to-r from-zwm-primary/5 to-zwm-secondary/5 z-0"></div>
+        <div className={`absolute inset-0 bg-gradient-to-r ${gradientStyle} z-0`}></div>
         
         <CardHeader className="relative z-10">
           <motion.div
@@ -93,9 +122,11 @@ const LoginCard: React.FC = () => {
             transition={{ delay: 0.2, duration: 0.5 }}
             className="text-center mb-2"
           >
-            <CardTitle className="text-2xl font-bold mb-2">Welcome Back</CardTitle>
+            <CardTitle className="text-2xl font-bold mb-2">
+              {accountType === 'buyer' ? 'Welcome Back' : 'Seller Login'}
+            </CardTitle>
             <motion.div 
-              className="h-1 w-12 bg-gradient-to-r from-zwm-primary to-zwm-secondary mx-auto rounded-full"
+              className={`h-1 w-12 bg-gradient-to-r ${accentColor} mx-auto rounded-full`}
               animate={{
                 width: ["0%", "100%", "50%"],
               }}
@@ -108,7 +139,7 @@ const LoginCard: React.FC = () => {
         </CardHeader>
         
         <CardContent className="relative z-10">
-          <LoginForm />
+          <LoginForm onAccountTypeChange={handleAccountTypeChange} />
         </CardContent>
         
         <CardFooter className="flex justify-center relative z-10">
@@ -117,7 +148,7 @@ const LoginCard: React.FC = () => {
             whileHover={{ scale: 1.05 }}
           >
             Don't have an account?{' '}
-            <Link to="/register" className="text-zwm-primary hover:text-zwm-secondary font-medium">
+            <Link to="/register" className={`font-medium ${accountType === 'buyer' ? 'text-zwm-primary hover:text-zwm-secondary' : 'text-amber-600 hover:text-orange-500'}`}>
               Sign up
             </Link>
           </motion.p>
