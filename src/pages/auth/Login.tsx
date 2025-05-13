@@ -105,6 +105,126 @@ const Login: React.FC = () => {
             }}
           />
           
+          {/* Additional NEW animated elements */}
+          <motion.div 
+            className="absolute top-1/4 left-1/3 w-44 h-44 rounded-full bg-gradient-to-r from-violet-400 to-fuchsia-500 blur-3xl opacity-10 spiral-float"
+            animate={{
+              rotate: [0, 180, 360],
+              scale: [1, 1.2, 0.8, 1],
+            }}
+            transition={{
+              duration: 25,
+              repeat: Infinity,
+              repeatType: "reverse",
+              delay: 7,
+            }}
+          />
+          
+          <motion.div 
+            className="absolute bottom-1/4 right-1/4 w-56 h-56 rounded-full bg-gradient-to-r from-blue-500 to-teal-400 blur-3xl opacity-10 radiance"
+            animate={{
+              y: [0, -40, 20, 0],
+              x: [0, 30, -20, 0],
+              rotate: [0, 20, -10, 0],
+            }}
+            transition={{
+              duration: 35,
+              repeat: Infinity,
+              repeatType: "mirror",
+            }}
+          />
+          
+          <motion.div 
+            className="absolute top-10 right-1/3 w-24 h-24 rounded-full bg-gradient-to-r from-red-300 to-orange-300 blur-3xl opacity-15 glow-pulse"
+            animate={{
+              y: [0, 15, -15, 0],
+              x: [0, -10, 10, 0],
+            }}
+            transition={{
+              duration: 10,
+              repeat: Infinity,
+              repeatType: "mirror",
+              delay: 2,
+            }}
+          />
+          
+          <motion.div 
+            className="absolute top-2/3 left-10 w-32 h-32 rounded-full bg-gradient-to-r from-purple-300 to-indigo-500 blur-3xl opacity-10 pulse-glow"
+            animate={{
+              scale: [1, 1.2, 0.9, 1],
+              opacity: [0.1, 0.2, 0.1],
+            }}
+            transition={{
+              duration: 8,
+              repeat: Infinity,
+              repeatType: "mirror",
+            }}
+          />
+          
+          <motion.div 
+            className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-80 h-80 rounded-full bg-gradient-to-r from-blue-400/10 to-indigo-400/10 blur-3xl gradient-shift"
+            animate={{
+              scale: [1, 1.1, 1],
+              rotate: [0, 10, 0, -10, 0],
+            }}
+            transition={{
+              duration: 20,
+              repeat: Infinity,
+              repeatType: "mirror",
+            }}
+          />
+          
+          <motion.div 
+            className="absolute -bottom-10 -left-10 w-40 h-40 rounded-full bg-gradient-to-r from-emerald-300 to-teal-400 blur-3xl opacity-10"
+            animate={{
+              scale: [1, 1.3, 1],
+              x: [0, 20, 0],
+              y: [0, 30, 0],
+            }}
+            transition={{
+              duration: 15,
+              repeat: Infinity,
+              repeatType: "reverse",
+            }}
+          />
+          
+          <motion.div 
+            className="absolute top-20 left-20 w-4 h-4 rounded-full bg-white opacity-20"
+            animate={{
+              y: [0, -100],
+              opacity: [0.2, 0],
+            }}
+            transition={{
+              duration: 10,
+              repeat: Infinity,
+              repeatType: "loop",
+            }}
+          />
+          
+          {/* Animated comets */}
+          {[...Array(5)].map((_, i) => (
+            <motion.div 
+              key={`comet-${i}`}
+              className="absolute w-2 h-2 rounded-full bg-white opacity-20"
+              style={{
+                top: `${Math.random() * 100}%`,
+                left: `${Math.random() * 100}%`,
+              }}
+              animate={{
+                x: [0, Math.random() > 0.5 ? 200 : -200],
+                y: [0, Math.random() > 0.5 ? 200 : -200],
+                opacity: [0.2, 0],
+                scale: [1, 0],
+              }}
+              transition={{
+                duration: 2 + Math.random() * 4,
+                repeat: Infinity,
+                delay: i * 2,
+                ease: "easeOut",
+              }}
+            />
+          ))}
+          
           {/* Wave effect elements */}
           <div className="absolute bottom-0 left-0 right-0 h-32 overflow-hidden">
             {[...Array(5)].map((_, index) => (
@@ -121,7 +241,7 @@ const Login: React.FC = () => {
           </div>
           
           {/* Particle system */}
-          {[...Array(12)].map((_, index) => (
+          {[...Array(20)].map((_, index) => (
             <motion.div
               key={`particle-${index}`}
               className="absolute rounded-full bg-white"
@@ -154,6 +274,28 @@ const Login: React.FC = () => {
           >
             <div className="absolute inset-0 bg-gradient-radial from-transparent via-blue-100/5 to-transparent gradient-shift" />
           </motion.div>
+          
+          {/* Star field background */}
+          {[...Array(30)].map((_, index) => (
+            <motion.div
+              key={`star-${index}`}
+              className="absolute bg-white rounded-full"
+              style={{
+                top: `${Math.random() * 100}%`,
+                left: `${Math.random() * 100}%`,
+                width: `${Math.random() * 2 + 1}px`,
+                height: `${Math.random() * 2 + 1}px`,
+              }}
+              animate={{
+                opacity: [0.2, 0.8, 0.2],
+              }}
+              transition={{
+                duration: 1 + Math.random() * 3,
+                repeat: Infinity,
+                delay: Math.random() * 3,
+              }}
+            />
+          ))}
         </motion.div>
       </div>
       

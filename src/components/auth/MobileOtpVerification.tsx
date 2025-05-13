@@ -1,10 +1,11 @@
+
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { InputOTP, InputOTPGroup, InputOTPSlot } from '@/components/ui/input-otp';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from '@/components/ui/card';
 import { Form, FormField, FormItem, FormLabel, FormControl, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
-import { Smartphone, Search } from 'lucide-react';
+import { Smartphone } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -91,8 +92,8 @@ const MobileOtpVerification: React.FC<MobileOtpVerificationProps> = ({
       
       // Show the code in a toast - in a real app this would be sent via SMS
       toast.info(`Demo: Your OTP is ${randomCode}`, {
-        description: "In a real app, this would be sent via SMS",
-        duration: 8000
+        description: "In a real app, this would be sent via SMS. For the demo, please use this code.",
+        duration: 10000
       });
       
       setFormattedPhoneNumber(fullPhoneNumber);
@@ -163,8 +164,8 @@ const MobileOtpVerification: React.FC<MobileOtpVerificationProps> = ({
       
       // Show the code in a toast - in a real app this would be sent via SMS
       toast.info(`Demo: Your new OTP is ${randomCode}`, {
-        description: "In a real app, this would be sent via SMS",
-        duration: 8000
+        description: "In a real app, this would be sent via SMS. For the demo, please use this code.",
+        duration: 10000
       });
       
       toast.success('New code sent!');
@@ -231,8 +232,8 @@ const MobileOtpVerification: React.FC<MobileOtpVerificationProps> = ({
                               value={searchQuery}
                               onValueChange={setSearchQuery}
                             />
-                            <CommandEmpty>No country found.</CommandEmpty>
                             <CommandList>
+                              <CommandEmpty>No country found.</CommandEmpty>
                               <CommandGroup>
                                 {filteredCountries.map((country) => (
                                   <CommandItem
@@ -306,16 +307,18 @@ const MobileOtpVerification: React.FC<MobileOtpVerificationProps> = ({
                       <FormLabel>One-Time Password</FormLabel>
                       <FormControl>
                         <div className="flex justify-center py-4">
-                          <InputOTP maxLength={6} {...field}>
-                            <InputOTPGroup>
-                              <InputOTPSlot index={0} />
-                              <InputOTPSlot index={1} />
-                              <InputOTPSlot index={2} />
-                              <InputOTPSlot index={3} />
-                              <InputOTPSlot index={4} />
-                              <InputOTPSlot index={5} />
-                            </InputOTPGroup>
-                          </InputOTP>
+                          <InputOTP 
+                            maxLength={6} 
+                            value={field.value}
+                            onChange={(value) => field.onChange(value)}
+                            render={({ slots }) => (
+                              <InputOTPGroup>
+                                {slots.map((slot, index) => (
+                                  <InputOTPSlot key={index} {...slot} />
+                                ))}
+                              </InputOTPGroup>
+                            )}
+                          />
                         </div>
                       </FormControl>
                       <FormMessage />
@@ -344,19 +347,27 @@ const MobileOtpVerification: React.FC<MobileOtpVerificationProps> = ({
           )}
         </CardContent>
         
-        <CardFooter className="flex justify-center text-sm text-muted-foreground">
-          {step === 'phone' 
-            ? 'We\'ll send a verification code to this number' 
-            : 'Didn\'t receive a code? '} 
+        <CardFooter className="flex flex-col space-y-2">
+          <div className="text-center text-sm text-muted-foreground">
+            {step === 'phone' 
+              ? 'We\'ll send a verification code to this number' 
+              : 'Didn\'t receive a code? '} 
+            {step === 'otp' && (
+              <button 
+                type="button"
+                className={`text-zwm-primary ml-1 ${resendDisabled ? 'opacity-50 cursor-not-allowed' : 'hover:underline'}`}
+                onClick={handleResendOtp}
+                disabled={resendDisabled}
+              >
+                {resendDisabled ? `Resend in ${countdownTime}s` : 'Resend'}
+              </button>
+            )}
+          </div>
           {step === 'otp' && (
-            <button 
-              type="button"
-              className={`text-zwm-primary ml-1 ${resendDisabled ? 'opacity-50 cursor-not-allowed' : 'hover:underline'}`}
-              onClick={handleResendOtp}
-              disabled={resendDisabled}
-            >
-              {resendDisabled ? `Resend in ${countdownTime}s` : 'Resend'}
-            </button>
+            <div className="text-xs text-center text-amber-600">
+              Note: This is a demo. In a real app, you would receive an SMS with the code. 
+              Look in the toast notifications for the demo code.
+            </div>
           )}
         </CardFooter>
       </Card>
