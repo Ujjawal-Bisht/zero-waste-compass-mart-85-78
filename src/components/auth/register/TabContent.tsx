@@ -46,6 +46,8 @@ const TabContent: React.FC<TabContentProps> = ({
             <PhoneRegisterTab
               onVerificationComplete={handlePhoneRegistration}
               onCancel={() => {}}
+              setCaptchaValue={setCaptchaValue}
+              captchaValue={captchaValue}
             />
           </TabsContent>
 
@@ -54,6 +56,9 @@ const TabContent: React.FC<TabContentProps> = ({
               handleGoogleLogin={handleGoogleLogin}
               isLoading={isLoading}
               accountType="buyer"
+              setCaptchaValue={setCaptchaValue}
+              captchaValue={captchaValue}
+              showCaptcha={true}
             />
           </TabsContent>
         </>
@@ -74,6 +79,8 @@ const TabContent: React.FC<TabContentProps> = ({
             <PhoneRegisterTab
               onVerificationComplete={handlePhoneRegistration}
               onCancel={() => {}}
+              setCaptchaValue={setCaptchaValue}
+              captchaValue={captchaValue}
             />
           </TabsContent>
 
@@ -82,6 +89,9 @@ const TabContent: React.FC<TabContentProps> = ({
               handleGoogleLogin={handleGoogleLogin}
               isLoading={isLoading}
               accountType="seller"
+              setCaptchaValue={setCaptchaValue}
+              captchaValue={captchaValue}
+              showCaptcha={true}
             />
           </TabsContent>
         </>

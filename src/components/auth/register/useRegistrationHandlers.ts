@@ -13,7 +13,7 @@ export const useRegistrationHandlers = () => {
   const [captchaValue, setCaptchaValue] = useState<string | null>(null);
 
   const handleRegistrationAttempt = async (
-    callback: () => Promise<void>, 
+    callback: () => Promise<any>, 
     successMessage: string,
     redirectPath: string,
     errorMessage: string = 'Failed to create account. Please try again.'
@@ -80,7 +80,10 @@ export const useRegistrationHandlers = () => {
 
   const handleGoogleLogin = async (accountType: 'buyer' | 'seller') => {
     await handleRegistrationAttempt(
-      async () => await googleLogin(accountType),
+      async () => {
+        const user = await googleLogin(accountType);
+        return user; // Return the user but don't use the return value in handleRegistrationAttempt
+      },
       'Successfully signed in with Google!',
       accountType === 'seller' ? '/seller/dashboard' : '/dashboard',
       'Failed to sign in with Google.'
@@ -89,7 +92,10 @@ export const useRegistrationHandlers = () => {
 
   const handlePhoneRegistration = (accountType: 'buyer' | 'seller') => (phoneNumber: string) => {
     handleRegistrationAttempt(
-      async () => phoneLogin(phoneNumber, accountType),
+      async () => {
+        const result = await phoneLogin(phoneNumber, accountType);
+        return result; // Return the result but don't use the return value in handleRegistrationAttempt
+      },
       'Account created successfully with phone verification!',
       accountType === 'seller' ? '/seller/dashboard' : '/dashboard',
       'Failed to create account with phone. Please try again.'

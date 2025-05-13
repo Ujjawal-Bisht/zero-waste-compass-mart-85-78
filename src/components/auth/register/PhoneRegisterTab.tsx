@@ -1,15 +1,20 @@
 
 import React from 'react';
 import MobileOtpVerification from '@/components/auth/MobileOtpVerification';
+import ReCAPTCHA from 'react-google-recaptcha';
 
 interface PhoneRegisterTabProps {
   onVerificationComplete: (phoneNumber: string) => void;
   onCancel: () => void;
+  setCaptchaValue: (value: string | null) => void;
+  captchaValue: string | null;
 }
 
 const PhoneRegisterTab: React.FC<PhoneRegisterTabProps> = ({ 
   onVerificationComplete, 
-  onCancel 
+  onCancel,
+  setCaptchaValue,
+  captchaValue
 }) => {
   return (
     <div className="space-y-4">
@@ -24,6 +29,22 @@ const PhoneRegisterTab: React.FC<PhoneRegisterTabProps> = ({
         onVerificationComplete={onVerificationComplete}
         onCancel={onCancel}
       />
+
+      {/* Captcha verification */}
+      <div className="mt-6">
+        <div className="flex justify-center">
+          <ReCAPTCHA
+            sitekey="6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI" // Google's test key
+            onChange={(value) => setCaptchaValue(value)}
+          />
+        </div>
+        
+        {!captchaValue && (
+          <div className="text-center text-sm text-orange-600 mt-2">
+            Please verify that you're not a robot
+          </div>
+        )}
+      </div>
     </div>
   );
 };

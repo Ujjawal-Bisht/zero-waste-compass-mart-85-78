@@ -1,17 +1,24 @@
 
 import React from 'react';
 import { motion } from 'framer-motion';
+import ReCAPTCHA from 'react-google-recaptcha';
 
 interface GoogleLoginSectionProps {
   handleGoogleLogin: () => Promise<void>;
   isLoading: boolean;
   accountType: 'buyer' | 'seller';
+  setCaptchaValue?: (value: string | null) => void;
+  captchaValue?: string | null;
+  showCaptcha?: boolean;
 }
 
 const GoogleLoginSection: React.FC<GoogleLoginSectionProps> = ({
   handleGoogleLogin,
   isLoading,
-  accountType
+  accountType,
+  setCaptchaValue,
+  captchaValue,
+  showCaptcha = false
 }) => {
   return (
     <div className="flex flex-col items-center justify-center p-6 border rounded-lg">
@@ -23,12 +30,31 @@ const GoogleLoginSection: React.FC<GoogleLoginSectionProps> = ({
             : 'Use your Google Business account to sign in as a seller.'}
         </p>
       </div>
+      
+      {/* Captcha verification for registration */}
+      {showCaptcha && setCaptchaValue && (
+        <div className="mb-4 w-full">
+          <div className="flex justify-center mb-2">
+            <ReCAPTCHA
+              sitekey="6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI" // Google's test key
+              onChange={(value) => setCaptchaValue(value)}
+            />
+          </div>
+          
+          {captchaValue === null && (
+            <div className="text-center text-sm text-orange-600">
+              Please verify that you're not a robot
+            </div>
+          )}
+        </div>
+      )}
+      
       <motion.button
         whileHover={{ scale: 1.02 }}
         whileTap={{ scale: 0.98 }}
         onClick={handleGoogleLogin}
-        disabled={isLoading}
-        className="flex items-center justify-center gap-3 w-full bg-white border border-gray-300 rounded-lg py-3 px-4 font-medium text-gray-700 hover:bg-gray-50 transition-all shadow-sm"
+        disabled={isLoading || (showCaptcha && !captchaValue)}
+        className="flex items-center justify-center gap-3 w-full bg-white border border-gray-300 rounded-lg py-3 px-4 font-medium text-gray-700 hover:bg-gray-50 transition-all shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
       >
         <svg className="w-5 h-5" viewBox="0 0 24 24">
           <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
