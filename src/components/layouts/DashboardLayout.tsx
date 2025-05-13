@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import ChatBot from '@/components/ChatBot';
@@ -10,21 +10,22 @@ import { SidebarProvider } from '@/components/ui/sidebar';
 
 const DashboardLayout: React.FC = () => {
   const navigate = useNavigate();
-  const [isCollapsed, setIsCollapsed] = useState(false);
 
   return (
     <SidebarProvider>
-      <div className="flex h-screen w-full bg-gray-50">
+      <div className="flex h-screen w-full bg-gray-50 overflow-hidden">
         {/* Sidebar */}
         <DashboardSidebar />
 
         {/* Main Content */}
-        <div className="flex-1 overflow-auto">
+        <div className="flex-1 flex flex-col overflow-hidden">
           {/* Header */}
           <DashboardHeader />
 
           {/* Page Content */}
-          <PageContainer />
+          <div className="flex-1 overflow-auto">
+            <PageContainer />
+          </div>
           
           {/* Chat Bot */}
           <ChatBot />
