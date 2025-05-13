@@ -5,7 +5,7 @@ import { z } from 'zod';
 import { useAuth } from '@/contexts/auth';
 import { toast } from 'sonner';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Store, User, Mail, Smartphone } from 'lucide-react';
+import { Store, User, Mail, Smartphone, BrandGoogle } from 'lucide-react';
 import ReturnToHomeButton from './LoginComponents/ReturnToHomeButton';
 import { userSchema, sellerSchema } from './schemas/registerSchema';
 
@@ -14,6 +14,7 @@ import BuyerForm from './register/BuyerForm';
 import SellerForm from './register/SellerForm';
 import SocialLogin from './register/SocialLogin';
 import PhoneRegisterTab from './register/PhoneRegisterTab';
+import GoogleLoginSection from './LoginComponents/GoogleLoginSection';
 import LoginLink from './register/LoginLink';
 
 interface RegisterFormProps {
@@ -25,7 +26,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ onAccountTypeChange }) => {
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
   const [accountType, setAccountType] = useState<'buyer' | 'seller'>('buyer');
-  const [registrationMethod, setRegistrationMethod] = useState<'email' | 'phone'>('email');
+  const [registrationMethod, setRegistrationMethod] = useState<'email' | 'phone' | 'google'>('email');
   const [captchaValue, setCaptchaValue] = useState<string | null>(null);
 
   // Notify parent component when account type changes
@@ -150,7 +151,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ onAccountTypeChange }) => {
         <TabsList className="grid w-full grid-cols-2">
           <TabsTrigger 
             value="buyer" 
-            className="flex items-center gap-2 py-3 data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-500 data-[state=active]:to-indigo-500 data-[state=active]:text-white"
+            className="flex items-center gap-2 py-3 data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-500 data-[state=active]:to-indigo-500 data-[state=active]:text-white transition-all duration-300 hover:bg-blue-50"
           >
             <User size={16} /> 
             <span className="text-base">
@@ -159,7 +160,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ onAccountTypeChange }) => {
           </TabsTrigger>
           <TabsTrigger 
             value="seller" 
-            className="flex items-center gap-2 py-3 data-[state=active]:bg-gradient-to-r data-[state=active]:from-orange-500 data-[state=active]:to-amber-500 data-[state=active]:text-white"
+            className="flex items-center gap-2 py-3 data-[state=active]:bg-gradient-to-r data-[state=active]:from-orange-500 data-[state=active]:to-amber-500 data-[state=active]:text-white transition-all duration-300 hover:bg-amber-50"
           >
             <Store size={16} />
             <span className="text-base">
@@ -168,18 +169,30 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ onAccountTypeChange }) => {
           </TabsTrigger>
         </TabsList>
         
-        <TabsContent value="buyer" className="mt-4">
-          <Tabs value={registrationMethod} onValueChange={(v) => setRegistrationMethod(v as 'email' | 'phone')} className="mb-4">
-            <TabsList className="grid w-full grid-cols-2 mb-4">
-              <TabsTrigger value="email" className="flex items-center gap-2">
+        <TabsContent value="buyer" className="mt-4 tab-transition">
+          <Tabs value={registrationMethod} onValueChange={(v) => setRegistrationMethod(v as 'email' | 'phone' | 'google')} className="mb-4">
+            <TabsList className="grid w-full grid-cols-3 mb-4">
+              <TabsTrigger 
+                value="email" 
+                className="flex items-center gap-2 transition-all duration-300 hover:bg-blue-50"
+              >
                 <Mail size={16} /> Email
               </TabsTrigger>
-              <TabsTrigger value="phone" className="flex items-center gap-2">
+              <TabsTrigger 
+                value="phone" 
+                className="flex items-center gap-2 transition-all duration-300 hover:bg-blue-50"
+              >
                 <Smartphone size={16} /> Phone
+              </TabsTrigger>
+              <TabsTrigger 
+                value="google" 
+                className="flex items-center gap-2 transition-all duration-300 hover:bg-blue-50"
+              >
+                <BrandGoogle size={16} /> Google
               </TabsTrigger>
             </TabsList>
             
-            <TabsContent value="email">
+            <TabsContent value="email" className="animate-fade-in">
               <BuyerForm
                 onSubmit={onSubmitBuyer}
                 isLoading={isLoading}
@@ -188,30 +201,72 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ onAccountTypeChange }) => {
               />
             </TabsContent>
             
-            <TabsContent value="phone">
+            <TabsContent value="phone" className="animate-fade-in">
               <PhoneRegisterTab
                 onVerificationComplete={handlePhoneRegistration}
                 onCancel={() => setRegistrationMethod('email')}
               />
             </TabsContent>
+
+            <TabsContent value="google" className="animate-fade-in">
+              <GoogleLoginSection 
+                handleGoogleLogin={handleGoogleLogin}
+                isLoading={isLoading}
+                accountType="buyer"
+              />
+            </TabsContent>
           </Tabs>
         </TabsContent>
         
-        <TabsContent value="seller" className="mt-4">
-          <SellerForm
-            onSubmit={onSubmitSeller}
-            isLoading={isLoading}
-            setCaptchaValue={setCaptchaValue}
-            captchaValue={captchaValue}
-          />
+        <TabsContent value="seller" className="mt-4 tab-transition">
+          <Tabs value={registrationMethod} onValueChange={(v) => setRegistrationMethod(v as 'email' | 'phone' | 'google')} className="mb-4">
+            <TabsList className="grid w-full grid-cols-3 mb-4">
+              <TabsTrigger 
+                value="email" 
+                className="flex items-center gap-2 transition-all duration-300 hover:bg-amber-50"
+              >
+                <Mail size={16} /> Email
+              </TabsTrigger>
+              <TabsTrigger 
+                value="phone" 
+                className="flex items-center gap-2 transition-all duration-300 hover:bg-amber-50"
+              >
+                <Smartphone size={16} /> Phone
+              </TabsTrigger>
+              <TabsTrigger 
+                value="google" 
+                className="flex items-center gap-2 transition-all duration-300 hover:bg-amber-50"
+              >
+                <BrandGoogle size={16} /> Google
+              </TabsTrigger>
+            </TabsList>
+            
+            <TabsContent value="email" className="animate-fade-in">
+              <SellerForm
+                onSubmit={onSubmitSeller}
+                isLoading={isLoading}
+                setCaptchaValue={setCaptchaValue}
+                captchaValue={captchaValue}
+              />
+            </TabsContent>
+            
+            <TabsContent value="phone" className="animate-fade-in">
+              <PhoneRegisterTab
+                onVerificationComplete={handlePhoneRegistration}
+                onCancel={() => setRegistrationMethod('email')}
+              />
+            </TabsContent>
+
+            <TabsContent value="google" className="animate-fade-in">
+              <GoogleLoginSection 
+                handleGoogleLogin={handleGoogleLogin}
+                isLoading={isLoading}
+                accountType="seller"
+              />
+            </TabsContent>
+          </Tabs>
         </TabsContent>
       </Tabs>
-
-      <SocialLogin
-        onGoogleLogin={handleGoogleLogin}
-        isLoading={isLoading}
-        captchaValue={captchaValue}
-      />
       
       <LoginLink />
       

@@ -1,6 +1,7 @@
 
 import React from 'react';
 import { motion } from 'framer-motion';
+import { Logo as ZeroWasteLogo } from '@/components/ui/logo';
 
 const Logo: React.FC = () => {
   return (
@@ -10,8 +11,11 @@ const Logo: React.FC = () => {
       animate={{ y: 0, opacity: 1 }}
       transition={{ duration: 0.6, ease: "easeOut" }}
     >
-      <motion.div whileHover={{ scale: 1.1, rotate: [0, -5, 5, 0] }}>
-        <div className="h-16 w-16 rounded-full zwm-gradient flex items-center justify-center text-white font-bold text-2xl mb-2">ZW</div>
+      <motion.div 
+        whileHover={{ scale: 1.1, rotate: [0, -5, 5, 0] }}
+        className="flex items-center justify-center"
+      >
+        <ZeroWasteLogo size="lg" showText={true} animated={true} />
       </motion.div>
     </motion.div>
   );

@@ -130,6 +130,46 @@ const Background: React.FC = () => {
             repeatType: "mirror",
           }}
         />
+
+        {/* New animated cosmic elements */}
+        <motion.div 
+          className="absolute top-10 right-1/3 w-60 h-60 rounded-full bg-gradient-to-r from-green-400 to-blue-300 blur-3xl opacity-15 cosmic-spiral"
+          animate={{
+            rotate: [0, 360],
+            scale: [1, 1.2, 0.9, 1.1, 1],
+          }}
+          transition={{
+            duration: 25,
+            repeat: Infinity,
+            repeatType: "reverse",
+          }}
+        />
+
+        <motion.div 
+          className="absolute bottom-40 right-10 w-52 h-52 rounded-full bg-gradient-to-r from-purple-300 to-pink-300 blur-3xl opacity-15 quantum-pulse"
+          animate={{
+            scale: [1, 1.2, 0.9, 1.15, 1],
+            opacity: [0.1, 0.15, 0.1, 0.18, 0.1],
+          }}
+          transition={{
+            duration: 18,
+            repeat: Infinity,
+          }}
+        />
+
+        <motion.div 
+          className="absolute top-40 left-10 w-48 h-48 rounded-full bg-gradient-to-r from-teal-300 to-cyan-400 blur-3xl opacity-15 nebula-drift"
+          animate={{
+            x: [0, 30, -20, 10, 0],
+            y: [0, -20, 30, 10, 0],
+            rotate: [0, 120, 240, 360],
+          }}
+          transition={{
+            duration: 30,
+            repeat: Infinity,
+            repeatType: "reverse",
+          }}
+        />
         
         {/* Background radial gradient overlay */}
         <motion.div
@@ -142,7 +182,7 @@ const Background: React.FC = () => {
         </motion.div>
         
         {/* Star field background */}
-        {[...Array(30)].map((_, index) => (
+        {[...Array(50)].map((_, index) => (
           <motion.div
             key={`star-${index}`}
             className="absolute bg-white rounded-full"
