@@ -27,17 +27,25 @@ const SocialLogin: React.FC<SocialLoginProps> = ({
 
       <motion.div 
         className="mt-6"
-        whileHover={{ scale: 1.03 }}
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.2, duration: 0.4 }}
+        whileHover={{ scale: 1.03, boxShadow: "0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)" }}
         whileTap={{ scale: 0.97 }}
       >
         <Button
           type="button"
           variant="outline"
-          className="w-full"
+          className="w-full button-hover"
           onClick={onGoogleLogin}
           disabled={isLoading || !captchaValue}
         >
-          <svg className="h-5 w-5 mr-2" viewBox="0 0 24 24">
+          <motion.svg 
+            className="h-5 w-5 mr-2"
+            viewBox="0 0 24 24"
+            animate={{ rotate: isLoading ? 360 : 0 }}
+            transition={{ duration: 2, repeat: isLoading ? Infinity : 0, ease: "linear" }}
+          >
             <path
               d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
               fill="#4285F4"
@@ -54,8 +62,8 @@ const SocialLogin: React.FC<SocialLoginProps> = ({
               d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
               fill="#EA4335"
             />
-          </svg>
-          Continue with Google
+          </motion.svg>
+          <span>{isLoading ? 'Connecting...' : 'Continue with Google'}</span>
         </Button>
       </motion.div>
     </div>

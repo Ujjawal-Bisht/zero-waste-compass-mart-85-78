@@ -12,7 +12,8 @@ const Logo: React.FC = () => {
       transition={{ duration: 0.6, ease: "easeOut" }}
     >
       <motion.div 
-        whileHover={{ scale: 1.1, rotate: [0, -5, 5, 0] }}
+        whileHover={{ scale: 1.05, rotate: [0, -3, 3, 0] }}
+        transition={{ duration: 0.5 }}
         className="flex items-center justify-center"
       >
         <ZeroWasteLogo size="lg" showText={true} animated={true} />

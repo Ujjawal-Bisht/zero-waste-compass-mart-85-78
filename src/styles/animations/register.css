@@ -1,146 +1,15 @@
 
-/* Animation classes for the register page */
-.register-bg .glow-pulse {
-  animation: pulse-slow 4s infinite ease-in-out;
-  filter: blur(60px);
-}
+/* Register page specific animations */
 
-.register-bg .spiral-float {
-  animation: float 6s infinite ease-in-out;
-  filter: blur(60px);
-}
-
-.register-bg .color-shift {
-  animation: color-shift 8s infinite alternate;
-  filter: blur(70px);
-}
-
-.register-bg .radiance {
-  animation: radiance 10s infinite alternate;
-  filter: blur(50px);
-}
-
-.register-bg .particle-float {
-  animation: float 5s infinite ease-in-out;
-  filter: blur(40px);
-}
-
-.register-bg .orbit {
-  animation: orbit 20s infinite linear;
-  filter: blur(45px);
-}
-
-.register-bg .blur-breathe {
-  animation: blur-breathe 7s infinite alternate;
-  filter: blur(55px);
-}
-
-.register-bg .pulse-glow {
-  animation: pulse-glow 6s infinite alternate;
-  filter: blur(50px);
-}
-
-.register-bg .gradient-shift {
-  animation: gradient-shift 15s infinite alternate;
-  filter: blur(80px);
-}
-
-/* Enhanced animations with more dramatic effects */
-.register-bg .cosmic-spiral {
-  animation: cosmic-spiral 15s infinite linear;
-  filter: blur(50px);
-}
-
-.register-bg .quantum-pulse {
-  animation: quantum-pulse 8s infinite alternate;
-  filter: blur(65px);
-}
-
-.register-bg .nebula-drift {
-  animation: nebula-drift 20s infinite alternate;
-  filter: blur(75px);
-}
-
-/* Button and tab animations */
+/* Tab transition animation */
 .tab-transition {
-  animation: tab-appear 0.4s ease-out forwards;
+  animation: tab-slide-in 0.5s ease-out forwards;
 }
 
-.button-glow {
-  animation: button-glow 2s infinite alternate;
-}
-
-@keyframes pulse-slow {
-  0%, 100% { opacity: 0.2; }
-  50% { opacity: 0.3; }
-}
-
-@keyframes float {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-20px); }
-}
-
-@keyframes color-shift {
-  0% { opacity: 0.1; }
-  50% { opacity: 0.15; }
-  100% { opacity: 0.1; }
-}
-
-@keyframes radiance {
-  0% { transform: scale(1); }
-  50% { transform: scale(1.1); }
-  100% { transform: scale(1); }
-}
-
-@keyframes orbit {
-  0% { transform: rotate(0deg) translateX(20px) rotate(0deg); }
-  100% { transform: rotate(360deg) translateX(20px) rotate(-360deg); }
-}
-
-@keyframes blur-breathe {
-  0% { filter: blur(50px); }
-  50% { filter: blur(60px); }
-  100% { filter: blur(50px); }
-}
-
-@keyframes pulse-glow {
-  0% { opacity: 0.1; }
-  50% { opacity: 0.2; }
-  100% { opacity: 0.1; }
-}
-
-@keyframes gradient-shift {
-  0% { background-position: 0% 50%; }
-  50% { background-position: 100% 50%; }
-  100% { background-position: 0% 50%; }
-}
-
-/* New enhanced animations */
-@keyframes cosmic-spiral {
-  0% { transform: rotate(0deg) scale(1); opacity: 0.1; }
-  50% { transform: rotate(180deg) scale(1.2); opacity: 0.2; }
-  100% { transform: rotate(360deg) scale(1); opacity: 0.1; }
-}
-
-@keyframes quantum-pulse {
-  0% { transform: scale(1); opacity: 0.1; }
-  25% { transform: scale(1.1); opacity: 0.2; }
-  50% { transform: scale(1); opacity: 0.15; }
-  75% { transform: scale(1.15); opacity: 0.25; }
-  100% { transform: scale(1); opacity: 0.1; }
-}
-
-@keyframes nebula-drift {
-  0% { transform: rotate(0deg) translateX(0) translateY(0); opacity: 0.1; }
-  33% { transform: rotate(120deg) translateX(30px) translateY(20px); opacity: 0.2; }
-  66% { transform: rotate(240deg) translateX(-20px) translateY(30px); opacity: 0.15; }
-  100% { transform: rotate(360deg) translateX(0) translateY(0); opacity: 0.1; }
-}
-
-@keyframes tab-appear {
+@keyframes tab-slide-in {
   from {
     opacity: 0;
-    transform: translateY(10px);
+    transform: translateY(15px);
   }
   to {
     opacity: 1;
@@ -148,23 +17,127 @@
   }
 }
 
-@keyframes button-glow {
-  0% { box-shadow: 0 0 5px rgba(59, 130, 246, 0.5); }
-  100% { box-shadow: 0 0 15px rgba(99, 102, 241, 0.8); }
+/* Button animations */
+.button-pulse {
+  animation: button-pulse 2s infinite;
 }
 
-/* Form animation */
-.animate-fade-in {
-  animation: fade-in 0.5s ease-out forwards;
-}
-
-@keyframes fade-in {
-  from {
-    opacity: 0;
-    transform: translateY(10px);
+@keyframes button-pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.7);
   }
+  70% {
+    box-shadow: 0 0 0 10px rgba(59, 130, 246, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(59, 130, 246, 0);
+  }
+}
+
+/* Form field animations */
+.form-field-focus {
+  transition: all 0.3s ease-in-out;
+}
+
+.form-field-focus:focus-within {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+}
+
+/* Enhanced hover effects */
+.enhanced-hover {
+  transition: all 0.2s ease;
+}
+
+.enhanced-hover:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+}
+
+/* Button hover animation */
+.button-hover {
+  position: relative;
+  overflow: hidden;
+}
+
+.button-hover::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    to right,
+    rgba(255, 255, 255, 0) 0%,
+    rgba(255, 255, 255, 0.2) 50%,
+    rgba(255, 255, 255, 0) 100%
+  );
+  transition: all 0.6s;
+}
+
+.button-hover:hover::after {
+  left: 100%;
+}
+
+/* Card animations */
+.card-float {
+  transition: all 0.3s ease;
+}
+
+.card-float:hover {
+  transform: translateY(-5px);
+}
+
+/* Input field animations */
+.input-animate {
+  transition: border 0.3s ease;
+}
+
+.input-animate:focus {
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.3);
+}
+
+/* Tab indicator animation */
+.tab-indicator {
+  position: relative;
+}
+
+.tab-indicator::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  width: 0;
+  height: 2px;
+  background: #3b82f6;
+  transition: width 0.3s ease;
+}
+
+.tab-indicator:hover::after {
+  width: 100%;
+}
+
+/* Text shimmer effect */
+.text-shimmer {
+  background: linear-gradient(
+    to right,
+    #3b82f6 0%,
+    #6366f1 20%,
+    #3b82f6 40%,
+    #3b82f6 100%
+  );
+  background-size: 200% auto;
+  color: #000;
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: text-shimmer 2s linear infinite;
+}
+
+@keyframes text-shimmer {
   to {
-    opacity: 1;
-    transform: translateY(0);
+    background-position: 200% center;
   }
 }

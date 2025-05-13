@@ -16,6 +16,7 @@ import SocialLogin from './register/SocialLogin';
 import PhoneRegisterTab from './register/PhoneRegisterTab';
 import GoogleLoginSection from './LoginComponents/GoogleLoginSection';
 import LoginLink from './register/LoginLink';
+import { motion } from 'framer-motion';
 
 interface RegisterFormProps {
   onAccountTypeChange?: (type: 'buyer' | 'seller') => void;
@@ -137,136 +138,176 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ onAccountTypeChange }) => {
     }
   };
 
+  // Animation variants for the tab buttons
+  const tabButtonVariants = {
+    hover: { scale: 1.05, transition: { duration: 0.2 } },
+    tap: { scale: 0.95, transition: { duration: 0.2 } },
+    initial: { opacity: 0, y: -10 },
+    animate: { opacity: 1, y: 0, transition: { duration: 0.4 } }
+  };
+
   return (
     <>
-      <Tabs 
-        value={accountType} 
-        onValueChange={(value) => {
-          setAccountType(value as 'buyer' | 'seller');
-          // Reset captcha when switching account types
-          setCaptchaValue(null);
-        }} 
-        className="mb-6"
+      <motion.div
+        initial={{ opacity: 0, y: -10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.4 }}
       >
-        <TabsList className="grid w-full grid-cols-2">
-          <TabsTrigger 
-            value="buyer" 
-            className="flex items-center gap-2 py-3 data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-500 data-[state=active]:to-indigo-500 data-[state=active]:text-white transition-all duration-300 hover:bg-blue-50"
-          >
-            <User size={16} /> 
-            <span className="text-base">
-              Buyer
-            </span>
-          </TabsTrigger>
-          <TabsTrigger 
-            value="seller" 
-            className="flex items-center gap-2 py-3 data-[state=active]:bg-gradient-to-r data-[state=active]:from-orange-500 data-[state=active]:to-amber-500 data-[state=active]:text-white transition-all duration-300 hover:bg-amber-50"
-          >
-            <Store size={16} />
-            <span className="text-base">
-              Seller
-            </span>
-          </TabsTrigger>
-        </TabsList>
-        
-        <TabsContent value="buyer" className="mt-4 tab-transition">
-          <Tabs value={registrationMethod} onValueChange={(v) => setRegistrationMethod(v as 'email' | 'phone' | 'google')} className="mb-4">
-            <TabsList className="grid w-full grid-cols-3 mb-4">
+        <Tabs 
+          value={accountType} 
+          onValueChange={(value) => {
+            setAccountType(value as 'buyer' | 'seller');
+            // Reset captcha when switching account types
+            setCaptchaValue(null);
+          }} 
+          className="mb-6"
+        >
+          <TabsList className="grid w-full grid-cols-2">
+            <motion.div 
+              whileHover="hover" 
+              whileTap="tap"
+              variants={tabButtonVariants}
+              className="w-full"
+            >
               <TabsTrigger 
-                value="email" 
-                className="flex items-center gap-2 transition-all duration-300 hover:bg-blue-50"
+                value="buyer" 
+                className="flex items-center gap-2 py-3 w-full data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-500 data-[state=active]:to-indigo-500 data-[state=active]:text-white transition-all duration-300 hover:bg-blue-50"
               >
-                <Mail size={16} /> Email
+                <User size={16} /> 
+                <span className="text-base">
+                  Buyer
+                </span>
               </TabsTrigger>
+            </motion.div>
+            <motion.div 
+              whileHover="hover" 
+              whileTap="tap"
+              variants={tabButtonVariants}
+              className="w-full"
+            >
               <TabsTrigger 
-                value="phone" 
-                className="flex items-center gap-2 transition-all duration-300 hover:bg-blue-50"
+                value="seller" 
+                className="flex items-center gap-2 py-3 w-full data-[state=active]:bg-gradient-to-r data-[state=active]:from-orange-500 data-[state=active]:to-amber-500 data-[state=active]:text-white transition-all duration-300 hover:bg-amber-50"
               >
-                <Smartphone size={16} /> Phone
+                <Store size={16} />
+                <span className="text-base">
+                  Seller
+                </span>
               </TabsTrigger>
-              <TabsTrigger 
-                value="google" 
-                className="flex items-center gap-2 transition-all duration-300 hover:bg-blue-50"
-              >
-                <BrandGoogle size={16} /> Google
-              </TabsTrigger>
-            </TabsList>
-            
-            <TabsContent value="email" className="animate-fade-in">
-              <BuyerForm
-                onSubmit={onSubmitBuyer}
-                isLoading={isLoading}
-                setCaptchaValue={setCaptchaValue}
-                captchaValue={captchaValue}
-              />
-            </TabsContent>
-            
-            <TabsContent value="phone" className="animate-fade-in">
-              <PhoneRegisterTab
-                onVerificationComplete={handlePhoneRegistration}
-                onCancel={() => setRegistrationMethod('email')}
-              />
-            </TabsContent>
+            </motion.div>
+          </TabsList>
+          
+          <TabsContent value="buyer" className="mt-4 tab-transition">
+            <Tabs value={registrationMethod} onValueChange={(v) => setRegistrationMethod(v as 'email' | 'phone' | 'google')} className="mb-4">
+              <TabsList className="grid w-full grid-cols-3 mb-4">
+                <motion.div whileHover="hover" whileTap="tap" variants={tabButtonVariants} className="w-full">
+                  <TabsTrigger 
+                    value="email" 
+                    className="flex items-center gap-2 w-full transition-all duration-300 hover:bg-blue-50"
+                  >
+                    <Mail size={16} /> Email
+                  </TabsTrigger>
+                </motion.div>
+                <motion.div whileHover="hover" whileTap="tap" variants={tabButtonVariants} className="w-full">
+                  <TabsTrigger 
+                    value="phone" 
+                    className="flex items-center gap-2 w-full transition-all duration-300 hover:bg-blue-50"
+                  >
+                    <Smartphone size={16} /> Phone
+                  </TabsTrigger>
+                </motion.div>
+                <motion.div whileHover="hover" whileTap="tap" variants={tabButtonVariants} className="w-full">
+                  <TabsTrigger 
+                    value="google" 
+                    className="flex items-center gap-2 w-full transition-all duration-300 hover:bg-blue-50"
+                  >
+                    <BrandGoogle size={16} /> Google
+                  </TabsTrigger>
+                </motion.div>
+              </TabsList>
+              
+              <TabsContent value="email" className="animate-fade-in">
+                <BuyerForm
+                  onSubmit={onSubmitBuyer}
+                  isLoading={isLoading}
+                  setCaptchaValue={setCaptchaValue}
+                  captchaValue={captchaValue}
+                />
+              </TabsContent>
+              
+              <TabsContent value="phone" className="animate-fade-in">
+                <PhoneRegisterTab
+                  onVerificationComplete={handlePhoneRegistration}
+                  onCancel={() => setRegistrationMethod('email')}
+                />
+              </TabsContent>
 
-            <TabsContent value="google" className="animate-fade-in">
-              <GoogleLoginSection 
-                handleGoogleLogin={handleGoogleLogin}
-                isLoading={isLoading}
-                accountType="buyer"
-              />
-            </TabsContent>
-          </Tabs>
-        </TabsContent>
-        
-        <TabsContent value="seller" className="mt-4 tab-transition">
-          <Tabs value={registrationMethod} onValueChange={(v) => setRegistrationMethod(v as 'email' | 'phone' | 'google')} className="mb-4">
-            <TabsList className="grid w-full grid-cols-3 mb-4">
-              <TabsTrigger 
-                value="email" 
-                className="flex items-center gap-2 transition-all duration-300 hover:bg-amber-50"
-              >
-                <Mail size={16} /> Email
-              </TabsTrigger>
-              <TabsTrigger 
-                value="phone" 
-                className="flex items-center gap-2 transition-all duration-300 hover:bg-amber-50"
-              >
-                <Smartphone size={16} /> Phone
-              </TabsTrigger>
-              <TabsTrigger 
-                value="google" 
-                className="flex items-center gap-2 transition-all duration-300 hover:bg-amber-50"
-              >
-                <BrandGoogle size={16} /> Google
-              </TabsTrigger>
-            </TabsList>
-            
-            <TabsContent value="email" className="animate-fade-in">
-              <SellerForm
-                onSubmit={onSubmitSeller}
-                isLoading={isLoading}
-                setCaptchaValue={setCaptchaValue}
-                captchaValue={captchaValue}
-              />
-            </TabsContent>
-            
-            <TabsContent value="phone" className="animate-fade-in">
-              <PhoneRegisterTab
-                onVerificationComplete={handlePhoneRegistration}
-                onCancel={() => setRegistrationMethod('email')}
-              />
-            </TabsContent>
+              <TabsContent value="google" className="animate-fade-in">
+                <GoogleLoginSection 
+                  handleGoogleLogin={handleGoogleLogin}
+                  isLoading={isLoading}
+                  accountType="buyer"
+                />
+              </TabsContent>
+            </Tabs>
+          </TabsContent>
+          
+          <TabsContent value="seller" className="mt-4 tab-transition">
+            <Tabs value={registrationMethod} onValueChange={(v) => setRegistrationMethod(v as 'email' | 'phone' | 'google')} className="mb-4">
+              <TabsList className="grid w-full grid-cols-3 mb-4">
+                <motion.div whileHover="hover" whileTap="tap" variants={tabButtonVariants} className="w-full">
+                  <TabsTrigger 
+                    value="email" 
+                    className="flex items-center gap-2 w-full transition-all duration-300 hover:bg-amber-50"
+                  >
+                    <Mail size={16} /> Email
+                  </TabsTrigger>
+                </motion.div>
+                <motion.div whileHover="hover" whileTap="tap" variants={tabButtonVariants} className="w-full">
+                  <TabsTrigger 
+                    value="phone" 
+                    className="flex items-center gap-2 w-full transition-all duration-300 hover:bg-amber-50"
+                  >
+                    <Smartphone size={16} /> Phone
+                  </TabsTrigger>
+                </motion.div>
+                <motion.div whileHover="hover" whileTap="tap" variants={tabButtonVariants} className="w-full">
+                  <TabsTrigger 
+                    value="google" 
+                    className="flex items-center gap-2 w-full transition-all duration-300 hover:bg-amber-50"
+                  >
+                    <BrandGoogle size={16} /> Google
+                  </TabsTrigger>
+                </motion.div>
+              </TabsList>
+              
+              <TabsContent value="email" className="animate-fade-in">
+                <SellerForm
+                  onSubmit={onSubmitSeller}
+                  isLoading={isLoading}
+                  setCaptchaValue={setCaptchaValue}
+                  captchaValue={captchaValue}
+                />
+              </TabsContent>
+              
+              <TabsContent value="phone" className="animate-fade-in">
+                <PhoneRegisterTab
+                  onVerificationComplete={handlePhoneRegistration}
+                  onCancel={() => setRegistrationMethod('email')}
+                />
+              </TabsContent>
 
-            <TabsContent value="google" className="animate-fade-in">
-              <GoogleLoginSection 
-                handleGoogleLogin={handleGoogleLogin}
-                isLoading={isLoading}
-                accountType="seller"
-              />
-            </TabsContent>
-          </Tabs>
-        </TabsContent>
-      </Tabs>
+              <TabsContent value="google" className="animate-fade-in">
+                <GoogleLoginSection 
+                  handleGoogleLogin={handleGoogleLogin}
+                  isLoading={isLoading}
+                  accountType="seller"
+                />
+              </TabsContent>
+            </Tabs>
+          </TabsContent>
+        </Tabs>
+      </motion.div>
       
       <LoginLink />
       
