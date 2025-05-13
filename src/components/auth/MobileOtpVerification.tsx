@@ -18,7 +18,6 @@ import {
   SelectTrigger,
   SelectValue
 } from '@/components/ui/select';
-import { COUNTRY_CODES } from '@/utils/countryCodes';
 import { Command, CommandInput, CommandEmpty, CommandGroup, CommandItem, CommandList } from '@/components/ui/command';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 
@@ -310,11 +309,15 @@ const MobileOtpVerification: React.FC<MobileOtpVerificationProps> = ({
                           <InputOTP 
                             maxLength={6} 
                             value={field.value}
-                            onChange={(value) => field.onChange(value)}
+                            onChange={field.onChange}
                             render={({ slots }) => (
                               <InputOTPGroup>
                                 {slots.map((slot, index) => (
-                                  <InputOTPSlot key={index} {...slot} />
+                                  <InputOTPSlot 
+                                    key={index} 
+                                    {...slot}
+                                    index={index}
+                                  />
                                 ))}
                               </InputOTPGroup>
                             )}
