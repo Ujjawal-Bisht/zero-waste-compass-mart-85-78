@@ -1,15 +1,48 @@
+import React, { createContext, useState, useEffect, useContext } from 'react';
+import { toast } from 'sonner';
+import { authService } from '@/services/auth-service';
+import { userService } from '@/services/user-service';
+import { User } from '@/types/user';
 
-import React, { createContext, useState, useEffect } from "react";
-import { User } from "@/types";
-import { AuthContextType } from "./auth-types";
-import { authService } from "./auth-service";
-import { toast } from "sonner";
+export interface AuthContextType {
+  currentUser: User | null;
+  loading: boolean;
+  login: (email: string, password: string) => Promise<void>;
+  googleLogin: () => Promise<User>; // Update this return type
+  phoneLogin: (phoneNumber: string) => Promise<{ verificationId: string }>;
+  verifyOtp: (verificationId: string, otp: string) => Promise<boolean>;
+  logout: () => Promise<void>;
+  isAdmin: () => boolean;
+  isSeller: () => boolean;
+  verifySellerAccount: (businessDocuments: File[]) => Promise<boolean>;
+}
 
-export const AuthContext = createContext<AuthContextType | undefined>(undefined);
+const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+interface AuthProviderProps {
+  children: React.ReactNode;
+}
+
+export const AuthContextProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [currentUser, setCurrentUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const loadUser = async () => {
+      try {
+        setLoading(true);
+        const user = await userService.getCurrentUser();
+        setCurrentUser(user);
+      } catch (error) {
+        console.error("Failed to load user:", error);
+        setCurrentUser(null);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadUser();
+  }, []);
 
   const login = async (email: string, password: string) => {
     try {
@@ -18,8 +51,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setCurrentUser(user);
       toast.success("Logged in successfully!");
     } catch (error) {
+      console.error("Login error:", error);
       toast.error("Failed to log in");
-      throw error;
     } finally {
       setLoading(false);
     }
@@ -45,35 +78,35 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const phoneLogin = async (phoneNumber: string) => {
     try {
       setLoading(true);
-      const user = await authService.phoneLogin(phoneNumber);
-      setCurrentUser(user);
-      toast.success("Logged in with phone successfully!");
+      const verificationResult = await authService.phoneLogin(phoneNumber);
+      toast.success("OTP sent to your phone number!");
+      return verificationResult;
     } catch (error) {
-      toast.error("Failed to log in with phone");
+      console.error("Phone login error:", error);
+      toast.error("Failed to send OTP");
       throw error;
     } finally {
       setLoading(false);
     }
   };
 
-  const register = async (
-    email: string, 
-    password: string, 
-    name: string, 
-    businessDetails?: { 
-      businessName?: string, 
-      businessType?: 'retailer' | 'distributor' | 'manufacturer' | 'individual',
-      isSeller?: boolean 
-    }
-  ) => {
+  const verifyOtp = async (verificationId: string, otp: string) => {
     try {
       setLoading(true);
-      const user = await authService.register(email, password, name, businessDetails);
-      setCurrentUser(user);
-      toast.success("Account created successfully!");
+      const success = await authService.verifyOtp(verificationId, otp);
+      if (success) {
+        const user = await userService.getCurrentUser();
+        setCurrentUser(user);
+        toast.success("Phone number verified successfully!");
+        return true;
+      } else {
+        toast.error("Invalid OTP");
+        return false;
+      }
     } catch (error) {
-      toast.error("Failed to create account");
-      throw error;
+      console.error("OTP verification error:", error);
+      toast.error("Failed to verify OTP");
+      return false;
     } finally {
       setLoading(false);
     }
@@ -81,79 +114,72 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const logout = async () => {
     try {
+      setLoading(true);
       await authService.logout();
       setCurrentUser(null);
       toast.success("Logged out successfully!");
     } catch (error) {
+      console.error("Logout error:", error);
       toast.error("Failed to log out");
-      throw error;
-    }
-  };
-
-  const resetPassword = async (email: string) => {
-    try {
-      await authService.resetPassword(email);
-      toast.success("Password reset email sent!");
-    } catch (error) {
-      toast.error("Failed to send password reset email");
-      throw error;
-    }
-  };
-
-  const updateProfile = async (data: Partial<User>) => {
-    try {
-      const updatedUser = await authService.updateProfile(currentUser, data);
-      if (updatedUser) {
-        setCurrentUser(updatedUser);
-        toast.success("Profile updated successfully!");
-      }
-    } catch (error) {
-      toast.error("Failed to update profile");
-      throw error;
-    }
-  };
-
-  const verifySellerAccount = async (businessDocuments: File[]) => {
-    try {
-      setLoading(true);
-      const updatedUser = await authService.verifySellerAccount(currentUser, businessDocuments);
-      if (updatedUser) {
-        setCurrentUser(updatedUser);
-        toast.success("Your seller account has been verified!");
-      }
-    } catch (error) {
-      toast.error("Failed to verify seller account");
-      throw error;
     } finally {
       setLoading(false);
     }
   };
 
-  useEffect(() => {
-    // Check for stored user on app load
-    const storedUser = authService.getSavedUser();
-    if (storedUser) {
-      setCurrentUser(storedUser);
-    }
-    setLoading(false);
-  }, []);
+  const isAdmin = () => {
+    return currentUser?.role === 'admin';
+  };
 
-  const value = {
+  const isSeller = () => {
+    return currentUser?.isSeller === true;
+  };
+
+  const verifySellerAccount = async (businessDocuments: File[]) => {
+    try {
+      setLoading(true);
+      const success = await userService.verifySellerAccount(businessDocuments);
+      if (success) {
+        const user = await userService.getCurrentUser();
+        setCurrentUser(user);
+        toast.success("Seller account verification request submitted successfully!");
+        return true;
+      } else {
+        toast.error("Failed to submit seller account verification request");
+        return false;
+      }
+    } catch (error) {
+      console.error("Seller account verification error:", error);
+      toast.error("Failed to submit seller account verification request");
+      return false;
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const contextValue: AuthContextType = {
     currentUser,
     loading,
     login,
     googleLogin,
     phoneLogin,
+    verifyOtp,
     logout,
-    register,
-    resetPassword,
-    updateProfile,
-    verifySellerAccount
+    isAdmin,
+    isSeller,
+    verifySellerAccount,
   };
 
   return (
-    <AuthContext.Provider value={value}>
+    <AuthContext.Provider value={contextValue}>
       {children}
     </AuthContext.Provider>
   );
+};
+
+export const useAuth = () => {
+  const context = useContext(AuthContext);
+  if (!context) {
+    throw new Error('useAuth must be used within an AuthProvider');
+  }
+  return context;
 };

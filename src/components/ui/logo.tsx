@@ -12,7 +12,8 @@ interface LogoProps {
   onClick?: () => void;
 }
 
-const Logo: React.FC<LogoProps> = ({ 
+// Export both default and named export
+export const Logo: React.FC<LogoProps> = ({ 
   size = 'md', 
   className, 
   showText = true,
@@ -95,4 +96,5 @@ const Logo: React.FC<LogoProps> = ({
   );
 };
 
+// Also maintain the default export for backward compatibility
 export default Logo;

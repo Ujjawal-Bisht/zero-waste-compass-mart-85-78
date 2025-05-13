@@ -5,7 +5,7 @@ import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { Sidebar } from '@/components/ui/sidebar';
 import { Logo } from '@/components/ui/logo';
-import { useMobile } from '@/hooks/use-mobile';
+import { useIsMobile } from '@/hooks/use-mobile';
 import { useAuth } from '@/contexts/auth';
 import { 
   Home, 
@@ -28,7 +28,7 @@ interface SidebarNavProps extends React.HTMLAttributes<HTMLDivElement> {
 
 export const DashboardSidebar = ({ className, onClose, ...props }: SidebarNavProps) => {
   const location = useLocation();
-  const isMobile = useMobile();
+  const isMobile = useIsMobile();
   const { currentUser, logout } = useAuth();
   const isSeller = currentUser?.isSeller;
   
@@ -134,3 +134,5 @@ export const DashboardSidebar = ({ className, onClose, ...props }: SidebarNavPro
     </Sidebar>
   );
 };
+
+export default DashboardSidebar;
