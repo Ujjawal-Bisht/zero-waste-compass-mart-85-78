@@ -49,11 +49,11 @@ export const AuthContextProvider: React.FC<AuthProviderProps> = ({ children }) =
     }
   };
 
-  const googleLogin = async () => {
+  const googleLogin = async (accountType: 'buyer' | 'seller' = 'buyer') => {
     try {
       setLoading(true);
-      console.log("Starting Google authentication flow...");
-      const user = await authService.googleLogin();
+      console.log(`Starting Google authentication flow as ${accountType}...`);
+      const user = await authService.googleLogin(accountType);
       setCurrentUser(user);
       toast.success("Logged in with Google successfully!");
       return user;
@@ -66,10 +66,10 @@ export const AuthContextProvider: React.FC<AuthProviderProps> = ({ children }) =
     }
   };
 
-  const phoneLogin = async (phoneNumber: string) => {
+  const phoneLogin = async (phoneNumber: string, accountType: 'buyer' | 'seller' = 'buyer') => {
     try {
       setLoading(true);
-      const result = await authService.phoneLogin(phoneNumber);
+      const result = await authService.phoneLogin(phoneNumber, accountType);
       toast.success("OTP sent to your phone number!");
       return result;
     } catch (error) {

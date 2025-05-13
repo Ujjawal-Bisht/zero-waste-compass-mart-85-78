@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { Sidebar } from '@/components/ui/sidebar';
@@ -28,6 +28,7 @@ interface SidebarNavProps extends React.HTMLAttributes<HTMLDivElement> {
 
 export const DashboardSidebar = ({ className, onClose, ...props }: SidebarNavProps) => {
   const location = useLocation();
+  const navigate = useNavigate();
   const isMobile = useIsMobile();
   const { currentUser, logout } = useAuth();
   const isSeller = currentUser?.isSeller;
@@ -94,12 +95,15 @@ export const DashboardSidebar = ({ className, onClose, ...props }: SidebarNavPro
     }
   };
 
+  const handleLogoClick = () => {
+    navigate('/');
+  };
+
   return (
     <Sidebar className={cn("pb-12", className)} {...props}>
       <div className="px-3 py-2">
         <div className="mb-8 pl-2 flex items-center">
-          <Logo className="mr-2 h-7 w-7" />
-          <span className="text-xl font-bold">Zero Waste Mart</span>
+          <Logo className="cursor-pointer" onClick={handleLogoClick} />
         </div>
         <h2 className="mb-2 px-4 text-lg font-semibold tracking-tight">
           {isSeller ? 'Seller Portal' : 'Navigation'}

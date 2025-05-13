@@ -5,9 +5,10 @@ import { useAuth } from '@/contexts/auth';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Input } from '@/components/ui/input';
-import { Search, Plus } from 'lucide-react';
+import { Search, Plus, Home } from 'lucide-react';
 import { motion } from 'framer-motion';
 import NotificationCenter from '@/components/NotificationCenter';
+import { Logo } from '@/components/ui/logo';
 
 const DashboardHeader: React.FC = () => {
   const { currentUser } = useAuth();
@@ -23,6 +24,10 @@ const DashboardHeader: React.FC = () => {
       .substring(0, 2);
   };
 
+  const goToHome = () => {
+    navigate('/');
+  };
+
   return (
     <header className="bg-white shadow-sm z-10 sticky top-0 border-b border-gray-100">
       <motion.div 
@@ -31,17 +36,48 @@ const DashboardHeader: React.FC = () => {
         animate={{ y: 0, opacity: 1 }}
         transition={{ duration: 0.5 }}
       >
-        <div className="flex-1 max-w-md">
-          <div className="relative w-full">
-            <Search className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
-            <Input 
-              type="search" 
-              placeholder="Search..." 
-              className="pl-10 w-full bg-gray-50 border-gray-100" 
-            />
+        <div className="hidden lg:flex items-center space-x-6">
+          <div className="cursor-pointer" onClick={goToHome}>
+            <Logo size="sm" showText={true} animated={true} />
+          </div>
+          <div className="flex-1 max-w-md">
+            <div className="relative w-full">
+              <Search className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
+              <Input 
+                type="search" 
+                placeholder="Search..." 
+                className="pl-10 w-full bg-gray-50 border-gray-100" 
+              />
+            </div>
           </div>
         </div>
+        
+        <div className="flex items-center lg:hidden">
+          <div className="cursor-pointer" onClick={goToHome}>
+            <Logo size="sm" showText={false} animated={true} />
+          </div>
+          <div className="flex-1 max-w-md ml-4">
+            <div className="relative w-full">
+              <Search className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
+              <Input 
+                type="search" 
+                placeholder="Search..." 
+                className="pl-10 w-full bg-gray-50 border-gray-100" 
+              />
+            </div>
+          </div>
+        </div>
+        
         <div className="flex items-center space-x-3 md:space-x-4">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={goToHome}
+            className="hidden md:flex items-center gap-2 hover:bg-gray-100 transition-colors"
+          >
+            <Home className="h-4 w-4" /> Home
+          </Button>
+          
           <motion.div
             whileHover={{ rotate: [0, -5, 5, 0], scale: 1.05 }}
             transition={{ duration: 0.5 }}
@@ -76,8 +112,13 @@ const DashboardHeader: React.FC = () => {
             <div className="ml-2 hidden md:block">
               <p className="text-sm font-medium">{currentUser?.displayName || 'User'}</p>
               {currentUser?.isSeller && (
-                <p className="text-xs text-muted-foreground">
-                  {currentUser?.verified ? 'Verified Seller' : 'Seller'}
+                <p className="text-xs text-amber-600">
+                  {currentUser?.verified ? '✓ Verified Seller' : 'Seller'}
+                </p>
+              )}
+              {!currentUser?.isSeller && (
+                <p className="text-xs text-blue-600">
+                  Buyer
                 </p>
               )}
             </div>

@@ -23,8 +23,10 @@ const DashboardLayout: React.FC = () => {
           <DashboardHeader />
 
           {/* Page Content */}
-          <div className="flex-1 overflow-auto">
-            <PageContainer />
+          <div className="flex-1 overflow-auto bg-gradient-to-b from-gray-50 to-white">
+            <div className="container mx-auto py-6 px-4 md:px-6">
+              <PageContainer />
+            </div>
           </div>
           
           {/* Chat Bot */}

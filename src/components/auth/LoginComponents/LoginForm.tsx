@@ -50,10 +50,10 @@ const LoginForm: React.FC = () => {
   const handleGoogleLogin = async () => {
     try {
       setIsLoading(true);
-      console.log("Attempting Google login from UI...");
+      console.log("Attempting Google login from UI as", accountType);
       
-      // We don't need to check captcha for Google login as Google handles verification
-      const user = await googleLogin();
+      // We pass accountType to googleLogin to simulate account selection
+      const user = await googleLogin(accountType);
       console.log("Google login successful, user:", user);
       
       // Determine where to navigate based on user properties
@@ -73,8 +73,9 @@ const LoginForm: React.FC = () => {
   const handlePhoneLogin = async (phoneNumber: string) => {
     try {
       setIsLoading(true);
-      await phoneLogin(phoneNumber);
-      navigate('/dashboard');
+      // Pass account type to phoneLogin
+      await phoneLogin(phoneNumber, accountType);
+      navigate(accountType === 'seller' ? '/seller/dashboard' : '/dashboard');
     } catch (error) {
       console.error('Phone login error:', error);
       toast.error('Failed to sign in with phone number.');
@@ -84,15 +85,29 @@ const LoginForm: React.FC = () => {
   };
 
   return (
-    <Tabs value={accountType} onValueChange={(value) => setAccountType(value as 'buyer' | 'seller')} className="mb-6">
+    <Tabs 
+      value={accountType} 
+      onValueChange={(value) => {
+        setAccountType(value as 'buyer' | 'seller');
+        // Reset captcha when switching account types
+        setCaptchaValue(null);
+      }} 
+      className="mb-6"
+    >
       <TabsList className="grid w-full grid-cols-2">
-        <TabsTrigger value="buyer" className="flex items-center gap-2 py-3">
+        <TabsTrigger 
+          value="buyer" 
+          className="flex items-center gap-2 py-3 data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-500 data-[state=active]:to-indigo-500 data-[state=active]:text-white"
+        >
           <ShoppingBag size={16} /> 
           <span className="text-base">
             Buyer
           </span>
         </TabsTrigger>
-        <TabsTrigger value="seller" className="flex items-center gap-2 py-3 bg-gradient-to-r from-indigo-500 data-[state=active]:from-orange-500 data-[state=active]:to-amber-500 data-[state=active]:text-white">
+        <TabsTrigger 
+          value="seller" 
+          className="flex items-center gap-2 py-3 data-[state=active]:bg-gradient-to-r data-[state=active]:from-orange-500 data-[state=active]:to-amber-500 data-[state=active]:text-white"
+        >
           <Store size={16} />
           <span className="text-base">
             Seller
@@ -101,7 +116,7 @@ const LoginForm: React.FC = () => {
       </TabsList>
       
       <TabsContent value="buyer" className="animate-fade-in mt-4">
-        <div className="bg-gradient-to-r from-blue-50 to-indigo-50 p-3 rounded-lg border border-blue-100 mb-4">
+        <div className="bg-gradient-to-r from-blue-50 to-indigo-50 p-4 rounded-lg border border-blue-100 mb-4 shadow-sm">
           <p className="text-sm text-blue-700">
             Welcome back! Sign in to your buyer account to explore sustainable products.
           </p>
@@ -136,7 +151,7 @@ const LoginForm: React.FC = () => {
       </TabsContent>
       
       <TabsContent value="seller" className="animate-fade-in mt-4">
-        <div className="bg-gradient-to-r from-amber-50 to-orange-50 p-3 rounded-lg border border-amber-200 mb-4">
+        <div className="bg-gradient-to-r from-amber-50 to-orange-50 p-4 rounded-lg border border-amber-200 mb-4 shadow-sm">
           <p className="text-sm text-amber-700">
             Welcome back, seller! Sign in to manage your sustainable business.
           </p>
@@ -146,6 +161,7 @@ const LoginForm: React.FC = () => {
           isLoading={isLoading}
           captchaValue={captchaValue}
           onCaptchaChange={onCaptchaChange}
+          onGoogleLogin={handleGoogleLogin}
         />
       </TabsContent>
     </Tabs>
