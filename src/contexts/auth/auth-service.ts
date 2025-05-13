@@ -1,4 +1,3 @@
-
 import { User } from "@/types";
 import { toast } from "sonner";
 
@@ -28,21 +27,29 @@ export const authService = {
 
   googleLogin: async (): Promise<User> => {
     try {
-      // Simulate Google login
+      // Improved Google login simulation
+      console.log("Initiating Google login...");
+      
+      // Simulate Google OAuth flow with a slight delay
+      await new Promise(resolve => setTimeout(resolve, 800));
+      
+      // Create a more realistic mock Google user
       const mockUser = {
-        id: "google123",
-        email: "user@gmail.com",
+        id: "google_" + Math.random().toString(36).substring(2, 9),
+        email: "user" + Math.floor(Math.random() * 1000) + "@gmail.com",
         displayName: "Google User",
-        photoURL: "https://via.placeholder.com/150",
+        photoURL: "https://randomuser.me/api/portraits/lego/1.jpg", // Use a random avatar
         isAdmin: false,
         isSeller: false,
         trustScore: undefined,
-        verified: false,
+        verified: true, // Google accounts are considered verified
       };
       
+      console.log("Google login successful:", mockUser);
       localStorage.setItem("zwm_user", JSON.stringify(mockUser));
       return mockUser;
     } catch (error) {
+      console.error("Google login failed:", error);
       throw error;
     }
   },

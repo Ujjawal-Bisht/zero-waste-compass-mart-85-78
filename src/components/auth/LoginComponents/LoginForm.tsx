@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
@@ -48,19 +47,23 @@ const LoginForm: React.FC = () => {
   };
 
   const handleGoogleLogin = async () => {
-    if (!captchaValue) {
-      toast.error('Please verify that you are not a robot');
-      return;
-    }
-    
     try {
       setIsLoading(true);
-      await googleLogin();
-      toast.success('Successfully signed in with Google!');
-      navigate('/dashboard');
+      console.log("Attempting Google login from UI...");
+      
+      // We don't need to check captcha for Google login as Google handles verification
+      const user = await googleLogin();
+      console.log("Google login successful, user:", user);
+      
+      // Determine where to navigate based on user properties
+      if (user.isSeller) {
+        navigate('/seller/dashboard');
+      } else {
+        navigate('/dashboard');
+      }
     } catch (error) {
-      console.error('Google login error:', error);
-      toast.error('Failed to sign in with Google.');
+      console.error('Google login error in UI:', error);
+      toast.error('Failed to sign in with Google. Please try again.');
     } finally {
       setIsLoading(false);
     }

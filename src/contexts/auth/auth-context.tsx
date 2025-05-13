@@ -28,10 +28,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const googleLogin = async () => {
     try {
       setLoading(true);
+      console.log("Starting Google authentication flow...");
       const user = await authService.googleLogin();
       setCurrentUser(user);
       toast.success("Logged in with Google successfully!");
+      return user; // Return the user for component handling
     } catch (error) {
+      console.error("Google authentication error:", error);
       toast.error("Failed to log in with Google");
       throw error;
     } finally {
