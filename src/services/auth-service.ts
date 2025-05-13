@@ -27,10 +27,10 @@ export const authService = {
     }
   },
 
-  googleLogin: async (): Promise<User> => {
+  googleLogin: async (accountType: 'buyer' | 'seller' = 'buyer'): Promise<User> => {
     try {
       // Improved Google login simulation with account selection dialog
-      console.log("Initiating Google login...");
+      console.log("Initiating Google login as", accountType);
       
       // Show a simulated account selection dialog
       await new Promise(resolve => {
@@ -110,15 +110,17 @@ export const authService = {
       // Simulate slight delay for authentication
       await new Promise(resolve => setTimeout(resolve, 500));
       
-      // Create a more realistic mock Google user
+      // Create a more realistic mock Google user based on accountType
       const mockUser = {
         id: "google_" + Math.random().toString(36).substring(2, 9),
         email: "user" + Math.floor(Math.random() * 1000) + "@gmail.com",
         displayName: "Google User",
         photoURL: "https://randomuser.me/api/portraits/lego/1.jpg", // Use a random avatar
         isAdmin: false,
-        isSeller: false,
-        trustScore: undefined,
+        isSeller: accountType === 'seller', // Set isSeller based on accountType
+        businessName: accountType === 'seller' ? "Google Business" : undefined,
+        businessType: accountType === 'seller' ? "retailer" as const : undefined,
+        trustScore: accountType === 'seller' ? 3.5 : undefined,
         verified: true, // Google accounts are considered verified
       };
       
@@ -131,10 +133,10 @@ export const authService = {
     }
   },
 
-  phoneLogin: async (phoneNumber: string): Promise<{ verificationId: string }> => {
+  phoneLogin: async (phoneNumber: string, accountType: 'buyer' | 'seller' = 'buyer'): Promise<{ verificationId: string }> => {
     try {
       // Simulate phone login verification process
-      console.log(`Sending OTP to ${phoneNumber}`);
+      console.log(`Sending OTP to ${phoneNumber} for ${accountType} account`);
       await new Promise(resolve => setTimeout(resolve, 1000));
       
       // Return a mock verification ID

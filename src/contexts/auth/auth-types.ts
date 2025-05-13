@@ -5,8 +5,8 @@ export interface AuthContextType {
   currentUser: User | null;
   loading: boolean;
   login: (email: string, password: string) => Promise<void>;
-  googleLogin: () => Promise<User>;
-  phoneLogin: (phoneNumber: string) => Promise<{ verificationId: string }>;
+  googleLogin: (accountType?: 'buyer' | 'seller') => Promise<User>;
+  phoneLogin: (phoneNumber: string, accountType?: 'buyer' | 'seller') => Promise<{ verificationId: string }>;
   logout: () => Promise<void>;
   register: (email: string, password: string, name: string, businessDetails?: { 
     businessName?: string, 
