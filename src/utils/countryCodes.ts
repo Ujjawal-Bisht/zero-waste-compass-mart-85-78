@@ -1,5 +1,5 @@
 
-interface CountryCode {
+export interface CountryCode {
   name: string;
   code: string;
   dialCode: string;

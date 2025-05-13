@@ -1,34 +1,12 @@
 
-import React, { useState, useEffect } from 'react';
-import { Button } from '@/components/ui/button';
-import { InputOTP, InputOTPGroup, InputOTPSlot } from '@/components/ui/input-otp';
-import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from '@/components/ui/card';
-import { Form, FormField, FormItem, FormLabel, FormControl, FormMessage } from '@/components/ui/form';
-import { Input } from '@/components/ui/input';
-import { Smartphone } from 'lucide-react';
-import { useForm } from 'react-hook-form';
-import { z } from 'zod';
-import { zodResolver } from '@hookform/resolvers/zod';
+import React, { useState } from 'react';
 import { motion } from 'framer-motion';
+import { Card, CardContent, CardFooter } from '@/components/ui/card';
 import { toast } from 'sonner';
-import { 
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue
-} from '@/components/ui/select';
-import { Command, CommandInput, CommandEmpty, CommandGroup, CommandItem, CommandList } from '@/components/ui/command';
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-
-const phoneSchema = z.object({
-  countryCode: z.string().min(1, { message: 'Country code is required' }),
-  phoneNumber: z.string().min(5, { message: 'Phone number must be at least 5 characters' })
-});
-
-const otpSchema = z.object({
-  otp: z.string().length(6, { message: 'OTP must be exactly 6 characters' })
-});
+import PhoneNumberForm, { PhoneFormValues } from './mobile-verification/PhoneNumberForm';
+import OtpForm, { OtpFormValues } from './mobile-verification/OtpForm';
+import VerificationHeader from './mobile-verification/VerificationHeader';
+import useCountdown from './mobile-verification/useCountdown';
 
 interface MobileOtpVerificationProps {
   onVerificationComplete: (phoneNumber: string) => void;
@@ -42,48 +20,16 @@ const MobileOtpVerification: React.FC<MobileOtpVerificationProps> = ({
   const [step, setStep] = useState<'phone' | 'otp'>('phone');
   const [formattedPhoneNumber, setFormattedPhoneNumber] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [resendDisabled, setResendDisabled] = useState(false);
-  const [countdownTime, setCountdownTime] = useState(0);
-  const [open, setOpen] = useState(false);
-  const [searchQuery, setSearchQuery] = useState('');
-  const [filteredCountries, setFilteredCountries] = useState(COUNTRY_CODES);
+  const { countdownTime, isActive, startCountdown } = useCountdown(30);
 
-  const phoneForm = useForm<z.infer<typeof phoneSchema>>({
-    resolver: zodResolver(phoneSchema),
-    defaultValues: {
-      countryCode: '+1', // Default to US
-      phoneNumber: ''
-    }
-  });
-
-  const otpForm = useForm<z.infer<typeof otpSchema>>({
-    resolver: zodResolver(otpSchema),
-    defaultValues: {
-      otp: ''
-    }
-  });
-
-  useEffect(() => {
-    // Filter countries based on search query
-    if (searchQuery) {
-      const filtered = COUNTRY_CODES.filter(country => 
-        country.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
-        country.dialCode.includes(searchQuery)
-      );
-      setFilteredCountries(filtered);
-    } else {
-      setFilteredCountries(COUNTRY_CODES);
-    }
-  }, [searchQuery]);
-
-  const handleSendOtp = async (values: z.infer<typeof phoneSchema>) => {
+  const handleSendOtp = async (values: PhoneFormValues) => {
     setIsSubmitting(true);
     try {
       // Format the phone number with country code
       const fullPhoneNumber = `${values.countryCode}${values.phoneNumber}`;
       
       // In a real implementation, we would call an API to send the OTP
-      // For now, simulate the API call with a toast notification
+      // For now, simulate the API call with a timeout
       await new Promise(resolve => setTimeout(resolve, 1500));
       
       // Generate a random 6-digit code for demo purposes
@@ -100,7 +46,7 @@ const MobileOtpVerification: React.FC<MobileOtpVerificationProps> = ({
       toast.success(`OTP sent to ${fullPhoneNumber}`);
       
       // Start countdown for resend button
-      startResendCountdown();
+      startCountdown();
     } catch (error) {
       toast.error('Failed to send OTP. Please try again.');
     } finally {
@@ -108,7 +54,7 @@ const MobileOtpVerification: React.FC<MobileOtpVerificationProps> = ({
     }
   };
 
-  const handleVerifyOtp = async (values: z.infer<typeof otpSchema>) => {
+  const handleVerifyOtp = async (values: OtpFormValues) => {
     setIsSubmitting(true);
     try {
       // In a real implementation, this would call an API to verify the OTP
@@ -129,30 +75,10 @@ const MobileOtpVerification: React.FC<MobileOtpVerificationProps> = ({
     }
   };
 
-  const startResendCountdown = () => {
-    setResendDisabled(true);
-    setCountdownTime(30);
-    
-    const timer = setInterval(() => {
-      setCountdownTime((prevTime) => {
-        if (prevTime <= 1) {
-          clearInterval(timer);
-          setResendDisabled(false);
-          return 0;
-        }
-        return prevTime - 1;
-      });
-    }, 1000);
-  };
-
   const handleResendOtp = async () => {
-    if (resendDisabled) return;
+    if (isActive) return;
     
     toast.info('Resending code...');
-    
-    // Get current values from phone form
-    const countryCode = phoneForm.getValues('countryCode');
-    const phoneNumber = phoneForm.getValues('phoneNumber');
     
     try {
       // Simulate API call
@@ -168,15 +94,10 @@ const MobileOtpVerification: React.FC<MobileOtpVerificationProps> = ({
       });
       
       toast.success('New code sent!');
-      startResendCountdown();
+      startCountdown();
     } catch (error) {
       toast.error('Failed to resend OTP. Please try again.');
     }
-  };
-
-  const formatPhoneNumberForDisplay = (countryCode: string, phoneNumber: string) => {
-    const country = COUNTRY_CODES.find(c => c.dialCode === countryCode);
-    return `${countryCode} ${phoneNumber}${country ? ` (${country.name})` : ''}`;
   };
 
   return (
@@ -187,191 +108,32 @@ const MobileOtpVerification: React.FC<MobileOtpVerificationProps> = ({
       className="w-full max-w-md mx-auto"
     >
       <Card className="shadow-md">
-        <CardHeader className="text-center">
-          <div className="mx-auto mb-4 bg-zwm-primary/10 p-3 rounded-full w-16 h-16 flex items-center justify-center">
-            <Smartphone className="h-8 w-8 text-zwm-primary" />
-          </div>
-          <CardTitle>{step === 'phone' ? 'Phone Verification' : 'Enter OTP'}</CardTitle>
-          <CardDescription>
-            {step === 'phone' 
-              ? 'Enter your phone number to receive a verification code' 
-              : `Enter the 6-digit code sent to ${formattedPhoneNumber}`}
-          </CardDescription>
-        </CardHeader>
+        <VerificationHeader step={step} phoneNumber={formattedPhoneNumber} />
         
         <CardContent>
           {step === 'phone' ? (
-            <Form {...phoneForm}>
-              <form onSubmit={phoneForm.handleSubmit(handleSendOtp)} className="space-y-4">
-                <FormField
-                  control={phoneForm.control}
-                  name="countryCode"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Country Code</FormLabel>
-                      <Popover open={open} onOpenChange={setOpen}>
-                        <PopoverTrigger asChild>
-                          <FormControl>
-                            <Button
-                              variant="outline"
-                              role="combobox"
-                              className="w-full justify-between"
-                            >
-                              {field.value ? 
-                                `${field.value} ${COUNTRY_CODES.find(country => country.dialCode === field.value)?.name || ''}` : 
-                                "Select country code"}
-                            </Button>
-                          </FormControl>
-                        </PopoverTrigger>
-                        <PopoverContent className="w-full p-0" align="start">
-                          <Command>
-                            <CommandInput 
-                              placeholder="Search country..." 
-                              className="flex h-10 w-full rounded-md bg-transparent py-3 text-sm outline-none placeholder:text-muted-foreground focus:placeholder:text-muted-foreground disabled:cursor-not-allowed disabled:opacity-50"
-                              value={searchQuery}
-                              onValueChange={setSearchQuery}
-                            />
-                            <CommandList>
-                              <CommandEmpty>No country found.</CommandEmpty>
-                              <CommandGroup>
-                                {filteredCountries.map((country) => (
-                                  <CommandItem
-                                    key={country.code}
-                                    value={`${country.dialCode}-${country.name}`}
-                                    onSelect={() => {
-                                      field.onChange(country.dialCode);
-                                      setOpen(false);
-                                    }}
-                                  >
-                                    <span className="font-medium">{country.dialCode}</span>
-                                    <span className="ml-2 text-muted-foreground">{country.name}</span>
-                                  </CommandItem>
-                                ))}
-                              </CommandGroup>
-                            </CommandList>
-                          </Command>
-                        </PopoverContent>
-                      </Popover>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={phoneForm.control}
-                  name="phoneNumber"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Phone Number</FormLabel>
-                      <FormControl>
-                        <Input 
-                          placeholder="123-456-7890" 
-                          {...field}
-                          className="w-full" 
-                          type="tel"
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                
-                <div className="flex justify-between">
-                  <Button 
-                    variant="outline" 
-                    type="button" 
-                    onClick={onCancel}
-                    disabled={isSubmitting}
-                  >
-                    Back
-                  </Button>
-                  <Button 
-                    type="submit" 
-                    className="zwm-gradient"
-                    disabled={isSubmitting}
-                  >
-                    {isSubmitting ? 'Sending...' : 'Send Code'}
-                  </Button>
-                </div>
-              </form>
-            </Form>
+            <PhoneNumberForm 
+              onSubmit={handleSendOtp} 
+              onCancel={onCancel}
+              isSubmitting={isSubmitting}
+            />
           ) : (
-            <Form {...otpForm}>
-              <form onSubmit={otpForm.handleSubmit(handleVerifyOtp)} className="space-y-4">
-                <FormField
-                  control={otpForm.control}
-                  name="otp"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>One-Time Password</FormLabel>
-                      <FormControl>
-                        <div className="flex justify-center py-4">
-                          <InputOTP 
-                            maxLength={6} 
-                            value={field.value}
-                            onChange={field.onChange}
-                            render={({ slots }) => (
-                              <InputOTPGroup>
-                                {slots.map((slot, index) => (
-                                  <InputOTPSlot 
-                                    key={index} 
-                                    {...slot}
-                                    index={index}
-                                  />
-                                ))}
-                              </InputOTPGroup>
-                            )}
-                          />
-                        </div>
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <div className="flex justify-between">
-                  <Button 
-                    variant="outline" 
-                    type="button" 
-                    onClick={() => setStep('phone')}
-                    disabled={isSubmitting}
-                  >
-                    Back
-                  </Button>
-                  <Button 
-                    type="submit" 
-                    className="zwm-gradient"
-                    disabled={isSubmitting}
-                  >
-                    {isSubmitting ? 'Verifying...' : 'Verify Code'}
-                  </Button>
-                </div>
-              </form>
-            </Form>
+            <OtpForm
+              onSubmit={handleVerifyOtp}
+              onBack={() => setStep('phone')}
+              isSubmitting={isSubmitting}
+              phoneNumber={formattedPhoneNumber}
+              onResend={handleResendOtp}
+              resendDisabled={isActive}
+              countdownTime={countdownTime}
+            />
           )}
         </CardContent>
         
         <CardFooter className="flex flex-col space-y-2">
           <div className="text-center text-sm text-muted-foreground">
-            {step === 'phone' 
-              ? 'We\'ll send a verification code to this number' 
-              : 'Didn\'t receive a code? '} 
-            {step === 'otp' && (
-              <button 
-                type="button"
-                className={`text-zwm-primary ml-1 ${resendDisabled ? 'opacity-50 cursor-not-allowed' : 'hover:underline'}`}
-                onClick={handleResendOtp}
-                disabled={resendDisabled}
-              >
-                {resendDisabled ? `Resend in ${countdownTime}s` : 'Resend'}
-              </button>
-            )}
+            {step === 'phone' && 'We\'ll send a verification code to this number'}
           </div>
-          {step === 'otp' && (
-            <div className="text-xs text-center text-amber-600">
-              Note: This is a demo. In a real app, you would receive an SMS with the code. 
-              Look in the toast notifications for the demo code.
-            </div>
-          )}
         </CardFooter>
       </Card>
     </motion.div>
