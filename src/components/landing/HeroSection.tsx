@@ -72,7 +72,7 @@ const HeroSection: React.FC = () => {
                 >
                   <Button
                     onClick={handleGetStarted}
-                    className="button-hover gradient-shift bg-white text-zwm-primary hover:bg-gray-100 text-lg px-6 py-5 md:px-8 md:py-6 shadow-lg rounded-full group"
+                    className="button-hover gradient-shift bg-white text-zwm-primary hover:bg-gray-100 text-lg px-6 py-5 md:px-8 md:py-6 shadow-lg rounded-full group ripple-effect"
                   >
                     <span className="mr-2">Get Started</span>
                     <span className="inline-flex items-center">
@@ -90,17 +90,8 @@ const HeroSection: React.FC = () => {
           </div>
         </div>
 
-        {/* Enhanced Abstract Shapes with more animations */}
+        {/* Enhanced Abstract Shapes with more animations - REMOVED WHITE CIRCLE */}
         <div className="absolute inset-0 overflow-hidden opacity-20">
-          <motion.div 
-            className="absolute -right-5 -top-20 w-64 md:w-96 h-64 md:h-96 rounded-full bg-white opacity-20 blur-breathe"
-            animate={{ 
-              y: [0, -20, 0], 
-              scale: [1, 1.1, 1],
-              rotate: [0, 5, 0]
-            }}
-            transition={{ duration: 8, repeat: Infinity, repeatType: "reverse" }}
-          ></motion.div>
           <motion.div 
             className="absolute right-20 bottom-10 w-40 md:w-64 h-40 md:h-64 rounded-full bg-white opacity-10 cosmic-pulse"
             animate={{ 

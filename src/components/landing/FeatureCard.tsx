@@ -1,7 +1,7 @@
 
 import React from 'react';
-import { Button } from '@/components/ui/button';
 import { motion } from 'framer-motion';
+import { Button } from '@/components/ui/button';
 import { LucideIcon } from 'lucide-react';
 
 interface FeatureCardProps {
@@ -11,7 +11,7 @@ interface FeatureCardProps {
   buttonText: string;
   buttonAction: () => void;
   iconBgColor: string;
-  animationType?: 'rotate' | 'scale' | 'vertical';
+  animationType: 'rotate' | 'scale' | 'vertical';
 }
 
 const FeatureCard: React.FC<FeatureCardProps> = ({
@@ -21,47 +21,134 @@ const FeatureCard: React.FC<FeatureCardProps> = ({
   buttonText,
   buttonAction,
   iconBgColor,
-  animationType = 'rotate',
+  animationType
 }) => {
-  let hoverAnimation = {};
-  
-  // Set animation based on type
-  switch (animationType) {
-    case 'rotate':
-      hoverAnimation = { rotate: [0, 10, -10, 0], transition: { duration: 0.5 } };
-      break;
-    case 'scale':
-      hoverAnimation = { scale: [1, 1.2, 1], transition: { duration: 0.5 } };
-      break;
-    case 'vertical':
-      hoverAnimation = { y: [0, -5, 0], transition: { duration: 0.5, repeat: 1 } };
-      break;
-    default:
-      hoverAnimation = { rotate: [0, 10, -10, 0], transition: { duration: 0.5 } };
-  }
+  // Define animation variants based on the type
+  const getIconAnimation = () => {
+    switch (animationType) {
+      case 'rotate':
+        return {
+          animate: {
+            rotate: [0, 10, 0, -10, 0],
+            transition: {
+              duration: 5,
+              repeat: Infinity,
+              ease: "easeInOut",
+            }
+          }
+        };
+      case 'scale':
+        return {
+          animate: {
+            scale: [1, 1.2, 1],
+            transition: {
+              duration: 3,
+              repeat: Infinity,
+              ease: "easeInOut",
+            }
+          }
+        };
+      case 'vertical':
+        return {
+          animate: {
+            y: [0, -7, 0],
+            transition: {
+              duration: 4,
+              repeat: Infinity,
+              ease: "easeInOut",
+            }
+          }
+        };
+      default:
+        return {
+          animate: {}
+        };
+    }
+  };
+
+  const iconAnimation = getIconAnimation();
 
   return (
-    <motion.div 
-      className="zwm-card p-8 text-center flex flex-col items-center"
+    <motion.div
+      className="bg-white rounded-xl shadow-md p-6 md:p-8 overflow-hidden spotlight-effect"
       initial={{ opacity: 0, y: 20 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true }}
-      transition={{ duration: 0.6 }}
-      whileHover={{ y: -10, boxShadow: "0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)" }}
+      transition={{ duration: 0.5 }}
+      whileHover={{ translateY: -5 }}
     >
-      <motion.div 
-        className={`h-20 w-20 rounded-full ${iconBgColor} flex items-center justify-center mb-6`}
-        whileHover={hoverAnimation}
-      >
-        <Icon className="h-10 w-10" />
-      </motion.div>
-      <h3 className="mt-2 text-2xl font-medium font-heading text-gray-900">{title}</h3>
-      <p className="mt-3 text-gray-600 max-w-md">
-        {description}
-      </p>
-      <Button variant="outline" className="mt-6" onClick={buttonAction}>
-        {buttonText}
-      </Button>
+      <div className="relative z-10">
+        <motion.div
+          className={`h-16 w-16 ${iconBgColor} rounded-lg flex items-center justify-center mb-6`}
+          {...iconAnimation}
+        >
+          <Icon className={`h-8 w-8 ${
+            title.includes('Upload') ? 'text-indigo-600' :
+            title.includes('Connect') ? 'text-purple-600' :
+            title.includes('Packaged') ? 'text-green-600' :
+            'text-blue-600'
+          }`} />
+        </motion.div>
+
+        <motion.h3
+          className="mt-2 text-xl font-medium font-heading text-gray-900"
+          initial={{ opacity: 0, x: -10 }}
+          whileInView={{ opacity: 1, x: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.3, delay: 0.2 }}
+        >
+          {title}
+        </motion.h3>
+
+        <motion.p
+          className="mt-3 text-gray-600"
+          initial={{ opacity: 0, x: -10 }}
+          whileInView={{ opacity: 1, x: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.3, delay: 0.3 }}
+        >
+          {description}
+        </motion.p>
+
+        <motion.div
+          className="mt-6"
+          initial={{ opacity: 0, y: 10 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.3, delay: 0.4 }}
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
+        >
+          <Button
+            onClick={buttonAction}
+            className={`ripple-effect highlight-pulse ${
+              title.includes('Upload') ? 'bg-indigo-600 hover:bg-indigo-700' :
+              title.includes('Connect') ? 'bg-purple-600 hover:bg-purple-700' :
+              title.includes('Packaged') ? 'bg-green-600 hover:bg-green-700' :
+              'bg-blue-600 hover:bg-blue-700'
+            } text-white`}
+          >
+            {buttonText}
+          </Button>
+        </motion.div>
+      </div>
+
+      {/* Decorative elements specific to each card */}
+      {title.includes('Upload') && (
+        <div className="absolute -bottom-6 -right-6 w-24 h-24 bg-indigo-100 rounded-full opacity-20 blur-md slow-spin"></div>
+      )}
+      
+      {title.includes('Connect') && (
+        <div className="absolute -top-10 -right-10 w-32 h-32 bg-purple-100 rounded-full opacity-20 blur-md message-pop"></div>
+      )}
+      
+      {title.includes('Packaged') && (
+        <div className="absolute -bottom-8 -left-8 w-28 h-28 bg-green-100 rounded-full opacity-20 blur-md package-float"></div>
+      )}
+      
+      {title.includes('Medicines') && (
+        <div className="absolute -top-6 -left-6 w-20 h-20 bg-blue-100 rounded-full opacity-20 blur-md pill-float"></div>
+      )}
     </motion.div>
   );
 };

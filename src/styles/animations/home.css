@@ -186,3 +186,198 @@
   background-size: 200% 200%;
   animation: morph-gradient 15s ease infinite;
 }
+
+/* NEW ANIMATIONS FOR FEATURE TABS */
+
+/* Icon bounce animation */
+@keyframes icon-bounce {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+.icon-bounce {
+  animation: icon-bounce 2s ease-in-out infinite;
+}
+
+/* Tab hover animation */
+@keyframes tab-glow {
+  0%, 100% {
+    box-shadow: 0 0 5px rgba(99, 102, 241, 0.4);
+  }
+  50% {
+    box-shadow: 0 0 15px rgba(99, 102, 241, 0.7);
+  }
+}
+
+.tab-glow {
+  animation: tab-glow 2s infinite;
+}
+
+/* Feature card animations */
+@keyframes card-breathe {
+  0%, 100% {
+    transform: scale(1);
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+  }
+  50% {
+    transform: scale(1.02);
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  }
+}
+
+.card-breathe {
+  animation: card-breathe 4s ease-in-out infinite;
+}
+
+/* Border animation for feature cards */
+@keyframes border-dance {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+.border-dance {
+  position: relative;
+}
+
+.border-dance::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 2px;
+  background: linear-gradient(
+    90deg,
+    rgba(99, 102, 241, 0.7),
+    rgba(168, 85, 247, 0.7),
+    rgba(236, 72, 153, 0.7),
+    rgba(99, 102, 241, 0.7)
+  );
+  background-size: 300% 100%;
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  animation: border-dance 4s linear infinite;
+}
+
+/* Icon background animations */
+@keyframes icon-bg-pulse {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 0.8;
+  }
+  50% {
+    transform: scale(1.15);
+    opacity: 1;
+  }
+}
+
+.icon-bg-pulse {
+  animation: icon-bg-pulse 3s ease-in-out infinite;
+}
+
+/* Text reveal animation */
+@keyframes text-reveal {
+  0% {
+    clip-path: inset(0 100% 0 0);
+  }
+  100% {
+    clip-path: inset(0 0 0 0);
+  }
+}
+
+.text-reveal {
+  animation: text-reveal 0.8s cubic-bezier(0.77, 0, 0.175, 1) forwards;
+}
+
+.text-reveal-delay-1 { animation-delay: 0.1s; }
+.text-reveal-delay-2 { animation-delay: 0.2s; }
+.text-reveal-delay-3 { animation-delay: 0.3s; }
+
+/* Pills floating in background animation */
+@keyframes pill-float {
+  0% {
+    transform: translateY(0) rotate(0deg);
+    opacity: 0.5;
+  }
+  50% {
+    transform: translateY(-15px) rotate(5deg);
+    opacity: 0.8;
+  }
+  100% {
+    transform: translateY(0) rotate(0deg);
+    opacity: 0.5;
+  }
+}
+
+.pill-float {
+  animation: pill-float 6s ease-in-out infinite;
+}
+
+/* Package float animation */
+@keyframes package-float {
+  0% {
+    transform: translateY(0) translateX(0);
+    opacity: 0.6;
+  }
+  33% {
+    transform: translateY(-10px) translateX(5px);
+    opacity: 0.8;
+  }
+  66% {
+    transform: translateY(5px) translateX(-5px);
+    opacity: 0.7;
+  }
+  100% {
+    transform: translateY(0) translateX(0);
+    opacity: 0.6;
+  }
+}
+
+.package-float {
+  animation: package-float 7s ease-in-out infinite;
+}
+
+/* Message bubble animation */
+@keyframes message-pop {
+  0% {
+    transform: scale(0.8);
+    opacity: 0;
+  }
+  70% {
+    transform: scale(1.05);
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.message-pop {
+  animation: message-pop 0.5s cubic-bezier(0.18, 0.89, 0.32, 1.28) forwards;
+}
+
+/* Rotation animation */
+@keyframes slow-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.slow-spin {
+  animation: slow-spin 12s linear infinite;
+}
