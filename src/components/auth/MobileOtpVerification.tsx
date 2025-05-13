@@ -19,7 +19,7 @@ import {
   SelectValue
 } from '@/components/ui/select';
 import { COUNTRY_CODES } from '@/utils/countryCodes';
-import { Command, CommandInput, CommandEmpty, CommandGroup, CommandItem } from '@/components/ui/command';
+import { Command, CommandInput, CommandEmpty, CommandGroup, CommandItem, CommandList } from '@/components/ui/command';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 
 const phoneSchema = z.object({
@@ -236,21 +236,23 @@ const MobileOtpVerification: React.FC<MobileOtpVerificationProps> = ({
                               />
                             </div>
                             <CommandEmpty>No country found.</CommandEmpty>
-                            <CommandGroup className="max-h-[300px] overflow-auto">
-                              {filteredCountries.map((country) => (
-                                <CommandItem
-                                  key={country.code}
-                                  value={`${country.dialCode}-${country.name}`}
-                                  onSelect={() => {
-                                    field.onChange(country.dialCode);
-                                    setOpen(false);
-                                  }}
-                                >
-                                  <span className="font-medium">{country.dialCode}</span>
-                                  <span className="ml-2 text-muted-foreground">{country.name}</span>
-                                </CommandItem>
-                              ))}
-                            </CommandGroup>
+                            <CommandList>
+                              <CommandGroup>
+                                {filteredCountries.map((country) => (
+                                  <CommandItem
+                                    key={country.code}
+                                    value={`${country.dialCode}-${country.name}`}
+                                    onSelect={() => {
+                                      field.onChange(country.dialCode);
+                                      setOpen(false);
+                                    }}
+                                  >
+                                    <span className="font-medium">{country.dialCode}</span>
+                                    <span className="ml-2 text-muted-foreground">{country.name}</span>
+                                  </CommandItem>
+                                ))}
+                              </CommandGroup>
+                            </CommandList>
                           </Command>
                         </PopoverContent>
                       </Popover>
