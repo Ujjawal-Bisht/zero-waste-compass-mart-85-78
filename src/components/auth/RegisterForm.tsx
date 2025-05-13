@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
@@ -125,6 +124,8 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ onAccountTypeChange }) => {
         zipCode: values.zipCode,
         country: values.country,
         dob: values.dob,
+        // This fixed the type error by adding isSeller flag
+        isSeller: false
       };
       
       await registerUser(values.email, values.password, values.name, extraUserDetails);
