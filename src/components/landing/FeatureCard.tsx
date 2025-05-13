@@ -8,20 +8,22 @@ interface FeatureCardProps {
   icon: LucideIcon;
   title: string;
   description: string;
-  buttonText: string;
-  buttonAction: () => void;
-  iconBgColor: string;
-  animationType: 'rotate' | 'scale' | 'vertical';
+  buttonText?: string;
+  buttonAction?: () => void;
+  iconBgColor?: string;
+  animationType?: 'rotate' | 'scale' | 'vertical';
+  delay?: number;
 }
 
 const FeatureCard: React.FC<FeatureCardProps> = ({
   icon: Icon,
   title,
   description,
-  buttonText,
-  buttonAction,
-  iconBgColor,
-  animationType
+  buttonText = "Learn More",
+  buttonAction = () => {},
+  iconBgColor = "bg-blue-50",
+  animationType = 'scale',
+  delay = 0
 }) => {
   // Define animation variants based on the type
   const getIconAnimation = () => {
@@ -74,7 +76,7 @@ const FeatureCard: React.FC<FeatureCardProps> = ({
       initial={{ opacity: 0, y: 20 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true }}
-      transition={{ duration: 0.5 }}
+      transition={{ duration: 0.5, delay }}
       whileHover={{ translateY: -5 }}
     >
       <div className="relative z-10">
@@ -110,27 +112,29 @@ const FeatureCard: React.FC<FeatureCardProps> = ({
           {description}
         </motion.p>
 
-        <motion.div
-          className="mt-6"
-          initial={{ opacity: 0, y: 10 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.3, delay: 0.4 }}
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.95 }}
-        >
-          <Button
-            onClick={buttonAction}
-            className={`ripple-effect highlight-pulse ${
-              title.includes('Upload') ? 'bg-indigo-600 hover:bg-indigo-700' :
-              title.includes('Connect') ? 'bg-purple-600 hover:bg-purple-700' :
-              title.includes('Packaged') ? 'bg-green-600 hover:bg-green-700' :
-              'bg-blue-600 hover:bg-blue-700'
-            } text-white`}
+        {buttonText && (
+          <motion.div
+            className="mt-6"
+            initial={{ opacity: 0, y: 10 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.3, delay: 0.4 }}
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
           >
-            {buttonText}
-          </Button>
-        </motion.div>
+            <Button
+              onClick={buttonAction}
+              className={`ripple-effect highlight-pulse ${
+                title.includes('Upload') ? 'bg-indigo-600 hover:bg-indigo-700' :
+                title.includes('Connect') ? 'bg-purple-600 hover:bg-purple-700' :
+                title.includes('Packaged') ? 'bg-green-600 hover:bg-green-700' :
+                'bg-blue-600 hover:bg-blue-700'
+              } text-white`}
+            >
+              {buttonText}
+            </Button>
+          </motion.div>
+        )}
       </div>
 
       {/* Decorative elements specific to each card */}

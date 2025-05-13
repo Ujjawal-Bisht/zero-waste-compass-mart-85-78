@@ -73,19 +73,31 @@ const FeaturesTabs: React.FC = () => {
                 <FeatureCard 
                   title="Find Deals" 
                   description="Discover discounted products nearing expiry dates, helping reduce waste and save money."
-                  icon={<ShoppingBag className="w-6 h-6" />}
+                  icon={ShoppingBag}
+                  buttonText="Explore Deals"
+                  buttonAction={() => console.log("Find Deals clicked")}
+                  iconBgColor="bg-blue-50"
+                  animationType="scale"
                   delay={0.1}
                 />
                 <FeatureCard 
                   title="Community Impact" 
                   description="Track your environmental impact through a dashboard showing waste reduction metrics."
-                  icon={<Users className="w-6 h-6" />}
+                  icon={Users}
+                  buttonText="View Impact"
+                  buttonAction={() => console.log("Community Impact clicked")}
+                  iconBgColor="bg-purple-50"
+                  animationType="rotate"
                   delay={0.2}
                 />
                 <FeatureCard 
                   title="Sustainability Rewards" 
                   description="Earn points for sustainable choices that can be redeemed for eco-friendly products."
-                  icon={<Leaf className="w-6 h-6" />}
+                  icon={Leaf}
+                  buttonText="View Rewards"
+                  buttonAction={() => console.log("Sustainability Rewards clicked")}
+                  iconBgColor="bg-green-50"
+                  animationType="vertical"
                   delay={0.3}
                 />
               </div>
@@ -96,19 +108,31 @@ const FeaturesTabs: React.FC = () => {
                 <FeatureCard 
                   title="Inventory Management" 
                   description="Manage products nearing expiry with automated discounting and promotion tools."
-                  icon={<LineChart className="w-6 h-6" />}
+                  icon={LineChart}
+                  buttonText="Explore Tools"
+                  buttonAction={() => console.log("Inventory Management clicked")}
+                  iconBgColor="bg-indigo-50"
+                  animationType="scale"
                   delay={0.1}
                 />
                 <FeatureCard 
                   title="Business Analytics" 
                   description="Access detailed analytics on waste reduction, sales, and sustainability metrics."
-                  icon={<Star className="w-6 h-6" />}
+                  icon={Star}
+                  buttonText="View Analytics"
+                  buttonAction={() => console.log("Business Analytics clicked")}
+                  iconBgColor="bg-amber-50"
+                  animationType="rotate"
                   delay={0.2}
                 />
                 <FeatureCard 
                   title="Brand Reputation" 
                   description="Enhance your brand's sustainability profile with badges and metrics to share."
-                  icon={<Leaf className="w-6 h-6" />}
+                  icon={Leaf}
+                  buttonText="Boost Reputation"
+                  buttonAction={() => console.log("Brand Reputation clicked")}
+                  iconBgColor="bg-green-50"
+                  animationType="vertical"
                   delay={0.3}
                 />
               </div>
