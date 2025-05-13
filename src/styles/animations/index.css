@@ -1,0 +1,8 @@
+
+/* Main animations file that imports all animation modules */
+@import './basic.css';
+@import './gradient.css';
+@import './hover.css';
+@import './particles.css';
+@import './cosmic.css';
+@import './star.css';

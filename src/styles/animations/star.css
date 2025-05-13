@@ -1,0 +1,86 @@
+
+/* Star and sparkle animations */
+
+/* Starfield twinkle */
+@keyframes twinkle {
+  0%, 100% {
+    opacity: 0.2;
+    transform: scale(0.8);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.twinkle {
+  animation: twinkle 3s infinite ease-in-out;
+}
+
+/* Staggered twinkle delays */
+.twinkle-delay-1 { animation-delay: 0s; }
+.twinkle-delay-2 { animation-delay: 0.5s; }
+.twinkle-delay-3 { animation-delay: 1s; }
+.twinkle-delay-4 { animation-delay: 1.5s; }
+.twinkle-delay-5 { animation-delay: 2s; }
+
+/* Comet trail effect */
+@keyframes comet-trail {
+  0% {
+    transform: translateX(-100px) translateY(-100px);
+    opacity: 0;
+  }
+  10% {
+    opacity: 1;
+  }
+  90% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateX(100px) translateY(100px);
+    opacity: 0;
+  }
+}
+
+.comet-trail {
+  animation: comet-trail 5s ease-in-out infinite;
+  animation-direction: alternate;
+}
+
+/* Geometric rotation */
+@keyframes geo-rotate {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+.geo-rotate-slow {
+  animation: geo-rotate 30s linear infinite;
+}
+
+.geo-rotate-medium {
+  animation: geo-rotate 15s linear infinite;
+}
+
+.geo-rotate-fast {
+  animation: geo-rotate 8s linear infinite;
+}
+
+/* Sparkle animation */
+@keyframes sparkle {
+  0%, 100% {
+    opacity: 0;
+    transform: scale(0);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.sparkle {
+  animation: sparkle 2s infinite ease-in-out;
+}

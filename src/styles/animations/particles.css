@@ -1,0 +1,98 @@
+
+/* Particles and floating element animations */
+
+/* Particles floating effect */
+@keyframes particle-float {
+  0%, 100% {
+    transform: translate(0, 0) rotate(0deg);
+  }
+  25% {
+    transform: translate(10px, -15px) rotate(5deg);
+  }
+  50% {
+    transform: translate(20px, 0) rotate(10deg);
+  }
+  75% {
+    transform: translate(10px, 15px) rotate(5deg);
+  }
+}
+
+.particle-float {
+  animation: particle-float 15s ease-in-out infinite;
+}
+
+/* Glowing pulsate */
+@keyframes glow-pulse {
+  0%, 100% {
+    box-shadow: 0 0 5px rgba(139, 92, 246, 0.3),
+                0 0 20px rgba(139, 92, 246, 0.1);
+  }
+  50% {
+    box-shadow: 0 0 10px rgba(59, 130, 246, 0.5),
+                0 0 30px rgba(59, 130, 246, 0.2);
+  }
+}
+
+.glow-pulse {
+  animation: glow-pulse 4s infinite;
+}
+
+/* Spiral float animation */
+@keyframes spiral-float {
+  0% {
+    transform: translateY(0) rotate(0deg) translateX(0);
+  }
+  25% {
+    transform: translateY(-15px) rotate(90deg) translateX(5px);
+  }
+  50% {
+    transform: translateY(0) rotate(180deg) translateX(0);
+  }
+  75% {
+    transform: translateY(15px) rotate(270deg) translateX(-5px);
+  }
+  100% {
+    transform: translateY(0) rotate(360deg) translateX(0);
+  }
+}
+
+.spiral-float {
+  animation: spiral-float 20s infinite ease-in-out;
+}
+
+/* Ethereal float */
+@keyframes ethereal-float {
+  0% {
+    transform: translateY(0) translateX(0) rotate(0deg) scale(1);
+  }
+  25% {
+    transform: translateY(-15px) translateX(10px) rotate(5deg) scale(1.05);
+  }
+  50% {
+    transform: translateY(5px) translateX(15px) rotate(10deg) scale(1.1);
+  }
+  75% {
+    transform: translateY(10px) translateX(5px) rotate(5deg) scale(1.05);
+  }
+  100% {
+    transform: translateY(0) translateX(0) rotate(0deg) scale(1);
+  }
+}
+
+.ethereal-float {
+  animation: ethereal-float 25s infinite ease-in-out;
+}
+
+/* Orbit animation */
+@keyframes orbit {
+  0% {
+    transform: rotate(0deg) translateX(50px) rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg) translateX(50px) rotate(-360deg);
+  }
+}
+
+.orbit {
+  animation: orbit 20s linear infinite;
+}

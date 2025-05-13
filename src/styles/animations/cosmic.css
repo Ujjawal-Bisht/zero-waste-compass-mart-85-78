@@ -1,0 +1,82 @@
+
+/* Cosmic and space-related animations */
+
+/* Wave animation */
+@keyframes wave {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  25% {
+    transform: translateY(-8px);
+  }
+  50% {
+    transform: translateY(0);
+  }
+  75% {
+    transform: translateY(8px);
+  }
+}
+
+.wave {
+  animation: wave 5s infinite ease-in-out;
+}
+
+/* Delayed wave group animations */
+.wave-group-1 { animation-delay: 0s; }
+.wave-group-2 { animation-delay: 1s; }
+.wave-group-3 { animation-delay: 2s; }
+.wave-group-4 { animation-delay: 3s; }
+.wave-group-5 { animation-delay: 4s; }
+
+/* Blur in and out */
+@keyframes blur-breathe {
+  0%, 100% {
+    filter: blur(0px);
+  }
+  50% {
+    filter: blur(3px);
+  }
+}
+
+.blur-breathe {
+  animation: blur-breathe 8s infinite ease-in-out;
+}
+
+/* Shimmering radiance animation */
+@keyframes radiance {
+  0% {
+    box-shadow: 0 0 5px rgba(255, 255, 255, 0.1),
+                0 0 10px rgba(255, 255, 255, 0.1);
+    opacity: 0.8;
+  }
+  50% {
+    box-shadow: 0 0 10px rgba(255, 255, 255, 0.3),
+                0 0 20px rgba(255, 255, 255, 0.2);
+    opacity: 1;
+  }
+  100% {
+    box-shadow: 0 0 5px rgba(255, 255, 255, 0.1),
+                0 0 10px rgba(255, 255, 255, 0.1);
+    opacity: 0.8;
+  }
+}
+
+.radiance {
+  animation: radiance 5s infinite;
+}
+
+/* Cosmic pulse animation */
+@keyframes cosmic-pulse {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 0.3;
+  }
+  50% {
+    transform: scale(1.2);
+    opacity: 0.6;
+  }
+}
+
+.cosmic-pulse {
+  animation: cosmic-pulse 8s infinite ease-in-out;
+}
