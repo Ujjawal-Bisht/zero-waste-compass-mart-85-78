@@ -1,6 +1,5 @@
 
 import React from 'react';
-import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import LoginCard from '@/components/auth/LoginComponents/LoginCard';
 
@@ -54,8 +53,10 @@ const Login: React.FC = () => {
         </motion.div>
       </div>
       
-      {/* Login Card */}
-      <LoginCard />
+      {/* Center the login card with flex */}
+      <div className="flex items-center justify-center w-full h-full">
+        <LoginCard />
+      </div>
     </div>
   );
 };

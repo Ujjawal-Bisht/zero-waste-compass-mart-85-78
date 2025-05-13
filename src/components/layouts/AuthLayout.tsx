@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Outlet, Navigate, Link } from 'react-router-dom';
+import { Outlet, Navigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/auth';
 import { Leaf } from 'lucide-react';
 import { motion } from 'framer-motion';
@@ -43,49 +43,7 @@ const AuthLayout: React.FC = () => {
       </div>
       
       <div className="py-12 sm:px-6 lg:px-8 z-10">
-        <div className="sm:mx-auto sm:w-full sm:max-w-md">
-          <motion.div 
-            initial={{ y: -50, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            transition={{ duration: 0.6 }}
-            className="h-16 w-16 mx-auto rounded-full zwm-gradient flex items-center justify-center text-white shadow-lg"
-          >
-            <Leaf className="h-8 w-8 text-white animate-float" />
-          </motion.div>
-          <motion.h2 
-            className="mt-6 text-center text-3xl font-extrabold text-gray-900 font-heading"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.6, delay: 0.2 }}
-          >
-            Zero Waste Mart
-          </motion.h2>
-          <motion.p 
-            className="mt-2 text-center text-sm text-gray-600 max-w-md mx-auto"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.6, delay: 0.3 }}
-          >
-            Join our sustainable community and help reduce waste together
-          </motion.p>
-        </div>
-        <motion.div
-          initial={{ y: 20, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          transition={{ duration: 0.6, delay: 0.4 }}
-        >
-          <Outlet />
-        </motion.div>
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.6, delay: 0.6 }}
-          className="mt-6 text-center"
-        >
-          <Link to="/" className="text-sm text-zwm-primary hover:text-zwm-secondary transition-colors">
-            ← Return to Home Page
-          </Link>
-        </motion.div>
+        <Outlet />
       </div>
     </div>
   );
