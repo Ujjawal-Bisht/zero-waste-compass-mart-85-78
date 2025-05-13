@@ -2,3 +2,62 @@
 @import './styles/base.css';
 @import './styles/animations.css';
 @import './styles/components.css';
+
+/* Login page specific animations */
+.captcha-container {
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.captcha-container:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+}
+
+/* Enhanced floating animation for login page */
+@keyframes floating-login {
+  0% {
+    transform: translateY(0) translateX(0) rotate(0);
+  }
+  25% {
+    transform: translateY(-10px) translateX(5px) rotate(2deg);
+  }
+  50% {
+    transform: translateY(0) translateX(10px) rotate(0);
+  }
+  75% {
+    transform: translateY(10px) translateX(5px) rotate(-2deg);
+  }
+  100% {
+    transform: translateY(0) translateX(0) rotate(0);
+  }
+}
+
+.floating-login {
+  animation: floating-login 8s ease-in-out infinite;
+}
+
+/* Enhanced glow effect */
+.glow-effect {
+  position: relative;
+}
+
+.glow-effect:after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 2px;
+  background: linear-gradient(to right, #3b82f6, #8b5cf6);
+  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.glow-effect:hover:after {
+  opacity: 1;
+}

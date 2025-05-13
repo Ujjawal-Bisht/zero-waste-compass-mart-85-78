@@ -127,15 +127,29 @@ const BuyerEmailLogin: React.FC<BuyerEmailLoginProps> = ({
           </div>
           
           <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.4, duration: 0.5 }}
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ delay: 0.3, duration: 0.5 }}
             className="flex justify-center"
           >
-            <ReCAPTCHA
-              sitekey="6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI" // This is a test key
-              onChange={onCaptchaChange}
-            />
+            <div className="captcha-container w-full max-w-md relative overflow-hidden rounded-lg border border-gray-200 shadow-sm bg-gradient-to-r from-blue-50 to-indigo-50 p-2 transform transition-all hover:shadow-md">
+              <ReCAPTCHA
+                sitekey="6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI" // This is a test key
+                onChange={onCaptchaChange}
+              />
+              <motion.div 
+                className="absolute inset-0 bg-blue-400 opacity-10"
+                animate={{ 
+                  opacity: [0.05, 0.1, 0.05],
+                  scale: [1, 1.02, 1]
+                }}
+                transition={{ 
+                  repeat: Infinity, 
+                  duration: 3,
+                  ease: "easeInOut"
+                }}
+              />
+            </div>
           </motion.div>
           
           <motion.div
@@ -152,15 +166,7 @@ const BuyerEmailLogin: React.FC<BuyerEmailLoginProps> = ({
           </motion.div>
         </form>
       </Form>
-
-      <div className="mt-6 text-center text-sm">
-        <p className="text-gray-600">
-          Don't have an account?{' '}
-          <Link to="/register" className="text-zwm-primary hover:text-zwm-secondary font-medium">
-            Sign up
-          </Link>
-        </p>
-      </div>
+      {/* Removed the duplicate sign up button here */}
     </>
   );
 };
