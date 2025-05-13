@@ -5,11 +5,12 @@ import { motion } from 'framer-motion';
 import { useAuth } from '@/contexts/auth';
 import { toast } from 'sonner';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { ShoppingBag, Store, Mail, Smartphone } from 'lucide-react';
+import { ShoppingBag, Store, Mail, Smartphone, ArrowLeft } from 'lucide-react';
 import BuyerEmailLogin from './BuyerEmailLogin';
 import SellerLogin from './SellerLogin';
 import MobileOtpVerification from '@/components/auth/MobileOtpVerification';
 import { EmailFormValues } from '@/components/auth/schemas/emailLoginSchema';
+import { Button } from '@/components/ui/button';
 
 interface LoginFormProps {
   onAccountTypeChange?: (type: 'buyer' | 'seller') => void;
@@ -211,7 +212,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ onAccountTypeChange }) => {
             className="bg-gradient-to-r from-amber-50 to-orange-50 p-4 rounded-lg border border-amber-200 mb-4 shadow-sm"
           >
             <p className="text-sm text-amber-700">
-              Welcome back, seller! Sign in to manage your sustainable business.
+              Seller login - Access your business dashboard to manage your sustainable products.
             </p>
           </motion.div>
           
@@ -278,6 +279,23 @@ const LoginForm: React.FC<LoginFormProps> = ({ onAccountTypeChange }) => {
           </Tabs>
         </TabsContent>
       </Tabs>
+
+      {/* Return to home button */}
+      <motion.div 
+        className="mt-6 flex justify-center"
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.2 }}
+      >
+        <Button
+          variant="ghost"
+          onClick={() => navigate('/')}
+          className="flex items-center gap-2 text-gray-600 hover:text-gray-900 transition-colors"
+        >
+          <ArrowLeft className="h-4 w-4" />
+          Return to Home Page
+        </Button>
+      </motion.div>
     </>
   );
 };

@@ -46,62 +46,86 @@ const SellerLogin: React.FC<SellerLoginProps> = ({
     <>
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-5">
-          <FormField
-            control={form.control}
-            name="email"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel className="text-gray-700">Business Email</FormLabel>
-                <div className="relative">
-                  <FormControl>
-                    <div className="relative">
-                      <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-                        <Mail className="h-5 w-5 text-gray-400" />
+          <motion.div
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.3 }}
+          >
+            <FormField
+              control={form.control}
+              name="email"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="text-gray-700">Business Email</FormLabel>
+                  <div className="relative">
+                    <FormControl>
+                      <div className="relative">
+                        <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                          <motion.div
+                            whileHover={{ rotate: [0, -10, 0] }}
+                            transition={{ duration: 0.5 }}
+                          >
+                            <Mail className="h-5 w-5 text-gray-400" />
+                          </motion.div>
+                        </div>
+                        <Input 
+                          placeholder="business@example.com" 
+                          className="pl-10 input-animated-border transition-all duration-300 focus:ring-2 ring-amber-300" 
+                          {...field} 
+                        />
                       </div>
-                      <Input 
-                        placeholder="business@example.com" 
-                        className="pl-10" 
-                        {...field} 
-                      />
-                    </div>
-                  </FormControl>
-                </div>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+                    </FormControl>
+                  </div>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </motion.div>
           
-          <FormField
-            control={form.control}
-            name="password"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel className="text-gray-700">Password</FormLabel>
-                <div className="relative">
-                  <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-                    <Lock className="h-5 w-5 text-gray-400" />
+          <motion.div
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.3, delay: 0.1 }}
+          >
+            <FormField
+              control={form.control}
+              name="password"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="text-gray-700">Password</FormLabel>
+                  <div className="relative">
+                    <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                      <motion.div
+                        whileHover={{ scale: 1.1 }}
+                        transition={{ duration: 0.3 }}
+                      >
+                        <Lock className="h-5 w-5 text-gray-400" />
+                      </motion.div>
+                    </div>
+                    <Input 
+                      type={showPassword ? "text" : "password"} 
+                      placeholder="******" 
+                      className="pl-10 pr-10 input-animated-border transition-all duration-300 focus:ring-2 ring-amber-300" 
+                      {...field} 
+                    />
+                    <motion.div 
+                      className="absolute inset-y-0 right-0 flex items-center pr-3 cursor-pointer"
+                      onClick={() => setShowPassword(!showPassword)}
+                      whileHover={{ scale: 1.1 }}
+                      whileTap={{ scale: 0.95 }}
+                    >
+                      {showPassword ? (
+                        <EyeOff className="h-5 w-5 text-gray-400 hover:text-gray-700" />
+                      ) : (
+                        <Eye className="h-5 w-5 text-gray-400 hover:text-gray-700" />
+                      )}
+                    </motion.div>
                   </div>
-                  <Input 
-                    type={showPassword ? "text" : "password"} 
-                    placeholder="******" 
-                    className="pl-10 pr-10" 
-                    {...field} 
-                  />
-                  <div 
-                    className="absolute inset-y-0 right-0 flex items-center pr-3 cursor-pointer"
-                    onClick={() => setShowPassword(!showPassword)}
-                  >
-                    {showPassword ? (
-                      <EyeOff className="h-5 w-5 text-gray-400 hover:text-gray-700" />
-                    ) : (
-                      <Eye className="h-5 w-5 text-gray-400 hover:text-gray-700" />
-                    )}
-                  </div>
-                </div>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </motion.div>
           
           <div className="flex justify-between items-center">
             <div className="flex items-center">
@@ -124,33 +148,27 @@ const SellerLogin: React.FC<SellerLoginProps> = ({
             </div>
           </div>
           
-          {/* Redesigned elegant reCAPTCHA for sellers */}
+          {/* Redesigned reCAPTCHA for sellers with proper sizing */}
           <motion.div
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.3, duration: 0.5 }}
-            className="flex justify-center my-3"
+            transition={{ delay: 0.2, duration: 0.4 }}
+            className="flex justify-center my-4"
           >
-            <div className="captcha-container w-full max-w-md mx-auto overflow-hidden rounded-lg shadow-sm bg-gradient-to-br from-amber-50 via-white to-orange-50 border border-amber-100 p-3 transform hover:shadow-md transition-all duration-300 ease-in-out">
+            <div className="captcha-container w-full max-w-md mx-auto overflow-hidden rounded-lg shadow-sm bg-gradient-to-br from-amber-50 via-white to-orange-50 border border-amber-100 p-2">
               <motion.div
-                className="relative"
-                whileHover={{ scale: 1.02 }}
+                className="relative flex justify-center"
+                whileHover={{ scale: 1.01 }}
                 transition={{ duration: 0.2 }}
               >
-                <div className="flex items-center justify-center">
-                  <div className="compact-captcha scale-95 origin-center">
-                    <ReCAPTCHA
-                      sitekey="6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI" // This is a test key
-                      onChange={onCaptchaChange}
-                      size="normal"
-                      theme="light"
-                    />
-                  </div>
-                </div>
+                <ReCAPTCHA
+                  sitekey="6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI" // This is a test key
+                  onChange={onCaptchaChange}
+                />
                 <motion.div 
-                  className="absolute inset-0 bg-amber-400 opacity-5 rounded-lg"
+                  className="absolute inset-0 bg-amber-400 opacity-0 rounded-lg pointer-events-none"
                   animate={{ 
-                    opacity: [0.05, 0.1, 0.05],
+                    opacity: [0, 0.05, 0],
                     scale: [1, 1.01, 1]
                   }}
                   transition={{ 
@@ -166,10 +184,13 @@ const SellerLogin: React.FC<SellerLoginProps> = ({
           <motion.div
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.3, delay: 0.3 }}
           >
             <Button
               type="submit"
-              className="w-full bg-zwm-secondary hover:bg-zwm-secondary/90 text-white transition-opacity h-12 text-lg font-medium"
+              className="w-full bg-zwm-secondary hover:bg-zwm-secondary/90 text-white transition-all duration-300 h-12 text-lg font-medium"
               disabled={isLoading || !captchaValue}
             >
               {isLoading ? 'Signing In...' : 'Sign In as Seller'}
