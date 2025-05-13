@@ -5,6 +5,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Form } from '@/components/ui/form';
 import { sellerSchema } from '../schemas/registerSchema';
+import { toast } from 'sonner';
 
 // Import refactored sections
 import SellerBenefits from './form-sections/SellerBenefits';
@@ -48,11 +49,26 @@ const SellerForm: React.FC<SellerFormProps> = ({
       acceptTerms: false,
       isSeller: true,
     },
+    mode: 'onBlur', // Validate on blur for better user experience
   });
+
+  const handleFormSubmit = (values: z.infer<typeof sellerSchema>) => {
+    if (!captchaValue) {
+      toast.error('Please verify that you are not a robot');
+      return;
+    }
+    
+    try {
+      onSubmit(values);
+    } catch (error) {
+      console.error('Form submission error:', error);
+      toast.error('There was an error submitting the form. Please try again.');
+    }
+  };
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+      <form onSubmit={form.handleSubmit(handleFormSubmit)} className="space-y-4">
         <SellerBenefits />
         <PersonalInfoSection form={form} isSeller={true} />
         <BusinessInfoSection form={form} />
@@ -63,6 +79,7 @@ const SellerForm: React.FC<SellerFormProps> = ({
           setCaptchaValue={setCaptchaValue}
           captchaValue={captchaValue}
           isSeller={true}
+          formErrors={Object.keys(form.formState.errors).length > 0}
         />
       </form>
     </Form>

@@ -5,6 +5,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Form } from '@/components/ui/form';
 import { userSchema } from '../schemas/registerSchema';
+import { toast } from 'sonner';
 
 // Import refactored sections
 import PersonalInfoSection from './form-sections/PersonalInfoSection';
@@ -41,11 +42,26 @@ const BuyerForm: React.FC<BuyerFormProps> = ({
       dob: '',
       acceptTerms: false,
     },
+    mode: 'onBlur', // Validate on blur for better user experience
   });
+
+  const handleFormSubmit = (values: z.infer<typeof userSchema>) => {
+    if (!captchaValue) {
+      toast.error('Please verify that you are not a robot');
+      return;
+    }
+    
+    try {
+      onSubmit(values);
+    } catch (error) {
+      console.error('Form submission error:', error);
+      toast.error('There was an error submitting the form. Please try again.');
+    }
+  };
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+      <form onSubmit={form.handleSubmit(handleFormSubmit)} className="space-y-4">
         <PersonalInfoSection form={form} />
         <AddressSection form={form} />
         <SecuritySection form={form} />
@@ -53,6 +69,7 @@ const BuyerForm: React.FC<BuyerFormProps> = ({
           isLoading={isLoading}
           setCaptchaValue={setCaptchaValue}
           captchaValue={captchaValue}
+          formErrors={Object.keys(form.formState.errors).length > 0}
         />
       </form>
     </Form>
