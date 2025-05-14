@@ -21,7 +21,7 @@ const ChatBot: React.FC = () => {
   const [messages, setMessages] = useState<Message[]>([
     {
       id: 1,
-      content: "Hello! I'm Zero Bot. How can I help you reduce waste today?",
+      content: "Hello! I'm Zero Bot, your AI assistant. How can I help you reduce waste today?",
       sender: 'bot',
       timestamp: new Date(),
     },
@@ -55,27 +55,49 @@ const ChatBot: React.FC = () => {
     setMessage('');
     setIsTyping(true);
 
-    // Simulate bot response after a short delay
+    // Generate AI response based on user question
     setTimeout(() => {
-      const botResponses = [
-        "Thanks for your message! We're committed to reducing waste together.",
-        "That's a great question about sustainability. Every small action counts!",
-        "You can donate items by filling out our donation form or visiting our drop-off locations.",
-        "Our community has saved over 1,200kg of food waste so far. Join us!",
-        "Need help finding items? You can search by category or location on our marketplace.",
-        "Remember, even small changes to reduce waste make a big difference for our planet.",
-        "Did you know? Food waste accounts for 8% of global greenhouse gas emissions.",
-        "We have collection points in over 25 locations across the city.",
-        "Have you tried our waste tracking feature? It helps visualize your positive impact.",
-      ];
+      const userQuery = message.toLowerCase();
+      let aiResponse = "";
 
-      const randomResponse = botResponses[Math.floor(Math.random() * botResponses.length)];
+      // Simple AI response logic based on keywords
+      if (userQuery.includes('how to donate') || userQuery.includes('donation')) {
+        aiResponse = "You can donate items by visiting our donation page and filling out the form, or by visiting any of our drop-off locations across the city. We accept food items, clothing, and household goods that are in good condition.";
+      } 
+      else if (userQuery.includes('drop') || userQuery.includes('location') || userQuery.includes('nearby')) {
+        aiResponse = "We have collection points in over 25 locations across the city. The nearest ones to the city center are at Community Center (123 Main St), Green Park (45 Park Ave), and Central Mall (78 Commerce Blvd). You can see all locations on our interactive map in the app.";
+      } 
+      else if (userQuery.includes('stat') || userQuery.includes('impact') || userQuery.includes('data')) {
+        aiResponse = "Our community has saved over 1,200kg of food waste so far this year! Together, we've helped reduce carbon emissions by approximately 3,600kg CO2e. Over 450 families have been supported through our donation program.";
+      } 
+      else if (userQuery.includes('how') && userQuery.includes('work')) {
+        aiResponse = "Zero Waste Mart works by connecting people with excess items to those who need them. You can list items you don't need, search for items you want, or donate to local charities and community groups. Our AI system helps match donors with recipients efficiently.";
+      }
+      else if (userQuery.includes('benefit') || userQuery.includes('why')) {
+        aiResponse = "By participating in Zero Waste Mart, you're helping reduce landfill waste, lowering greenhouse gas emissions, supporting local communities, and potentially saving money. Every item reused is one less item produced and one less in landfill!";
+      }
+      else if (userQuery.includes('hello') || userQuery.includes('hi') || userQuery.includes('hey')) {
+        aiResponse = "Hello there! I'm Zero Bot, your AI assistant for all things related to reducing waste and sustainable living. How can I help you today?";
+      }
+      else {
+        // Default responses for other queries
+        const generalResponses = [
+          "That's an interesting question about sustainability. From my data, reducing food waste is one of the most effective ways individuals can combat climate change. Would you like some tips on reducing food waste?",
+          "Based on my knowledge base, your question relates to sustainable living. Our community offers workshops and resources on this topic every month. Would you like me to share the schedule?",
+          "According to my analysis, this question falls under waste reduction strategies. Our app has a detailed guide on implementing a zero-waste lifestyle. Would you like me to share the link?",
+          "My AI processing suggests you're interested in environmental impact. Did you know our marketplace has already prevented over 5 tons of usable goods from entering landfills this year?",
+          "I've analyzed similar questions from our community, and many users find our item-sharing feature helpful for this scenario. Have you tried browsing what's available near you?",
+          "My algorithms indicate this is related to sustainable consumption. Our blog has an in-depth article addressing this topic that was published last week. Would you like me to summarize it?",
+          "Based on pattern recognition from similar queries, I recommend checking out our community forums where this topic has been discussed extensively by sustainability experts.",
+        ];
+        aiResponse = generalResponses[Math.floor(Math.random() * generalResponses.length)];
+      }
 
       setIsTyping(false);
       
       const botMessage: Message = {
         id: messages.length + 2,
-        content: randomResponse,
+        content: aiResponse,
         sender: 'bot',
         timestamp: new Date(),
       };
@@ -130,7 +152,7 @@ const ChatBot: React.FC = () => {
                 </Avatar>
                 <div>
                   <span className="text-white font-medium flex items-center gap-1">
-                    Zero Bot <Sparkles size={14} className="ml-1" />
+                    Zero Bot AI <Sparkles size={14} className="ml-1" />
                   </span>
                   <span className="text-white/70 text-xs">AI assistant</span>
                 </div>
@@ -220,7 +242,7 @@ const ChatBot: React.FC = () => {
                   value={message}
                   onChange={(e) => setMessage(e.target.value)}
                   onKeyPress={handleKeyPress}
-                  placeholder="Type your message..."
+                  placeholder="Ask me anything..."
                   className="flex-1 border-gray-200 focus:border-zwm-primary shadow-sm"
                 />
                 <Button 
@@ -238,7 +260,14 @@ const ChatBot: React.FC = () => {
                   </CollapsibleTrigger>
                   <CollapsibleContent>
                     <div className="grid grid-cols-2 gap-2 pt-2">
-                      {["How to donate?", "Nearby drop-offs?", "Statistics", "Impact report"].map(q => (
+                      {[
+                        "How to donate?", 
+                        "Nearby drop-offs?", 
+                        "Impact statistics", 
+                        "How does it work?", 
+                        "Benefits of Zero Waste",
+                        "Sustainability tips"
+                      ].map(q => (
                         <Button 
                           key={q} 
                           variant="outline" 
