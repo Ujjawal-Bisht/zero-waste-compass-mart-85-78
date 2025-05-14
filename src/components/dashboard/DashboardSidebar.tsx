@@ -27,7 +27,7 @@ export const DashboardSidebar = ({ className, onClose, ...props }: SidebarNavPro
   const { currentUser, logout } = useAuth();
   const isSeller = currentUser?.isSeller;
   
-  // Remove "Marketplace" and "Profile" from navigationLinks
+  // Add "Profile" back to navigation menu, remove from top right later
   const navigationLinks = [
     {
       title: 'Dashboard',
@@ -38,6 +38,11 @@ export const DashboardSidebar = ({ className, onClose, ...props }: SidebarNavPro
       title: 'Add Item',
       href: '/items/add',
       icon: <PlusCircle className="mr-2 h-4 w-4" />,
+    },
+    {
+      title: 'Profile',
+      href: '/profile',
+      icon: <User className="mr-2 h-4 w-4" />,
     }
   ];
 

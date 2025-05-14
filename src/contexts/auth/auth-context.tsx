@@ -1,4 +1,3 @@
-
 import React, { createContext, useState, useEffect } from 'react';
 import { toast } from 'sonner';
 import { authService } from '@/services/auth-service';
@@ -21,6 +20,24 @@ export const AuthContextProvider: React.FC<AuthProviderProps> = ({ children }) =
     const loadUser = async () => {
       try {
         setLoading(true);
+        // Try to load user from localStorage first for persistence
+        const storedUser = localStorage.getItem("zwm_user");
+        if (storedUser) {
+          setCurrentUser(JSON.parse(storedUser));
+          setLoading(false);
+          // Also update user object from backend in background
+          try {
+            const updatedUser = await userService.getCurrentUser();
+            if (updatedUser) {
+              setCurrentUser(updatedUser);
+              localStorage.setItem("zwm_user", JSON.stringify(updatedUser));
+            }
+          } catch (error) {
+            // Do nothing, just use local user info
+          }
+          return;
+        }
+        // If not in local storage, get from userService
         const user = await userService.getCurrentUser();
         setCurrentUser(user);
       } catch (error) {
