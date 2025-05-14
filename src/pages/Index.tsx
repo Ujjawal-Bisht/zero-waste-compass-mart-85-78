@@ -3,7 +3,7 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/auth';
 import { Button } from '@/components/ui/button';
-import { ShoppingBag, Upload, MessageCircle, ShoppingBagIcon, IndianRupee, Pill } from 'lucide-react';
+import { ShoppingBag, Upload, MessageCircle, IndianRupee, Pill } from 'lucide-react';
 import { motion } from 'framer-motion';
 import HeroSection from '@/components/landing/HeroSection';
 import StatsSection from '@/components/landing/StatsSection';
