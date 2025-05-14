@@ -5,6 +5,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
+import { v4 as uuidv4 } from 'uuid';
 
 import { Button } from '@/components/ui/button';
 import { Form } from '@/components/ui/form';
@@ -15,7 +16,6 @@ import ExpiryDatePicker from './ExpiryDatePicker';
 import DescriptionImageSection from './DescriptionImageSection';
 import { useLocalStorage } from '../hooks/useLocalStorage';
 import { Item } from '@/types';
-import { v4 as uuidv4 } from 'uuid';
 
 interface ItemFormProps {
   onBarcodeDetected?: (barcode: string, item: any) => void;
@@ -44,14 +44,12 @@ const ItemForm: React.FC<ItemFormProps> = ({ onBarcodeDetected }) => {
       const item = barcodeDatabase[barcode];
       
       // Calculate expiry date based on expiryDays if present
-      let expiryDate = '';
       if (item.expiryDays) {
         const date = new Date();
         date.setDate(date.getDate() + item.expiryDays);
-        expiryDate = date.toISOString().split('T')[0];
         
-        // Set expiry date in the form
-        setTimeout(() => form.setValue('expiryDate', expiryDate), 600);
+        // Set expiry date in the form as Date object
+        setTimeout(() => form.setValue('expiryDate', date), 600);
       }
       
       // Animate the form filling with a slight delay between fields
@@ -79,6 +77,11 @@ const ItemForm: React.FC<ItemFormProps> = ({ onBarcodeDetected }) => {
     try {
       setIsSubmitting(true);
       
+      // Get the date string in ISO format for storage
+      const expiryDateString = values.expiryDate instanceof Date 
+        ? values.expiryDate.toISOString().split('T')[0]
+        : new Date().toISOString().split('T')[0];
+      
       // Create a new item object
       const newItem: Item = {
         id: uuidv4(),
@@ -86,7 +89,7 @@ const ItemForm: React.FC<ItemFormProps> = ({ onBarcodeDetected }) => {
         description: values.description || '',
         category: values.category || 'other',
         imageUrl: imagePreview || 'https://via.placeholder.com/150',
-        expiryDate: values.expiryDate || new Date().toISOString().split('T')[0],
+        expiryDate: expiryDateString,
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
         status: 'available',
