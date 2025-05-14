@@ -5,7 +5,6 @@ import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { Sidebar } from '@/components/ui/sidebar';
 import { Logo } from '@/components/ui/logo';
-import { useIsMobile } from '@/hooks/use-mobile';
 import { useAuth } from '@/contexts/auth';
 import { motion } from 'framer-motion';
 import { 
@@ -16,8 +15,7 @@ import {
   LogOut, 
   PlusCircle,
   Store,
-  ShieldCheck,
-  Menu
+  ShieldCheck
 } from 'lucide-react';
 
 interface SidebarNavProps extends React.HTMLAttributes<HTMLDivElement> {
@@ -27,12 +25,11 @@ interface SidebarNavProps extends React.HTMLAttributes<HTMLDivElement> {
 export const DashboardSidebar = ({ className, onClose, ...props }: SidebarNavProps) => {
   const location = useLocation();
   const navigate = useNavigate();
-  const isMobile = useIsMobile();
   const { currentUser, logout } = useAuth();
   const isSeller = currentUser?.isSeller;
   
-  // Common buyer links
-  const buyerLinks = [
+  // All navigation links for all users
+  const navigationLinks = [
     {
       title: 'Dashboard',
       href: '/dashboard',
@@ -55,8 +52,9 @@ export const DashboardSidebar = ({ className, onClose, ...props }: SidebarNavPro
     }
   ];
 
-  // Common seller links
-  const sellerLinks = [
+  // Add seller options if user is a seller
+  const sellerLinks = isSeller ? [
+    { title: 'Seller Options', href: '', icon: null }, // This is a divider
     {
       title: 'Seller Dashboard',
       href: '/seller/dashboard',
@@ -77,18 +75,13 @@ export const DashboardSidebar = ({ className, onClose, ...props }: SidebarNavPro
       href: '/seller/profile',
       icon: <ShieldCheck className="mr-2 h-4 w-4" />,
     }
-  ];
+  ] : [];
 
-  // Default navigation links based on user type
-  const defaultNavigationLinks = isSeller ? sellerLinks : buyerLinks;
-
-  // For laptop/desktop, show both sets of links if user is a seller
-  const navigationLinks = isSeller && !isMobile
-    ? [...buyerLinks, { title: 'Seller Options', href: '', icon: null }, ...sellerLinks]
-    : defaultNavigationLinks;
+  // Combine all links
+  const allLinks = [...navigationLinks, ...sellerLinks];
 
   const handleItemClick = () => {
-    if (isMobile && onClose) {
+    if (onClose) {
       onClose();
     }
   };
@@ -120,11 +113,11 @@ export const DashboardSidebar = ({ className, onClose, ...props }: SidebarNavPro
         </motion.div>
         
         <h2 className="mb-4 px-4 text-lg font-semibold tracking-tight text-white">
-          {isSeller ? 'Navigation' : 'Navigation'}
+          Navigation
         </h2>
         
         <div className="space-y-1">
-          {navigationLinks.map((link, index) => {
+          {allLinks.map((link, index) => {
             // Check if this is a divider entry (no href)
             if (!link.href) {
               return (

@@ -22,20 +22,18 @@ const DashboardLayout: React.FC = () => {
   return (
     <SidebarProvider>
       <div className="flex h-screen w-full bg-gray-50 overflow-hidden">
-        {/* Mobile Hamburger Menu Button */}
-        {isMobile && (
-          <Button 
-            variant="ghost" 
-            size="icon" 
-            onClick={toggleSidebar}
-            className="menu-button button-transition lg:hidden"
-          >
-            <Menu className="h-5 w-5 text-white" />
-          </Button>
-        )}
+        {/* Hamburger Menu Button - Visible on all devices */}
+        <Button 
+          variant="ghost" 
+          size="icon" 
+          onClick={toggleSidebar}
+          className="menu-button button-transition fixed top-4 left-4 z-40"
+        >
+          <Menu className="h-5 w-5 text-white" />
+        </Button>
         
-        {/* Show sidebar based on mobile/desktop view */}
-        <div className={`${isMobile ? (sidebarOpen ? 'translate-x-0' : '-translate-x-full') : 'translate-x-0'} transition-transform duration-300 z-50`}>
+        {/* Sidebar - hidden by default, shown when toggled */}
+        <div className={`${sidebarOpen ? 'translate-x-0' : '-translate-x-full'} transition-transform duration-300 z-50 fixed h-full`}>
           <DashboardSidebar onClose={() => setSidebarOpen(false)} />
         </div>
 
