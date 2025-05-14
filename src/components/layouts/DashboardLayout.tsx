@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { Menu } from 'lucide-react';
+import { Menu, X } from 'lucide-react';
 import ChatBot from '@/components/ChatBot';
 import { DashboardSidebar } from '@/components/dashboard/DashboardSidebar';
 import DashboardHeader from '@/components/dashboard/DashboardHeader';
@@ -22,18 +22,22 @@ const DashboardLayout: React.FC = () => {
   return (
     <SidebarProvider>
       <div className="flex h-screen w-full bg-gray-50 overflow-hidden">
-        {/* Hamburger Menu Button - positioned to not overlap with logo */}
+        {/* Hamburger Menu Button - always visible */}
         <Button 
           variant="ghost" 
           size="icon" 
           onClick={toggleSidebar}
-          className="menu-button button-transition fixed top-4 left-16 z-40 md:left-4"
+          className="menu-button button-transition fixed top-4 left-4 z-50"
         >
-          <Menu className="h-5 w-5 text-white" />
+          {sidebarOpen ? (
+            <X className="h-5 w-5 text-white" />
+          ) : (
+            <Menu className="h-5 w-5 text-white" />
+          )}
         </Button>
         
         {/* Sidebar - hidden by default, shown when toggled */}
-        <div className={`${sidebarOpen ? 'translate-x-0' : '-translate-x-full'} transition-transform duration-300 z-50 fixed h-full`}>
+        <div className={`${sidebarOpen ? 'translate-x-0' : '-translate-x-full'} transition-transform duration-300 z-40 fixed h-full`}>
           <DashboardSidebar onClose={() => setSidebarOpen(false)} />
         </div>
 

@@ -28,7 +28,7 @@ export const DashboardSidebar = ({ className, onClose, ...props }: SidebarNavPro
   const { currentUser, logout } = useAuth();
   const isSeller = currentUser?.isSeller;
   
-  // Define navigation links
+  // Define all navigation links in a single array
   const navigationLinks = [
     {
       title: 'Dashboard',
@@ -52,33 +52,86 @@ export const DashboardSidebar = ({ className, onClose, ...props }: SidebarNavPro
     }
   ];
 
-  // Add seller options if user is a seller
-  const sellerLinks = isSeller ? [
-    { title: 'Seller Options', href: '', icon: null }, // This is a divider
-    {
-      title: 'Seller Dashboard',
-      href: '/seller/dashboard',
-      icon: <Store className="mr-2 h-4 w-4" />,
-    },
-    {
-      title: 'Products',
-      href: '/seller/products',
-      icon: <Package className="mr-2 h-4 w-4" />,
-    },
-    {
-      title: 'Orders',
-      href: '/seller/orders',
-      icon: <ShoppingCart className="mr-2 h-4 w-4" />,
-    },
-    {
-      title: 'Seller Profile',
-      href: '/seller/profile',
-      icon: <ShieldCheck className="mr-2 h-4 w-4" />,
-    }
-  ] : [];
-
-  // Combine all links
-  const allLinks = [...navigationLinks, ...sellerLinks];
+  // Only add seller section if user is a seller
+  const sellerSection = isSeller ? (
+    <>
+      <div className="mt-6 mb-2 px-4">
+        <h3 className="text-sm font-medium text-gray-300 border-b border-gray-600 pb-1">
+          Seller Options
+        </h3>
+      </div>
+      <div className="space-y-1">
+        <motion.div whileHover={{ x: 5 }} whileTap={{ scale: 0.98 }}>
+          <Button
+            variant={location.pathname === '/seller/dashboard' ? "secondary" : "ghost"}
+            className={`w-full justify-start ${
+              location.pathname === '/seller/dashboard' 
+                ? 'bg-white bg-opacity-20 text-white' 
+                : 'text-gray-200 hover:bg-white hover:bg-opacity-10'
+            } transition-all duration-300 sidebar-menu-item`}
+            onClick={onClose}
+            asChild
+          >
+            <Link to="/seller/dashboard">
+              <Store className="mr-2 h-4 w-4" />
+              Seller Dashboard
+            </Link>
+          </Button>
+        </motion.div>
+        <motion.div whileHover={{ x: 5 }} whileTap={{ scale: 0.98 }}>
+          <Button
+            variant={location.pathname === '/seller/products' ? "secondary" : "ghost"}
+            className={`w-full justify-start ${
+              location.pathname === '/seller/products' 
+                ? 'bg-white bg-opacity-20 text-white' 
+                : 'text-gray-200 hover:bg-white hover:bg-opacity-10'
+            } transition-all duration-300 sidebar-menu-item`}
+            onClick={onClose}
+            asChild
+          >
+            <Link to="/seller/products">
+              <Package className="mr-2 h-4 w-4" />
+              Products
+            </Link>
+          </Button>
+        </motion.div>
+        <motion.div whileHover={{ x: 5 }} whileTap={{ scale: 0.98 }}>
+          <Button
+            variant={location.pathname === '/seller/orders' ? "secondary" : "ghost"}
+            className={`w-full justify-start ${
+              location.pathname === '/seller/orders' 
+                ? 'bg-white bg-opacity-20 text-white' 
+                : 'text-gray-200 hover:bg-white hover:bg-opacity-10'
+            } transition-all duration-300 sidebar-menu-item`}
+            onClick={onClose}
+            asChild
+          >
+            <Link to="/seller/orders">
+              <ShoppingCart className="mr-2 h-4 w-4" />
+              Orders
+            </Link>
+          </Button>
+        </motion.div>
+        <motion.div whileHover={{ x: 5 }} whileTap={{ scale: 0.98 }}>
+          <Button
+            variant={location.pathname === '/seller/profile' ? "secondary" : "ghost"}
+            className={`w-full justify-start ${
+              location.pathname === '/seller/profile' 
+                ? 'bg-white bg-opacity-20 text-white' 
+                : 'text-gray-200 hover:bg-white hover:bg-opacity-10'
+            } transition-all duration-300 sidebar-menu-item`}
+            onClick={onClose}
+            asChild
+          >
+            <Link to="/seller/profile">
+              <ShieldCheck className="mr-2 h-4 w-4" />
+              Seller Profile
+            </Link>
+          </Button>
+        </motion.div>
+      </div>
+    </>
+  ) : null;
 
   const handleItemClick = () => {
     if (onClose) {
@@ -89,6 +142,9 @@ export const DashboardSidebar = ({ className, onClose, ...props }: SidebarNavPro
   const handleLogout = async () => {
     try {
       await logout();
+      if (onClose) {
+        onClose();
+      }
     } catch (error) {
       console.error('Logout error:', error);
     }
@@ -96,11 +152,14 @@ export const DashboardSidebar = ({ className, onClose, ...props }: SidebarNavPro
 
   const handleLogoClick = () => {
     navigate('/');
+    if (onClose) {
+      onClose();
+    }
   };
 
   return (
     <Sidebar 
-      className={cn("pb-12 bg-navy-blue", className)} 
+      className={cn("pb-12 bg-navy-blue w-64", className)} 
       {...props}
     >
       <div className="px-3 py-2 flex flex-col h-full">
@@ -117,19 +176,7 @@ export const DashboardSidebar = ({ className, onClose, ...props }: SidebarNavPro
         </h2>
         
         <div className="space-y-1">
-          {allLinks.map((link, index) => {
-            // Check if this is a divider entry (no href)
-            if (!link.href) {
-              return (
-                <div key={`divider-${index}`} className="mt-6 mb-2 px-4">
-                  <h3 className="text-sm font-medium text-gray-300 border-b border-gray-600 pb-1">
-                    {link.title}
-                  </h3>
-                </div>
-              );
-            }
-            
-            // Regular navigation link
+          {navigationLinks.map((link) => {
             const isActive = location.pathname === link.href;
             
             return (
@@ -157,6 +204,9 @@ export const DashboardSidebar = ({ className, onClose, ...props }: SidebarNavPro
             );
           })}
         </div>
+        
+        {/* Only show seller section if user is a seller */}
+        {sellerSection}
         
         <div className="mt-auto px-3 py-2">
           <motion.div
