@@ -1,4 +1,25 @@
 
-/* This file is intentionally left empty as we now import animation files directly in index.css */
-/* This maintains backward compatibility for any code that may import this file */
-
+@import './button/index.css';
+@import './button/core.css';
+@import './button/enhanced.css';
+@import './button/hover.css';
+@import './button/pulse.css';
+@import './button/shimmer.css';
+@import './button/portal-specific.css';
+@import './basic.css';
+@import './chatbot.css';
+@import './cosmic.css';
+@import './forms.css';
+@import './gradient.css';
+@import './home.css';
+@import './hover.css';
+@import './items.css';
+@import './login.css';
+@import './menu.css';
+@import './mobile.css';
+@import './particles.css';
+@import './register.css';
+@import './seller.css';
+@import './star.css';
+@import './tabs.css';
+@import './transitions.css';
