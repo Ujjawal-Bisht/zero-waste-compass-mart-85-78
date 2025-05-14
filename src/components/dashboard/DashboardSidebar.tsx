@@ -7,6 +7,7 @@ import { Sidebar } from '@/components/ui/sidebar';
 import { Logo } from '@/components/ui/logo';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { useAuth } from '@/contexts/auth';
+import { motion } from 'framer-motion';
 import { 
   Home, 
   Package, 
@@ -30,6 +31,7 @@ export const DashboardSidebar = ({ className, onClose, ...props }: SidebarNavPro
   const { currentUser, logout } = useAuth();
   const isSeller = currentUser?.isSeller;
   
+  // Common buyer links
   const buyerLinks = [
     {
       title: 'Dashboard',
@@ -53,6 +55,7 @@ export const DashboardSidebar = ({ className, onClose, ...props }: SidebarNavPro
     }
   ];
 
+  // Common seller links
   const sellerLinks = [
     {
       title: 'Seller Dashboard',
@@ -76,7 +79,13 @@ export const DashboardSidebar = ({ className, onClose, ...props }: SidebarNavPro
     }
   ];
 
-  const navigationLinks = isSeller ? sellerLinks : buyerLinks;
+  // Default navigation links based on user type
+  const defaultNavigationLinks = isSeller ? sellerLinks : buyerLinks;
+
+  // For laptop/desktop, show both sets of links if user is a seller
+  const navigationLinks = isSeller && !isMobile
+    ? [...buyerLinks, { title: 'Seller Options', href: '', icon: null }, ...sellerLinks]
+    : defaultNavigationLinks;
 
   const handleItemClick = () => {
     if (isMobile && onClose) {
@@ -101,39 +110,81 @@ export const DashboardSidebar = ({ className, onClose, ...props }: SidebarNavPro
       className={cn("pb-12 bg-navy-blue", className)} 
       {...props}
     >
-      <div className="px-3 py-2">
-        <div className="mb-8 pl-2 flex items-center">
-          <Logo className="cursor-pointer hover-scale" onClick={handleLogoClick} />
-        </div>
-        <h2 className="mb-4 px-4 text-lg font-semibold tracking-tight text-white">
-          {isSeller ? 'Seller Portal' : 'Navigation'}
-        </h2>
-        <div className="space-y-1">
-          {navigationLinks.map((link) => (
-            <Button
-              key={link.href}
-              variant={location.pathname === link.href ? "secondary" : "ghost"}
-              className={`w-full justify-start ${location.pathname === link.href ? 'bg-white bg-opacity-20 text-white' : 'text-gray-200 hover:bg-white hover:bg-opacity-10'} transition-all duration-300`}
-              onClick={handleItemClick}
-              asChild
-            >
-              <Link to={link.href}>
-                {link.icon}
-                {link.title}
-              </Link>
-            </Button>
-          ))}
-        </div>
-      </div>
-      <div className="mt-auto px-3 py-2">
-        <Button 
-          className="w-full justify-start text-white hover:bg-white hover:bg-opacity-10" 
-          variant="ghost" 
-          onClick={handleLogout}
+      <div className="px-3 py-2 flex flex-col h-full">
+        <motion.div 
+          className="mb-8 pl-2 flex items-center"
+          whileHover={{ scale: 1.03 }}
+          whileTap={{ scale: 0.97 }}
         >
-          <LogOut className="mr-2 h-4 w-4 transition-transform duration-300" />
-          Logout
-        </Button>
+          <Logo className="cursor-pointer hover-scale" onClick={handleLogoClick} />
+        </motion.div>
+        
+        <h2 className="mb-4 px-4 text-lg font-semibold tracking-tight text-white">
+          {isSeller ? 'Navigation' : 'Navigation'}
+        </h2>
+        
+        <div className="space-y-1">
+          {navigationLinks.map((link, index) => {
+            // Check if this is a divider entry (no href)
+            if (!link.href) {
+              return (
+                <div key={`divider-${index}`} className="mt-6 mb-2 px-4">
+                  <h3 className="text-sm font-medium text-gray-300 border-b border-gray-600 pb-1">
+                    {link.title}
+                  </h3>
+                </div>
+              );
+            }
+            
+            // Regular navigation link
+            const isActive = location.pathname === link.href;
+            
+            return (
+              <motion.div
+                key={link.href}
+                whileHover={{ x: 5 }}
+                whileTap={{ scale: 0.98 }}
+              >
+                <Button
+                  variant={isActive ? "secondary" : "ghost"}
+                  className={`w-full justify-start ${
+                    isActive 
+                      ? 'bg-white bg-opacity-20 text-white' 
+                      : 'text-gray-200 hover:bg-white hover:bg-opacity-10'
+                  } transition-all duration-300 sidebar-menu-item`}
+                  onClick={handleItemClick}
+                  asChild
+                >
+                  <Link to={link.href}>
+                    {link.icon}
+                    {link.title}
+                  </Link>
+                </Button>
+              </motion.div>
+            );
+          })}
+        </div>
+        
+        <div className="mt-auto px-3 py-2">
+          <motion.div
+            whileHover={{ x: 5, backgroundColor: "rgba(239, 68, 68, 0.2)" }}
+            whileTap={{ scale: 0.95 }}
+          >
+            <Button 
+              className="w-full justify-start text-white hover:bg-white hover:bg-opacity-10 logout-button" 
+              variant="ghost" 
+              onClick={handleLogout}
+            >
+              <motion.div
+                whileHover={{ rotate: 10 }}
+                className="mr-2 flex items-center"
+              >
+                <LogOut className="h-4 w-4 transition-transform duration-300" />
+              </motion.div>
+              Logout
+            </Button>
+          </motion.div>
+        </div>
       </div>
     </Sidebar>
   );

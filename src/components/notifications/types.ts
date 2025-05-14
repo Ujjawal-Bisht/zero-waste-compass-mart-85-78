@@ -8,4 +8,9 @@ export interface Notification {
   time: string;
   read: boolean;
   type: NotificationType;
+  icon?: string; // Optional icon for the notification
+  action?: {
+    label: string;
+    url: string;
+  }; // Optional action for the notification
 }

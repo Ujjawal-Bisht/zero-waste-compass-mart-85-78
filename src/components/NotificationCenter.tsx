@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { Bell } from 'lucide-react';
+import { Bell, BellRing } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -11,6 +11,7 @@ import { Notification } from './notifications/types';
 
 const NotificationCenter: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
+  const [isHovered, setIsHovered] = useState(false);
   const [notifications, setNotifications] = useState<Notification[]>(mockNotifications);
 
   const unreadCount = notifications.filter(n => !n.read).length;
@@ -31,42 +32,82 @@ const NotificationCenter: React.FC = () => {
 
   return (
     <div className="relative">
-      <Button
-        variant="ghost"
-        size="icon"
-        onClick={() => setIsOpen(!isOpen)}
-        className="relative notification-bell notification-bell-pulse button-shimmer notification-shimmer"
-        aria-label="Notifications"
+      <motion.div
+        whileHover={{ scale: 1.05 }}
+        whileTap={{ scale: 0.95 }}
+        onHoverStart={() => setIsHovered(true)}
+        onHoverEnd={() => setIsHovered(false)}
       >
-        <Bell className="h-5 w-5" />
-        {unreadCount > 0 && (
-          <Badge className="absolute -top-1 -right-1 h-5 w-5 p-0 flex items-center justify-center bg-zwm-primary text-white notification-badge pulse-soft badge-animate">
-            {unreadCount}
-          </Badge>
-        )}
-      </Button>
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={() => setIsOpen(!isOpen)}
+          className="relative notification-bell notification-bell-pulse button-shimmer notification-shimmer group"
+          aria-label="Notifications"
+        >
+          <motion.div
+            animate={unreadCount > 0 ? { rotate: [0, 15, -15, 0] } : {}}
+            transition={{ 
+              duration: 0.5, 
+              repeat: unreadCount > 0 ? Infinity : 0, 
+              repeatDelay: 5 
+            }}
+          >
+            {isHovered || unreadCount > 0 ? 
+              <BellRing className="h-5 w-5 text-primary transition-all duration-300" /> : 
+              <Bell className="h-5 w-5 transition-all duration-300" />
+            }
+          </motion.div>
+          
+          {unreadCount > 0 && (
+            <Badge 
+              className="absolute -top-1 -right-1 h-5 w-5 p-0 flex items-center justify-center bg-zwm-primary text-white notification-badge pulse-soft badge-animate"
+            >
+              <motion.span
+                initial={{ scale: 0.5, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                exit={{ scale: 0.5, opacity: 0 }}
+                transition={{ type: "spring", stiffness: 500, damping: 20 }}
+              >
+                {unreadCount}
+              </motion.span>
+            </Badge>
+          )}
+        </Button>
+      </motion.div>
 
       <AnimatePresence>
         {isOpen && (
           <motion.div 
-            className="absolute right-0 mt-2 w-80 sm:w-96 bg-white rounded-lg shadow-lg border z-50 dropdown-menu-animate"
+            className="absolute right-0 mt-2 w-80 sm:w-96 bg-white rounded-lg shadow-lg border z-50 dropdown-menu-animate overflow-hidden"
             initial={{ opacity: 0, y: -20, scale: 0.95 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: -20, scale: 0.95 }}
-            transition={{ duration: 0.2 }}
+            transition={{ type: "spring", stiffness: 400, damping: 30 }}
           >
-            <NotificationHeader 
-              unreadCount={unreadCount} 
-              markAllAsRead={markAllAsRead} 
-              closeNotifications={() => setIsOpen(false)} 
-            />
-            <div className="max-h-[400px] overflow-y-auto">
+            <motion.div
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: 0.1, type: "spring" }}
+            >
+              <NotificationHeader 
+                unreadCount={unreadCount} 
+                markAllAsRead={markAllAsRead} 
+                closeNotifications={() => setIsOpen(false)} 
+              />
+            </motion.div>
+            <motion.div 
+              className="max-h-[400px] overflow-y-auto"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.2 }}
+            >
               <NotificationList 
                 notifications={notifications}
                 markAsRead={markAsRead}
                 deleteNotification={deleteNotification}
               />
-            </div>
+            </motion.div>
           </motion.div>
         )}
       </AnimatePresence>
