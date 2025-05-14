@@ -10,7 +10,12 @@
 
 /* Active button scaling */
 .button-active-scale {
-  transform: transform transition-transform active:scale-95;
+  transition: transform 0.3s ease;
+  transform: scale(1);
+}
+
+.button-active-scale:active {
+  transform: scale(0.95);
 }
 
 /* Button shadow transitions */
