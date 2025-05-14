@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from 'react';
 import { useAuth } from '@/contexts/auth';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -21,7 +20,7 @@ const SellerDashboard: React.FC = () => {
     // Set loaded state after a small delay for entrance animations
     const timer = setTimeout(() => setLoaded(true), 100);
     return () => clearTimeout(timer);
-  }, [toast]);
+  }, []);
 
   const containerVariants = {
     hidden: { opacity: 0 },
