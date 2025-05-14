@@ -4,6 +4,7 @@ import { motion } from 'framer-motion';
 import { toast } from '@/components/ui/use-toast';
 import { Order } from '@/types';
 import OrdersCard from '@/components/orders/OrdersCard';
+import { generateInvoice } from '@/utils/exportUtils';
 
 const SellerOrders: React.FC = () => {
   // This would be replaced with actual data from a database
@@ -12,6 +13,7 @@ const SellerOrders: React.FC = () => {
       id: 'ORD001',
       buyerId: 'buyer123',
       buyerName: 'John Doe',
+      sellerId: 'seller123',
       items: [
         { itemId: '1', name: 'Organic Bananas', quantity: 2, price: 299.99 },
       ],
@@ -19,11 +21,13 @@ const SellerOrders: React.FC = () => {
       paymentStatus: 'paid',
       totalAmount: 599.98,
       createdAt: '2023-05-20T10:30:00',
+      updatedAt: '2023-05-20T10:30:00',
     },
     {
       id: 'ORD002',
       buyerId: 'buyer456',
       buyerName: 'Jane Smith',
+      sellerId: 'seller123',
       items: [
         { itemId: '2', name: 'T-shirts Pack', quantity: 1, price: 2499.00 },
       ],
@@ -31,6 +35,7 @@ const SellerOrders: React.FC = () => {
       paymentStatus: 'paid',
       totalAmount: 2499.00,
       createdAt: '2023-05-19T14:15:00',
+      updatedAt: '2023-05-19T14:15:00',
     },
   ]);
 
@@ -65,6 +70,11 @@ const SellerOrders: React.FC = () => {
   };
 
   const handlePrintInvoice = (orderId: string) => {
+    const order = orders.find(o => o.id === orderId);
+    if (order) {
+      generateInvoice(order);
+    }
+    
     toast({
       title: "Print Invoice",
       description: `Printing invoice for order ${orderId}`,

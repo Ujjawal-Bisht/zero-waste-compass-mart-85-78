@@ -1,0 +1,29 @@
+
+/* Card entrance animations with staggered delay */
+.seller-card-enter {
+  animation: seller-card-appear 0.5s ease-out forwards;
+  opacity: 0;
+  transform: translateY(20px);
+}
+
+.seller-card-delay-1 { animation-delay: 0.1s; }
+.seller-card-delay-2 { animation-delay: 0.2s; }
+.seller-card-delay-3 { animation-delay: 0.3s; }
+.seller-card-delay-4 { animation-delay: 0.4s; }
+
+@keyframes seller-card-appear {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Product card animations */
+.product-card {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.product-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 15px 30px -10px rgba(0, 0, 0, 0.1);
+}

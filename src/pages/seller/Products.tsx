@@ -4,10 +4,11 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
 import { Item } from '@/types';
-import { Plus, Package } from 'lucide-react';
+import { Plus, Package, Printer } from 'lucide-react';
 import { motion } from 'framer-motion';
 import ProductTable from '@/components/products/ProductTable';
 import { getCategoryBadgeColor, getStatusBadgeColor, formatDate } from '@/components/products/productUtils';
+import { exportProducts } from '@/utils/exportUtils';
 
 const SellerProducts: React.FC = () => {
   const navigate = useNavigate();
@@ -64,6 +65,10 @@ const SellerProducts: React.FC = () => {
   const handleAddProduct = () => {
     navigate('/items/add');
   };
+  
+  const handleExportProducts = () => {
+    exportProducts(products);
+  };
 
   return (
     <motion.div 
@@ -82,12 +87,27 @@ const SellerProducts: React.FC = () => {
           <p className="text-muted-foreground">Manage your product listings</p>
         </motion.div>
         <motion.div
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.95 }}
+          className="flex gap-3"
+          initial={{ x: 20, opacity: 0 }}
+          animate={{ x: 0, opacity: 1 }}
+          transition={{ duration: 0.5 }}
         >
-          <Button onClick={handleAddProduct} className="zwm-gradient button-shimmer">
-            <Plus className="mr-2 h-4 w-4" /> Add Product
-          </Button>
+          <motion.div
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+          >
+            <Button variant="outline" onClick={handleExportProducts} className="button-shimmer flex items-center">
+              <Printer className="mr-2 h-4 w-4" /> Export
+            </Button>
+          </motion.div>
+          <motion.div
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+          >
+            <Button onClick={handleAddProduct} className="zwm-gradient button-shimmer">
+              <Plus className="mr-2 h-4 w-4" /> Add Product
+            </Button>
+          </motion.div>
         </motion.div>
       </div>
       
@@ -97,7 +117,7 @@ const SellerProducts: React.FC = () => {
         transition={{ duration: 0.5, delay: 0.2 }}
       >
         <Card className="product-card">
-          <CardHeader>
+          <CardHeader className="flex justify-between items-center">
             <CardTitle className="flex items-center">
               <Package className="mr-2 h-5 w-5" />
               <span>All Products</span>

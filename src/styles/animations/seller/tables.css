@@ -1,0 +1,27 @@
+
+/* Row hover animation */
+.table-row-animate {
+  transition: all 0.2s ease-in-out;
+}
+
+.table-row-animate:hover {
+  background-color: rgba(243, 244, 246, 0.6);
+  transform: translateX(3px);
+}
+
+/* Dropdown menu animation */
+.dropdown-menu-animate {
+  transform-origin: top right;
+  animation: dropdown-appear 0.2s ease-out forwards;
+}
+
+@keyframes dropdown-appear {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}

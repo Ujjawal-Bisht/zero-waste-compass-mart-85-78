@@ -1,0 +1,29 @@
+
+/* Import all seller animation modules */
+@import './cards.css';
+@import './charts.css';
+@import './tables.css';
+@import './badges.css';
+@import './buttons.css';
+@import './menus.css';
+@import './profile.css';
+
+/* Core seller animations that are shared across all components */
+.seller-animation-base {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.seller-fade-in {
+  animation: seller-fade-in 0.5s ease-out forwards;
+}
+
+@keyframes seller-fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

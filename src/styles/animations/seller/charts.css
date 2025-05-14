@@ -1,0 +1,52 @@
+
+/* Chart animation */
+.chart-animate {
+  animation: chart-grow 1.2s ease-out forwards;
+  transform-origin: bottom;
+}
+
+@keyframes chart-grow {
+  from {
+    transform: scaleY(0);
+    opacity: 0;
+  }
+  to {
+    transform: scaleY(1);
+    opacity: 1;
+  }
+}
+
+/* Trust score circle animation */
+.trust-circle {
+  stroke-dasharray: 100;
+  stroke-dashoffset: 100;
+  animation: trust-circle-fill 1.5s ease-out forwards;
+  animation-delay: 0.5s;
+}
+
+@keyframes trust-circle-fill {
+  to {
+    stroke-dashoffset: var(--final-offset);
+  }
+}
+
+/* Progress bar animation */
+.progress-animate {
+  animation: progress-fill 1.5s ease-out forwards;
+  animation-delay: 0.2s;
+}
+
+@keyframes progress-fill {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+
+/* Data value counter animation */
+.count-up {
+  counter-reset: count 0;
+  animation: count-up 2s forwards ease-out;
+}

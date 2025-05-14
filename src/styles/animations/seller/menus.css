@@ -1,0 +1,57 @@
+
+/* Menu animation */
+.menu-icon {
+  transition: all 0.3s ease;
+}
+
+.menu-icon:hover {
+  transform: rotate(90deg);
+}
+
+/* Enhanced menu button animation */
+@keyframes menu-line-animation {
+  0% {
+    transform: scaleX(1);
+  }
+  50% {
+    transform: scaleX(0.7);
+  }
+  100% {
+    transform: scaleX(1);
+  }
+}
+
+.menu-line {
+  transform-origin: center;
+  transition: all 0.3s ease;
+}
+
+.menu-line-1 {
+  animation: menu-line-animation 2s infinite;
+  animation-delay: 0.1s;
+}
+
+.menu-line-2 {
+  animation: menu-line-animation 2s infinite;
+  animation-delay: 0.2s;
+}
+
+.menu-line-3 {
+  animation: menu-line-animation 2s infinite;
+  animation-delay: 0.3s;
+}
+
+.menu-button:hover .menu-line-1 {
+  transform: translateY(1px) rotate(45deg);
+  animation: none;
+}
+
+.menu-button:hover .menu-line-2 {
+  opacity: 0;
+  animation: none;
+}
+
+.menu-button:hover .menu-line-3 {
+  transform: translateY(-1px) rotate(-45deg);
+  animation: none;
+}

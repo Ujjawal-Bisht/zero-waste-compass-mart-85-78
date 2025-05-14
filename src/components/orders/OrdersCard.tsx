@@ -6,6 +6,7 @@ import { ShoppingCart, Printer } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { Order } from '@/types';
 import OrdersTable from './OrdersTable';
+import { exportOrders } from '@/utils/exportUtils';
 
 interface OrdersCardProps {
   orders: Order[];
@@ -26,6 +27,10 @@ const OrdersCard: React.FC<OrdersCardProps> = ({
   onSendShippingUpdate,
   onCancelOrder
 }) => {
+  const handleExport = () => {
+    exportOrders(orders);
+  };
+
   return (
     <motion.div
       initial={{ y: 20, opacity: 0 }}
@@ -49,7 +54,11 @@ const OrdersCard: React.FC<OrdersCardProps> = ({
             className="ml-auto"
             whileHover={{ scale: 1.05 }}
           >
-            <Button variant="outline" className="flex items-center button-shimmer">
+            <Button 
+              variant="outline" 
+              className="flex items-center button-shimmer" 
+              onClick={handleExport}
+            >
               <Printer className="h-4 w-4 mr-2" />
               Export
             </Button>

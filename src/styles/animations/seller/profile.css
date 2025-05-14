@@ -1,0 +1,40 @@
+
+/* Profile section animations */
+.profile-tab-content {
+  animation: tab-fade-in 0.3s ease-out forwards;
+}
+
+@keyframes tab-fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Tab hover effect */
+.profile-tab {
+  position: relative;
+  overflow: hidden;
+}
+
+.profile-tab::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background: linear-gradient(90deg, #f59e0b, #f97316);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.3s ease;
+}
+
+.profile-tab[data-state="active"]::after,
+.profile-tab:hover::after {
+  transform: scaleX(1);
+}

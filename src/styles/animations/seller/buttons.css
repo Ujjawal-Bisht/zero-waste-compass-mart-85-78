@@ -1,0 +1,54 @@
+
+/* Enhanced float animation for icons */
+.icon-float {
+  animation: icon-float 3s infinite ease-in-out;
+}
+
+@keyframes icon-float {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-8px) rotate(10deg);
+  }
+}
+
+/* Logout button animation */
+.logout-button {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+}
+
+.logout-button::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(239, 68, 68, 0.2), transparent);
+  animation: logout-shimmer 3s infinite;
+}
+
+@keyframes logout-shimmer {
+  0% {
+    left: -100%;
+  }
+  50% {
+    left: 100%;
+  }
+  100% {
+    left: 100%;
+  }
+}
+
+.logout-button:hover {
+  background-color: rgba(239, 68, 68, 0.1);
+  color: rgb(220, 38, 38);
+}
+
+.logout-button:hover svg {
+  transform: translateX(3px) rotate(360deg);
+  transition: transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
