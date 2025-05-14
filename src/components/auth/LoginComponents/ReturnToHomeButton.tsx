@@ -18,7 +18,7 @@ const ReturnToHomeButton: React.FC = () => {
       <Button
         variant="ghost"
         onClick={() => navigate('/')}
-        className="flex items-center gap-2 text-gray-600 hover:text-gray-900 transition-colors home-button button-bounce"
+        className="flex items-center gap-2 text-gray-600 hover:text-gray-900 transition-colors home-button button-bounce home-button-3d"
       >
         <ArrowLeft className="h-4 w-4 home-button-icon rotate-on-hover" />
         Return to Home Page

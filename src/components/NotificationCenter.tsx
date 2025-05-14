@@ -4,6 +4,7 @@ import { Bell, Check, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { motion, AnimatePresence } from 'framer-motion';
 
 type Notification = {
   id: string;
@@ -88,93 +89,112 @@ const NotificationCenter: React.FC = () => {
         variant="ghost"
         size="icon"
         onClick={() => setIsOpen(!isOpen)}
-        className="relative"
+        className="relative notification-bell"
         aria-label="Notifications"
       >
         <Bell className="h-5 w-5" />
         {unreadCount > 0 && (
-          <Badge className="absolute -top-1 -right-1 h-5 w-5 p-0 flex items-center justify-center bg-zwm-primary text-white">
+          <Badge className="absolute -top-1 -right-1 h-5 w-5 p-0 flex items-center justify-center bg-zwm-primary text-white notification-badge pulse-soft">
             {unreadCount}
           </Badge>
         )}
       </Button>
 
-      {isOpen && (
-        <div className="absolute right-0 mt-2 w-80 sm:w-96 bg-white rounded-lg shadow-lg border z-50 animate-slide-in">
-          <div className="p-3 border-b flex items-center justify-between">
-            <h3 className="font-medium">Notifications</h3>
-            <div className="flex gap-2">
-              {unreadCount > 0 && (
+      <AnimatePresence>
+        {isOpen && (
+          <motion.div 
+            className="absolute right-0 mt-2 w-80 sm:w-96 bg-white rounded-lg shadow-lg border z-50"
+            initial={{ opacity: 0, y: -20, scale: 0.95 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: -20, scale: 0.95 }}
+            transition={{ duration: 0.2 }}
+          >
+            <div className="p-3 border-b flex items-center justify-between">
+              <h3 className="font-medium">Notifications</h3>
+              <div className="flex gap-2">
+                {unreadCount > 0 && (
+                  <Button 
+                    variant="ghost" 
+                    size="sm" 
+                    onClick={markAllAsRead} 
+                    className="text-xs hover:bg-gray-100 transition-all duration-300"
+                  >
+                    Mark all as read
+                  </Button>
+                )}
                 <Button 
                   variant="ghost" 
                   size="sm" 
-                  onClick={markAllAsRead} 
-                  className="text-xs"
+                  onClick={() => setIsOpen(false)}
+                  className="hover:bg-red-50 hover:text-red-500 transition-all duration-300"
                 >
-                  Mark all as read
+                  <X size={16} />
                 </Button>
-              )}
-              <Button 
-                variant="ghost" 
-                size="sm" 
-                onClick={() => setIsOpen(false)}
-              >
-                <X size={16} />
-              </Button>
-            </div>
-          </div>
-
-          <div className="max-h-[400px] overflow-y-auto">
-            {notifications.length > 0 ? (
-              notifications.map(notification => (
-                <div 
-                  key={notification.id} 
-                  className={`p-3 border-b transition-colors flex ${!notification.read ? 'bg-gray-50' : ''}`}
-                >
-                  <div className="mr-3 mt-1">
-                    <Avatar className="h-8 w-8">
-                      <AvatarImage src="/placeholder.svg" />
-                      <AvatarFallback className="bg-zwm-secondary text-white">ZW</AvatarFallback>
-                    </Avatar>
-                  </div>
-                  
-                  <div className="flex-1">
-                    <div className="flex justify-between items-start">
-                      <h4 className="font-medium text-sm">{notification.title}</h4>
-                      <div className="flex gap-1">
-                        {!notification.read && (
-                          <Button 
-                            variant="ghost" 
-                            size="icon" 
-                            className="h-5 w-5" 
-                            onClick={() => markAsRead(notification.id)}
-                          >
-                            <Check size={12} />
-                          </Button>
-                        )}
-                        <Button 
-                          variant="ghost" 
-                          size="icon" 
-                          className="h-5 w-5" 
-                          onClick={() => deleteNotification(notification.id)}
-                        >
-                          <X size={12} />
-                        </Button>
-                      </div>
-                    </div>
-                    <p className="text-xs text-gray-600 mt-1">{notification.message}</p>
-                    <span className="text-xs text-gray-400 mt-2 block">{notification.time}</span>
-                  </div>
-                </div>
-              ))
-            ) : (
-              <div className="p-8 text-center text-gray-500">
-                <p className="text-sm">No notifications</p>
               </div>
-            )}
-          </div>
-        </div>
-      )}
+            </div>
+
+            <div className="max-h-[400px] overflow-y-auto">
+              {notifications.length > 0 ? (
+                <motion.div>
+                  {notifications.map((notification, index) => (
+                    <motion.div 
+                      key={notification.id} 
+                      className={`p-3 border-b transition-colors hover:bg-gray-50 flex ${!notification.read ? 'bg-gray-50' : ''}`}
+                      initial={{ opacity: 0, y: -10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: index * 0.05 }}
+                      exit={{ opacity: 0, height: 0, marginTop: 0, marginBottom: 0 }}
+                    >
+                      <div className="mr-3 mt-1">
+                        <Avatar className="h-8 w-8">
+                          <AvatarImage src="/placeholder.svg" />
+                          <AvatarFallback className="bg-zwm-secondary text-white">ZW</AvatarFallback>
+                        </Avatar>
+                      </div>
+                      
+                      <div className="flex-1">
+                        <div className="flex justify-between items-start">
+                          <h4 className="font-medium text-sm">{notification.title}</h4>
+                          <div className="flex gap-1">
+                            {!notification.read && (
+                              <Button 
+                                variant="ghost" 
+                                size="icon" 
+                                className="h-5 w-5 hover:bg-green-50 hover:text-green-500 transition-all duration-300" 
+                                onClick={() => markAsRead(notification.id)}
+                              >
+                                <Check size={12} />
+                              </Button>
+                            )}
+                            <Button 
+                              variant="ghost" 
+                              size="icon" 
+                              className="h-5 w-5 hover:bg-red-50 hover:text-red-500 transition-all duration-300" 
+                              onClick={() => deleteNotification(notification.id)}
+                            >
+                              <X size={12} />
+                            </Button>
+                          </div>
+                        </div>
+                        <p className="text-xs text-gray-600 mt-1">{notification.message}</p>
+                        <span className="text-xs text-gray-400 mt-2 block">{notification.time}</span>
+                      </div>
+                    </motion.div>
+                  ))}
+                </motion.div>
+              ) : (
+                <motion.div 
+                  className="p-8 text-center text-gray-500"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                >
+                  <p className="text-sm">No notifications</p>
+                </motion.div>
+              )}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 };

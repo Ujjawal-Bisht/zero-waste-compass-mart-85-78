@@ -125,7 +125,8 @@
 }
 
 .home-button:hover .home-button-icon {
-  transform: scale(1.2);
+  transform: scale(1.2) rotate(360deg);
+  transition: transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
 /* Seller portal specific home button */
@@ -184,4 +185,105 @@
 
 .rotate-on-hover:hover {
   animation: subtle-rotate 0.5s ease;
+}
+
+/* NEW ENHANCED HOME BUTTON ANIMATIONS */
+.home-button-3d {
+  position: relative;
+  transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  transform-style: preserve-3d;
+  perspective: 800px;
+}
+
+.home-button-3d:hover {
+  transform: translateY(-2px) translateZ(10px) rotateX(5deg);
+}
+
+.home-button-3d::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: linear-gradient(
+    120deg,
+    transparent,
+    rgba(255, 255, 255, 0.4),
+    transparent
+  );
+  opacity: 0;
+  transition: opacity 0.4s ease;
+}
+
+.home-button-3d:hover::before {
+  opacity: 1;
+}
+
+/* Seller specific 3D button */
+.seller-button-3d:hover {
+  box-shadow: 0 10px 20px -5px rgba(245, 158, 11, 0.3);
+}
+
+/* Buyer specific 3D button */
+.buyer-button-3d:hover {
+  box-shadow: 0 10px 20px -5px rgba(59, 130, 246, 0.3);
+}
+
+/* Search bar animations */
+.search-bar-focus {
+  transition: all 0.3s ease;
+}
+
+.search-bar-focus:focus-within {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+/* Search icon animation */
+@keyframes search-bounce {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.2); }
+}
+
+.search-icon-animated {
+  transition: all 0.3s ease;
+}
+
+.search-bar-focus:focus-within .search-icon-animated {
+  animation: search-bounce 0.6s ease;
+  color: #4f46e5;
+}
+
+/* Notification bell animation */
+@keyframes bell-ring {
+  0%, 100% { transform: rotate(0); }
+  20% { transform: rotate(8deg); }
+  40% { transform: rotate(-8deg); }
+  60% { transform: rotate(4deg); }
+  80% { transform: rotate(-4deg); }
+}
+
+.notification-bell {
+  transition: all 0.3s ease;
+}
+
+.notification-bell:hover {
+  animation: bell-ring 0.6s ease-in-out;
+  transform-origin: top center;
+}
+
+.notification-badge {
+  transition: all 0.3s ease;
+}
+
+.notification-bell:hover .notification-badge {
+  transform: scale(1.2);
+}
+
+/* Search and notification container animation */
+.navbar-item {
+  transition: all 0.3s ease;
+}
+
+.navbar-item:hover {
+  transform: translateY(-2px);
 }

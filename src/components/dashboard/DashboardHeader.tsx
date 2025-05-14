@@ -39,32 +39,42 @@ const DashboardHeader: React.FC = () => {
         transition={{ duration: 0.5 }}
       >
         <div className="hidden lg:flex items-center space-x-6">
-          <div className="cursor-pointer" onClick={goToHome}>
+          <motion.div 
+            className="cursor-pointer navbar-item" 
+            onClick={goToHome}
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+          >
             <Logo size="sm" showText={true} animated={true} />
-          </div>
-          <div className="flex-1 max-w-md">
-            <div className="relative w-full">
-              <Search className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
+          </motion.div>
+          <div className="flex-1 max-w-md navbar-item">
+            <div className="relative w-full search-bar-focus rounded-md overflow-hidden">
+              <Search className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground search-icon-animated" />
               <Input 
                 type="search" 
                 placeholder="Search..." 
-                className="pl-10 w-full bg-gray-50 border-gray-100" 
+                className="pl-10 w-full bg-gray-50 border-gray-100 transition-all duration-300 focus:ring-2 focus:ring-offset-0 focus:ring-blue-400 focus:border-blue-400" 
               />
             </div>
           </div>
         </div>
         
         <div className="flex items-center lg:hidden">
-          <div className="cursor-pointer" onClick={goToHome}>
+          <motion.div 
+            className="cursor-pointer navbar-item" 
+            onClick={goToHome}
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+          >
             <Logo size="sm" showText={false} animated={true} />
-          </div>
-          <div className="flex-1 max-w-md ml-4">
-            <div className="relative w-full">
-              <Search className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
+          </motion.div>
+          <div className="flex-1 max-w-md ml-4 navbar-item">
+            <div className="relative w-full search-bar-focus rounded-md overflow-hidden">
+              <Search className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground search-icon-animated" />
               <Input 
                 type="search" 
                 placeholder="Search..." 
-                className="pl-10 w-full bg-gray-50 border-gray-100" 
+                className="pl-10 w-full bg-gray-50 border-gray-100 transition-all duration-300 focus:ring-2 focus:ring-offset-0 focus:ring-blue-400 focus:border-blue-400" 
               />
             </div>
           </div>
@@ -75,15 +85,16 @@ const DashboardHeader: React.FC = () => {
             variant="outline"
             size="sm"
             onClick={goToHome}
-            className={`hidden md:flex items-center gap-2 hover:bg-gray-100 transition-colors home-button ${isSellerPortal ? 'seller-home-button' : 'buyer-home-button'} button-bounce`}
+            className={`hidden md:flex items-center gap-2 hover:bg-gray-100 transition-colors home-button home-button-3d ${isSellerPortal ? 'seller-home-button seller-button-3d' : 'buyer-home-button buyer-button-3d'} button-bounce button-shimmer`}
           >
-            <Home className="h-4 w-4 home-button-icon rotate-on-hover" /> 
+            <Home className="h-4 w-4 home-button-icon" /> 
             <span className="relative">Home</span>
           </Button>
           
           <motion.div
             whileHover={{ rotate: [0, -5, 5, 0], scale: 1.05 }}
             transition={{ duration: 0.5 }}
+            className="navbar-item notification-bell"
           >
             <NotificationCenter />
           </motion.div>
@@ -91,17 +102,18 @@ const DashboardHeader: React.FC = () => {
           <motion.div
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
+            className="navbar-item"
           >
             <Button 
               onClick={() => navigate('/items/add')} 
-              className={currentUser?.isSeller ? "seller-button-gradient" : "buyer-button-gradient"}
+              className={currentUser?.isSeller ? "seller-button-gradient button-pulse-glow" : "buyer-button-gradient button-pulse-glow"}
             >
               <Plus className="h-4 w-4 mr-1" /> Add Item
             </Button>
           </motion.div>
           
           <motion.div 
-            className="flex items-center cursor-pointer"
+            className="flex items-center cursor-pointer navbar-item"
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
             onClick={() => navigate('/profile')}
