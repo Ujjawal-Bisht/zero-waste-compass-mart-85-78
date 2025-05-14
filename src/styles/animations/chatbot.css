@@ -1,0 +1,98 @@
+
+/* ChatBot specific animations */
+
+@keyframes bot-entrance {
+  from {
+    opacity: 0;
+    transform: scale(0.8) translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+.bot-entrance {
+  animation: bot-entrance 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+}
+
+@keyframes message-appear {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.message-appear {
+  animation: message-appear 0.3s ease-out forwards;
+}
+
+@keyframes typing-indicator {
+  0% { opacity: 0.4; }
+  50% { opacity: 1; }
+  100% { opacity: 0.4; }
+}
+
+.typing-dot {
+  animation: typing-indicator 1.4s infinite;
+}
+
+.typing-dot:nth-child(2) {
+  animation-delay: 0.2s;
+}
+
+.typing-dot:nth-child(3) {
+  animation-delay: 0.4s;
+}
+
+@keyframes pulse-glow {
+  0% {
+    box-shadow: 0 0 0 0 rgba(79, 70, 229, 0.4);
+  }
+  70% {
+    box-shadow: 0 0 0 10px rgba(79, 70, 229, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(79, 70, 229, 0);
+  }
+}
+
+.pulse-glow {
+  animation: pulse-glow 2s infinite cubic-bezier(0.66, 0, 0, 1);
+}
+
+@keyframes float-button {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-5px);
+  }
+}
+
+.float-button {
+  animation: float-button 3s ease-in-out infinite;
+}
+
+/* Message animations with staggered delays */
+.message-delay-1 { animation-delay: 0.1s; }
+.message-delay-2 { animation-delay: 0.2s; }
+.message-delay-3 { animation-delay: 0.3s; }
+
+/* Fancy chat bubble shapes */
+.chat-bubble-user {
+  border-radius: 18px 18px 0 18px;
+}
+
+.chat-bubble-bot {
+  border-radius: 18px 18px 18px 0;
+}
+
+/* Gradient background for bot messages */
+.bot-message-gradient {
+  background-image: linear-gradient(135deg, #f5f7fa 0%, #e4eaef 100%);
+}
