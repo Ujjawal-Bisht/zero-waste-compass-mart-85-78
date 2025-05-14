@@ -28,7 +28,7 @@ export const DashboardSidebar = ({ className, onClose, ...props }: SidebarNavPro
   const { currentUser, logout } = useAuth();
   const isSeller = currentUser?.isSeller;
   
-  // All navigation links for all users
+  // Define navigation links
   const navigationLinks = [
     {
       title: 'Dashboard',

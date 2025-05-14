@@ -22,12 +22,12 @@ const DashboardLayout: React.FC = () => {
   return (
     <SidebarProvider>
       <div className="flex h-screen w-full bg-gray-50 overflow-hidden">
-        {/* Hamburger Menu Button - Visible on all devices */}
+        {/* Hamburger Menu Button - positioned to not overlap with logo */}
         <Button 
           variant="ghost" 
           size="icon" 
           onClick={toggleSidebar}
-          className="menu-button button-transition fixed top-4 left-4 z-40"
+          className="menu-button button-transition fixed top-4 left-16 z-40 md:left-4"
         >
           <Menu className="h-5 w-5 text-white" />
         </Button>
