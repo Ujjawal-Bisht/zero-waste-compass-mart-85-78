@@ -1,6 +1,6 @@
 
 import { toast as sonnerToast } from "sonner";
-import type { ToastProps as SonnerToastProps } from "sonner";
+import type { ToasterProps } from "sonner";
 
 // Define the type for our toast function parameters
 interface ToastProps {
