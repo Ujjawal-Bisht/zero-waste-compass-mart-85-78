@@ -6,7 +6,7 @@ import FeaturesTabs from '@/components/landing/FeaturesTabs';
 import StatsSection from '@/components/landing/StatsSection';
 import CTASection from '@/components/landing/CTASection';
 import Footer from '@/components/landing/Footer';
-import { Toaster } from '@/components/ui/sonner';
+import { Toaster } from 'sonner';
 
 const LandingPage: React.FC = () => {
   return (

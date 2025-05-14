@@ -6,7 +6,7 @@ import { ShoppingBag, Truck, Users, LineChart, Leaf, Star, Upload, MessageCircle
 import FeatureCard from './FeatureCard';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/auth';
-import { toast } from '@/components/ui/use-toast';
+import { toast } from 'sonner';
 
 const FeaturesTabs: React.FC = () => {
   const [activeTab, setActiveTab] = useState('buyers');
@@ -16,8 +16,7 @@ const FeaturesTabs: React.FC = () => {
   const handleButtonClick = (action: string) => {
     if (!currentUser) {
       // If user is not logged in, redirect to register page
-      toast({
-        title: "Authentication required",
+      toast("Authentication required", {
         description: "Please sign up or log in to access this feature",
         duration: 3000,
       });
@@ -33,8 +32,7 @@ const FeaturesTabs: React.FC = () => {
       case 'connectBuyers':
       case 'connectSellers':
         navigate('/dashboard');
-        toast({
-          title: "Coming Soon",
+        toast("Coming Soon", {
           description: "The messaging feature will be available soon!",
           duration: 3000,
         });
@@ -52,8 +50,7 @@ const FeaturesTabs: React.FC = () => {
         if (currentUser.isSeller) {
           navigate('/seller/products');
         } else {
-          toast({
-            title: "Seller Account Required",
+          toast("Seller Account Required", {
             description: "You need a seller account to access this feature",
             duration: 3000,
           });
@@ -63,14 +60,12 @@ const FeaturesTabs: React.FC = () => {
       case 'pharmacySolutions':
         if (currentUser.isSeller) {
           navigate('/seller/dashboard');
-          toast({
-            title: "Pharmacy Features",
+          toast("Pharmacy Features", {
             description: "Specialized pharmacy features coming soon!",
             duration: 3000,
           });
         } else {
-          toast({
-            title: "Seller Account Required",
+          toast("Seller Account Required", {
             description: "You need a seller account to access this feature",
             duration: 3000,
           });
