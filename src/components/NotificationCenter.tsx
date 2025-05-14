@@ -16,8 +16,8 @@ const NotificationCenter: React.FC = () => {
   return (
     <div className="relative">
       <motion.div
-        whileHover={{ scale: 1.10, rotate: 3 }}
-        whileTap={{ scale: 0.96, rotate: -3 }}
+        whileHover={{ scale: 1.10 }}
+        whileTap={{ scale: 0.96 }}
         onHoverStart={() => setIsHovered(true)}
         onHoverEnd={() => setIsHovered(false)}
         className="transition-transform duration-200"
@@ -26,7 +26,7 @@ const NotificationCenter: React.FC = () => {
           variant="ghost"
           size="icon"
           tabIndex={0}
-          className={`relative notification-bell notification-bell-pulse button-shimmer notification-shimmer group ring-2 ring-primary/30`}
+          className={`relative notification-bell notification-bell-pulse notification-shimmer rounded-full group`}
           aria-label="Notifications"
         >
           <motion.div
