@@ -1,6 +1,5 @@
 
-/* DEPRECATED: This file has been refactored into multiple files in the /button folder */
-/* Please use imports from src/styles/animations/button/index.css instead */
-/* This file is kept for backward compatibility */
+/* This file imports all button animation modules */
+/* It's kept for backward compatibility but we recommend using the modular imports directly */
 
 @import './button/index.css';

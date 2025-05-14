@@ -1,11 +1,6 @@
 
+/* Main animations index file - imports all animation modules */
 @import './button/index.css';
-@import './button/core.css';
-@import './button/enhanced.css';
-@import './button/hover.css';
-@import './button/pulse.css';
-@import './button/shimmer.css';
-@import './button/portal-specific.css';
 @import './basic.css';
 @import './chatbot.css';
 @import './cosmic.css';
