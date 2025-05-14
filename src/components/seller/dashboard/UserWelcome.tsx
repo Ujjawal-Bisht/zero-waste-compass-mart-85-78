@@ -20,8 +20,9 @@ const UserWelcome: React.FC<UserWelcomeProps> = ({ currentUser }) => {
       className="flex items-center justify-between"
     >
       <div>
+        {/* Always show account holder name, not business name */}
         <h2 className="text-3xl font-bold tracking-tight">
-          Welcome back, {currentUser?.businessName || currentUser?.displayName}
+          Welcome back, {currentUser?.displayName}
         </h2>
         <p className="text-muted-foreground">
           Manage your products, orders and seller profile from here.
@@ -43,3 +44,4 @@ const UserWelcome: React.FC<UserWelcomeProps> = ({ currentUser }) => {
 };
 
 export default UserWelcome;
+

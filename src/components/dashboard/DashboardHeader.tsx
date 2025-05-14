@@ -124,6 +124,7 @@ const DashboardHeader: React.FC = () => {
             </Button>
           </motion.div>
           
+          {/* Remove Profile text/info from top right avatar area */}
           <motion.div 
             className="flex items-center cursor-pointer navbar-item"
             whileHover={{ scale: 1.05 }}
@@ -136,19 +137,8 @@ const DashboardHeader: React.FC = () => {
                 {getInitials(currentUser?.displayName)}
               </AvatarFallback>
             </Avatar>
-            <div className="ml-2 hidden md:block">
-              <p className="text-sm font-medium">{currentUser?.displayName || 'User'}</p>
-              {currentUser?.isSeller && (
-                <p className="text-xs text-amber-600">
-                  {currentUser?.verified ? '✓ Verified Seller' : 'Seller'}
-                </p>
-              )}
-              {!currentUser?.isSeller && (
-                <p className="text-xs text-blue-600">
-                  Buyer
-                </p>
-              )}
-            </div>
+            {/* Remove profile/name and account type text */}
+            {/* No text or "Profile" here, only the thumbnail */}
           </motion.div>
         </div>
       </motion.div>
@@ -157,3 +147,4 @@ const DashboardHeader: React.FC = () => {
 };
 
 export default DashboardHeader;
+
