@@ -1,0 +1,26 @@
+
+/* Form-related animations and styles */
+
+/* Scale utility for captcha */
+.scale-80 {
+  transform: scale(0.8);
+}
+
+.scale-95 {
+  transform: scale(0.95);
+}
+
+/* Compressed layout styles */
+.compact-form .form-item {
+  margin-bottom: 0.75rem;
+}
+
+.compact-form label {
+  margin-bottom: 0.25rem;
+}
+
+/* Input animations */
+.input-animated-border:focus {
+  box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.3);
+  transition: all 0.2s ease;
+}

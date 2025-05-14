@@ -1,0 +1,17 @@
+
+/* Base layout styles and global utilities */
+
+/* Add smooth scrolling for the whole page */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Fix for mobile viewport height issues */
+.min-h-screen {
+  min-height: 100vh; /* fallback */
+  min-height: -webkit-fill-available;
+}
+
+html, body {
+  height: -webkit-fill-available;
+}
