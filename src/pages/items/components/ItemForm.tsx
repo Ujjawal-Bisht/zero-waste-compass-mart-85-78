@@ -13,6 +13,9 @@ import { barcodeDatabase } from '../data/barcodeDatabase';
 import ItemDetailsSection from './ItemDetailsSection';
 import ExpiryDatePicker from './ExpiryDatePicker';
 import DescriptionImageSection from './DescriptionImageSection';
+import { useLocalStorage } from '../hooks/useLocalStorage';
+import { Item } from '@/types';
+import { v4 as uuidv4 } from 'uuid';
 
 interface ItemFormProps {
   onBarcodeDetected?: (barcode: string, item: any) => void;
@@ -22,7 +25,8 @@ const ItemForm: React.FC<ItemFormProps> = ({ onBarcodeDetected }) => {
   const navigate = useNavigate();
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
-
+  const [savedProducts, setSavedProducts] = useLocalStorage<Item[]>('seller-products', []);
+  
   const form = useForm<ItemFormValues>({
     resolver: zodResolver(itemFormSchema),
     defaultValues: {
@@ -38,6 +42,17 @@ const ItemForm: React.FC<ItemFormProps> = ({ onBarcodeDetected }) => {
   const handleBarcodeDetected = (barcode: string) => {
     if (barcode && barcodeDatabase[barcode]) {
       const item = barcodeDatabase[barcode];
+      
+      // Calculate expiry date based on expiryDays if present
+      let expiryDate = '';
+      if (item.expiryDays) {
+        const date = new Date();
+        date.setDate(date.getDate() + item.expiryDays);
+        expiryDate = date.toISOString().split('T')[0];
+        
+        // Set expiry date in the form
+        setTimeout(() => form.setValue('expiryDate', expiryDate), 600);
+      }
       
       // Animate the form filling with a slight delay between fields
       setTimeout(() => form.setValue('name', item.name), 100);
@@ -64,9 +79,33 @@ const ItemForm: React.FC<ItemFormProps> = ({ onBarcodeDetected }) => {
     try {
       setIsSubmitting(true);
       
-      // Simulate API call with a delay to show the loading state
-      console.log('Form values:', values);
-      console.log('Image:', imagePreview);
+      // Create a new item object
+      const newItem: Item = {
+        id: uuidv4(),
+        name: values.name,
+        description: values.description || '',
+        category: values.category || 'other',
+        imageUrl: imagePreview || 'https://via.placeholder.com/150',
+        expiryDate: values.expiryDate || new Date().toISOString().split('T')[0],
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+        status: 'available',
+        userId: 'seller123', // Mock user ID
+        userName: 'Demo Business',
+        userPhoto: null,
+        location: {
+          address: values.address || '123 Main St',
+          lat: 40.7128,
+          lng: -74.006,
+        },
+        quantity: values.quantity || 1,
+        originalPrice: values.originalPrice || 0,
+        currentPrice: values.currentPrice || 0,
+        dynamicPricingEnabled: false,
+      };
+      
+      // Save the new item to localStorage
+      setSavedProducts([...savedProducts, newItem]);
       
       // Artificial delay to show loading state
       await new Promise(resolve => setTimeout(resolve, 1000));
@@ -76,8 +115,8 @@ const ItemForm: React.FC<ItemFormProps> = ({ onBarcodeDetected }) => {
         description: 'Your item has been added to your inventory'
       });
       
-      // Navigate back to dashboard
-      navigate('/dashboard');
+      // Navigate back to products page
+      navigate('/seller/products');
     } catch (error) {
       console.error('Error adding item:', error);
       toast.error('Failed to add item. Please try again.');
@@ -141,7 +180,7 @@ const ItemForm: React.FC<ItemFormProps> = ({ onBarcodeDetected }) => {
           <Button
             type="button"
             variant="outline"
-            onClick={() => navigate('/dashboard')}
+            onClick={() => navigate('/seller/products')}
             disabled={isSubmitting}
             className="transition-all hover:bg-gray-100"
           >

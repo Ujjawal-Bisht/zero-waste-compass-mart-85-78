@@ -1,7 +1,7 @@
 
-/* Main animations index file - imports all animation modules */
-@import './button/index.css';
+/* Main animation index file - imports all animation modules */
 @import './basic.css';
+@import './button.css';
 @import './chatbot.css';
 @import './cosmic.css';
 @import './forms.css';
@@ -13,6 +13,7 @@
 @import './menu.css';
 @import './mobile.css';
 @import './particles.css';
+@import './product.css';
 @import './register.css';
 @import './seller.css';
 @import './star.css';

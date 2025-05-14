@@ -70,8 +70,8 @@ const ProductTable: React.FC<ProductTableProps> = ({
             </th>
           </tr>
         </thead>
-        <tbody className="bg-white divide-y divide-gray-200">
-          {products.length === 0 ? (
+        {products.length === 0 ? (
+          <tbody>
             <tr>
               <td colSpan={7} className="px-6 py-4 text-center text-sm text-gray-500">
                 <div className="flex flex-col items-center py-8">
@@ -89,24 +89,24 @@ const ProductTable: React.FC<ProductTableProps> = ({
                 </div>
               </td>
             </tr>
-          ) : (
-            <motion.tbody
-              variants={containerVariants}
-              initial="hidden"
-              animate="visible"
-            >
-              {products.map((product) => (
-                <ProductRow 
-                  key={product.id}
-                  product={product}
-                  getCategoryBadgeColor={getCategoryBadgeColor}
-                  getStatusBadgeColor={getStatusBadgeColor}
-                  formatDate={formatDate}
-                />
-              ))}
-            </motion.tbody>
-          )}
-        </tbody>
+          </tbody>
+        ) : (
+          <motion.tbody
+            variants={containerVariants}
+            initial="hidden"
+            animate="visible"
+          >
+            {products.map((product) => (
+              <ProductRow 
+                key={product.id}
+                product={product}
+                getCategoryBadgeColor={getCategoryBadgeColor}
+                getStatusBadgeColor={getStatusBadgeColor}
+                formatDate={formatDate}
+              />
+            ))}
+          </motion.tbody>
+        )}
       </table>
     </div>
   );
