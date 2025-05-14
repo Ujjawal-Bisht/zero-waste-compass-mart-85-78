@@ -19,6 +19,7 @@
 .profile-tab {
   position: relative;
   overflow: hidden;
+  transition: all 0.2s ease;
 }
 
 .profile-tab::after {
@@ -37,4 +38,161 @@
 .profile-tab[data-state="active"]::after,
 .profile-tab:hover::after {
   transform: scaleX(1);
+}
+
+.profile-tab:hover {
+  background-color: rgba(249, 115, 22, 0.05);
+}
+
+.profile-tab[data-state="active"] {
+  background-color: rgba(249, 115, 22, 0.1);
+}
+
+/* Card animations */
+.shadow-pop {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.shadow-pop:hover {
+  box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.1);
+  transform: translateY(-5px);
+}
+
+/* Form field animations */
+.form-field-animate {
+  transition: all 0.3s ease;
+}
+
+.form-field-animate:focus-within {
+  transform: translateY(-2px);
+}
+
+/* Profile settings toggle animations */
+.toggle-slide {
+  position: relative;
+  transition: all 0.3s ease;
+  overflow: hidden;
+}
+
+.toggle-slide::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(249, 115, 22, 0.1), transparent);
+  transition: left 0.5s ease;
+}
+
+.toggle-slide:hover::before {
+  left: 100%;
+}
+
+/* Profile section content animations */
+.profile-animate-in > * {
+  opacity: 0;
+  transform: translateY(20px);
+  animation: profile-stagger-in 0.5s ease forwards;
+}
+
+.profile-animate-in > *:nth-child(1) { animation-delay: 0.1s; }
+.profile-animate-in > *:nth-child(2) { animation-delay: 0.2s; }
+.profile-animate-in > *:nth-child(3) { animation-delay: 0.3s; }
+.profile-animate-in > *:nth-child(4) { animation-delay: 0.4s; }
+.profile-animate-in > *:nth-child(5) { animation-delay: 0.5s; }
+.profile-animate-in > *:nth-child(6) { animation-delay: 0.6s; }
+
+@keyframes profile-stagger-in {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Button hover animation for profile actions */
+.profile-action-button {
+  position: relative;
+  overflow: hidden;
+}
+
+.profile-action-button::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  transition: left 0.5s ease;
+}
+
+.profile-action-button:hover::after {
+  left: 100%;
+}
+
+/* Settings option hover animation */
+.settings-option {
+  transition: all 0.3s ease;
+  border-radius: 0.375rem;
+}
+
+.settings-option:hover {
+  background-color: rgba(249, 115, 22, 0.05);
+  transform: translateX(5px);
+}
+
+/* Profile metrics animation */
+.metric-card {
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.metric-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 4px;
+  height: 0;
+  background: linear-gradient(180deg, #f59e0b, #f97316);
+  transition: height 0.3s ease;
+}
+
+.metric-card:hover::before {
+  height: 100%;
+}
+
+.metric-card:hover {
+  transform: translateY(-2px) translateX(2px);
+  box-shadow: 0 10px 25px -5px rgba(249, 115, 22, 0.1);
+}
+
+/* Value change indicator animation */
+.value-change-up {
+  animation: pulse-green 2s infinite;
+}
+
+.value-change-down {
+  animation: pulse-red 2s infinite;
+}
+
+@keyframes pulse-green {
+  0%, 100% {
+    color: rgba(16, 185, 129, 1);
+  }
+  50% {
+    color: rgba(16, 185, 129, 0.7);
+  }
+}
+
+@keyframes pulse-red {
+  0%, 100% {
+    color: rgba(239, 68, 68, 1);
+  }
+  50% {
+    color: rgba(239, 68, 68, 0.7);
+  }
 }

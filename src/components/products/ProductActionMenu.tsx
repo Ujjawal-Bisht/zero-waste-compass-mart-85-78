@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Item } from '@/types';
 import {
   DropdownMenu,
@@ -7,16 +7,24 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
   DropdownMenuSeparator,
+  DropdownMenuSub,
+  DropdownMenuSubContent,
+  DropdownMenuSubTrigger,
+  DropdownMenuRadioGroup,
+  DropdownMenuRadioItem,
 } from '@/components/ui/dropdown-menu';
 import { Button } from '@/components/ui/button';
-import { MoreVertical } from 'lucide-react';
+import { MoreVertical, Tag, Bookmark, Edit, Trash, Eye, Copy, EyeOff } from 'lucide-react';
 import { toast } from '@/components/ui/use-toast';
+import { motion } from 'framer-motion';
 
 interface ProductActionMenuProps {
   product: Item;
 }
 
 const ProductActionMenu: React.FC<ProductActionMenuProps> = ({ product }) => {
+  const [selectedCategory, setSelectedCategory] = useState(product.category);
+
   const handleEditProduct = (productId: string) => {
     toast({
       title: "Editing product",
@@ -39,6 +47,15 @@ const ProductActionMenu: React.FC<ProductActionMenuProps> = ({ product }) => {
     toast({
       title: "Product duplicated",
       description: `"${product.name}" has been duplicated`,
+      duration: 3000,
+    });
+  };
+
+  const handleChangeCategory = (productId: string, newCategory: string) => {
+    setSelectedCategory(newCategory);
+    toast({
+      title: "Category updated",
+      description: `Product category changed to "${newCategory}"`,
       duration: 3000,
     });
   };
@@ -68,40 +85,68 @@ const ProductActionMenu: React.FC<ProductActionMenuProps> = ({ product }) => {
           <MoreVertical className="h-4 w-4" />
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="table-dropdown-content">
+      <DropdownMenuContent align="end" className="table-dropdown-content w-56">
         <DropdownMenuItem 
           onClick={() => handleViewDetails(product.id)}
           className="flex items-center cursor-pointer action-view"
         >
-          <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-2" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+          <Eye className="h-4 w-4 mr-2" />
           View details
         </DropdownMenuItem>
         <DropdownMenuItem 
           onClick={() => handleEditProduct(product.id)}
           className="flex items-center cursor-pointer action-edit"
         >
-          <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-2" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+          <Edit className="h-4 w-4 mr-2" />
           Edit
         </DropdownMenuItem>
         <DropdownMenuItem 
           onClick={() => handleDuplicateProduct(product)}
           className="flex items-center cursor-pointer"
         >
-          <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-2" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2"/></svg>
+          <Copy className="h-4 w-4 mr-2" />
           Duplicate
         </DropdownMenuItem>
+        
+        {/* New Category Change Option */}
+        <DropdownMenuSub>
+          <DropdownMenuSubTrigger className="flex items-center cursor-pointer">
+            <Tag className="h-4 w-4 mr-2" />
+            Change Category
+          </DropdownMenuSubTrigger>
+          <DropdownMenuSubContent className="min-w-[180px]">
+            <DropdownMenuRadioGroup value={selectedCategory} onValueChange={(value) => handleChangeCategory(product.id, value)}>
+              <DropdownMenuRadioItem value="food" className="cursor-pointer">
+                <span className="h-2 w-2 rounded-full bg-green-500 mr-2 inline-block"></span> Food
+              </DropdownMenuRadioItem>
+              <DropdownMenuRadioItem value="clothing" className="cursor-pointer">
+                <span className="h-2 w-2 rounded-full bg-blue-500 mr-2 inline-block"></span> Clothing
+              </DropdownMenuRadioItem>
+              <DropdownMenuRadioItem value="electronics" className="cursor-pointer">
+                <span className="h-2 w-2 rounded-full bg-yellow-500 mr-2 inline-block"></span> Electronics
+              </DropdownMenuRadioItem>
+              <DropdownMenuRadioItem value="furniture" className="cursor-pointer">
+                <span className="h-2 w-2 rounded-full bg-purple-500 mr-2 inline-block"></span> Furniture
+              </DropdownMenuRadioItem>
+              <DropdownMenuRadioItem value="other" className="cursor-pointer">
+                <span className="h-2 w-2 rounded-full bg-gray-500 mr-2 inline-block"></span> Other
+              </DropdownMenuRadioItem>
+            </DropdownMenuRadioGroup>
+          </DropdownMenuSubContent>
+        </DropdownMenuSub>
+        
         <DropdownMenuItem 
           onClick={() => handleToggleVisibility(product, product.status)}
           className="flex items-center cursor-pointer"
         >
           {product.status === 'available' ? (
             <>
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-2" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/><path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/><path d="m1 1 22 22"/></svg>
+              <EyeOff className="h-4 w-4 mr-2" />
               Hide product
             </>
           ) : (
             <>
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-2" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+              <Eye className="h-4 w-4 mr-2" />
               Show product
             </>
           )}
@@ -111,7 +156,7 @@ const ProductActionMenu: React.FC<ProductActionMenuProps> = ({ product }) => {
           onClick={() => handleDeleteProduct(product.id)}
           className="flex items-center cursor-pointer text-red-600 action-delete"
         >
-          <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-2" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg>
+          <Trash className="h-4 w-4 mr-2" />
           Delete
         </DropdownMenuItem>
       </DropdownMenuContent>

@@ -1,5 +1,5 @@
 
-/* Main animation index file - imports all animation modules */
+/* Main animations index file */
 @import './basic.css';
 @import './button.css';
 @import './chatbot.css';
@@ -9,6 +9,7 @@
 @import './home.css';
 @import './hover.css';
 @import './items.css';
+@import './item-form.css'; /* New item-form specific animations */
 @import './login.css';
 @import './menu.css';
 @import './mobile.css';
