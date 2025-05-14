@@ -1,19 +1,4 @@
 
-/* Import all animation modules */
-@import './basic.css';
-@import './cosmic.css';
-@import './gradient.css';
-@import './hover.css';
-@import './particles.css';
-@import './star.css';
-@import './register.css';
-@import './home.css';
-@import './mobile.css';
-@import './items.css';
-@import './button.css';
-@import './seller.css';
-@import './chatbot.css';
-@import './login.css';
-@import './tabs.css';
-@import './forms.css';
-@import './transitions.css';
+/* This file is intentionally left empty as we now import animation files directly in index.css */
+/* This maintains backward compatibility for any code that may import this file */
+

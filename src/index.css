@@ -1,10 +1,35 @@
 
+/* Base styles */
 @import './styles/base.css';
-@import './styles/animations.css';
-@import './styles/components.css';
-@import './styles/animations/login.css';
-@import './styles/animations/tabs.css';
-@import './styles/animations/forms.css';
-@import './styles/animations/transitions.css';
-@import './styles/layout/mobile.css';
+
+/* Layout styles */
 @import './styles/layout/base.css';
+@import './styles/layout/mobile.css';
+
+/* Component styles */
+@import './styles/components.css';
+
+/* Animation imports - core animations first */
+@import './styles/animations.css';
+
+/* Specific animation categories */
+@import './styles/animations/basic.css';
+@import './styles/animations/gradient.css';
+@import './styles/animations/hover.css';
+@import './styles/animations/cosmic.css';
+@import './styles/animations/particles.css';
+@import './styles/animations/star.css';
+
+/* Feature-specific animations */
+@import './styles/animations/button.css';
+@import './styles/animations/forms.css';
+@import './styles/animations/items.css';
+@import './styles/animations/login.css';
+@import './styles/animations/register.css';
+@import './styles/animations/home.css';
+@import './styles/animations/seller.css';
+@import './styles/animations/chatbot.css';
+@import './styles/animations/tabs.css';
+@import './styles/animations/transitions.css';
+@import './styles/animations/mobile.css';
+
