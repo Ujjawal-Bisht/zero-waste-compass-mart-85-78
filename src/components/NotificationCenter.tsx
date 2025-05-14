@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Bell, BellRing } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -33,20 +32,21 @@ const NotificationCenter: React.FC = () => {
   return (
     <div className="relative">
       <motion.div
-        whileHover={{ scale: 1.05 }}
-        whileTap={{ scale: 0.95 }}
+        whileHover={{ scale: 1.10, rotate: 3 }}
+        whileTap={{ scale: 0.96, rotate: -3 }}
         onHoverStart={() => setIsHovered(true)}
         onHoverEnd={() => setIsHovered(false)}
+        className="transition-transform duration-200"
       >
         <Button
           variant="ghost"
           size="icon"
           onClick={() => setIsOpen(!isOpen)}
-          className="relative notification-bell notification-bell-pulse button-shimmer notification-shimmer group"
+          className={`relative notification-bell notification-bell-pulse button-shimmer notification-shimmer group ring-2 ring-primary/30 ${isOpen ? "animate-pulse" : ""}`}
           aria-label="Notifications"
         >
           <motion.div
-            animate={unreadCount > 0 ? { rotate: [0, 15, -15, 0] } : {}}
+            animate={unreadCount > 0 ? { rotate: [0, 10, -10, 0], scale: [1, 1.1, 0.96, 1] } : {}}
             transition={{ 
               duration: 0.5, 
               repeat: unreadCount > 0 ? Infinity : 0, 

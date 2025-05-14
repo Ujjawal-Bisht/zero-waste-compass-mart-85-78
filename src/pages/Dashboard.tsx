@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -6,6 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { ItemStatus, Item } from '@/types';
 import { IndianRupee } from 'lucide-react';
+import { useToast } from "@/hooks/use-toast";
 
 // Extended mock data for dashboard (100+ entries)
 const mockItems: Item[] = [
@@ -196,6 +196,7 @@ for (let i = 6; i <= 105; i++) {
 
 const Dashboard = () => {
   const navigate = useNavigate();
+  const { toast } = useToast();
   const [selectedStatus, setSelectedStatus] = useState<ItemStatus | 'all'>('all');
   const [searchQuery, setSearchQuery] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
@@ -252,7 +253,25 @@ const Dashboard = () => {
   const handlePageChange = (pageNumber: number) => {
     setCurrentPage(pageNumber);
   };
-  
+
+  // Handler to show "View" toast and mimic navigation (replace with real view later)
+  const handleView = (item: Item) => {
+    toast({
+      title: "View Item",
+      description: `Viewing "${item.name}" (ID: ${item.id})`,
+    });
+    // navigate(`/items/${item.id}`); // Uncomment to enable real routing!
+  };
+
+  // Handler to show "Edit" toast and mimic navigation (replace with real edit page later)
+  const handleEdit = (item: Item) => {
+    toast({
+      title: "Edit Item",
+      description: `Editing "${item.name}" (ID: ${item.id})`,
+    });
+    // navigate(`/items/edit/${item.id}`); // Uncomment to enable real routing!
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 animate-fade-in">
@@ -343,6 +362,8 @@ const Dashboard = () => {
             getStatusClass={getStatusClass} 
             formatDate={formatDate}
             getCategoryText={getCategoryText} 
+            onView={handleView}
+            onEdit={handleEdit}
           />
           <Pagination 
             currentPage={currentPage} 
@@ -356,6 +377,8 @@ const Dashboard = () => {
             getStatusClass={getStatusClass} 
             formatDate={formatDate}
             getCategoryText={getCategoryText}
+            onView={handleView}
+            onEdit={handleEdit}
           />
           <Pagination 
             currentPage={currentPage} 
@@ -369,6 +392,8 @@ const Dashboard = () => {
             getStatusClass={getStatusClass} 
             formatDate={formatDate}
             getCategoryText={getCategoryText}
+            onView={handleView}
+            onEdit={handleEdit}
           />
           <Pagination 
             currentPage={currentPage} 
@@ -382,6 +407,8 @@ const Dashboard = () => {
             getStatusClass={getStatusClass} 
             formatDate={formatDate}
             getCategoryText={getCategoryText}
+            onView={handleView}
+            onEdit={handleEdit}
           />
           <Pagination 
             currentPage={currentPage} 
@@ -399,13 +426,17 @@ interface ItemsTableProps {
   getStatusClass: (status: ItemStatus) => string;
   formatDate: (dateString: string) => string;
   getCategoryText: (category: string) => string;
+  onView: (item: Item) => void;
+  onEdit: (item: Item) => void;
 }
 
 const ItemsTable: React.FC<ItemsTableProps> = ({ 
   items, 
   getStatusClass, 
   formatDate,
-  getCategoryText
+  getCategoryText,
+  onView,
+  onEdit
 }) => {
   return (
     <div className="overflow-x-auto">
@@ -469,10 +500,18 @@ const ItemsTable: React.FC<ItemsTableProps> = ({
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                       <div className="flex justify-end space-x-2">
-                        <Button size="sm" variant="outline" className="hover:bg-gray-100 transition-colors">
+                        <Button size="sm" variant="outline" className="hover:bg-blue-50 text-blue-600 hover:text-blue-800 transition-colors flex items-center"
+                          onClick={() => onView(item)}>
+                          <span className="mr-1">
+                            <svg xmlns="http://www.w3.org/2000/svg" className="inline-block" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7S1 12 1 12Z"/><circle cx="12" cy="12" r="3" /></svg>
+                          </span>
                           View
                         </Button>
-                        <Button size="sm" variant="outline" className="border-zwm-primary text-zwm-primary hover:bg-zwm-primary/10 transition-colors">
+                        <Button size="sm" variant="outline" className="border-zwm-primary text-zwm-primary hover:bg-zwm-primary/10 hover:text-white transition-colors flex items-center"
+                          onClick={() => onEdit(item)}>
+                          <span className="mr-1">
+                            <svg xmlns="http://www.w3.org/2000/svg" className="inline-block" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="M16.475 3.725a2.438 2.438 0 0 1 3.45 3.45L7.5 19.6l-4 1 1-4L16.475 3.725Z" /></svg>
+                          </span>
                           Edit
                         </Button>
                       </div>
