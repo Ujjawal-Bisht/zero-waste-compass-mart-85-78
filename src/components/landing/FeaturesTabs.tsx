@@ -4,9 +4,83 @@ import { motion } from 'framer-motion';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { ShoppingBag, Truck, Users, LineChart, Leaf, Star, Upload, MessageCircle, Box, Pill } from 'lucide-react';
 import FeatureCard from './FeatureCard';
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from '@/contexts/auth';
+import { toast } from '@/components/ui/use-toast';
 
 const FeaturesTabs: React.FC = () => {
   const [activeTab, setActiveTab] = useState('buyers');
+  const navigate = useNavigate();
+  const { currentUser } = useAuth();
+
+  const handleButtonClick = (action: string) => {
+    if (!currentUser) {
+      // If user is not logged in, redirect to register page
+      toast({
+        title: "Authentication required",
+        description: "Please sign up or log in to access this feature",
+        duration: 3000,
+      });
+      navigate('/register');
+      return;
+    }
+
+    // Handle different button actions based on user type and action
+    switch (action) {
+      case 'findDeals':
+        navigate('/marketplace');
+        break;
+      case 'connectBuyers':
+      case 'connectSellers':
+        navigate('/dashboard');
+        toast({
+          title: "Coming Soon",
+          description: "The messaging feature will be available soon!",
+          duration: 3000,
+        });
+        break;
+      case 'browseMedicine':
+        navigate('/marketplace?category=medicine');
+        break;
+      case 'browseFood':
+        navigate('/marketplace?category=food');
+        break;
+      case 'addItem':
+        navigate('/items/add');
+        break;
+      case 'manageInventory':
+        if (currentUser.isSeller) {
+          navigate('/seller/products');
+        } else {
+          toast({
+            title: "Seller Account Required",
+            description: "You need a seller account to access this feature",
+            duration: 3000,
+          });
+          navigate('/seller/profile');
+        }
+        break;
+      case 'pharmacySolutions':
+        if (currentUser.isSeller) {
+          navigate('/seller/dashboard');
+          toast({
+            title: "Pharmacy Features",
+            description: "Specialized pharmacy features coming soon!",
+            duration: 3000,
+          });
+        } else {
+          toast({
+            title: "Seller Account Required",
+            description: "You need a seller account to access this feature",
+            duration: 3000,
+          });
+          navigate('/register');
+        }
+        break;
+      default:
+        navigate('/dashboard');
+    }
+  };
 
   return (
     <section className="bg-gray-50 py-16 md:py-24 px-4 sm:px-6 lg:px-8">
@@ -75,7 +149,7 @@ const FeaturesTabs: React.FC = () => {
                   description="Discover discounted products nearing expiry dates, helping reduce waste and save money."
                   icon={ShoppingBag}
                   buttonText="Explore Deals"
-                  buttonAction={() => console.log("Find Deals clicked")}
+                  buttonAction={() => handleButtonClick('findDeals')}
                   iconBgColor="bg-blue-50"
                   animationType="scale"
                   delay={0.1}
@@ -85,7 +159,7 @@ const FeaturesTabs: React.FC = () => {
                   description="Directly communicate with sellers to arrange pickups or deliveries."
                   icon={MessageCircle}
                   buttonText="Start Connecting"
-                  buttonAction={() => console.log("Connect clicked")}
+                  buttonAction={() => handleButtonClick('connectSellers')}
                   iconBgColor="bg-purple-50"
                   animationType="rotate"
                   delay={0.2}
@@ -95,7 +169,7 @@ const FeaturesTabs: React.FC = () => {
                   description="Browse a wide selection of packaged food items nearing their best-before date at great discounts."
                   icon={Box}
                   buttonText="Browse Food"
-                  buttonAction={() => console.log("Packaged Food clicked")}
+                  buttonAction={() => handleButtonClick('browseFood')}
                   iconBgColor="bg-amber-50"
                   animationType="vertical"
                   delay={0.3}
@@ -105,7 +179,7 @@ const FeaturesTabs: React.FC = () => {
                   description="Find essential medicines at discounted prices while ensuring they're still effective and safe."
                   icon={Pill}
                   buttonText="Browse Medicines"
-                  buttonAction={() => console.log("Medicines clicked")}
+                  buttonAction={() => handleButtonClick('browseMedicine')}
                   iconBgColor="bg-green-50"
                   animationType="scale"
                   delay={0.4}
@@ -120,7 +194,7 @@ const FeaturesTabs: React.FC = () => {
                   description="Easily list your products that are approaching expiry date for sale at discounted prices."
                   icon={Upload}
                   buttonText="Add Now"
-                  buttonAction={() => console.log("Add Item clicked")}
+                  buttonAction={() => handleButtonClick('addItem')}
                   iconBgColor="bg-indigo-50"
                   animationType="scale"
                   delay={0.1}
@@ -130,7 +204,7 @@ const FeaturesTabs: React.FC = () => {
                   description="Communicate directly with interested buyers through our integrated messaging system."
                   icon={MessageCircle}
                   buttonText="Connect"
-                  buttonAction={() => console.log("Connect with Buyers clicked")}
+                  buttonAction={() => handleButtonClick('connectBuyers')}
                   iconBgColor="bg-purple-50"
                   animationType="rotate"
                   delay={0.2}
@@ -140,7 +214,7 @@ const FeaturesTabs: React.FC = () => {
                   description="Special tools to manage packaged food inventory and set dynamic pricing based on expiry dates."
                   icon={Box}
                   buttonText="Manage Inventory"
-                  buttonAction={() => console.log("Manage Food Items clicked")}
+                  buttonAction={() => handleButtonClick('manageInventory')}
                   iconBgColor="bg-amber-50"
                   animationType="vertical"
                   delay={0.3}
@@ -150,7 +224,7 @@ const FeaturesTabs: React.FC = () => {
                   description="Specialized features for pharmacies to manage medicine inventory and comply with regulations."
                   icon={Pill}
                   buttonText="Explore Solutions"
-                  buttonAction={() => console.log("Pharmacy Solutions clicked")}
+                  buttonAction={() => handleButtonClick('pharmacySolutions')}
                   iconBgColor="bg-green-50"
                   animationType="scale"
                   delay={0.4}
