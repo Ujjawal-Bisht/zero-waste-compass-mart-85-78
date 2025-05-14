@@ -37,7 +37,24 @@ const ChatMessage: React.FC<ChatMessageProps> = ({ message, index }) => {
             : 'bot-message-gradient text-gray-800 chat-bubble-bot shadow-sm'
         }`}
       >
-        <p className="text-sm">{message.content}</p>
+        <p className="text-sm">
+          {message.content}
+        </p>
+        {message.referencedLinks && message.referencedLinks.length > 0 && (
+          <div className="mt-2">
+            {message.referencedLinks.map((link, i) => (
+              <a 
+                key={i} 
+                href={link} 
+                target="_blank" 
+                rel="noopener noreferrer" 
+                className="text-xs text-blue-600 hover:underline block"
+              >
+                {link.length > 40 ? `${link.substring(0, 40)}...` : link}
+              </a>
+            ))}
+          </div>
+        )}
         <span className="text-xs mt-1 block opacity-70">
           {message.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
         </span>
