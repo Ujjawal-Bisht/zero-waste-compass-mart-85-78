@@ -45,7 +45,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
     const Comp = asChild ? Slot : "button"
     return (
       <Comp
-        className={cn(buttonVariants({ variant, size, className }), "transform transition-transform active:scale-95 hover:shadow-md relative overflow-hidden")}
+        className={cn(buttonVariants({ variant, size, className }), "transform transition-transform active:scale-95 hover:shadow-md relative overflow-hidden button-transition")}
         ref={ref}
         {...props}
       />

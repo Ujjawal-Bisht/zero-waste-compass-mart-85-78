@@ -1,0 +1,62 @@
+
+/* Seller portal specific animations */
+.seller-enhanced-hover:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 25px -5px rgba(245, 158, 11, 0.4);
+}
+
+/* Seller portal specific home button */
+.seller-home-button {
+  position: relative;
+}
+
+.seller-home-button::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background: linear-gradient(90deg, #f59e0b, #f97316);
+  transform: scaleX(0);
+  transform-origin: right;
+  transition: transform 0.4s ease;
+}
+
+.seller-home-button:hover::after {
+  transform: scaleX(1);
+  transform-origin: left;
+}
+
+/* Buyer portal specific home button */
+.buyer-home-button {
+  position: relative;
+}
+
+.buyer-home-button::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background: linear-gradient(90deg, #3b82f6, #6366f1);
+  transform: scaleX(0);
+  transform-origin: right;
+  transition: transform 0.4s ease;
+}
+
+.buyer-home-button:hover::after {
+  transform: scaleX(1);
+  transform-origin: left;
+}
+
+/* Seller specific 3D button */
+.seller-button-3d:hover {
+  box-shadow: 0 10px 20px -5px rgba(245, 158, 11, 0.3);
+}
+
+/* Buyer specific 3D button */
+.buyer-button-3d:hover {
+  box-shadow: 0 10px 20px -5px rgba(59, 130, 246, 0.3);
+}

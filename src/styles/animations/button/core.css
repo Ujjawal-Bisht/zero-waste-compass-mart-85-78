@@ -1,0 +1,23 @@
+
+/* Core button animations */
+
+/* Button base transitions */
+.button-transition {
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+/* Active button scaling */
+.button-active-scale {
+  transform: transform transition-transform active:scale-95;
+}
+
+/* Button shadow transitions */
+.button-shadow-transition {
+  transition: box-shadow 0.3s ease;
+}
+
+.button-shadow-transition:hover {
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}

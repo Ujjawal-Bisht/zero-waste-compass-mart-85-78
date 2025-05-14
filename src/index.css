@@ -21,7 +21,7 @@
 @import './styles/animations/star.css';
 
 /* Feature-specific animations */
-@import './styles/animations/button.css';
+@import './styles/animations/button/index.css';
 @import './styles/animations/forms.css';
 @import './styles/animations/items.css';
 @import './styles/animations/login.css';
