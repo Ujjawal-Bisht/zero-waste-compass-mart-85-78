@@ -70,6 +70,21 @@ const FeatureCard: React.FC<FeatureCardProps> = ({
 
   const iconAnimation = getIconAnimation();
 
+  // Get proper button color based on title
+  const getButtonClasses = () => {
+    if (title.includes('Upload') || title.includes('Add Item')) {
+      return 'bg-indigo-600 hover:bg-indigo-700 text-white';
+    } else if (title.includes('Connect')) {
+      return 'bg-purple-600 hover:bg-purple-700 text-white';
+    } else if (title.includes('Packaged') || title.includes('Manage Food')) {
+      return 'bg-green-600 hover:bg-green-700 text-white';
+    } else if (title.includes('Medicines') || title.includes('Pharmacy')) {
+      return 'bg-blue-600 hover:bg-blue-700 text-white';
+    } else {
+      return 'bg-zwm-primary hover:bg-zwm-primary/90 text-white';
+    }
+  };
+
   return (
     <motion.div
       className="bg-white rounded-xl shadow-md p-6 md:p-8 overflow-hidden spotlight-effect"
@@ -124,12 +139,7 @@ const FeatureCard: React.FC<FeatureCardProps> = ({
           >
             <Button
               onClick={buttonAction}
-              className={`ripple-effect highlight-pulse ${
-                title.includes('Upload') ? 'bg-indigo-600 hover:bg-indigo-700' :
-                title.includes('Connect') ? 'bg-purple-600 hover:bg-purple-700' :
-                title.includes('Packaged') ? 'bg-green-600 hover:bg-green-700' :
-                'bg-blue-600 hover:bg-blue-700'
-              } text-white`}
+              className={`${getButtonClasses()} shadow-md font-medium px-6 py-2 h-auto`}
             >
               {buttonText}
             </Button>
