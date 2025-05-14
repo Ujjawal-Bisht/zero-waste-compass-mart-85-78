@@ -13,6 +13,7 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
+import { motion } from 'framer-motion';
 
 const Header: React.FC = () => {
   const navigate = useNavigate();
@@ -47,14 +48,22 @@ const Header: React.FC = () => {
                 </SheetHeader>
                 <div className="flex flex-col gap-4 mt-8">
                   {navigationItems.map((item, index) => (
-                    <Button 
+                    <motion.div
                       key={index}
-                      onClick={item.onClick}
-                      className={item.highlight ? "zwm-gradient-hover w-full" : "w-full"}
-                      variant={item.highlight ? "default" : "ghost"}
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: index * 0.1, duration: 0.3 }}
                     >
-                      {item.label}
-                    </Button>
+                      <Button 
+                        onClick={item.onClick}
+                        className={`w-full ${item.highlight ? "zwm-gradient-hover button-pulse-glow" : "button-bounce"}`}
+                        variant={item.highlight ? "default" : "ghost"}
+                      >
+                        {item.label}
+                      </Button>
+                    </motion.div>
                   ))}
                 </div>
               </SheetContent>
@@ -62,14 +71,29 @@ const Header: React.FC = () => {
           ) : (
             <div className="flex items-center space-x-4">
               {navigationItems.map((item, index) => (
-                <Button 
+                <motion.div
                   key={index}
-                  onClick={item.onClick} 
-                  className={item.highlight ? "zwm-gradient-hover" : ""}
-                  variant={item.highlight ? "default" : "ghost"}
+                  whileHover={{ 
+                    scale: 1.05,
+                    transition: { type: "spring", stiffness: 400, damping: 10 }
+                  }}
+                  whileTap={{ scale: 0.95 }}
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: index * 0.2, duration: 0.3 }}
                 >
-                  {item.label}
-                </Button>
+                  <Button 
+                    onClick={item.onClick} 
+                    className={
+                      item.highlight 
+                        ? "zwm-gradient-hover button-pulse-glow button-shimmer" 
+                        : "enhanced-hover"
+                    }
+                    variant={item.highlight ? "default" : "ghost"}
+                  >
+                    {item.label}
+                  </Button>
+                </motion.div>
               ))}
             </div>
           )}
