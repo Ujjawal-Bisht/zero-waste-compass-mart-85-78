@@ -1,0 +1,95 @@
+
+/* Invoice-specific animations and styles */
+
+@keyframes fadeInInvoice {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.invoice-header {
+  animation: fadeInInvoice 0.5s ease-out forwards;
+}
+
+.invoice-item {
+  opacity: 0;
+  animation: fadeInInvoice 0.5s ease-out forwards;
+  animation-delay: calc(var(--item-index) * 0.1s);
+}
+
+/* Shimmer effect for invoice button */
+.invoice-button-shimmer {
+  position: relative;
+  overflow: hidden;
+}
+
+.invoice-button-shimmer::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  background: linear-gradient(
+    to right,
+    rgba(255, 255, 255, 0) 0%,
+    rgba(255, 255, 255, 0.3) 50%,
+    rgba(255, 255, 255, 0) 100%
+  );
+  transform: translateX(-100%);
+}
+
+.invoice-button-shimmer:hover::after {
+  transform: translateX(100%);
+  transition: transform 0.6s ease-out;
+}
+
+/* Print animation */
+.print-button-animate {
+  transition: all 0.2s ease;
+}
+
+.print-button-animate:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+.print-button-animate:active {
+  transform: translateY(0);
+}
+
+/* Logo animation */
+.invoice-logo {
+  transition: all 0.3s ease;
+}
+
+.invoice-logo:hover {
+  transform: rotate(5deg);
+}
+
+/* Invoice sections appear with delay */
+.invoice-section-animate {
+  opacity: 0;
+  animation: fadeInInvoice 0.5s ease-out forwards;
+}
+
+.invoice-section-animate:nth-child(1) {
+  animation-delay: 0.1s;
+}
+
+.invoice-section-animate:nth-child(2) {
+  animation-delay: 0.2s;
+}
+
+.invoice-section-animate:nth-child(3) {
+  animation-delay: 0.3s;
+}
+
+.invoice-section-animate:nth-child(4) {
+  animation-delay: 0.4s;
+}

@@ -83,10 +83,13 @@ export const printContent = (title: string, content: string): void => {
       <head>
         <title>${title}</title>
         <style>
+          @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Montserrat:wght@400;500;600;700&display=swap');
+          
           body {
-            font-family: Arial, sans-serif;
+            font-family: 'Poppins', sans-serif;
             margin: 20px;
             line-height: 1.6;
+            color: #333;
           }
           .header {
             display: flex;
@@ -95,28 +98,136 @@ export const printContent = (title: string, content: string): void => {
             border-bottom: 1px solid #ddd;
             padding-bottom: 10px;
           }
+          .branding {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+          }
+          .logo {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: linear-gradient(to right, #3b82f6, #8b5cf6);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 24px;
+            font-weight: bold;
+          }
+          .company-info {
+            display: flex;
+            flex-direction: column;
+          }
           h1 {
+            font-family: 'Montserrat', sans-serif;
             color: #333;
             margin-bottom: 20px;
+            font-weight: 700;
+          }
+          h2 {
+            font-family: 'Montserrat', sans-serif;
+            color: #4f46e5;
+            margin-bottom: 15px;
+            font-weight: 600;
           }
           table {
             width: 100%;
             border-collapse: collapse;
             margin-bottom: 20px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
           }
           th, td {
-            border: 1px solid #ddd;
-            padding: 8px;
+            border: 1px solid #eee;
+            padding: 12px;
             text-align: left;
           }
           th {
+            background-color: #f8fafc;
+            font-weight: 600;
+            color: #4b5563;
+            font-family: 'Montserrat', sans-serif;
+          }
+          tr:nth-child(even) {
+            background-color: #f9fafb;
+          }
+          tr:hover {
             background-color: #f3f4f6;
           }
           .footer {
             margin-top: 30px;
             text-align: center;
+            font-size: 0.85em;
+            color: #6b7280;
+            padding-top: 20px;
+            border-top: 1px solid #eee;
+          }
+          .document-type {
+            font-family: 'Montserrat', sans-serif;
             font-size: 0.8em;
-            color: #666;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            color: #6b7280;
+            margin-bottom: 5px;
+          }
+          .info-box {
+            background-color: #f9fafb;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 20px;
+            border-left: 4px solid #4f46e5;
+          }
+          .status-badge {
+            display: inline-block;
+            padding: 5px 10px;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: 500;
+            text-transform: uppercase;
+          }
+          .status-pending {
+            background-color: #fff7ed;
+            color: #c2410c;
+          }
+          .status-shipped {
+            background-color: #f0f9ff;
+            color: #0369a1;
+          }
+          .status-delivered {
+            background-color: #f0fdf4;
+            color: #16a34a;
+          }
+          .status-cancelled {
+            background-color: #fef2f2;
+            color: #dc2626;
+          }
+          .payment-paid {
+            background-color: #f0fdf4;
+            color: #16a34a;
+          }
+          .payment-pending {
+            background-color: #fff7ed;
+            color: #c2410c;
+          }
+          .payment-failed {
+            background-color: #fef2f2;
+            color: #dc2626;
+          }
+          .amount-section {
+            font-family: 'Montserrat', sans-serif;
+          }
+          .amount-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid #f3f4f6;
+          }
+          .amount-total {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: #111827;
+            padding: 10px 0;
+            border-top: 2px solid #e5e7eb;
           }
           @media print {
             .no-print {
@@ -125,25 +236,39 @@ export const printContent = (title: string, content: string): void => {
             body {
               margin: 1cm;
             }
+            .shadow {
+              box-shadow: none !important;
+            }
+            .info-box {
+              border: 1px solid #e5e7eb;
+            }
           }
         </style>
       </head>
       <body>
         <div class="header">
-          <h1>${title}</h1>
+          <div class="branding">
+            <div class="logo">ZWM</div>
+            <div class="company-info">
+              <h1>Zero Waste Mart</h1>
+              <p>Your trusted marketplace for sustainable products</p>
+            </div>
+          </div>
           <div>
+            <p class="document-type">${title}</p>
             <p><strong>Date:</strong> ${currentDate}</p>
           </div>
         </div>
         ${content}
         <div class="footer">
+          <p>Thank you for shopping with Zero Waste Mart</p>
           <p>Generated on ${new Date().toLocaleString()}</p>
         </div>
         <div class="no-print" style="text-align: center; margin-top: 20px;">
-          <button onclick="window.print();" style="padding: 10px 20px; background-color: #4f46e5; color: white; border: none; border-radius: 4px; cursor: pointer;">
+          <button onclick="window.print();" style="padding: 10px 20px; background-color: #4f46e5; color: white; border: none; border-radius: 4px; cursor: pointer; font-family: 'Poppins', sans-serif;">
             Print Document
           </button>
-          <button onclick="window.close();" style="padding: 10px 20px; margin-left: 10px; background-color: #6b7280; color: white; border: none; border-radius: 4px; cursor: pointer;">
+          <button onclick="window.close();" style="padding: 10px 20px; margin-left: 10px; background-color: #6b7280; color: white; border: none; border-radius: 4px; cursor: pointer; font-family: 'Poppins', sans-serif;">
             Close
           </button>
         </div>
@@ -159,10 +284,30 @@ export const printContent = (title: string, content: string): void => {
 
 // Function to generate and print an invoice for a specific order
 export const generateInvoice = (order: Order): void => {
+  const getStatusBadge = (status: string) => {
+    const statusClasses: Record<string, string> = {
+      pending: 'status-pending',
+      processing: 'status-processing',
+      shipped: 'status-shipped',
+      delivered: 'status-delivered',
+      cancelled: 'status-cancelled',
+    };
+    return statusClasses[status] || '';
+  };
+
+  const getPaymentStatusBadge = (status: string) => {
+    const statusClasses: Record<string, string> = {
+      pending: 'payment-pending',
+      paid: 'payment-paid',
+      failed: 'payment-failed',
+    };
+    return statusClasses[status] || '';
+  };
+
   const itemsList = order.items.map(item => `
     <tr>
       <td>${item.itemId}</td>
-      <td>${item.name}</td>
+      <td>${item.name || 'Product'}</td>
       <td>${item.quantity}</td>
       <td>${formatCurrency(item.price)}</td>
       <td>${formatCurrency(item.price * item.quantity)}</td>
@@ -170,24 +315,42 @@ export const generateInvoice = (order: Order): void => {
   `).join('');
 
   const invoiceContent = `
-    <div style="margin-bottom: 30px;">
+    <div class="info-box" style="margin-bottom: 30px;">
       <h2>Invoice #${order.id}</h2>
       <div style="display: flex; justify-content: space-between; margin-bottom: 20px;">
         <div>
           <p><strong>Bill To:</strong></p>
-          <p>${order.buyerName}</p>
-          <p><strong>Order Date:</strong> ${new Date(order.createdAt).toLocaleDateString()}</p>
-          <p><strong>Order Status:</strong> ${order.status}</p>
+          <p>${order.buyerName || 'Customer'}</p>
+          <p><strong>Order Date:</strong> ${new Date(order.createdAt).toLocaleDateString('en-US', { 
+            year: 'numeric', 
+            month: 'long', 
+            day: 'numeric' 
+          })}</p>
         </div>
         <div>
-          <p><strong>Payment Status:</strong> ${order.paymentStatus}</p>
-          <p><strong>Payment Date:</strong> ${new Date(order.createdAt).toLocaleDateString()}</p>
+          <p>
+            <strong>Status: </strong> 
+            <span class="status-badge ${getStatusBadge(order.status)}">
+              ${order.status.charAt(0).toUpperCase() + order.status.slice(1)}
+            </span>
+          </p>
+          <p>
+            <strong>Payment: </strong>
+            <span class="status-badge ${getPaymentStatusBadge(order.paymentStatus)}">
+              ${order.paymentStatus.charAt(0).toUpperCase() + order.paymentStatus.slice(1)}
+            </span>
+          </p>
+          <p><strong>Payment Date:</strong> ${new Date(order.createdAt).toLocaleDateString('en-US', { 
+            year: 'numeric', 
+            month: 'long', 
+            day: 'numeric' 
+          })}</p>
         </div>
       </div>
     </div>
 
-    <table border="1" cellpadding="8" cellspacing="0" style="border-collapse: collapse; width: 100%;">
-      <thead style="background-color: #f3f4f6;">
+    <table>
+      <thead>
         <tr>
           <th>Item ID</th>
           <th>Description</th>
@@ -199,25 +362,31 @@ export const generateInvoice = (order: Order): void => {
       <tbody>
         ${itemsList}
       </tbody>
-      <tfoot>
-        <tr>
-          <td colspan="4" style="text-align: right; font-weight: bold;">Subtotal:</td>
-          <td>${formatCurrency(order.totalAmount)}</td>
-        </tr>
-        <tr>
-          <td colspan="4" style="text-align: right; font-weight: bold;">Taxes:</td>
-          <td>${formatCurrency(0)}</td>
-        </tr>
-        <tr>
-          <td colspan="4" style="text-align: right; font-weight: bold;">Total:</td>
-          <td style="font-weight: bold;">${formatCurrency(order.totalAmount)}</td>
-        </tr>
-      </tfoot>
     </table>
 
-    <div style="margin-top: 30px;">
-      <p><strong>Terms & Conditions:</strong></p>
-      <p>Payment is due within 30 days. Please make checks payable to Your Company Name.</p>
+    <div class="amount-section" style="width: 300px; margin-left: auto;">
+      <div class="amount-row">
+        <span>Subtotal:</span>
+        <span>${formatCurrency(order.totalAmount)}</span>
+      </div>
+      <div class="amount-row">
+        <span>Taxes:</span>
+        <span>${formatCurrency(0)}</span>
+      </div>
+      <div class="amount-row">
+        <span>Shipping:</span>
+        <span>${formatCurrency(0)}</span>
+      </div>
+      <div class="amount-row amount-total">
+        <span>Total:</span>
+        <span>${formatCurrency(order.totalAmount)}</span>
+      </div>
+    </div>
+
+    <div style="margin-top: 40px;">
+      <h3>Terms & Conditions</h3>
+      <p>Payment is due within 30 days. Please make checks payable to Zero Waste Mart.</p>
+      <p>For questions concerning this invoice, please contact customer support.</p>
     </div>
   `;
 

@@ -1,4 +1,3 @@
-
 export interface User {
   id: string;
   email: string | null;
@@ -83,15 +82,21 @@ export interface Review {
   createdAt: string;
 }
 
+// Extend the OrderItem interface to include the name field
+export interface OrderItem {
+  itemId: string;
+  quantity: number;
+  price: number;
+  name?: string;
+}
+
+// Extend the Order interface to include the buyerName field
 export interface Order {
   id: string;
   buyerId: string;
+  buyerName?: string;
   sellerId: string;
-  items: {
-    itemId: string;
-    quantity: number;
-    price: number;
-  }[];
+  items: OrderItem[];
   status: 'pending' | 'processing' | 'shipped' | 'delivered' | 'cancelled';
   paymentStatus: 'pending' | 'paid' | 'failed';
   totalAmount: number;
