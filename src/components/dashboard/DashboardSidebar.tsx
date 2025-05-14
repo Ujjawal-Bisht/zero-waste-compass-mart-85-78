@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { cn } from '@/lib/utils';
@@ -28,7 +27,7 @@ export const DashboardSidebar = ({ className, onClose, ...props }: SidebarNavPro
   const { currentUser, logout } = useAuth();
   const isSeller = currentUser?.isSeller;
   
-  // Define all navigation links in a single array
+  // Remove "Marketplace" and "Profile" from navigationLinks
   const navigationLinks = [
     {
       title: 'Dashboard',
@@ -36,19 +35,9 @@ export const DashboardSidebar = ({ className, onClose, ...props }: SidebarNavPro
       icon: <Home className="mr-2 h-4 w-4" />,
     },
     {
-      title: 'Marketplace',
-      href: '/marketplace',
-      icon: <Package className="mr-2 h-4 w-4" />,
-    },
-    {
       title: 'Add Item',
       href: '/items/add',
       icon: <PlusCircle className="mr-2 h-4 w-4" />,
-    },
-    {
-      title: 'Profile',
-      href: '/profile',
-      icon: <User className="mr-2 h-4 w-4" />,
     }
   ];
 
@@ -162,7 +151,8 @@ export const DashboardSidebar = ({ className, onClose, ...props }: SidebarNavPro
       className={cn("pb-12 bg-navy-blue w-64", className)} 
       {...props}
     >
-      <div className="px-3 py-2 flex flex-col h-full">
+      {/* Add padding-top so the fixed cross/menu button never covers the logo or content */}
+      <div className="px-3 py-2 flex flex-col h-full pt-16">
         <motion.div 
           className="mb-8 pl-2 flex items-center"
           whileHover={{ scale: 1.03 }}
