@@ -28,6 +28,8 @@ const DashboardHeader: React.FC = () => {
     navigate('/');
   };
 
+  const isSellerPortal = currentUser?.isSeller;
+
   return (
     <header className="bg-white shadow-sm z-10 sticky top-0 border-b border-gray-100">
       <motion.div 
@@ -73,9 +75,10 @@ const DashboardHeader: React.FC = () => {
             variant="outline"
             size="sm"
             onClick={goToHome}
-            className="hidden md:flex items-center gap-2 hover:bg-gray-100 transition-colors"
+            className={`hidden md:flex items-center gap-2 hover:bg-gray-100 transition-colors home-button ${isSellerPortal ? 'seller-home-button' : 'buyer-home-button'} button-bounce`}
           >
-            <Home className="h-4 w-4" /> Home
+            <Home className="h-4 w-4 home-button-icon rotate-on-hover" /> 
+            <span className="relative">Home</span>
           </Button>
           
           <motion.div
