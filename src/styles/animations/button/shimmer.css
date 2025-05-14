@@ -1,29 +1,94 @@
 
-/* Shimmering border effect */
+/* Button shimmer effect */
 .button-shimmer {
   position: relative;
-  background-clip: padding-box;
-  border: solid 2px transparent;
+  overflow: hidden;
 }
 
 .button-shimmer::before {
   content: '';
   position: absolute;
-  inset: -2px;
-  z-index: -1;
-  border-radius: inherit;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
   background: linear-gradient(
-    45deg,
-    rgba(59, 130, 246, 0.3),
-    rgba(139, 92, 246, 0.3),
-    rgba(59, 130, 246, 0.3)
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.2),
+    transparent
   );
-  background-size: 200% 200%;
-  animation: shimmer-border 3s linear infinite;
+  animation: shimmer-sweep 2.5s infinite;
 }
 
-@keyframes shimmer-border {
-  0% { background-position: 0% 0%; }
-  50% { background-position: 100% 100%; }
-  100% { background-position: 0% 0%; }
+@keyframes shimmer-sweep {
+  0% {
+    left: -100%;
+  }
+  50% {
+    left: 100%;
+  }
+  100% {
+    left: 100%;
+  }
+}
+
+/* Enhanced shimmer for notification button */
+.notification-shimmer::after {
+  content: '';
+  position: absolute;
+  top: -10%;
+  left: -10%;
+  width: 120%;
+  height: 120%;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle,
+    rgba(255, 255, 255, 0.3) 0%,
+    transparent 70%
+  );
+  opacity: 0;
+  animation: notification-pulse 3s infinite;
+}
+
+@keyframes notification-pulse {
+  0% {
+    transform: scale(0.8);
+    opacity: 0;
+  }
+  50% {
+    opacity: 0.5;
+  }
+  100% {
+    transform: scale(1.2);
+    opacity: 0;
+  }
+}
+
+/* Menu button shimmer */
+.menu-button-shimmer::before {
+  animation: menu-shimmer 3s infinite;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.3),
+    transparent
+  );
+}
+
+@keyframes menu-shimmer {
+  0% {
+    left: -100%;
+    opacity: 0.5;
+  }
+  40% {
+    opacity: 0.8;
+  }
+  60% {
+    opacity: 0.8;
+  }
+  100% {
+    left: 100%;
+    opacity: 0.5;
+  }
 }

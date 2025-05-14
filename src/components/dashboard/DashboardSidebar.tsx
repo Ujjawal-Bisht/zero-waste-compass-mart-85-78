@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
@@ -19,7 +19,8 @@ import {
   SlidersHorizontal,
   ShieldCheck,
   MessageCircle,
-  Bell
+  Bell,
+  Menu
 } from 'lucide-react';
 
 interface SidebarNavProps extends React.HTMLAttributes<HTMLDivElement> {
@@ -32,6 +33,7 @@ export const DashboardSidebar = ({ className, onClose, ...props }: SidebarNavPro
   const isMobile = useIsMobile();
   const { currentUser, logout } = useAuth();
   const isSeller = currentUser?.isSeller;
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
   
   const buyerLinks = [
     {
@@ -99,43 +101,68 @@ export const DashboardSidebar = ({ className, onClose, ...props }: SidebarNavPro
     navigate('/');
   };
 
+  const toggleMenu = () => {
+    setIsMenuOpen(!isMenuOpen);
+  };
+
   return (
-    <Sidebar className={cn("pb-12", className)} {...props}>
-      <div className="px-3 py-2">
-        <div className="mb-8 pl-2 flex items-center">
-          <Logo className="cursor-pointer" onClick={handleLogoClick} />
-        </div>
-        <h2 className="mb-2 px-4 text-lg font-semibold tracking-tight">
-          {isSeller ? 'Seller Portal' : 'Navigation'}
-        </h2>
-        <div className="space-y-1">
-          {navigationLinks.map((link) => (
-            <Button
-              key={link.href}
-              variant={location.pathname === link.href ? "secondary" : "ghost"}
-              className="w-full justify-start"
-              onClick={handleItemClick}
-              asChild
-            >
-              <Link to={link.href}>
-                {link.icon}
-                {link.title}
-              </Link>
-            </Button>
-          ))}
-        </div>
-      </div>
-      <div className="mt-auto px-3 py-2">
+    <>
+      {/* Mobile Hamburger Menu */}
+      <div className="lg:hidden fixed top-4 left-4 z-50">
         <Button 
-          className="w-full justify-start" 
           variant="ghost" 
-          onClick={handleLogout}
+          size="icon" 
+          onClick={toggleMenu}
+          className="menu-button menu-button-shimmer button-transition"
         >
-          <LogOut className="mr-2 h-4 w-4" />
-          Logout
+          <div className="flex flex-col items-center justify-center space-y-1.5">
+            <span className="w-5 h-0.5 bg-current menu-line menu-line-1"></span>
+            <span className="w-5 h-0.5 bg-current menu-line menu-line-2"></span>
+            <span className="w-5 h-0.5 bg-current menu-line menu-line-3"></span>
+          </div>
         </Button>
       </div>
-    </Sidebar>
+      
+      <Sidebar 
+        className={cn("pb-12", className, isMenuOpen || !isMobile ? "translate-x-0" : "-translate-x-full lg:translate-x-0 transition-transform duration-300")} 
+        {...props}
+      >
+        <div className="px-3 py-2">
+          <div className="mb-8 pl-2 flex items-center">
+            <Logo className="cursor-pointer hover-scale" onClick={handleLogoClick} />
+          </div>
+          <h2 className="mb-2 px-4 text-lg font-semibold tracking-tight">
+            {isSeller ? 'Seller Portal' : 'Navigation'}
+          </h2>
+          <div className="space-y-1">
+            {navigationLinks.map((link) => (
+              <Button
+                key={link.href}
+                variant={location.pathname === link.href ? "secondary" : "ghost"}
+                className={`w-full justify-start ${location.pathname === link.href ? 'bg-gradient-to-r from-gray-100 to-gray-200' : ''} transition-all duration-300 hover:translate-x-1`}
+                onClick={handleItemClick}
+                asChild
+              >
+                <Link to={link.href}>
+                  {link.icon}
+                  {link.title}
+                </Link>
+              </Button>
+            ))}
+          </div>
+        </div>
+        <div className="mt-auto px-3 py-2">
+          <Button 
+            className="w-full justify-start logout-button logout-pulse" 
+            variant="ghost" 
+            onClick={handleLogout}
+          >
+            <LogOut className="mr-2 h-4 w-4 transition-transform duration-300" />
+            Logout
+          </Button>
+        </div>
+      </Sidebar>
+    </>
   );
 };
 

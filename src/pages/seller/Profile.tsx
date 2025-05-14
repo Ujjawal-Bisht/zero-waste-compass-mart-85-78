@@ -14,6 +14,11 @@ const SellerProfile: React.FC = () => {
     visible: { opacity: 1, y: 0, transition: { duration: 0.5 } }
   };
 
+  const tabVariants = {
+    hidden: { opacity: 0, y: 10 },
+    visible: { opacity: 1, y: 0, transition: { duration: 0.3 } }
+  };
+
   return (
     <motion.div 
       className="space-y-6"
@@ -30,38 +35,40 @@ const SellerProfile: React.FC = () => {
       
       <Tabs defaultValue="profile" className="space-y-6">
         <TabsList className="grid w-full max-w-md grid-cols-4 mb-8">
-          <TabsTrigger value="profile" className="flex items-center gap-2">
+          <TabsTrigger value="profile" className="flex items-center gap-2 profile-tab">
             <Store size={16} /> Profile
           </TabsTrigger>
-          <TabsTrigger value="statistics" className="flex items-center gap-2">
+          <TabsTrigger value="statistics" className="flex items-center gap-2 profile-tab">
             <LineChart size={16} /> Statistics
           </TabsTrigger>
-          <TabsTrigger value="recent" className="flex items-center gap-2">
+          <TabsTrigger value="recent" className="flex items-center gap-2 profile-tab">
             <Package size={16} /> Recent Items
           </TabsTrigger>
-          <TabsTrigger value="verification" className="flex items-center gap-2">
+          <TabsTrigger value="verification" className="flex items-center gap-2 profile-tab">
             <Shield size={16} /> Verification
           </TabsTrigger>
         </TabsList>
         
-        <TabsContent value="profile" className="space-y-6">
-          <ProfileFormTab />
+        <TabsContent value="profile" className="space-y-6 profile-tab-content">
+          <motion.div variants={tabVariants}>
+            <ProfileFormTab />
+          </motion.div>
         </TabsContent>
         
-        <TabsContent value="statistics">
-          <StatisticsTab />
+        <TabsContent value="statistics" className="profile-tab-content">
+          <motion.div variants={tabVariants}>
+            <StatisticsTab />
+          </motion.div>
         </TabsContent>
         
-        <TabsContent value="recent">
-          <RecentItemsTab />
+        <TabsContent value="recent" className="profile-tab-content">
+          <motion.div variants={tabVariants}>
+            <RecentItemsTab />
+          </motion.div>
         </TabsContent>
         
-        <TabsContent value="verification">
-          <motion.div
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.3 }}
-          >
+        <TabsContent value="verification" className="profile-tab-content">
+          <motion.div variants={tabVariants}>
             <VerificationForm />
           </motion.div>
         </TabsContent>
