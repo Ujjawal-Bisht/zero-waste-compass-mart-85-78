@@ -7,6 +7,7 @@ import StatsSection from '@/components/landing/StatsSection';
 import CTASection from '@/components/landing/CTASection';
 import Footer from '@/components/landing/Footer';
 import { Toaster } from 'sonner';
+import ChatBot from '@/components/ChatBot';
 
 const LandingPage: React.FC = () => {
   return (
@@ -18,6 +19,7 @@ const LandingPage: React.FC = () => {
       <StatsSection />
       <CTASection />
       <Footer />
+      <ChatBot />
     </div>
   );
 };
