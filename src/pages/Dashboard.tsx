@@ -254,22 +254,14 @@ const Dashboard = () => {
     setCurrentPage(pageNumber);
   };
 
-  // Handler to show "View" toast and mimic navigation (replace with real view later)
+  // Handler to navigate to item "view" page
   const handleView = (item: Item) => {
-    toast({
-      title: "View Item",
-      description: `Viewing "${item.name}" (ID: ${item.id})`,
-    });
-    // navigate(`/items/${item.id}`); // Uncomment to enable real routing!
+    navigate(`/items/${item.id}`);
   };
 
-  // Handler to show "Edit" toast and mimic navigation (replace with real edit page later)
+  // Handler to navigate to item "edit" page
   const handleEdit = (item: Item) => {
-    toast({
-      title: "Edit Item",
-      description: `Editing "${item.name}" (ID: ${item.id})`,
-    });
-    // navigate(`/items/edit/${item.id}`); // Uncomment to enable real routing!
+    navigate(`/items/edit/${item.id}`);
   };
 
   return (
