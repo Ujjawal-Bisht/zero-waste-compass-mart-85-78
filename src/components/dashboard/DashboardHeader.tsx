@@ -9,6 +9,7 @@ import { Search, Plus, Home } from 'lucide-react';
 import { motion } from 'framer-motion';
 import NotificationCenter from '@/components/NotificationCenter';
 import { Logo } from '@/components/ui/logo';
+import SellerMenuBar from '@/components/seller/SellerMenuBar';
 
 const DashboardHeader: React.FC = () => {
   const { currentUser } = useAuth();
@@ -81,6 +82,17 @@ const DashboardHeader: React.FC = () => {
         </div>
         
         <div className="flex items-center space-x-3 md:space-x-4">
+          {/* Only show if user is a seller */}
+          {isSellerPortal && (
+            <motion.div
+              className="navbar-item"
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+            >
+              <SellerMenuBar />
+            </motion.div>
+          )}
+
           <Button
             variant="outline"
             size="sm"

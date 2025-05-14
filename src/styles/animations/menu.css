@@ -1,0 +1,133 @@
+
+/* Menu Bar Animations */
+
+/* Hamburger Menu Lines */
+.menu-line {
+  transition: all 0.3s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+}
+
+.menu-open .menu-line-1 {
+  transform: rotate(45deg) translate(5px, 5px);
+}
+
+.menu-open .menu-line-2 {
+  opacity: 0;
+  transform: translateX(-10px);
+}
+
+.menu-open .menu-line-3 {
+  transform: rotate(-45deg) translate(5px, -5px);
+}
+
+/* Menu Item Hover */
+.seller-menu-item {
+  position: relative;
+  overflow: hidden;
+}
+
+.seller-menu-item::before {
+  content: '';
+  position: absolute;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(245, 158, 11, 0.2),
+    transparent
+  );
+  transition: all 0.5s ease;
+}
+
+.seller-menu-item:hover::before {
+  left: 100%;
+}
+
+/* Active Menu Item Indicator */
+.seller-menu-item.active::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  width: 5px;
+  height: 5px;
+  background-color: #f59e0b;
+  border-radius: 50%;
+  transform: translateX(-50%);
+  transition: all 0.3s ease;
+}
+
+.seller-menu-item.active:hover::after {
+  width: 7px;
+  height: 7px;
+}
+
+/* Menu Container Animation */
+.seller-menu-container {
+  transform-origin: top right;
+  transition: all 0.3s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+}
+
+.seller-menu-container.hidden {
+  transform: scale(0.95);
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* Menu Icon Hover */
+.menu-icon {
+  transition: all 0.2s ease;
+}
+
+.seller-menu-item:hover .menu-icon {
+  transform: scale(1.15);
+}
+
+/* 3D Menu Effect */
+.seller-menu-3d {
+  perspective: 1000px;
+}
+
+.seller-menu-3d-item {
+  transition: transform 0.2s ease;
+  transform-style: preserve-3d;
+}
+
+.seller-menu-3d-item:hover {
+  transform: translateZ(20px);
+}
+
+/* Floating Animation for Menu Button */
+@keyframes float-subtle {
+  0%, 100% {
+    transform: translateY(0) rotate(0deg);
+  }
+  50% {
+    transform: translateY(-3px) rotate(3deg);
+  }
+}
+
+.float-menu-button {
+  animation: float-subtle 3s ease-in-out infinite;
+}
+
+/* Notification Badge Animation */
+@keyframes notification-pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7);
+    transform: scale(1);
+  }
+  70% {
+    box-shadow: 0 0 0 10px rgba(239, 68, 68, 0);
+    transform: scale(1.1);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(239, 68, 68, 0);
+    transform: scale(1);
+  }
+}
+
+.notification-badge-animated {
+  animation: notification-pulse 2s infinite;
+}
