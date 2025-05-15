@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Item, ItemCategory } from '@/types';
 import {
@@ -15,22 +14,8 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { Button } from '@/components/ui/button';
 import { 
-  MoreVertical, 
-  Tag, 
-  Edit, 
-  Trash, 
-  Eye, 
-  Copy, 
-  EyeOff, 
-  Download,
-  BarChart, 
-  Share2,
-  Gift,
-  Zap,
-  PriceTag,
-  Bell,
-  FileBarChart,
-  Printer
+  MoreHorizontal, Pencil, Trash, Copy, Tag, 
+  ShoppingBag, Eye, ArrowDownToLine, Check  
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { useLocalStorage } from '@/pages/items/hooks/useLocalStorage';
@@ -218,7 +203,7 @@ const ProductActionMenu: React.FC<ProductActionMenuProps> = ({ product }) => {
       <DropdownMenuTrigger asChild>
         <motion.div whileHover={{ rotate: 90, scale: 1.1 }} whileTap={{ scale: 0.9 }}>
           <Button variant="ghost" className="h-8 w-8 p-0 menu-icon">
-            <MoreVertical className="h-4 w-4" />
+            <MoreHorizontal className="h-4 w-4" />
           </Button>
         </motion.div>
       </DropdownMenuTrigger>
@@ -238,7 +223,7 @@ const ProductActionMenu: React.FC<ProductActionMenuProps> = ({ product }) => {
             onClick={() => handleEditProduct(product.id)}
             className="flex items-center cursor-pointer action-edit"
           >
-            <Edit className="h-4 w-4 mr-2" />
+            <Pencil className="h-4 w-4 mr-2" />
             Edit
           </DropdownMenuItem>
         </motion.div>
