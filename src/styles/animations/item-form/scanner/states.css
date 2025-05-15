@@ -1,0 +1,86 @@
+
+/* Camera warming up effect */
+.camera-starting {
+  position: relative;
+  overflow: hidden;
+}
+
+.camera-starting::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    135deg,
+    rgba(0, 0, 0, 0.05),
+    rgba(0, 0, 0, 0.2)
+  );
+  animation: cameraWarmup 1s ease-out forwards;
+}
+
+@keyframes cameraWarmup {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+/* Processing overlay animation */
+.processing-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(255, 255, 255, 0.8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+}
+
+.processing .processing-overlay {
+  opacity: 1;
+}
+
+.processing-icon {
+  display: inline-block;
+  width: 40px;
+  height: 40px;
+  border: 3px solid rgba(99, 102, 241, 0.3);
+  border-radius: 50%;
+  border-top-color: rgba(99, 102, 241, 1);
+  animation: spin 1s infinite linear;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Scanner initialization animation */
+.scanner-init {
+  position: relative;
+}
+
+.scanner-init::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    45deg,
+    rgba(99, 102, 241, 0.1),
+    rgba(139, 92, 246, 0.1)
+  );
+  animation: scannerInitPulse 2s infinite;
+}
+
+@keyframes scannerInitPulse {
+  0%, 100% {
+    opacity: 0.2;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}

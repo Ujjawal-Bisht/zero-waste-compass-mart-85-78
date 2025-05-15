@@ -1,0 +1,52 @@
+
+/* Enhanced detection animation */
+.barcode-detected {
+  animation: detectionFlash 0.8s ease;
+}
+
+@keyframes detectionFlash {
+  0% {
+    box-shadow: 0 0 0 rgba(16, 185, 129, 0);
+  }
+  50% {
+    box-shadow: 0 0 50px rgba(16, 185, 129, 0.9);
+  }
+  100% {
+    box-shadow: 0 0 0 rgba(16, 185, 129, 0);
+  }
+}
+
+/* Success animation with glowing effect */
+.success-pulse {
+  position: relative;
+  animation: successGlow 2s infinite;
+}
+
+@keyframes successGlow {
+  0%, 100% {
+    box-shadow: 0 0 15px rgba(16, 185, 129, 0.2);
+  }
+  50% {
+    box-shadow: 0 0 30px rgba(16, 185, 129, 0.6);
+  }
+}
+
+/* Barcode success animation */
+.barcode-success {
+  animation: successPop 0.5s ease-out;
+}
+
+@keyframes successPop {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+  75% {
+    transform: scale(0.98);
+  }
+  100% {
+    transform: scale(1);
+  }
+}

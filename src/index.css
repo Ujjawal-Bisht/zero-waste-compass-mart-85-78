@@ -33,3 +33,5 @@
 @import './styles/animations/transitions.css';
 @import './styles/animations/mobile.css';
 @import './styles/animations/menu.css';
+@import './styles/animations/item-form/index.css';
+

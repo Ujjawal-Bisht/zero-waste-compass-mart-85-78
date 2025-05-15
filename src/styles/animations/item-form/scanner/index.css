@@ -1,0 +1,10 @@
+
+/* Scanner animations index file that imports all sub-files */
+@import './base.css';
+@import './scan-line.css';
+@import './detection.css';
+@import './corners.css';
+@import './recognition.css';
+@import './states.css';
+@import './buttons.css';
+@import './progress.css';

@@ -7,4 +7,5 @@
 @import './hover.css';
 @import './buttons.css';
 @import './barcode.css';
-@import './scanner-effects.css';
+@import './scanner/index.css';  /* Updated to use the new refactored scanner animations */
+

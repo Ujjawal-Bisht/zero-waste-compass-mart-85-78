@@ -1,0 +1,65 @@
+
+/* Enhanced scan line with double effect */
+.scan-line {
+  position: absolute;
+  height: 2px;
+  width: 100%;
+  background: linear-gradient(
+    90deg, 
+    transparent, 
+    rgba(99, 102, 241, 0.3),
+    rgba(99, 102, 241, 0.8),
+    rgba(99, 102, 241, 0.3),
+    transparent
+  );
+  box-shadow: 
+    0 0 8px rgba(79, 70, 229, 0.6),
+    0 0 12px rgba(79, 70, 229, 0.4);
+  z-index: 10;
+  animation: scanLine 2s cubic-bezier(0.5, 0, 0.5, 1) infinite;
+}
+
+.scan-line::before, 
+.scan-line::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  width: 100%;
+  height: 1px;
+}
+
+.scan-line::before {
+  top: -2px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.5),
+    transparent
+  );
+}
+
+.scan-line::after {
+  bottom: -2px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(99, 102, 241, 0.3),
+    transparent
+  );
+}
+
+/* Scanner line animation */
+@keyframes scanLine {
+  0% {
+    top: 15%;
+    opacity: 0.5;
+  }
+  50% {
+    top: 85%;
+    opacity: 1;
+  }
+  100% {
+    top: 15%;
+    opacity: 0.5;
+  }
+}
