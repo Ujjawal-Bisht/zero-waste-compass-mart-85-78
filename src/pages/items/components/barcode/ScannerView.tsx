@@ -20,9 +20,9 @@ const ScannerView: React.FC<ScannerViewProps> = ({
 }) => {
   const [torchEnabled, setTorchEnabled] = useState(false);
   
-  const handleTorchToggle = () => {
+  const handleTorchToggle = async () => {
     const newStatus = !torchEnabled;
-    const success = toggleTorch(newStatus);
+    const success = await toggleTorch(newStatus);
     if (success) {
       setTorchEnabled(newStatus);
     } else if (newStatus) {

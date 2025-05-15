@@ -40,6 +40,23 @@ export const flipCamera = (setFacingMode: React.Dispatch<React.SetStateAction<st
 };
 
 /**
+ * Configure advanced camera settings for the scanner
+ * @param config Scanner configuration
+ */
+export const configureCameraSettings = async (config: any): Promise<any> => {
+  try {
+    const deviceId = await selectOptimalCamera();
+    if (deviceId) {
+      config.inputStream.constraints.deviceId = deviceId;
+    }
+    return config;
+  } catch (error) {
+    console.error('Error configuring camera settings:', error);
+    return config; // Return original config if there's an error
+  }
+};
+
+/**
  * Select the optimal camera for barcode scanning (usually back camera)
  */
 export const selectOptimalCamera = async (): Promise<string | undefined> => {
@@ -85,8 +102,8 @@ export const hasTorch = (): boolean => {
     if (track) {
       // Use capabilities to check for torch support
       const capabilities = track.getCapabilities();
-      // Using optional chaining to safely check if torch exists
-      hasIt = !!capabilities?.torch;
+      // Using a type assertion to safely check if torch exists
+      hasIt = !!(capabilities as any)?.torch;
     }
   } catch (e) {
     console.warn("Can't access to track settings", e);
@@ -98,28 +115,32 @@ export const hasTorch = (): boolean => {
 /**
  * Toggle the torch/flashlight of the active camera if available
  */
-export const toggleTorch = async (track: MediaStreamTrack | null, enable: boolean): Promise<boolean> => {
-  if (!track || !('getCapabilities' in track)) {
-    console.warn('This browser does not support torch control');
-    return false;
-  }
-
-  const capabilities = track.getCapabilities();
-  
-  // Check if torch is available safely with optional chaining
-  if (!capabilities?.torch) {
-    console.warn('This device does not have torch capability');
-    return false;
-  }
-
+export const toggleTorch = async (enable: boolean): Promise<boolean> => {
   try {
-    // Use the applyConstraints method safely with type casting
+    const stream = document.querySelector('video')?.srcObject as MediaStream;
+    const track = stream?.getVideoTracks()[0];
+    
+    if (!track || !('getCapabilities' in track)) {
+      console.warn('This browser does not support torch control');
+      return false;
+    }
+
+    const capabilities = track.getCapabilities();
+    
+    // Check if torch is available using type assertion
+    if (!((capabilities as any)?.torch)) {
+      console.warn('This device does not have torch capability');
+      return false;
+    }
+
+    // Use the applyConstraints method with type assertion
     await track.applyConstraints({
       advanced: [{ torch: enable } as any]
     });
+    
     return true;
   } catch (err) {
     console.error('Error toggling torch:', err);
     return false;
   }
-}
+};

@@ -1,6 +1,6 @@
 
 import Quagga from 'quagga';
-import { selectOptimalCamera } from './utils/cameraUtils';
+import { selectOptimalCamera, toggleTorch } from './utils/cameraUtils';
 
 /**
  * Initialize the barcode scanner with the specified configuration
@@ -73,3 +73,6 @@ export const stopScanner = () => {
     console.error("Error stopping scanner:", error);
   }
 };
+
+// Re-export functions from cameraUtils to maintain API
+export { selectOptimalCamera, toggleTorch };
