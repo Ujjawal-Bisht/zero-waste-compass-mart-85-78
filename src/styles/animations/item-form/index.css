@@ -1,0 +1,8 @@
+
+/* Main item form animations index file that imports all sub-files */
+@import './form-fields.css';
+@import './effects.css';
+@import './transitions.css';
+@import './success.css';
+@import './hover.css';
+@import './buttons.css';

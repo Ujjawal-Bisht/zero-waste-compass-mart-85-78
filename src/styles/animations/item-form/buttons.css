@@ -1,0 +1,33 @@
+
+/* Button animations and effects */
+/* Improved button effects */
+.button-glow {
+  position: relative;
+  overflow: hidden;
+}
+
+.button-glow::before {
+  content: '';
+  position: absolute;
+  top: -2px;
+  left: -2px;
+  right: -2px;
+  bottom: -2px;
+  background: linear-gradient(45deg, #3b82f6, #6366f1, #8b5cf6, #3b82f6);
+  background-size: 400%;
+  z-index: -1;
+  animation: glowing 12s linear infinite;
+  opacity: 0;
+  transition: opacity 0.3s ease-in-out;
+  border-radius: 0.5rem;
+}
+
+.button-glow:hover::before {
+  opacity: 1;
+}
+
+@keyframes glowing {
+  0% { background-position: 0 0; }
+  50% { background-position: 400% 0; }
+  100% { background-position: 0 0; }
+}

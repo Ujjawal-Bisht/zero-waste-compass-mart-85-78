@@ -9,7 +9,7 @@
 @import './home.css';
 @import './hover.css';
 @import './items.css';
-@import './item-form.css'; /* New item-form specific animations */
+@import './item-form/index.css'; /* Updated to use the directory structure */
 @import './login.css';
 @import './menu.css';
 @import './mobile.css';

@@ -1,0 +1,37 @@
+
+/* Section transition effects */
+.section-transition {
+  transition: all 0.3s ease-out;
+}
+
+.section-transition:hover {
+  transform: translateY(-2px);
+}
+
+/* Section heading pulse */
+.section-heading-pulse {
+  position: relative;
+}
+
+.section-heading-pulse::before {
+  content: '';
+  position: absolute;
+  left: -10px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 4px;
+  height: 70%;
+  background: linear-gradient(to bottom, #3b82f6, #8b5cf6);
+  border-radius: 4px;
+}
+
+/* Form section hover effects */
+.form-section {
+  transition: all 0.3s ease;
+  border: 1px solid transparent;
+}
+
+.form-section:hover {
+  box-shadow: 0 4px 12px -2px rgba(0, 0, 0, 0.08);
+  border-color: rgba(99, 102, 241, 0.2);
+}

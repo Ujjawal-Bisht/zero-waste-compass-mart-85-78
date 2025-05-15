@@ -1,0 +1,77 @@
+
+/* Form field specific animations */
+.form-field-animate {
+  animation: field-fade-in 0.5s ease forwards;
+}
+
+@keyframes field-fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.form-stagger > * {
+  opacity: 0;
+  animation: stagger-fade-in 0.5s ease forwards;
+}
+
+.form-stagger > *:nth-child(1) { animation-delay: 0.1s; }
+.form-stagger > *:nth-child(2) { animation-delay: 0.2s; }
+.form-stagger > *:nth-child(3) { animation-delay: 0.3s; }
+.form-stagger > *:nth-child(4) { animation-delay: 0.4s; }
+.form-stagger > *:nth-child(5) { animation-delay: 0.5s; }
+.form-stagger > *:nth-child(6) { animation-delay: 0.6s; }
+
+@keyframes stagger-fade-in {
+  to {
+    opacity: 1;
+  }
+}
+
+.form-field-success {
+  animation: field-success-pulse 1s ease;
+}
+
+@keyframes field-success-pulse {
+  0%, 100% {
+    background-color: transparent;
+  }
+  50% {
+    background-color: rgba(16, 185, 129, 0.1);
+  }
+}
+
+/* Input focus state animations */
+.input-focus-animation {
+  position: relative;
+}
+
+.input-focus-animation::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 0;
+  height: 2px;
+  background: linear-gradient(90deg, #4f46e5, #8b5cf6);
+  transition: width 0.3s ease;
+}
+
+.input-focus-animation:focus-within::after {
+  width: 100%;
+}
+
+/* Form field animations */
+.form-field {
+  transition: all 0.3s ease;
+}
+
+.form-field:focus-within label {
+  color: #4f46e5;
+  transform: translateY(-1px);
+}
