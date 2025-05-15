@@ -1,33 +1,24 @@
+
 import React, { useState } from 'react';
 import { Item, ItemCategory } from '@/types';
 import {
   DropdownMenu,
   DropdownMenuContent,
-  DropdownMenuItem,
   DropdownMenuTrigger,
   DropdownMenuSeparator,
-  DropdownMenuSub,
-  DropdownMenuSubContent,
-  DropdownMenuSubTrigger,
-  DropdownMenuRadioGroup,
-  DropdownMenuRadioItem,
 } from '@/components/ui/dropdown-menu';
 import { Button } from '@/components/ui/button';
-import { 
-  MoreHorizontal, Pencil, Trash, Copy, Tag, 
-  ShoppingBag, Eye, ArrowDownToLine, Check, 
-  Zap, Gift, Printer, Bell, Download,
-  FileBarChart, Share2, EyeOff
-} from 'lucide-react';
+import { MoreHorizontal } from 'lucide-react';
 import { toast } from 'sonner';
 import { useLocalStorage } from '@/pages/items/hooks/useLocalStorage';
 import { motion } from 'framer-motion';
+import { ActionMenuProps } from './menu/types';
+import BasicActions from './menu/BasicActions';
+import CategoryMenu from './menu/CategoryMenu';
+import EnhancedActions from './menu/EnhancedActions';
+import DeleteMenuItem from './menu/DeleteMenuItem';
 
-interface ProductActionMenuProps {
-  product: Item;
-}
-
-const ProductActionMenu: React.FC<ProductActionMenuProps> = ({ product }) => {
+const ProductActionMenu: React.FC<ActionMenuProps> = ({ product }) => {
   const [selectedCategory, setSelectedCategory] = useState<string>(product.category);
   const [savedProducts, setSavedProducts] = useLocalStorage<Item[]>('seller-products', []);
 
@@ -195,11 +186,6 @@ const ProductActionMenu: React.FC<ProductActionMenuProps> = ({ product }) => {
     });
   };
 
-  const itemAnimation = {
-    whileHover: { x: 5, backgroundColor: "rgba(243, 244, 246, 0.8)" },
-    transition: { type: "spring", stiffness: 300, damping: 10 }
-  };
-
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -210,203 +196,36 @@ const ProductActionMenu: React.FC<ProductActionMenuProps> = ({ product }) => {
         </motion.div>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="table-dropdown-content w-56">
-        <motion.div {...itemAnimation}>
-          <DropdownMenuItem 
-            onClick={() => handleViewDetails(product.id)}
-            className="flex items-center cursor-pointer action-view"
-          >
-            <Eye className="h-4 w-4 mr-2" />
-            View details
-          </DropdownMenuItem>
-        </motion.div>
-        
-        <motion.div {...itemAnimation}>
-          <DropdownMenuItem 
-            onClick={() => handleEditProduct(product.id)}
-            className="flex items-center cursor-pointer action-edit"
-          >
-            <Pencil className="h-4 w-4 mr-2" />
-            Edit
-          </DropdownMenuItem>
-        </motion.div>
-        
-        <motion.div {...itemAnimation}>
-          <DropdownMenuItem 
-            onClick={() => handleDuplicateProduct(product)}
-            className="flex items-center cursor-pointer"
-          >
-            <Copy className="h-4 w-4 mr-2" />
-            Duplicate
-          </DropdownMenuItem>
-        </motion.div>
+        <BasicActions 
+          product={product}
+          onViewDetails={handleViewDetails}
+          onEditProduct={handleEditProduct}
+          onDuplicateProduct={handleDuplicateProduct}
+        />
         
         {/* Category Change Option */}
-        <DropdownMenuSub>
-          <motion.div {...itemAnimation}>
-            <DropdownMenuSubTrigger className="flex items-center cursor-pointer">
-              <Tag className="h-4 w-4 mr-2" />
-              Change Category
-            </DropdownMenuSubTrigger>
-          </motion.div>
-          <DropdownMenuSubContent className="min-w-[180px]">
-            <DropdownMenuRadioGroup value={selectedCategory} onValueChange={(value) => handleChangeCategory(value)}>
-              <motion.div {...itemAnimation}>
-                <DropdownMenuRadioItem value="food" className="cursor-pointer">
-                  <span className="h-2 w-2 rounded-full bg-green-500 mr-2 inline-block"></span> Food
-                </DropdownMenuRadioItem>
-              </motion.div>
-              <motion.div {...itemAnimation}>
-                <DropdownMenuRadioItem value="clothing" className="cursor-pointer">
-                  <span className="h-2 w-2 rounded-full bg-blue-500 mr-2 inline-block"></span> Clothing
-                </DropdownMenuRadioItem>
-              </motion.div>
-              <motion.div {...itemAnimation}>
-                <DropdownMenuRadioItem value="electronics" className="cursor-pointer">
-                  <span className="h-2 w-2 rounded-full bg-yellow-500 mr-2 inline-block"></span> Electronics
-                </DropdownMenuRadioItem>
-              </motion.div>
-              <motion.div {...itemAnimation}>
-                <DropdownMenuRadioItem value="furniture" className="cursor-pointer">
-                  <span className="h-2 w-2 rounded-full bg-purple-500 mr-2 inline-block"></span> Furniture
-                </DropdownMenuRadioItem>
-              </motion.div>
-              <motion.div {...itemAnimation}>
-                <DropdownMenuRadioItem value="household" className="cursor-pointer">
-                  <span className="h-2 w-2 rounded-full bg-cyan-500 mr-2 inline-block"></span> Household
-                </DropdownMenuRadioItem>
-              </motion.div>
-              <motion.div {...itemAnimation}>
-                <DropdownMenuRadioItem value="books" className="cursor-pointer">
-                  <span className="h-2 w-2 rounded-full bg-indigo-500 mr-2 inline-block"></span> Books
-                </DropdownMenuRadioItem>
-              </motion.div>
-              <motion.div {...itemAnimation}>
-                <DropdownMenuRadioItem value="toys" className="cursor-pointer">
-                  <span className="h-2 w-2 rounded-full bg-pink-500 mr-2 inline-block"></span> Toys
-                </DropdownMenuRadioItem>
-              </motion.div>
-              <motion.div {...itemAnimation}>
-                <DropdownMenuRadioItem value="medicine" className="cursor-pointer">
-                  <span className="h-2 w-2 rounded-full bg-red-500 mr-2 inline-block"></span> Medicine
-                </DropdownMenuRadioItem>
-              </motion.div>
-              <motion.div {...itemAnimation}>
-                <DropdownMenuRadioItem value="other" className="cursor-pointer">
-                  <span className="h-2 w-2 rounded-full bg-gray-500 mr-2 inline-block"></span> Other
-                </DropdownMenuRadioItem>
-              </motion.div>
-            </DropdownMenuRadioGroup>
-          </DropdownMenuSubContent>
-        </DropdownMenuSub>
-        
-        {/* New enhanced options */}
-        <DropdownMenuSeparator />
-        
-        <motion.div {...itemAnimation}>
-          <DropdownMenuItem 
-            onClick={() => handleToggleDynamicPricing(product)}
-            className="flex items-center cursor-pointer"
-          >
-            <Zap className="h-4 w-4 mr-2 text-yellow-500" />
-            {product.dynamicPricingEnabled ? 'Disable dynamic pricing' : 'Enable dynamic pricing'}
-          </DropdownMenuItem>
-        </motion.div>
-        
-        <motion.div {...itemAnimation}>
-          <DropdownMenuItem 
-            onClick={() => handlePromoteProduct(product)}
-            className="flex items-center cursor-pointer"
-          >
-            <Gift className="h-4 w-4 mr-2 text-purple-500" />
-            Promote product
-          </DropdownMenuItem>
-        </motion.div>
-        
-        <motion.div {...itemAnimation}>
-          <DropdownMenuItem 
-            onClick={() => handlePrintLabel(product)}
-            className="flex items-center cursor-pointer"
-          >
-            <Printer className="h-4 w-4 mr-2 text-blue-500" />
-            Print label
-          </DropdownMenuItem>
-        </motion.div>
-        
-        <motion.div {...itemAnimation}>
-          <DropdownMenuItem 
-            onClick={() => handleSetAlert(product)}
-            className="flex items-center cursor-pointer"
-          >
-            <Bell className="h-4 w-4 mr-2 text-amber-500" />
-            Set stock alert
-          </DropdownMenuItem>
-        </motion.div>
+        <CategoryMenu 
+          selectedCategory={selectedCategory}
+          onCategoryChange={handleChangeCategory}
+        />
         
         <DropdownMenuSeparator />
         
-        <motion.div {...itemAnimation}>
-          <DropdownMenuItem 
-            onClick={() => handleDownloadProductData(product)}
-            className="flex items-center cursor-pointer"
-          >
-            <Download className="h-4 w-4 mr-2 text-blue-600" />
-            Export product data
-          </DropdownMenuItem>
-        </motion.div>
-        
-        <motion.div {...itemAnimation}>
-          <DropdownMenuItem 
-            onClick={() => handleAnalyticsView(product.id)}
-            className="flex items-center cursor-pointer"
-          >
-            <FileBarChart className="h-4 w-4 mr-2 text-indigo-600" />
-            View analytics
-          </DropdownMenuItem>
-        </motion.div>
-        
-        <motion.div {...itemAnimation}>
-          <DropdownMenuItem 
-            onClick={() => handleShareProduct(product)}
-            className="flex items-center cursor-pointer"
-          >
-            <Share2 className="h-4 w-4 mr-2 text-green-600" />
-            Share product
-          </DropdownMenuItem>
-        </motion.div>
-        
-        <motion.div {...itemAnimation}>
-          <DropdownMenuItem 
-            onClick={() => handleToggleVisibility(product, product.status)}
-            className="flex items-center cursor-pointer"
-          >
-            {product.status === 'available' ? (
-              <>
-                <EyeOff className="h-4 w-4 mr-2 text-amber-600" />
-                Hide product
-              </>
-            ) : (
-              <>
-                <Eye className="h-4 w-4 mr-2 text-green-600" />
-                Show product
-              </>
-            )}
-          </DropdownMenuItem>
-        </motion.div>
+        <EnhancedActions 
+          product={product}
+          onToggleDynamicPricing={handleToggleDynamicPricing}
+          onPromoteProduct={handlePromoteProduct}
+          onPrintLabel={handlePrintLabel}
+          onSetAlert={handleSetAlert}
+          onDownloadProductData={handleDownloadProductData}
+          onAnalyticsView={handleAnalyticsView}
+          onShareProduct={handleShareProduct}
+          onToggleVisibility={handleToggleVisibility}
+        />
         
         <DropdownMenuSeparator />
         
-        <motion.div 
-          whileHover={{ x: 5, backgroundColor: "rgba(254, 202, 202, 0.8)" }}
-          transition={{ type: "spring", stiffness: 300, damping: 10 }}
-        >
-          <DropdownMenuItem 
-            onClick={() => handleDeleteProduct(product.id)}
-            className="flex items-center cursor-pointer text-red-600 action-delete"
-          >
-            <Trash className="h-4 w-4 mr-2" />
-            Delete
-          </DropdownMenuItem>
-        </motion.div>
+        <DeleteMenuItem onClick={() => handleDeleteProduct(product.id)} />
       </DropdownMenuContent>
     </DropdownMenu>
   );

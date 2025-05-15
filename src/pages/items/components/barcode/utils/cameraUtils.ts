@@ -1,3 +1,4 @@
+
 /**
  * Attempt to find a video input device with the matching facingMode
  * @param facingMode 
@@ -34,8 +35,30 @@ export const getConstraints = (deviceId?: string, facingMode?: string): MediaStr
  * @param setFacingMode 
  * @returns 
  */
-export const flipCamera = (setFacingMode: (facingMode: string) => void) => {
-  setFacingMode(facingMode => (facingMode === 'user' ? 'environment' : 'user'));
+export const flipCamera = (setFacingMode: React.Dispatch<React.SetStateAction<string>>) => {
+  setFacingMode((prevFacingMode: string) => (prevFacingMode === 'user' ? 'environment' : 'user'));
+};
+
+/**
+ * Select the optimal camera for barcode scanning (usually back camera)
+ */
+export const selectOptimalCamera = async (): Promise<string | undefined> => {
+  try {
+    const devices = await navigator.mediaDevices.enumerateDevices();
+    const cameras = devices.filter(device => device.kind === 'videoinput');
+    
+    // Try to find back camera
+    const backCamera = cameras.find(camera => 
+      camera.label.toLowerCase().includes('back') || 
+      camera.label.toLowerCase().includes('rear') ||
+      camera.label.toLowerCase().includes('environment')
+    );
+    
+    return backCamera?.deviceId;
+  } catch (error) {
+    console.error('Error selecting optimal camera:', error);
+    return undefined;
+  }
 };
 
 /**
@@ -54,10 +77,16 @@ export const hasTorch = (): boolean => {
   let hasIt = false;
 
   try {
-    const track = window.stream?.getVideoTracks()[0];
+    // We need to ensure we're not accessing a global stream variable
+    // that might not exist
+    const videoTracks = document.querySelector('video')?.srcObject as MediaStream;
+    const track = videoTracks?.getVideoTracks()[0];
 
     if (track) {
-      hasIt = 'torch' in track.getSettings();
+      // Use capabilities to check for torch support
+      const capabilities = track.getCapabilities();
+      // Using optional chaining to safely check if torch exists
+      hasIt = !!capabilities?.torch;
     }
   } catch (e) {
     console.warn("Can't access to track settings", e);
@@ -77,16 +106,14 @@ export const toggleTorch = async (track: MediaStreamTrack | null, enable: boolea
 
   const capabilities = track.getCapabilities();
   
-  // Check if torch is available in the capabilities
-  if (!capabilities.torch) {
+  // Check if torch is available safely with optional chaining
+  if (!capabilities?.torch) {
     console.warn('This device does not have torch capability');
     return false;
   }
 
   try {
-    // Use the applyConstraints method without referencing 'torch' directly in type
-    // This avoids TypeScript errors while still allowing the functionality to work
-    // in browsers that support it
+    // Use the applyConstraints method safely with type casting
     await track.applyConstraints({
       advanced: [{ torch: enable } as any]
     });
