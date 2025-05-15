@@ -1,11 +1,10 @@
 
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import { FormField, FormItem, FormLabel, FormControl, FormMessage } from '@/components/ui/form';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { ItemCategory } from '@/types';
 import { UseFormReturn } from 'react-hook-form';
 import { ItemFormValues } from '../../schemas/itemFormSchema';
-import { motion } from 'framer-motion';
 
 // Define the categories that can be selected
 const foodCategories: { value: ItemCategory; label: string }[] = [
@@ -17,9 +16,27 @@ const foodCategories: { value: ItemCategory; label: string }[] = [
 
 interface CategoryFieldProps {
   form: UseFormReturn<ItemFormValues, any, undefined>;
+  isUpdated?: boolean;
 }
 
-const CategoryField: React.FC<CategoryFieldProps> = ({ form }) => {
+const CategoryField: React.FC<CategoryFieldProps> = ({ form, isUpdated = false }) => {
+  const selectRef = useRef<HTMLButtonElement>(null);
+
+  // Add animation when field is updated (e.g., from barcode scan)
+  useEffect(() => {
+    if (isUpdated && selectRef.current) {
+      const select = selectRef.current;
+      select.classList.add('form-field-success');
+      
+      // Remove the animation class after animation completes
+      const timer = setTimeout(() => {
+        select.classList.remove('form-field-success');
+      }, 1000);
+      
+      return () => clearTimeout(timer);
+    }
+  }, [isUpdated]);
+
   return (
     <FormField
       control={form.control}
@@ -33,7 +50,10 @@ const CategoryField: React.FC<CategoryFieldProps> = ({ form }) => {
             value={field.value}
           >
             <FormControl>
-              <SelectTrigger className="transition-all hover:border-zwm-primary focus:border-zwm-primary">
+              <SelectTrigger 
+                className="transition-all hover:border-zwm-primary focus:border-zwm-primary" 
+                ref={selectRef}
+              >
                 <SelectValue placeholder="Select a category" />
               </SelectTrigger>
             </FormControl>

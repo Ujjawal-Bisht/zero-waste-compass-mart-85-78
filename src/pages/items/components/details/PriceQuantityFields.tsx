@@ -1,74 +1,130 @@
 
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import { FormField, FormItem, FormLabel, FormControl, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { UseFormReturn } from 'react-hook-form';
 import { ItemFormValues } from '../../schemas/itemFormSchema';
-import { IndianRupee } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 interface PriceQuantityFieldsProps {
   form: UseFormReturn<ItemFormValues, any, undefined>;
+  isOriginalPriceUpdated?: boolean;
+  isCurrentPriceUpdated?: boolean;
+  isQuantityUpdated?: boolean;
 }
 
-const PriceQuantityFields: React.FC<PriceQuantityFieldsProps> = ({ form }) => {
+const PriceQuantityFields: React.FC<PriceQuantityFieldsProps> = ({ 
+  form, 
+  isOriginalPriceUpdated = false,
+  isCurrentPriceUpdated = false,
+  isQuantityUpdated = false
+}) => {
+  const originalPriceRef = useRef<HTMLInputElement>(null);
+  const currentPriceRef = useRef<HTMLInputElement>(null);
+  const quantityRef = useRef<HTMLInputElement>(null);
+
+  // Apply animation to original price field
+  useEffect(() => {
+    if (isOriginalPriceUpdated && originalPriceRef.current) {
+      const input = originalPriceRef.current;
+      input.classList.add('form-field-success');
+      
+      const timer = setTimeout(() => {
+        input.classList.remove('form-field-success');
+      }, 1000);
+      
+      return () => clearTimeout(timer);
+    }
+  }, [isOriginalPriceUpdated]);
+
+  // Apply animation to current price field
+  useEffect(() => {
+    if (isCurrentPriceUpdated && currentPriceRef.current) {
+      const input = currentPriceRef.current;
+      input.classList.add('form-field-success');
+      
+      const timer = setTimeout(() => {
+        input.classList.remove('form-field-success');
+      }, 1000);
+      
+      return () => clearTimeout(timer);
+    }
+  }, [isCurrentPriceUpdated]);
+
+  // Apply animation to quantity field
+  useEffect(() => {
+    if (isQuantityUpdated && quantityRef.current) {
+      const input = quantityRef.current;
+      input.classList.add('form-field-success');
+      
+      const timer = setTimeout(() => {
+        input.classList.remove('form-field-success');
+      }, 1000);
+      
+      return () => clearTimeout(timer);
+    }
+  }, [isQuantityUpdated]);
+
+  // Animation variants for the grid
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    show: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.1
+      }
+    }
+  };
+  
   const itemVariants = {
-    hidden: { opacity: 0, x: 20 },
-    show: { opacity: 1, x: 0, transition: { duration: 0.3 } }
+    hidden: { opacity: 0, y: 10 },
+    show: { opacity: 1, y: 0, transition: { duration: 0.3 } }
   };
 
   return (
-    <>
-      <motion.div 
-        className="grid grid-cols-2 gap-4" 
-        variants={itemVariants}
-      >
+    <motion.div 
+      className="grid grid-cols-3 gap-4"
+      variants={containerVariants}
+      initial="hidden"
+      animate="show"
+    >
+      <motion.div variants={itemVariants}>
         <FormField
           control={form.control}
           name="originalPrice"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Original Price (₹)</FormLabel>
+              <FormLabel>Original Price</FormLabel>
               <FormControl>
-                <div className="relative">
-                  <span className="absolute left-3 top-2.5 text-muted-foreground">
-                    <IndianRupee size={16} />
-                  </span>
-                  <Input 
-                    type="number" 
-                    step="0.01"
-                    placeholder="0.00" 
-                    onChange={e => field.onChange(parseFloat(e.target.value) || undefined)} 
-                    value={field.value === undefined ? '' : field.value}
-                    className="pl-8 transition-all hover:border-zwm-primary focus:border-zwm-primary"
-                  />
-                </div>
+                <Input 
+                  placeholder="0.00" 
+                  type="number" 
+                  {...field} 
+                  className="transition-all hover:border-zwm-primary focus:border-zwm-primary" 
+                  ref={originalPriceRef}
+                />
               </FormControl>
               <FormMessage />
             </FormItem>
           )}
         />
+      </motion.div>
 
+      <motion.div variants={itemVariants}>
         <FormField
           control={form.control}
           name="currentPrice"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Discounted Price (₹)</FormLabel>
+              <FormLabel>Current Price</FormLabel>
               <FormControl>
-                <div className="relative">
-                  <span className="absolute left-3 top-2.5 text-muted-foreground">
-                    <IndianRupee size={16} />
-                  </span>
-                  <Input 
-                    type="number" 
-                    step="0.01" 
-                    placeholder="0.00" 
-                    onChange={e => field.onChange(parseFloat(e.target.value) || undefined)} 
-                    value={field.value === undefined ? '' : field.value}
-                    className="pl-8 transition-all hover:border-zwm-primary focus:border-zwm-primary" 
-                  />
-                </div>
+                <Input 
+                  placeholder="0.00" 
+                  type="number" 
+                  {...field} 
+                  className="transition-all hover:border-zwm-primary focus:border-zwm-primary" 
+                  ref={currentPriceRef}
+                />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -85,12 +141,11 @@ const PriceQuantityFields: React.FC<PriceQuantityFieldsProps> = ({ form }) => {
               <FormLabel>Quantity</FormLabel>
               <FormControl>
                 <Input 
-                  type="number" 
-                  min="1" 
                   placeholder="1" 
-                  onChange={e => field.onChange(parseInt(e.target.value) || undefined)} 
-                  value={field.value === undefined ? '' : field.value}
+                  type="number" 
+                  {...field} 
                   className="transition-all hover:border-zwm-primary focus:border-zwm-primary" 
+                  ref={quantityRef}
                 />
               </FormControl>
               <FormMessage />
@@ -98,7 +153,7 @@ const PriceQuantityFields: React.FC<PriceQuantityFieldsProps> = ({ form }) => {
           )}
         />
       </motion.div>
-    </>
+    </motion.div>
   );
 };
 

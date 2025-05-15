@@ -17,7 +17,8 @@ const ItemForm: React.FC<ItemFormProps> = ({ onBarcodeDetected, onFormSuccess })
     setImagePreview,
     isSubmitting,
     handleBarcodeDetected,
-    onSubmit
+    onSubmit,
+    updatedFields
   } = useItemForm({ 
     onBarcodeDetected, 
     onFormSuccess 
@@ -31,6 +32,7 @@ const ItemForm: React.FC<ItemFormProps> = ({ onBarcodeDetected, onFormSuccess })
           imagePreview={imagePreview}
           setImagePreview={setImagePreview}
           handleBarcodeDetected={handleBarcodeDetected}
+          updatedFields={updatedFields}
         />
         <FormButtons isSubmitting={isSubmitting} />
       </form>

@@ -11,9 +11,14 @@ import PriceQuantityFields from './details/PriceQuantityFields';
 interface ItemDetailsSectionProps {
   form: UseFormReturn<ItemFormValues, any, undefined>;
   handleBarcodeDetected: (barcode: string) => void;
+  updatedFields?: string[];
 }
 
-const ItemDetailsSection: React.FC<ItemDetailsSectionProps> = ({ form, handleBarcodeDetected }) => {
+const ItemDetailsSection: React.FC<ItemDetailsSectionProps> = ({ 
+  form, 
+  handleBarcodeDetected,
+  updatedFields = []
+}) => {
   // Animation variants for staggered children
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -38,20 +43,35 @@ const ItemDetailsSection: React.FC<ItemDetailsSectionProps> = ({ form, handleBar
       animate="show"
     >
       <motion.div variants={itemVariants}>
-        <ItemNameField form={form} handleBarcodeDetected={handleBarcodeDetected} />
+        <ItemNameField 
+          form={form} 
+          handleBarcodeDetected={handleBarcodeDetected} 
+          isUpdated={updatedFields.includes('name')}
+        />
       </motion.div>
 
       <motion.div variants={itemVariants}>
-        <CategoryField form={form} />
+        <CategoryField 
+          form={form} 
+          isUpdated={updatedFields.includes('category')}
+        />
       </motion.div>
 
       {/* Address input */}
       <motion.div variants={itemVariants}>
-        <AddressField form={form} />
+        <AddressField 
+          form={form} 
+          isUpdated={updatedFields.includes('address')}
+        />
       </motion.div>
 
       {/* Price and quantity inputs */}
-      <PriceQuantityFields form={form} />
+      <PriceQuantityFields 
+        form={form} 
+        isOriginalPriceUpdated={updatedFields.includes('originalPrice')}
+        isCurrentPriceUpdated={updatedFields.includes('currentPrice')}
+        isQuantityUpdated={updatedFields.includes('quantity')}
+      />
     </motion.div>
   );
 };

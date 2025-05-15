@@ -12,13 +12,15 @@ interface FormSectionsProps {
   imagePreview: string | null;
   setImagePreview: React.Dispatch<React.SetStateAction<string | null>>;
   handleBarcodeDetected: (barcode: string) => void;
+  updatedFields?: string[];
 }
 
 const FormSections: React.FC<FormSectionsProps> = ({ 
   form, 
   imagePreview, 
   setImagePreview, 
-  handleBarcodeDetected 
+  handleBarcodeDetected,
+  updatedFields = []
 }) => {
   const formVariants = {
     hidden: { opacity: 0 },
@@ -56,14 +58,18 @@ const FormSections: React.FC<FormSectionsProps> = ({
             <span className="w-1.5 h-6 bg-blue-500 rounded-full mr-2 inline-block"></span>
             Item Details
           </h3>
-          <ItemDetailsSection form={form} handleBarcodeDetected={handleBarcodeDetected} />
+          <ItemDetailsSection 
+            form={form} 
+            handleBarcodeDetected={handleBarcodeDetected} 
+            updatedFields={updatedFields}
+          />
         </div>
         <div className="p-4 bg-purple-50 rounded-lg border border-purple-100 shadow-sm">
           <h3 className="text-lg font-semibold text-purple-700 mb-2 flex items-center">
             <span className="w-1.5 h-6 bg-purple-500 rounded-full mr-2 inline-block"></span>
             Expiry Date
           </h3>
-          <ExpiryDatePicker form={form} />
+          <ExpiryDatePicker form={form} isUpdated={updatedFields.includes('expiryDate')} />
         </div>
       </motion.div>
 
@@ -77,6 +83,7 @@ const FormSections: React.FC<FormSectionsProps> = ({
             form={form}
             imagePreview={imagePreview}
             setImagePreview={setImagePreview}
+            isDescriptionUpdated={updatedFields.includes('description')}
           />
         </div>
       </motion.div>

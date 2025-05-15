@@ -1,5 +1,5 @@
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useNavigate } from 'react-router-dom';
@@ -21,6 +21,7 @@ export const useItemForm = ({ onBarcodeDetected, onFormSuccess }: UseItemFormPro
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [savedProducts, setSavedProducts] = useLocalStorage<Item[]>('seller-products', []);
+  const [updatedFields, setUpdatedFields] = useState<string[]>([]);
   
   const form = useForm<ItemFormValues>({
     resolver: zodResolver(itemFormSchema),
@@ -34,9 +35,31 @@ export const useItemForm = ({ onBarcodeDetected, onFormSuccess }: UseItemFormPro
     },
   });
 
+  // Watch for field changes to update animations
+  useEffect(() => {
+    const subscription = form.watch((value, { name, type }) => {
+      if (name && type === 'change') {
+        setUpdatedFields(prev => {
+          if (prev.includes(name)) return prev;
+          
+          // Add the field to the updated list and remove it after animation completes
+          const newFields = [...prev, name];
+          setTimeout(() => {
+            setUpdatedFields(current => current.filter(field => field !== name));
+          }, 1500); // Animation duration
+          
+          return newFields;
+        });
+      }
+    });
+    
+    return () => subscription.unsubscribe();
+  }, [form.watch]);
+
   const handleBarcodeDetected = (barcode: string) => {
     if (barcode && barcodeDatabase[barcode]) {
       const item = barcodeDatabase[barcode];
+      const fieldsToUpdate: string[] = [];
       
       // Calculate expiry date based on expiryDays if present
       if (item.expiryDays) {
@@ -44,15 +67,40 @@ export const useItemForm = ({ onBarcodeDetected, onFormSuccess }: UseItemFormPro
         date.setDate(date.getDate() + item.expiryDays);
         
         // Set expiry date in the form as Date object
-        setTimeout(() => form.setValue('expiryDate', date), 600);
+        setTimeout(() => {
+          form.setValue('expiryDate', date);
+          fieldsToUpdate.push('expiryDate');
+        }, 600);
       }
       
       // Animate the form filling with a slight delay between fields
-      setTimeout(() => form.setValue('name', item.name), 100);
-      setTimeout(() => form.setValue('description', item.description), 200);
-      setTimeout(() => form.setValue('category', item.category as any), 300);
-      setTimeout(() => form.setValue('originalPrice', item.originalPrice), 400);
-      setTimeout(() => form.setValue('currentPrice', item.currentPrice), 500);
+      setTimeout(() => {
+        form.setValue('name', item.name);
+        fieldsToUpdate.push('name');
+      }, 100);
+      
+      setTimeout(() => {
+        form.setValue('description', item.description);
+        fieldsToUpdate.push('description');
+      }, 200);
+      
+      setTimeout(() => {
+        form.setValue('category', item.category as any);
+        fieldsToUpdate.push('category');
+      }, 300);
+      
+      setTimeout(() => {
+        form.setValue('originalPrice', item.originalPrice);
+        fieldsToUpdate.push('originalPrice');
+      }, 400);
+      
+      setTimeout(() => {
+        form.setValue('currentPrice', item.currentPrice);
+        fieldsToUpdate.push('currentPrice');
+        
+        // Update the field animations after all fields are set
+        setUpdatedFields(fieldsToUpdate);
+      }, 500);
       
       toast.success(`Scanned item: ${item.name}`, {
         description: 'Item details have been filled automatically'
@@ -133,6 +181,7 @@ export const useItemForm = ({ onBarcodeDetected, onFormSuccess }: UseItemFormPro
     setImagePreview,
     isSubmitting,
     handleBarcodeDetected,
-    onSubmit
+    onSubmit,
+    updatedFields
   };
 };
