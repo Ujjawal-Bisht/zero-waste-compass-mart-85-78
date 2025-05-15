@@ -19,9 +19,10 @@ import { Item } from '@/types';
 
 interface ItemFormProps {
   onBarcodeDetected?: (barcode: string, item: any) => void;
+  onFormSuccess?: () => void;
 }
 
-const ItemForm: React.FC<ItemFormProps> = ({ onBarcodeDetected }) => {
+const ItemForm: React.FC<ItemFormProps> = ({ onBarcodeDetected, onFormSuccess }) => {
   const navigate = useNavigate();
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -118,8 +119,12 @@ const ItemForm: React.FC<ItemFormProps> = ({ onBarcodeDetected }) => {
         description: 'Your item has been added to your inventory'
       });
       
-      // Navigate back to products page
-      navigate('/seller/products');
+      if (onFormSuccess) {
+        onFormSuccess();
+      }
+      
+      // Navigate back to products page after delay
+      setTimeout(() => navigate('/seller/products'), 2000);
     } catch (error) {
       console.error('Error adding item:', error);
       toast.error('Failed to add item. Please try again.');
@@ -133,7 +138,7 @@ const ItemForm: React.FC<ItemFormProps> = ({ onBarcodeDetected }) => {
     show: {
       opacity: 1,
       transition: {
-        staggerChildren: 0.1
+        staggerChildren: 0.15
       }
     }
   };
@@ -153,29 +158,47 @@ const ItemForm: React.FC<ItemFormProps> = ({ onBarcodeDetected }) => {
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
         <motion.div 
-          className="grid grid-cols-1 md:grid-cols-2 gap-6"
+          className="grid grid-cols-1 md:grid-cols-2 gap-8"
           variants={formVariants}
           initial="hidden"
           animate="show"
         >
-          <motion.div variants={sectionVariants} className="space-y-6">
-            <ItemDetailsSection form={form} handleBarcodeDetected={handleBarcodeDetected} />
-            <ExpiryDatePicker form={form} />
+          <motion.div variants={sectionVariants} className="space-y-6 form-stagger">
+            <div className="p-4 bg-blue-50 rounded-lg border border-blue-100 shadow-sm">
+              <h3 className="text-lg font-semibold text-blue-700 mb-2 flex items-center">
+                <span className="w-1.5 h-6 bg-blue-500 rounded-full mr-2 inline-block"></span>
+                Item Details
+              </h3>
+              <ItemDetailsSection form={form} handleBarcodeDetected={handleBarcodeDetected} />
+            </div>
+            <div className="p-4 bg-purple-50 rounded-lg border border-purple-100 shadow-sm">
+              <h3 className="text-lg font-semibold text-purple-700 mb-2 flex items-center">
+                <span className="w-1.5 h-6 bg-purple-500 rounded-full mr-2 inline-block"></span>
+                Expiry Date
+              </h3>
+              <ExpiryDatePicker form={form} />
+            </div>
           </motion.div>
 
           <motion.div variants={sectionVariants}>
-            <DescriptionImageSection 
-              form={form}
-              imagePreview={imagePreview}
-              setImagePreview={setImagePreview}
-            />
+            <div className="p-4 bg-indigo-50 rounded-lg border border-indigo-100 shadow-sm h-full">
+              <h3 className="text-lg font-semibold text-indigo-700 mb-2 flex items-center">
+                <span className="w-1.5 h-6 bg-indigo-500 rounded-full mr-2 inline-block"></span>
+                Description & Image
+              </h3>
+              <DescriptionImageSection 
+                form={form}
+                imagePreview={imagePreview}
+                setImagePreview={setImagePreview}
+              />
+            </div>
           </motion.div>
         </motion.div>
 
         <motion.div 
-          className="flex items-center justify-end space-x-4 pt-4"
+          className="flex items-center justify-end space-x-4 pt-4 border-t border-gray-100 mt-8"
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.5, duration: 0.3 }}
@@ -185,24 +208,27 @@ const ItemForm: React.FC<ItemFormProps> = ({ onBarcodeDetected }) => {
             variant="outline"
             onClick={() => navigate('/seller/products')}
             disabled={isSubmitting}
-            className="transition-all hover:bg-gray-100"
+            className="transition-all hover:bg-gray-100 px-6"
           >
             Cancel
           </Button>
           <motion.div
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
+            whileHover={{ scale: 1.03 }}
+            whileTap={{ scale: 0.97 }}
           >
             <Button 
               type="submit" 
-              className="zwm-gradient-hover transition-all"
+              className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white px-8 py-2 h-11 transition-all"
               disabled={isSubmitting}
             >
               {isSubmitting ? (
-                <>
-                  <span className="animate-pulse">Adding...</span>
-                  <span className="loading-dots"></span>
-                </>
+                <span className="flex items-center">
+                  <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  </svg>
+                  Adding Item...
+                </span>
               ) : 'Add Item'}
             </Button>
           </motion.div>

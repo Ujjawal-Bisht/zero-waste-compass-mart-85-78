@@ -196,3 +196,78 @@
     color: rgba(239, 68, 68, 0.7);
   }
 }
+
+/* Add these new animations for improved seller profile UI */
+.profile-card {
+  transition: all 0.3s ease;
+  border-radius: 0.75rem;
+  overflow: hidden;
+}
+
+.profile-card:hover {
+  box-shadow: 0 12px 24px -8px rgba(249, 115, 22, 0.15);
+  transform: translateY(-3px);
+}
+
+/* Smooth tab transitions */
+.tab-transition {
+  transition: all 0.3s ease;
+}
+
+.tab-transition-enter {
+  opacity: 0;
+  transform: translateY(10px);
+}
+
+.tab-transition-enter-active {
+  opacity: 1;
+  transform: translateY(0);
+  transition: opacity 0.3s, transform 0.3s;
+}
+
+.tab-transition-exit {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.tab-transition-exit-active {
+  opacity: 0;
+  transform: translateY(10px);
+  transition: opacity 0.3s, transform 0.3s;
+}
+
+/* Hover effect for seller cards */
+.seller-card-hover {
+  transition: all 0.3s ease;
+}
+
+.seller-card-hover:hover {
+  transform: scale(1.02);
+  box-shadow: 0 15px 30px -5px rgba(249, 115, 22, 0.15);
+}
+
+/* Button animations for seller profile */
+.seller-button {
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.seller-button::after {
+  content: '';
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: -100%;
+  background: linear-gradient(90deg, 
+    rgba(255,255,255,0) 0%, 
+    rgba(255,255,255,0.2) 50%, 
+    rgba(255,255,255,0) 100%
+  );
+  transition: left 0.5s ease;
+}
+
+.seller-button:hover::after {
+  left: 100%;
+}
