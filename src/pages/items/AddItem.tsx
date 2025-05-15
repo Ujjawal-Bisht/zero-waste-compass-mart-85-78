@@ -132,24 +132,19 @@ const AddItem: React.FC = () => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2, duration: 0.5, type: "spring" }}
         >
+          {/* Match header to design in reference image */}
           <motion.div
-            initial={{ background: "linear-gradient(90deg, #3b82f6, #6366f1)" }}
-            animate={{ 
-              background: [
-                "linear-gradient(90deg, #3b82f6, #6366f1)",
-                "linear-gradient(90deg, #6366f1, #8b5cf6)", 
-                "linear-gradient(90deg, #8b5cf6, #3b82f6)"
-              ]
-            }}
-            transition={{ duration: 10, repeat: Infinity }}
-            className="inline-block rounded-lg p-1 mb-3"
+            className="header-gradient mb-3 mx-auto inline-flex justify-center"
+            whileHover={{ y: -2, boxShadow: '0 8px 25px rgba(99, 102, 241, 0.3)' }}
+            transition={{ type: "spring", stiffness: 400, damping: 10 }}
           >
-            <h1 className="text-3xl md:text-4xl font-bold bg-white rounded-md p-2 px-4 bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-indigo-600">
+            <h1 className="text-3xl md:text-4xl font-bold text-white">
               Add New Item
             </h1>
           </motion.div>
+          
           <motion.p 
-            className="text-muted-foreground text-lg"
+            className="text-indigo-700 text-lg font-medium"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.4, duration: 0.5 }}
@@ -157,11 +152,7 @@ const AddItem: React.FC = () => {
             Add products for donation or discount sale to help reduce waste
           </motion.p>
           
-          <motion.div 
-            className="h-1 bg-gradient-to-r from-blue-500 via-indigo-500 to-purple-500 rounded-full mt-4 w-0 mx-auto"
-            animate={{ width: "120px" }}
-            transition={{ delay: 0.6, duration: 1, ease: "easeOut" }}
-          />
+          <div className="clean-divider mt-3"></div>
         </motion.div>
 
         <motion.div 

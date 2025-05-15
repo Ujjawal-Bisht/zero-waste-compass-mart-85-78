@@ -7,7 +7,8 @@ export const initializeScanner = (
   onProcessed: (result: any) => void,
   onError: (err: Error) => void,
   onInitSuccess?: () => void,
-  enableTorch: boolean = false
+  enableTorch: boolean = false,
+  deviceId?: string
 ) => {
   if (scannerRef.current) {
     try {
@@ -22,6 +23,13 @@ export const initializeScanner = (
             facingMode: "environment", // Use the rear camera
             aspectRatio: { min: 1, max: 2 },
             torch: enableTorch, // Enable or disable flashlight
+            deviceId: deviceId ? { exact: deviceId } : undefined // Use specific device if available
+          },
+          area: { // Only consider the center part of the image
+            top: "30%",
+            right: "20%",
+            left: "20%",
+            bottom: "30%",
           },
         },
         locator: {
@@ -135,63 +143,136 @@ export const drawBarcodeBox = (result: any) => {
         }
       }
 
-      // Draw focused box if result is found (in green with animation effect)
+      // Draw focused box if result is found (enhanced with animation effects)
       if (result.codeResult && result.codeResult.code) {
+        // Create gradient for detection box
+        const gradient = drawingCtx.createLinearGradient(
+          result.box.x, 
+          result.box.y, 
+          result.box.x + result.box.width, 
+          result.box.y + result.box.height
+        );
+        gradient.addColorStop(0, '#4f46e5');
+        gradient.addColorStop(1, '#8b5cf6');
+        
         // Draw a more prominent box
-        drawingCtx.strokeStyle = '#00FF00';
+        drawingCtx.strokeStyle = gradient;
         drawingCtx.lineWidth = 5;
         
         // Add a pulsing effect by varying opacity
         const currentTime = Date.now() % 1000;
-        const opacity = 0.6 + 0.4 * Math.sin(currentTime / 1000 * Math.PI * 2);
+        const opacity = 0.7 + 0.3 * Math.sin(currentTime / 1000 * Math.PI * 2);
         
-        drawingCtx.strokeStyle = `rgba(0, 255, 0, ${opacity})`;
         drawingCtx.strokeRect(result.box.x, result.box.y, result.box.width, result.box.height);
         
-        // Add text with the barcode number
-        drawingCtx.font = '16px Arial';
+        // Add fancy text with the barcode number
+        drawingCtx.font = 'bold 14px Arial';
+        
+        // Text background
+        drawingCtx.fillStyle = 'rgba(99, 102, 241, 0.8)';
+        const textPadding = 8;
+        const textWidth = result.codeResult.code.length * 8 + textPadding * 2; // Approximate text width
+        drawingCtx.fillRect(
+          result.box.x, 
+          result.box.y - 30, 
+          textWidth, 
+          24
+        );
+        
+        // Arrow pointer
+        drawingCtx.beginPath();
+        drawingCtx.moveTo(result.box.x + textWidth/2 - 8, result.box.y - 6);
+        drawingCtx.lineTo(result.box.x + textWidth/2 + 8, result.box.y - 6);
+        drawingCtx.lineTo(result.box.x + textWidth/2, result.box.y);
+        drawingCtx.closePath();
+        drawingCtx.fill();
+        
+        // Text
         drawingCtx.fillStyle = 'white';
-        drawingCtx.fillRect(result.box.x, result.box.y - 25, result.codeResult.code.length * 10 + 20, 25);
-        drawingCtx.fillStyle = 'black';
-        drawingCtx.fillText(result.codeResult.code, result.box.x + 10, result.box.y - 7);
+        drawingCtx.fillText(
+          result.codeResult.code, 
+          result.box.x + textPadding, 
+          result.box.y - 14
+        );
         
         // Add highlight behind the barcode
-        drawingCtx.fillStyle = 'rgba(0, 255, 0, 0.2)';
+        drawingCtx.fillStyle = `rgba(99, 102, 241, ${opacity * 0.2})`;
         drawingCtx.fillRect(result.box.x, result.box.y, result.box.width, result.box.height);
       }
     }
   }
 };
 
-// New function to improve camera selection
+// Enhanced function to select the best camera
 export const selectOptimalCamera = async (): Promise<string | undefined> => {
   try {
     const devices = await navigator.mediaDevices.enumerateDevices();
     const videoDevices = devices.filter(device => device.kind === 'videoinput');
     
-    // Try to find a back camera
-    const backCamera = videoDevices.find(device => 
-      device.label.toLowerCase().includes('back') || 
-      device.label.toLowerCase().includes('rear')
-    );
-    
-    if (backCamera) {
-      return backCamera.deviceId;
+    if (videoDevices.length === 0) {
+      return undefined;
     }
     
-    // If no back camera found, use the last device (often the back camera on mobile)
-    if (videoDevices.length > 1) {
+    // Try to find a back camera based on common naming patterns
+    const backCameraKeywords = ['back', 'rear', 'environment', 'facing back'];
+    
+    for (const keyword of backCameraKeywords) {
+      const matchingCamera = videoDevices.find(device => 
+        device.label.toLowerCase().includes(keyword)
+      );
+      
+      if (matchingCamera) {
+        return matchingCamera.deviceId;
+      }
+    }
+    
+    // If no back camera found by name, use heuristics:
+    // On mobile, the back camera is usually the last in the list
+    if (videoDevices.length > 1 && /Mobi|Android/i.test(navigator.userAgent)) {
       return videoDevices[videoDevices.length - 1].deviceId;
     }
     
     // Fall back to the first camera
-    if (videoDevices.length > 0) {
-      return videoDevices[0].deviceId;
-    }
-    
-    return undefined;
+    return videoDevices[0].deviceId;
   } catch (error) {
     console.error("Error selecting camera:", error);
     return undefined;
+  }
+};
+
+// Function to check and enhance camera capabilities
+export const enhanceCameraCapabilities = async (stream: MediaStream) => {
+  try {
+    const videoTrack = stream.getVideoTracks()[0];
+    if (!videoTrack) return;
+    
+    const capabilities = videoTrack.getCapabilities();
+    const settings = videoTrack.getSettings();
+    
+    // Try to improve zoom for better barcode detection
+    if (capabilities.zoom) {
+      await videoTrack.applyConstraints({
+        advanced: [{ zoom: Math.min(capabilities.zoom.max, 1.5) }]
+      });
+    }
+    
+    // Try to improve focus for better barcode detection
+    if (capabilities.focusMode) {
+      await videoTrack.applyConstraints({
+        advanced: [{ focusMode: "continuous" }]
+      });
+    }
+    
+    // Improve sharpness if available
+    if (capabilities.sharpness) {
+      await videoTrack.applyConstraints({
+        advanced: [{ sharpness: capabilities.sharpness.max }]
+      });
+    }
+    
+    return true;
+  } catch (error) {
+    console.log("Could not enhance camera capabilities:", error);
+    return false;
   }
 };

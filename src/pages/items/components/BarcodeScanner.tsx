@@ -1,11 +1,12 @@
+
 import React, { useState, useRef, useEffect } from 'react';
-import { Barcode, Camera } from 'lucide-react';
+import { Barcode, Camera, Scan } from 'lucide-react';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogTrigger } from "@/components/ui/dialog";
 import Quagga from 'quagga';
 import BarcodeScannerDialog from './barcode/BarcodeScannerDialog';
-import { initializeScanner, drawBarcodeBox } from './barcode/scannerUtils';
+import { initializeScanner, drawBarcodeBox, selectOptimalCamera } from './barcode/scannerUtils';
 import { motion } from 'framer-motion';
 
 interface BarcodeScannerProps {
@@ -18,15 +19,34 @@ export const BarcodeScanner: React.FC<BarcodeScannerProps> = ({ onBarcodeDetecte
   const [scanFeedback, setScanFeedback] = useState('');
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [hasPermission, setHasPermission] = useState<boolean | null>(null);
+  const [scanProgress, setScanProgress] = useState(0);
   const scannerRef = useRef<HTMLDivElement>(null);
   const scanLineRef = useRef<HTMLDivElement>(null);
   const quaggaInitialized = useRef(false);
   const detectionCount = useRef<Record<string, number>>({});
+  const progressIntervalRef = useRef<number | null>(null);
 
   // Animate the scan line
   useEffect(() => {
     if (isScanning && scanLineRef.current) {
       // The animation is now handled by CSS in items.css
+    }
+    
+    // Start the scanning progress animation when scanning begins
+    if (isScanning) {
+      setScanProgress(0);
+      const intervalId = window.setInterval(() => {
+        setScanProgress(prev => {
+          if (prev < 95) return prev + 1;
+          return prev;
+        });
+      }, 100);
+      progressIntervalRef.current = intervalId;
+      return () => {
+        if (progressIntervalRef.current) {
+          clearInterval(progressIntervalRef.current);
+        }
+      };
     }
   }, [isScanning]);
 
@@ -39,6 +59,9 @@ export const BarcodeScanner: React.FC<BarcodeScannerProps> = ({ onBarcodeDetecte
     // Clean up function
     return () => {
       cleanupScanner();
+      if (progressIntervalRef.current) {
+        clearInterval(progressIntervalRef.current);
+      }
     };
   }, [isDialogOpen, isScanning]);
 
@@ -53,6 +76,7 @@ export const BarcodeScanner: React.FC<BarcodeScannerProps> = ({ onBarcodeDetecte
       if (detectionCount.current[code] >= 3) {
         setBarcodeResult(code);
         setScanFeedback(`Barcode detected: ${code}`);
+        setScanProgress(100);
         
         // Visual feedback
         const scannerElement = scannerRef.current;
@@ -69,7 +93,7 @@ export const BarcodeScanner: React.FC<BarcodeScannerProps> = ({ onBarcodeDetecte
         
         // Haptic feedback if available
         if (navigator.vibrate) {
-          navigator.vibrate(200);
+          navigator.vibrate([100, 50, 200]);
         }
         
         // Use a slight delay to show the detected barcode before closing
@@ -80,6 +104,7 @@ export const BarcodeScanner: React.FC<BarcodeScannerProps> = ({ onBarcodeDetecte
         }, 500);
       } else {
         setScanFeedback(`Confirming scan: ${code} (${detectionCount.current[code]}/3)`);
+        setScanProgress(30 + (detectionCount.current[code] * 20)); // Incremental progress
       }
     }
   };
@@ -108,12 +133,21 @@ export const BarcodeScanner: React.FC<BarcodeScannerProps> = ({ onBarcodeDetecte
         console.error("Error stopping Quagga:", error);
       }
     }
+    
+    if (progressIntervalRef.current) {
+      clearInterval(progressIntervalRef.current);
+      progressIntervalRef.current = null;
+    }
   };
 
-  const startScanner = () => {
+  const startScanner = async () => {
     setIsScanning(true);
     setScanFeedback('Initializing camera...');
     detectionCount.current = {}; // Reset detection counter
+    setScanProgress(5); // Start progress indicator
+    
+    // Try to select the optimal camera (back camera if available)
+    const optimalCameraId = await selectOptimalCamera();
     
     if (scannerRef.current) {
       initializeScanner(
@@ -126,8 +160,10 @@ export const BarcodeScanner: React.FC<BarcodeScannerProps> = ({ onBarcodeDetecte
           quaggaInitialized.current = true;
           setHasPermission(true);
           setScanFeedback('Camera ready. Scanning for barcode...');
+          setScanProgress(25); // Update progress after initialization
         },
-        false // torch initially disabled
+        false, // torch initially disabled
+        optimalCameraId
       );
     }
   };
@@ -140,6 +176,7 @@ export const BarcodeScanner: React.FC<BarcodeScannerProps> = ({ onBarcodeDetecte
   const resetScanner = () => {
     setBarcodeResult(null);
     setScanFeedback('');
+    setScanProgress(0);
     detectionCount.current = {};
     startScanner();
   };
@@ -159,11 +196,11 @@ export const BarcodeScanner: React.FC<BarcodeScannerProps> = ({ onBarcodeDetecte
           <Button 
             type="button" 
             variant="outline" 
-            className="mt-8 button-glow"
+            className="mt-8 scanner-button add-button-special text-white"
             title="Scan Barcode"
           >
-            <Barcode className="h-4 w-4 mr-1" />
-            <span>Scan</span>
+            <Scan className="h-4 w-4 mr-2" />
+            <span>Scan Barcode</span>
           </Button>
         </motion.div>
       </DialogTrigger>
@@ -177,6 +214,7 @@ export const BarcodeScanner: React.FC<BarcodeScannerProps> = ({ onBarcodeDetecte
         scanLineRef={scanLineRef}
         setIsDialogOpen={setIsDialogOpen}
         onResetScanner={resetScanner}
+        scanProgress={scanProgress}
       />
     </Dialog>
   );
