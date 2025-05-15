@@ -1,22 +1,31 @@
 
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { X, Flashlight } from 'lucide-react';
+import { Flashlight } from 'lucide-react';
 import { toggleTorch } from './scannerUtils';
 import { motion } from 'framer-motion';
+import ScannerControls from './ScannerControls';
+import ScanProgressBar from './ScanProgressBar';
+import ScanFeedback from './ScanFeedback';
 
 interface ScannerViewProps {
   scannerRef: React.RefObject<HTMLDivElement>;
   scanLineRef: React.RefObject<HTMLDivElement>;
   scanFeedback: string;
+  scanProgress: number;
   onStopScanner: () => void;
+  onResetScanner: () => void;
+  barcodeResult: string | null;
 }
 
 const ScannerView: React.FC<ScannerViewProps> = ({
   scannerRef,
   scanLineRef,
   scanFeedback,
+  scanProgress,
   onStopScanner,
+  onResetScanner,
+  barcodeResult
 }) => {
   const [torchEnabled, setTorchEnabled] = useState(false);
   
@@ -41,6 +50,7 @@ const ScannerView: React.FC<ScannerViewProps> = ({
     >
       <div 
         ref={scannerRef} 
+        id="scanner"
         className="w-full h-full"
       >
         {/* Quagga will inject video here */}
@@ -76,43 +86,20 @@ const ScannerView: React.FC<ScannerViewProps> = ({
             <Flashlight className={`h-4 w-4 ${torchEnabled ? 'text-yellow-400 filter drop-shadow-md' : ''}`} />
           </Button>
         </motion.div>
-        
-        <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.95 }}>
-          <Button 
-            type="button"
-            variant="outline" 
-            size="sm" 
-            className="scanner-button bg-white/90 backdrop-blur-sm z-10"
-            onClick={onStopScanner}
-          >
-            <X className="h-4 w-4" />
-          </Button>
-        </motion.div>
       </div>
       
+      {/* Scanner controls (Stop/Reset) */}
+      <ScannerControls
+        onStopScanner={onStopScanner}
+        onResetScanner={onResetScanner}
+        isDetected={!!barcodeResult}
+      />
+      
+      {/* Progress bar */}
+      <ScanProgressBar progress={scanProgress} />
+      
       {/* Enhanced status indicator */}
-      <motion.div 
-        className="absolute bottom-0 left-0 right-0 p-3 bg-gradient-to-t from-black/90 to-black/60 text-white text-center backdrop-blur-sm"
-        initial={{ y: 20, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
-        transition={{ delay: 0.2 }}
-      >
-        <div className="flex items-center justify-center gap-2">
-          <motion.div
-            animate={{ 
-              scale: [1, 1.2, 1],
-              opacity: [0.5, 1, 0.5] 
-            }}
-            transition={{ 
-              duration: 1.5,
-              repeat: Infinity,
-              repeatType: "reverse"
-            }}
-            className="h-2 w-2 bg-indigo-400 rounded-full"
-          ></motion.div>
-          <span className="text-sm font-medium">{scanFeedback}</span>
-        </div>
-      </motion.div>
+      <ScanFeedback message={scanFeedback} />
     </motion.div>
   );
 };
