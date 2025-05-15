@@ -3,13 +3,22 @@ import React, { useEffect, useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
-import { Item } from '@/types';
-import { Plus, Package, Printer } from 'lucide-react';
+import { Item, ItemCategory } from '@/types';
+import { 
+  Plus, 
+  Package, 
+  Printer, 
+  Filter, 
+  ArrowUpDown,
+  FileDown, 
+  FileUp
+} from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import ProductTable from '@/components/products/ProductTable';
 import { getCategoryBadgeColor, getStatusBadgeColor, formatDate } from '@/components/products/productUtils';
 import { exportProducts } from '@/utils/exportUtils';
 import { useLocalStorage } from '@/pages/items/hooks/useLocalStorage';
+import { toast } from '@/components/ui/use-toast';
 
 const SellerProducts: React.FC = () => {
   const navigate = useNavigate();
@@ -17,6 +26,7 @@ const SellerProducts: React.FC = () => {
   // Use local storage to retrieve saved products
   const [savedProducts, setSavedProducts] = useLocalStorage<Item[]>('seller-products', []);
   const [products, setProducts] = useState<Item[]>([]);
+  const [activeFilter, setActiveFilter] = useState<string | null>(null);
   
   // Initialize with sample products if no saved products
   useEffect(() => {
@@ -89,7 +99,34 @@ const SellerProducts: React.FC = () => {
   
   const handleExportProducts = () => {
     exportProducts(products);
+    toast({
+      title: "Products exported",
+      description: "CSV file has been downloaded",
+      duration: 3000
+    });
   };
+
+  const handleImportProducts = () => {
+    // This would open a file picker in a real app
+    toast({
+      title: "Import functionality",
+      description: "This would open a file picker to import products",
+      duration: 3000
+    });
+  };
+
+  const handleFilterByCategory = (category: ItemCategory | null) => {
+    if (category === activeFilter) {
+      setActiveFilter(null); // Clear filter if clicking the active one
+    } else {
+      setActiveFilter(category);
+    }
+  };
+  
+  // Get filtered products
+  const filteredProducts = activeFilter 
+    ? products.filter(p => p.category === activeFilter) 
+    : products;
 
   return (
     <motion.div 
@@ -117,37 +154,92 @@ const SellerProducts: React.FC = () => {
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
           >
-            <Button variant="outline" onClick={handleExportProducts} className="button-shimmer flex items-center">
-              <Printer className="mr-2 h-4 w-4" /> Export
+            <Button variant="outline" onClick={handleImportProducts} className="button-shimmer flex items-center">
+              <FileUp className="mr-2 h-4 w-4" /> Import
             </Button>
           </motion.div>
           <motion.div
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
           >
-            <Button onClick={handleAddProduct} className="zwm-gradient button-shimmer">
+            <Button variant="outline" onClick={handleExportProducts} className="button-shimmer flex items-center">
+              <FileDown className="mr-2 h-4 w-4" /> Export
+            </Button>
+          </motion.div>
+          <motion.div
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+          >
+            <Button onClick={handleAddProduct} className="bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 button-shimmer text-white">
               <Plus className="mr-2 h-4 w-4" /> Add Product
             </Button>
           </motion.div>
         </motion.div>
       </div>
       
+      {/* Category quick filters */}
+      <motion.div 
+        className="flex flex-wrap gap-2"
+        initial={{ y: 10, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        transition={{ duration: 0.3, delay: 0.3 }}
+      >
+        {['food', 'clothing', 'electronics', 'furniture', 'household'].map((category) => (
+          <Button
+            key={category}
+            variant={activeFilter === category ? "default" : "outline"}
+            size="sm"
+            onClick={() => handleFilterByCategory(category as ItemCategory)}
+            className="rounded-full"
+          >
+            <span 
+              className={`h-2 w-2 rounded-full ${
+                category === 'food' ? 'bg-green-500' : 
+                category === 'clothing' ? 'bg-blue-500' :
+                category === 'electronics' ? 'bg-yellow-500' :
+                category === 'furniture' ? 'bg-purple-500' :
+                'bg-cyan-500'
+              } mr-2`}
+            ></span>
+            {category.charAt(0).toUpperCase() + category.slice(1)}
+          </Button>
+        ))}
+        {activeFilter && (
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => setActiveFilter(null)}
+            className="text-gray-500"
+          >
+            Clear filter
+          </Button>
+        )}
+      </motion.div>
+      
       <motion.div
         initial={{ y: 20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ duration: 0.5, delay: 0.2 }}
       >
-        <Card className="product-card">
-          <CardHeader className="flex justify-between items-center">
+        <Card className="product-card border-0 shadow-md">
+          <CardHeader className="flex justify-between items-center bg-gradient-to-r from-indigo-50 to-purple-50 rounded-t-lg">
             <CardTitle className="flex items-center">
-              <Package className="mr-2 h-5 w-5" />
-              <span>All Products</span>
+              <Package className="mr-2 h-5 w-5 text-indigo-600" />
+              <span>All Products {activeFilter && `(${activeFilter})`}</span>
             </CardTitle>
+            <div className="flex gap-2">
+              <Button variant="ghost" size="sm">
+                <Filter className="h-4 w-4 mr-1" /> Filter
+              </Button>
+              <Button variant="ghost" size="sm">
+                <ArrowUpDown className="h-4 w-4 mr-1" /> Sort
+              </Button>
+            </div>
           </CardHeader>
-          <CardContent>
+          <CardContent className="p-0">
             <AnimatePresence mode="wait">
               <ProductTable
-                products={products}
+                products={filteredProducts}
                 getCategoryBadgeColor={getCategoryBadgeColor}
                 getStatusBadgeColor={getStatusBadgeColor}
                 formatDate={formatDate}

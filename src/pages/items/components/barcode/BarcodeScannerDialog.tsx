@@ -1,140 +1,259 @@
 
-import React, { useState } from 'react';
-import { X, Flashlight, RotateCcw, Check } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import React, { useEffect, useState } from 'react';
 import {
+  Dialog,
   DialogContent,
+  DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog";
-import ScannerView from './ScannerView';
-import IdleView from './IdleView';
-import { motion } from 'framer-motion';
+  DialogDescription,
+} from '@/components/ui/dialog';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import { Progress } from '@/components/ui/progress';
+import { Camera, X, Loader2, Check, AlertTriangle } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { initializeScanner, stopScanner } from './scannerUtils';
 
 interface BarcodeScannerDialogProps {
-  isScanning: boolean;
-  barcodeResult: string | null;
-  scanFeedback: string;
-  onStartScanner: () => void;
-  onStopScanner: () => void;
-  scannerRef: React.RefObject<HTMLDivElement>;
-  scanLineRef: React.RefObject<HTMLDivElement>;
-  setIsDialogOpen: (isOpen: boolean) => void;
-  onResetScanner?: () => void;
-  scanProgress: number;
+  isOpen: boolean;
+  onClose: () => void;
+  onBarcodeDetected: (barcode: string) => void;
 }
 
 const BarcodeScannerDialog: React.FC<BarcodeScannerDialogProps> = ({
-  isScanning,
-  barcodeResult,
-  scanFeedback,
-  onStartScanner,
-  onStopScanner,
-  scannerRef,
-  scanLineRef,
-  setIsDialogOpen,
-  onResetScanner,
-  scanProgress,
+  isOpen,
+  onClose,
+  onBarcodeDetected,
 }) => {
-  const [showSuccess, setShowSuccess] = useState(false);
-
-  // Show success animation when barcode is detected
-  React.useEffect(() => {
-    if (barcodeResult && !isScanning) {
-      setShowSuccess(true);
-      const timer = setTimeout(() => {
-        setShowSuccess(false);
-      }, 3000);
-      return () => clearTimeout(timer);
+  const [scanProgress, setScanProgress] = useState(0);
+  const [scannerActive, setScannerActive] = useState(false);
+  const [manualBarcode, setManualBarcode] = useState('');
+  const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState(false);
+  
+  // Increase progress when scanner is active
+  useEffect(() => {
+    let interval: NodeJS.Timeout;
+    
+    if (scannerActive && scanProgress < 95) {
+      interval = setInterval(() => {
+        setScanProgress(prev => {
+          const nextValue = prev + (95 - prev) * 0.05;
+          return Math.min(nextValue, 95);
+        });
+      }, 500);
     }
-  }, [barcodeResult, isScanning]);
+    
+    return () => {
+      if (interval) clearInterval(interval);
+    };
+  }, [scannerActive, scanProgress]);
+
+  useEffect(() => {
+    // Reset state when dialog opens
+    if (isOpen) {
+      setScanProgress(0);
+      setScannerActive(false);
+      setError(null);
+      setSuccess(false);
+      setManualBarcode('');
+    }
+  }, [isOpen]);
+
+  useEffect(() => {
+    // Clean up scanner on component unmount
+    return () => {
+      stopScanner();
+    };
+  }, []);
+
+  const handleStartScanner = () => {
+    setScannerActive(true);
+    setError(null);
+    
+    initializeScanner({
+      containerId: 'interactive',
+      onDetected: (code) => {
+        handleBarcodeDetection(code);
+      },
+      onError: (err) => {
+        setError(err.message || 'Failed to access camera');
+        setScannerActive(false);
+        setScanProgress(0);
+      }
+    });
+  };
+
+  const handleBarcodeDetection = (code: string) => {
+    stopScanner();
+    setScannerActive(false);
+    setScanProgress(100);
+    setSuccess(true);
+    
+    // Delay to show success animation
+    setTimeout(() => {
+      onBarcodeDetected(code);
+      onClose();
+    }, 1500);
+  };
+
+  const handleManualSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (manualBarcode.trim()) {
+      handleBarcodeDetection(manualBarcode);
+    }
+  };
+
+  const handleClose = () => {
+    stopScanner();
+    setScannerActive(false);
+    onClose();
+  };
 
   return (
-    <DialogContent className="sm:max-w-md">
-      <DialogHeader>
-        <DialogTitle className="flex items-center justify-between">
-          <span className="flex-1 text-lg font-semibold text-indigo-700">
-            {barcodeResult ? "Barcode Detected" : "Scan Barcode"}
-          </span>
-          {barcodeResult && !isScanning && onResetScanner && (
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={onResetScanner}
-              className="animate-fade-in scanner-button text-indigo-600 border-indigo-200"
-            >
-              <RotateCcw className="h-4 w-4 mr-1" /> Scan Again
-            </Button>
-          )}
-        </DialogTitle>
-      </DialogHeader>
-      
-      {isScanning && (
-        <div className="mb-2">
-          <div className="flex justify-between text-xs text-muted-foreground mb-1">
-            <span>Scanning</span>
-            <span>{scanProgress}%</span>
-          </div>
-          <Progress value={scanProgress} className="h-1.5 bg-slate-100" 
-            indicatorClassName="bg-gradient-to-r from-indigo-500 to-purple-500" />
-        </div>
-      )}
-      
-      <div className="flex flex-col items-center justify-center space-y-4">
-        {isScanning ? (
-          <ScannerView
-            scannerRef={scannerRef}
-            scanLineRef={scanLineRef}
-            scanFeedback={scanFeedback}
-            onStopScanner={onStopScanner}
-          />
-        ) : (
-          <IdleView onStartScanner={onStartScanner} />
-        )}
+    <Dialog open={isOpen} onOpenChange={handleClose}>
+      <DialogContent className="sm:max-w-md">
+        <DialogHeader>
+          <DialogTitle className="flex items-center">
+            <Camera className="mr-2 h-5 w-5 text-indigo-500" />
+            <span>Barcode Scanner</span>
+          </DialogTitle>
+          <DialogDescription>
+            Position the barcode within the camera view or enter the code manually.
+          </DialogDescription>
+        </DialogHeader>
         
-        {barcodeResult && !isScanning && (
-          <motion.div 
-            className={`text-center p-4 rounded-md w-full ${showSuccess ? "success-pulse" : ""}`}
-            style={{
-              background: 'linear-gradient(to right, rgba(99, 102, 241, 0.1), rgba(139, 92, 246, 0.1))',
-              boxShadow: '0 4px 12px -2px rgba(99, 102, 241, 0.15)',
-              border: '1px solid rgba(99, 102, 241, 0.2)'
-            }}
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.3 }}
-          >
-            <div className="flex items-center justify-center mb-3">
+        <div className="flex flex-col space-y-4">
+          {/* Progress indicator */}
+          <div className="relative">
+            <Progress 
+              value={scanProgress} 
+              className="h-2 bg-gray-100" 
+            />
+            {scanProgress === 100 && success && (
               <motion.div 
-                className="bg-gradient-to-r from-indigo-500 to-purple-500 p-2 rounded-full"
                 initial={{ scale: 0 }}
                 animate={{ scale: 1 }}
-                transition={{ type: "spring", stiffness: 300, damping: 10 }}
+                className="absolute -right-3 -top-3"
               >
-                <Check className="h-6 w-6 text-white" />
+                <div className="bg-green-500 text-white p-1 rounded-full">
+                  <Check className="h-4 w-4" />
+                </div>
               </motion.div>
-            </div>
-            <p className="text-base font-semibold text-indigo-800">Barcode detected: {barcodeResult}</p>
-            <p className="text-sm text-indigo-600 mt-1">Item details have been filled automatically</p>
-            
-            <motion.div
-              className="mt-4"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.5 }}
-            >
+            )}
+          </div>
+          
+          {/* Scanner or error display */}
+          <div className="relative h-60 bg-gray-100 rounded-md overflow-hidden">
+            <AnimatePresence mode="wait">
+              {error ? (
+                <motion.div 
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  className="absolute inset-0 flex flex-col items-center justify-center p-4 bg-gray-100"
+                >
+                  <AlertTriangle className="h-12 w-12 text-amber-500 mb-4" />
+                  <p className="text-center text-gray-700">{error}</p>
+                  <Button 
+                    variant="outline" 
+                    onClick={() => setError(null)}
+                    className="mt-4"
+                  >
+                    Try Again
+                  </Button>
+                </motion.div>
+              ) : scannerActive ? (
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  className="absolute inset-0"
+                >
+                  <div id="interactive" className="h-full viewport"></div>
+                  <div className="absolute inset-0 pointer-events-none border-2 border-dashed border-indigo-400 m-8 rounded-md scanner-target"></div>
+                  <div className="scan-line absolute left-0 w-full h-px bg-indigo-500 opacity-75"></div>
+                </motion.div>
+              ) : success ? (
+                <motion.div 
+                  initial={{ opacity: 0, scale: 0.9 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  className="absolute inset-0 flex items-center justify-center bg-green-50"
+                >
+                  <div className="text-center">
+                    <motion.div 
+                      initial={{ scale: 0 }}
+                      animate={{ scale: 1 }}
+                      transition={{ type: "spring" }}
+                    >
+                      <div className="inline-flex items-center justify-center h-16 w-16 rounded-full bg-green-100 mb-4">
+                        <Check className="h-8 w-8 text-green-600" />
+                      </div>
+                    </motion.div>
+                    <h3 className="text-lg font-medium text-green-800 mb-2">Barcode Detected!</h3>
+                    <p className="text-green-600">Processing product information...</p>
+                  </div>
+                </motion.div>
+              ) : (
+                <motion.div 
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  className="absolute inset-0 flex items-center justify-center"
+                >
+                  <Button
+                    onClick={handleStartScanner}
+                    className="bg-indigo-600 hover:bg-indigo-700 text-white"
+                  >
+                    <Camera className="mr-2 h-4 w-4" />
+                    Start Scanner
+                  </Button>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
+          
+          {/* Manual entry form */}
+          <form onSubmit={handleManualSubmit} className="space-y-2">
+            <p className="text-sm text-gray-500">Or enter barcode manually:</p>
+            <div className="flex space-x-2">
+              <Input
+                value={manualBarcode}
+                onChange={(e) => setManualBarcode(e.target.value)}
+                placeholder="Enter barcode number"
+                className="flex-1"
+                disabled={scannerActive || success}
+              />
               <Button 
-                className="w-full add-button-special text-white"
-                onClick={() => setIsDialogOpen(false)}
+                type="submit" 
+                disabled={!manualBarcode.trim() || scannerActive || success}
               >
-                Continue
+                {success ? <Check className="h-4 w-4" /> : 'Submit'}
               </Button>
-            </motion.div>
-          </motion.div>
-        )}
-      </div>
-    </DialogContent>
+            </div>
+          </form>
+        </div>
+        
+        <DialogFooter className="flex justify-between">
+          <Button
+            variant="outline"
+            onClick={handleClose}
+            className="flex items-center"
+            disabled={success}
+          >
+            <X className="mr-2 h-4 w-4" /> Cancel
+          </Button>
+          
+          {scannerActive && (
+            <div className="flex items-center text-sm text-indigo-600">
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              Scanning...
+            </div>
+          )}
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   );
 };
 
