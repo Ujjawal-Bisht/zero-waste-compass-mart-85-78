@@ -15,7 +15,9 @@ import {
 import { Button } from '@/components/ui/button';
 import { 
   MoreHorizontal, Pencil, Trash, Copy, Tag, 
-  ShoppingBag, Eye, ArrowDownToLine, Check  
+  ShoppingBag, Eye, ArrowDownToLine, Check, 
+  Zap, Gift, Printer, Bell, Download,
+  FileBarChart, Share2, EyeOff
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { useLocalStorage } from '@/pages/items/hooks/useLocalStorage';

@@ -1,118 +1,98 @@
+/**
+ * Attempt to find a video input device with the matching facingMode
+ * @param facingMode 
+ * @returns 
+ */
+export const findCameraDevice = async (facingMode: string): Promise<MediaDeviceInfo | undefined> => {
+  const devices = await navigator.mediaDevices.enumerateDevices();
+  return devices.find(device => device.kind === 'videoinput' && device.label.toLowerCase().includes(facingMode));
+}
 
 /**
- * Utilities for camera handling and device selection
+ * Gets the constraints for the camera
+ * @param deviceId 
+ * @param facingMode 
+ * @returns 
  */
+export const getConstraints = (deviceId?: string, facingMode?: string): MediaStreamConstraints => {
+  const video: MediaTrackConstraints = {};
 
-/**
- * Attempt to select the optimal camera for barcode scanning
- * Returns the selected camera ID or null if not available
- */
-export const selectOptimalCamera = async (): Promise<string | null> => {
-  try {
-    const devices = await navigator.mediaDevices.enumerateDevices();
-    const videoDevices = devices.filter(device => device.kind === 'videoinput');
-    
-    // If there are multiple cameras, prefer back camera for mobile devices
-    if (videoDevices.length > 1) {
-      // Try to find a back camera by looking for common naming patterns
-      const backCameraKeywords = ['back', 'environment', 'rear'];
-      const backCamera = videoDevices.find(device => 
-        backCameraKeywords.some(keyword => 
-          device.label.toLowerCase().includes(keyword)
-        )
-      );
-      
-      if (backCamera) {
-        return backCamera.deviceId;
-      }
-    }
-    
-    // Try to get camera capabilities for better configuration
-    const stream = await navigator.mediaDevices.getUserMedia({ video: true });
-    const tracks = stream.getVideoTracks();
-    
-    if (tracks.length > 0) {
-      // Stop the test stream
-      tracks.forEach(track => track.stop());
-      
-      // Return the device ID of the first track
-      return tracks[0].getSettings().deviceId || null;
-    }
-    
-    return null;
-  } catch (error) {
-    console.warn('Could not select optimal camera:', error);
-    // Fallback to default camera selection
-    return null;
+  if (deviceId) {
+    video.deviceId = deviceId;
+  } else if (facingMode) {
+    // Prefer user facing camera in mobile
+    video.facingMode = facingMode;
   }
+
+  return {
+    video,
+  };
+}
+
+/**
+ * Toggles the camera between front and back
+ * @param setFacingMode 
+ * @returns 
+ */
+export const flipCamera = (setFacingMode: (facingMode: string) => void) => {
+  setFacingMode(facingMode => (facingMode === 'user' ? 'environment' : 'user'));
 };
 
 /**
- * Configure camera settings based on capabilities
+ * Check if the browser supports the MediaDevices API
+ * @returns boolean
  */
-export const configureCameraSettings = async (config: any): Promise<void> => {
-  try {
-    const stream = await navigator.mediaDevices.getUserMedia({ video: true });
-    const tracks = stream.getVideoTracks();
-    
-    if (tracks.length > 0) {
-      const capabilities = tracks[0].getCapabilities();
-      
-      // Configuration using camera capabilities (not all browsers support these)
-      try {
-        if (capabilities && 'focusMode' in capabilities) {
-          if (config && config.inputStream && config.inputStream.constraints) {
-            // We need to use a different way to set advanced constraints
-            // as the 'advanced' property doesn't exist directly on constraints object
-            const enhancedConstraints = {
-              ...config.inputStream.constraints,
-              advanced: [{ focusMode: 'continuous' }]
-            };
-            
-            // Replace constraints with enhanced version
-            config.inputStream.constraints = enhancedConstraints;
-          }
-        }
-      } catch (e) {
-        console.warn('Could not set advanced camera features:', e);
-      }
-      
-      // Stop the test stream
-      tracks.forEach(track => track.stop());
-    }
-  } catch (error) {
-    console.warn('Error configuring camera:', error);
-  }
-};
+export const hasMediaDevices = (): boolean => {
+  return !!(navigator.mediaDevices && navigator.mediaDevices.getUserMedia);
+}
 
 /**
- * Toggle the torch/flashlight if the device supports it
+ * Check if the browser supports the Torch API
+ * @returns boolean
  */
-export const toggleTorch = async (on: boolean): Promise<boolean> => {
+export const hasTorch = (): boolean => {
+  let hasIt = false;
+
   try {
-    const stream = await navigator.mediaDevices.getUserMedia({ 
-      video: { facingMode: 'environment' } 
-    });
-    const track = stream.getVideoTracks()[0];
-    
-    // Check if torch is supported
-    const capabilities = track.getCapabilities();
-    
-    // Only proceed if the torch capability is available
-    if (!capabilities || !('torch' in capabilities)) {
-      console.log('Torch not supported on this device');
-      return false;
+    const track = window.stream?.getVideoTracks()[0];
+
+    if (track) {
+      hasIt = 'torch' in track.getSettings();
     }
-    
-    // Use the constraint as a custom setting since TypeScript doesn't recognize torch
-    // @ts-ignore - Torch is a valid constraint in many mobile browsers but not in the TypeScript definitions
-    await track.applyConstraints({
-      advanced: [{ torch: on }]
-    });
-    
-    return true;
-  } catch (error) {
-    console.error('Error toggling torch:', error);
+  } catch (e) {
+    console.warn("Can't access to track settings", e);
+  }
+
+  return hasIt;
+}
+
+/**
+ * Toggle the torch/flashlight of the active camera if available
+ */
+export const toggleTorch = async (track: MediaStreamTrack | null, enable: boolean): Promise<boolean> => {
+  if (!track || !('getCapabilities' in track)) {
+    console.warn('This browser does not support torch control');
     return false;
   }
-};
+
+  const capabilities = track.getCapabilities();
+  
+  // Check if torch is available in the capabilities
+  if (!capabilities.torch) {
+    console.warn('This device does not have torch capability');
+    return false;
+  }
+
+  try {
+    // Use the applyConstraints method without referencing 'torch' directly in type
+    // This avoids TypeScript errors while still allowing the functionality to work
+    // in browsers that support it
+    await track.applyConstraints({
+      advanced: [{ torch: enable } as any]
+    });
+    return true;
+  } catch (err) {
+    console.error('Error toggling torch:', err);
+    return false;
+  }
+}
