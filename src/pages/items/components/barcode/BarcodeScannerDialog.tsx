@@ -11,9 +11,14 @@ import {
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Progress } from '@/components/ui/progress';
-import { Camera, X, Loader2, Check, AlertTriangle } from 'lucide-react';
+import { Camera, X, Loader2, Check, AlertTriangle, Barcode, PackageOpen } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { initializeScanner, stopScanner } from './scannerUtils';
+import { barcodeDatabase } from '../../data/barcodeDatabase';
+import { toast } from 'sonner';
+import { useLocalStorage } from '../../hooks/useLocalStorage';
+import { Item } from '@/types';
+import { v4 as uuidv4 } from 'uuid';
 
 interface BarcodeScannerDialogProps {
   isOpen: boolean;
@@ -31,6 +36,9 @@ const BarcodeScannerDialog: React.FC<BarcodeScannerDialogProps> = ({
   const [manualBarcode, setManualBarcode] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
+  const [lastDetectedCode, setLastDetectedCode] = useState<string | null>(null);
+  const [savedProducts, setSavedProducts] = useLocalStorage<Item[]>('seller-products', []);
+  const [productInfo, setProductInfo] = useState<any>(null);
   
   // Increase progress when scanner is active
   useEffect(() => {
@@ -58,6 +66,8 @@ const BarcodeScannerDialog: React.FC<BarcodeScannerDialogProps> = ({
       setError(null);
       setSuccess(false);
       setManualBarcode('');
+      setLastDetectedCode(null);
+      setProductInfo(null);
     }
   }, [isOpen]);
 
@@ -72,9 +82,15 @@ const BarcodeScannerDialog: React.FC<BarcodeScannerDialogProps> = ({
     setScannerActive(true);
     setError(null);
     
+    // Add haptic feedback if available
+    if (navigator.vibrate) {
+      navigator.vibrate(50);
+    }
+    
     initializeScanner({
       containerId: 'interactive',
       onDetected: (code) => {
+        setLastDetectedCode(code);
         handleBarcodeDetection(code);
       },
       onError: (err) => {
@@ -90,6 +106,53 @@ const BarcodeScannerDialog: React.FC<BarcodeScannerDialogProps> = ({
     setScannerActive(false);
     setScanProgress(100);
     setSuccess(true);
+    
+    // Haptic feedback
+    if (navigator.vibrate) {
+      navigator.vibrate([50, 100, 100]);
+    }
+    
+    // Check if product exists in database
+    const foundProduct = barcodeDatabase[code];
+    if (foundProduct) {
+      setProductInfo(foundProduct);
+      
+      // Add product to saved products
+      const today = new Date();
+      const expiryDate = new Date();
+      expiryDate.setDate(today.getDate() + (foundProduct.expiryDays || 30));
+      
+      const newProduct: Item = {
+        id: uuidv4(),
+        name: foundProduct.name,
+        description: foundProduct.description || '',
+        category: foundProduct.category || 'other',
+        imageUrl: foundProduct.imageUrl || 'https://via.placeholder.com/150',
+        expiryDate: expiryDate.toISOString().split('T')[0],
+        createdAt: today.toISOString(),
+        updatedAt: today.toISOString(),
+        status: 'available',
+        userId: 'seller123',
+        userName: 'Demo Business',
+        userPhoto: null,
+        location: {
+          address: '123 Main St',
+          lat: 40.7128,
+          lng: -74.006,
+        },
+        quantity: foundProduct.quantity || 1,
+        originalPrice: foundProduct.originalPrice || 0,
+        currentPrice: foundProduct.currentPrice || 0,
+        dynamicPricingEnabled: false,
+      };
+      
+      // Save to local storage
+      setSavedProducts([...savedProducts, newProduct]);
+      
+      toast.success(`Product added: ${foundProduct.name}`, {
+        description: "Added to your inventory",
+      });
+    }
     
     // Delay to show success animation
     setTimeout(() => {
@@ -116,8 +179,14 @@ const BarcodeScannerDialog: React.FC<BarcodeScannerDialogProps> = ({
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
           <DialogTitle className="flex items-center">
-            <Camera className="mr-2 h-5 w-5 text-indigo-500" />
-            <span>Barcode Scanner</span>
+            <motion.div
+              initial={{ scale: 0 }}
+              animate={{ scale: 1 }}
+              transition={{ type: "spring", stiffness: 260, damping: 20 }}
+            >
+              <Camera className="mr-2 h-5 w-5 text-indigo-500" />
+            </motion.div>
+            <span>Enhanced Barcode Scanner</span>
           </DialogTitle>
           <DialogDescription>
             Position the barcode within the camera view or enter the code manually.
@@ -134,7 +203,8 @@ const BarcodeScannerDialog: React.FC<BarcodeScannerDialogProps> = ({
             {scanProgress === 100 && success && (
               <motion.div 
                 initial={{ scale: 0 }}
-                animate={{ scale: 1 }}
+                animate={{ scale: 1, rotate: [0, 10, 0] }}
+                transition={{ type: "spring", stiffness: 260, damping: 20 }}
                 className="absolute -right-3 -top-3"
               >
                 <div className="bg-green-500 text-white p-1 rounded-full">
@@ -154,15 +224,26 @@ const BarcodeScannerDialog: React.FC<BarcodeScannerDialogProps> = ({
                   exit={{ opacity: 0 }}
                   className="absolute inset-0 flex flex-col items-center justify-center p-4 bg-gray-100"
                 >
-                  <AlertTriangle className="h-12 w-12 text-amber-500 mb-4" />
-                  <p className="text-center text-gray-700">{error}</p>
-                  <Button 
-                    variant="outline" 
-                    onClick={() => setError(null)}
-                    className="mt-4"
+                  <motion.div
+                    initial={{ scale: 0 }}
+                    animate={{ scale: 1 }}
+                    transition={{ type: "spring", stiffness: 200 }}
                   >
-                    Try Again
-                  </Button>
+                    <AlertTriangle className="h-12 w-12 text-amber-500 mb-4" />
+                  </motion.div>
+                  <p className="text-center text-gray-700">{error}</p>
+                  <motion.div
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                  >
+                    <Button 
+                      variant="outline" 
+                      onClick={() => setError(null)}
+                      className="mt-4"
+                    >
+                      Try Again
+                    </Button>
+                  </motion.div>
                 </motion.div>
               ) : scannerActive ? (
                 <motion.div
@@ -173,7 +254,47 @@ const BarcodeScannerDialog: React.FC<BarcodeScannerDialogProps> = ({
                 >
                   <div id="interactive" className="h-full viewport"></div>
                   <div className="absolute inset-0 pointer-events-none border-2 border-dashed border-indigo-400 m-8 rounded-md scanner-target"></div>
-                  <div className="scan-line absolute left-0 w-full h-px bg-indigo-500 opacity-75"></div>
+                  <motion.div 
+                    className="scan-line absolute left-0 w-full h-px bg-indigo-500 opacity-75"
+                    animate={{ 
+                      top: ["30%", "70%", "30%"],
+                      opacity: [0.5, 1, 0.5],
+                      boxShadow: [
+                        "0 0 4px rgba(79, 70, 229, 0.3)",
+                        "0 0 8px rgba(79, 70, 229, 0.6)",
+                        "0 0 4px rgba(79, 70, 229, 0.3)"
+                      ]
+                    }}
+                    transition={{ 
+                      duration: 2, 
+                      repeat: Infinity,
+                      ease: "easeInOut"
+                    }}
+                  ></motion.div>
+                  
+                  {/* Enhanced scanning corners */}
+                  <div className="absolute inset-8 pointer-events-none">
+                    <motion.div 
+                      className="absolute top-0 left-0 w-5 h-5 border-t-2 border-l-2 border-indigo-500"
+                      animate={{ opacity: [0.5, 1, 0.5] }}
+                      transition={{ duration: 1.5, repeat: Infinity }}
+                    ></motion.div>
+                    <motion.div 
+                      className="absolute top-0 right-0 w-5 h-5 border-t-2 border-r-2 border-indigo-500"
+                      animate={{ opacity: [0.5, 1, 0.5] }}
+                      transition={{ duration: 1.5, repeat: Infinity, delay: 0.2 }}
+                    ></motion.div>
+                    <motion.div 
+                      className="absolute bottom-0 left-0 w-5 h-5 border-b-2 border-l-2 border-indigo-500"
+                      animate={{ opacity: [0.5, 1, 0.5] }}
+                      transition={{ duration: 1.5, repeat: Infinity, delay: 0.4 }}
+                    ></motion.div>
+                    <motion.div 
+                      className="absolute bottom-0 right-0 w-5 h-5 border-b-2 border-r-2 border-indigo-500"
+                      animate={{ opacity: [0.5, 1, 0.5] }}
+                      transition={{ duration: 1.5, repeat: Infinity, delay: 0.6 }}
+                    ></motion.div>
+                  </div>
                 </motion.div>
               ) : success ? (
                 <motion.div 
@@ -181,18 +302,35 @@ const BarcodeScannerDialog: React.FC<BarcodeScannerDialogProps> = ({
                   animate={{ opacity: 1, scale: 1 }}
                   className="absolute inset-0 flex items-center justify-center bg-green-50"
                 >
-                  <div className="text-center">
+                  <div className="text-center px-4">
                     <motion.div 
                       initial={{ scale: 0 }}
-                      animate={{ scale: 1 }}
-                      transition={{ type: "spring" }}
+                      animate={{ scale: 1, rotate: [0, 10, 0] }}
+                      transition={{ type: "spring", stiffness: 260, damping: 20 }}
                     >
-                      <div className="inline-flex items-center justify-center h-16 w-16 rounded-full bg-green-100 mb-4">
+                      <div className="inline-flex items-center justify-center h-16 w-16 rounded-full bg-green-100 mb-4 success-pulse">
                         <Check className="h-8 w-8 text-green-600" />
                       </div>
                     </motion.div>
                     <h3 className="text-lg font-medium text-green-800 mb-2">Barcode Detected!</h3>
-                    <p className="text-green-600">Processing product information...</p>
+                    <p className="text-green-600 text-sm">{lastDetectedCode}</p>
+                    
+                    {productInfo && (
+                      <motion.div 
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: 0.3 }}
+                        className="mt-3 bg-white p-2 rounded-md text-left text-sm text-gray-700 border border-green-200"
+                      >
+                        <div className="flex items-center">
+                          <PackageOpen className="h-4 w-4 text-green-500 mr-1" />
+                          <span className="font-medium">{productInfo.name}</span>
+                        </div>
+                        {productInfo.currentPrice && (
+                          <p className="text-xs mt-1">Price: ₹{productInfo.currentPrice.toFixed(2)}</p>
+                        )}
+                      </motion.div>
+                    )}
                   </div>
                 </motion.div>
               ) : (
@@ -200,15 +338,37 @@ const BarcodeScannerDialog: React.FC<BarcodeScannerDialogProps> = ({
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   exit={{ opacity: 0 }}
-                  className="absolute inset-0 flex items-center justify-center"
+                  className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-indigo-50 to-white"
                 >
-                  <Button
-                    onClick={handleStartScanner}
-                    className="bg-indigo-600 hover:bg-indigo-700 text-white"
+                  <motion.div
+                    whileHover={{ scale: 1.05, boxShadow: "0 10px 25px -5px rgba(79, 70, 229, 0.2)" }}
+                    whileTap={{ scale: 0.98 }}
                   >
-                    <Camera className="mr-2 h-4 w-4" />
-                    Start Scanner
-                  </Button>
+                    <Button
+                      onClick={handleStartScanner}
+                      className="bg-indigo-600 hover:bg-indigo-700 text-white"
+                    >
+                      <Camera className="mr-2 h-4 w-4" />
+                      Start Scanner
+                    </Button>
+                  </motion.div>
+                  
+                  {/* Animated scanner hint */}
+                  <motion.div 
+                    className="absolute bottom-4 left-0 right-0 text-center text-xs text-gray-500"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ delay: 0.5 }}
+                  >
+                    <motion.div
+                      animate={{ y: [0, -5, 0] }}
+                      transition={{ duration: 2, repeat: Infinity }}
+                      className="inline-block"
+                    >
+                      <Barcode className="h-4 w-4 mx-auto mb-1 text-indigo-400" />
+                    </motion.div>
+                    <p>Position barcode within frame once started</p>
+                  </motion.div>
                 </motion.div>
               )}
             </AnimatePresence>
@@ -225,31 +385,48 @@ const BarcodeScannerDialog: React.FC<BarcodeScannerDialogProps> = ({
                 className="flex-1"
                 disabled={scannerActive || success}
               />
-              <Button 
-                type="submit" 
-                disabled={!manualBarcode.trim() || scannerActive || success}
+              <motion.div
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
               >
-                {success ? <Check className="h-4 w-4" /> : 'Submit'}
-              </Button>
+                <Button 
+                  type="submit" 
+                  disabled={!manualBarcode.trim() || scannerActive || success}
+                >
+                  {success ? <Check className="h-4 w-4" /> : 'Submit'}
+                </Button>
+              </motion.div>
             </div>
           </form>
         </div>
         
         <DialogFooter className="flex justify-between">
-          <Button
-            variant="outline"
-            onClick={handleClose}
-            className="flex items-center"
-            disabled={success}
+          <motion.div
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
           >
-            <X className="mr-2 h-4 w-4" /> Cancel
-          </Button>
+            <Button
+              variant="outline"
+              onClick={handleClose}
+              className="flex items-center"
+              disabled={success}
+            >
+              <X className="mr-2 h-4 w-4" /> Cancel
+            </Button>
+          </motion.div>
           
           {scannerActive && (
-            <div className="flex items-center text-sm text-indigo-600">
+            <motion.div 
+              className="flex items-center text-sm text-indigo-600"
+              animate={{ 
+                opacity: [0.7, 1, 0.7], 
+                scale: [0.98, 1, 0.98] 
+              }}
+              transition={{ repeat: Infinity, duration: 1.5 }}
+            >
               <Loader2 className="mr-2 h-4 w-4 animate-spin" />
               Scanning...
-            </div>
+            </motion.div>
           )}
         </DialogFooter>
       </DialogContent>

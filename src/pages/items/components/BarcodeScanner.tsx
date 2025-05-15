@@ -1,4 +1,3 @@
-
 import React, { useState, useRef, useEffect } from 'react';
 import { Barcode, Camera, Scan } from 'lucide-react';
 import { toast } from 'sonner';
@@ -6,8 +5,9 @@ import { Button } from '@/components/ui/button';
 import { Dialog, DialogTrigger } from "@/components/ui/dialog";
 import Quagga from 'quagga';
 import BarcodeScannerDialog from './barcode/BarcodeScannerDialog';
-import { initializeScanner, drawBarcodeBox, selectOptimalCamera } from './barcode/scannerUtils';
+import { initializeScanner, stopScanner, selectOptimalCamera } from './barcode/scannerUtils';
 import { motion } from 'framer-motion';
+import { barcodeDatabase } from '../data/barcodeDatabase';
 
 interface BarcodeScannerProps {
   onBarcodeDetected: (barcode: string) => void;
@@ -26,10 +26,21 @@ export const BarcodeScanner: React.FC<BarcodeScannerProps> = ({ onBarcodeDetecte
   const detectionCount = useRef<Record<string, number>>({});
   const progressIntervalRef = useRef<number | null>(null);
 
+  // Reset state when dialog opens
+  useEffect(() => {
+    if (isDialogOpen) {
+      setBarcodeResult(null);
+      setScanFeedback('');
+      setIsScanning(false);
+      setScanProgress(0);
+      detectionCount.current = {};
+    }
+  }, [isDialogOpen]);
+
   // Animate the scan line
   useEffect(() => {
     if (isScanning && scanLineRef.current) {
-      // The animation is now handled by CSS in items.css
+      // The animation is now handled by CSS in scanner-effects.css
     }
     
     // Start the scanning progress animation when scanning begins
@@ -78,6 +89,12 @@ export const BarcodeScanner: React.FC<BarcodeScannerProps> = ({ onBarcodeDetecte
         setScanFeedback(`Barcode detected: ${code}`);
         setScanProgress(100);
         
+        // Check if code exists in database
+        const foundProduct = barcodeDatabase[code];
+        if (foundProduct) {
+          setScanFeedback(`Found product: ${foundProduct.name}`);
+        }
+        
         // Visual feedback
         const scannerElement = scannerRef.current;
         if (scannerElement) {
@@ -109,10 +126,6 @@ export const BarcodeScanner: React.FC<BarcodeScannerProps> = ({ onBarcodeDetecte
     }
   };
 
-  const handleProcessed = (result: any) => {
-    drawBarcodeBox(result);
-  };
-
   const handleScannerError = (err: Error) => {
     console.error("Error initializing Quagga:", err);
     setScanFeedback('Camera access denied. Please check permissions.');
@@ -126,7 +139,6 @@ export const BarcodeScanner: React.FC<BarcodeScannerProps> = ({ onBarcodeDetecte
     if (quaggaInitialized.current && Quagga) {
       try {
         Quagga.offDetected(handleDetected);
-        Quagga.offProcessed(handleProcessed);
         Quagga.stop();
         quaggaInitialized.current = false;
       } catch (error) {
@@ -146,25 +158,26 @@ export const BarcodeScanner: React.FC<BarcodeScannerProps> = ({ onBarcodeDetecte
     detectionCount.current = {}; // Reset detection counter
     setScanProgress(5); // Start progress indicator
     
-    // Try to select the optimal camera (back camera if available)
-    const optimalCameraId = await selectOptimalCamera();
-    
-    if (scannerRef.current) {
-      initializeScanner(
-        scannerRef,
-        handleDetected,
-        handleProcessed,
-        handleScannerError,
-        () => {
-          // On successful initialization
-          quaggaInitialized.current = true;
-          setHasPermission(true);
-          setScanFeedback('Camera ready. Scanning for barcode...');
-          setScanProgress(25); // Update progress after initialization
-        },
-        false, // torch initially disabled
-        optimalCameraId
-      );
+    try {
+      // Try to select the optimal camera (back camera if available)
+      const optimalCameraId = await selectOptimalCamera();
+      
+      if (scannerRef.current) {
+        initializeScanner({
+          containerId: scannerRef.current.id || 'scanner',
+          onDetected: handleDetected,
+          onError: handleScannerError
+        });
+        
+        // On successful initialization
+        quaggaInitialized.current = true;
+        setHasPermission(true);
+        setScanFeedback('Camera ready. Scanning for barcode...');
+        setScanProgress(25); // Update progress after initialization
+      }
+    } catch (error) {
+      console.error("Failed to initialize scanner:", error);
+      handleScannerError(error instanceof Error ? error : new Error('Failed to start scanner'));
     }
   };
 
@@ -181,6 +194,14 @@ export const BarcodeScanner: React.FC<BarcodeScannerProps> = ({ onBarcodeDetecte
     startScanner();
   };
 
+  const handleOpenDialog = () => {
+    // Add haptic feedback if available
+    if (navigator.vibrate) {
+      navigator.vibrate(50);
+    }
+    setIsDialogOpen(true);
+  };
+
   return (
     <Dialog open={isDialogOpen} onOpenChange={(open) => {
       if (!open && isScanning) {
@@ -190,32 +211,40 @@ export const BarcodeScanner: React.FC<BarcodeScannerProps> = ({ onBarcodeDetecte
     }}>
       <DialogTrigger asChild>
         <motion.div
-          whileHover={{ scale: 1.05 }}
+          whileHover={{ scale: 1.05, y: -2 }}
           whileTap={{ scale: 0.95 }}
+          className="animate-bounce-subtle"
         >
           <Button 
             type="button" 
             variant="outline" 
-            className="mt-8 scanner-button add-button-special text-white"
+            className="mt-8 scanner-button add-button-special text-white bg-gradient-to-r from-indigo-600 to-indigo-500 hover:from-indigo-700 hover:to-indigo-600 border-none"
             title="Scan Barcode"
+            onClick={handleOpenDialog}
           >
-            <Scan className="h-4 w-4 mr-2" />
+            <motion.div
+              initial={{ rotate: 0 }}
+              animate={{ rotate: [0, -10, 10, -10, 0] }}
+              transition={{ 
+                repeat: Infinity, 
+                repeatDelay: 3,
+                duration: 0.5 
+              }}
+            >
+              <Scan className="h-4 w-4 mr-2" />
+            </motion.div>
             <span>Scan Barcode</span>
           </Button>
         </motion.div>
       </DialogTrigger>
+      
       <BarcodeScannerDialog
-        isScanning={isScanning}
-        barcodeResult={barcodeResult}
-        scanFeedback={scanFeedback}
-        onStartScanner={startScanner}
-        onStopScanner={stopScanner}
-        scannerRef={scannerRef}
-        scanLineRef={scanLineRef}
-        setIsDialogOpen={setIsDialogOpen}
-        onResetScanner={resetScanner}
-        scanProgress={scanProgress}
+        isOpen={isDialogOpen}
+        onClose={() => setIsDialogOpen(false)}
+        onBarcodeDetected={onBarcodeDetected}
       />
     </Dialog>
   );
 };
+
+export default BarcodeScanner;

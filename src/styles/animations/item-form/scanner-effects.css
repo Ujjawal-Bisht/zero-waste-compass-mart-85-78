@@ -1,0 +1,291 @@
+
+/* Enhanced barcode scanner animations */
+
+/* Advanced scanner animation effects */
+.viewport {
+  position: relative;
+  overflow: hidden;
+}
+
+.viewport::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(
+    135deg,
+    rgba(99, 102, 241, 0.05),
+    rgba(139, 92, 246, 0.08)
+  );
+  pointer-events: none;
+}
+
+/* Enhanced scan line with double effect */
+.scan-line {
+  position: absolute;
+  height: 2px;
+  width: 100%;
+  background: linear-gradient(
+    90deg, 
+    transparent, 
+    rgba(99, 102, 241, 0.3),
+    rgba(99, 102, 241, 0.8),
+    rgba(99, 102, 241, 0.3),
+    transparent
+  );
+  box-shadow: 
+    0 0 8px rgba(79, 70, 229, 0.6),
+    0 0 12px rgba(79, 70, 229, 0.4);
+  z-index: 10;
+}
+
+.scan-line::before, 
+.scan-line::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  width: 100%;
+  height: 1px;
+}
+
+.scan-line::before {
+  top: -2px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.5),
+    transparent
+  );
+}
+
+.scan-line::after {
+  bottom: -2px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(99, 102, 241, 0.3),
+    transparent
+  );
+}
+
+/* Target area highlight animation */
+.scanner-target {
+  animation: targetPulse 3s infinite;
+  box-shadow: inset 0 0 0 2px rgba(99, 102, 241, 0.3);
+}
+
+@keyframes targetPulse {
+  0%, 100% {
+    box-shadow: inset 0 0 0 2px rgba(79, 70, 229, 0.3);
+  }
+  50% {
+    box-shadow: inset 0 0 0 2px rgba(79, 70, 229, 0.6);
+  }
+}
+
+/* Enhanced detection animation */
+.barcode-detected {
+  animation: detectionFlash 0.5s ease;
+}
+
+@keyframes detectionFlash {
+  0%, 100% {
+    box-shadow: 0 0 0 rgba(16, 185, 129, 0);
+  }
+  50% {
+    box-shadow: 0 0 50px rgba(16, 185, 129, 0.9);
+  }
+}
+
+/* Success animation with glowing effect */
+.success-pulse {
+  position: relative;
+  animation: successGlow 2s infinite;
+}
+
+@keyframes successGlow {
+  0%, 100% {
+    box-shadow: 0 0 15px rgba(16, 185, 129, 0.2);
+  }
+  50% {
+    box-shadow: 0 0 30px rgba(16, 185, 129, 0.6);
+  }
+}
+
+/* Camera warming up effect */
+.camera-starting {
+  position: relative;
+  overflow: hidden;
+}
+
+.camera-starting::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    135deg,
+    rgba(0, 0, 0, 0.05),
+    rgba(0, 0, 0, 0.2)
+  );
+  animation: cameraWarmup 1s ease-out forwards;
+}
+
+@keyframes cameraWarmup {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+/* Corner indicators animation */
+.scan-corner {
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  border-color: rgba(99, 102, 241, 0.8);
+  border-style: solid;
+  animation: cornerPulse 2s infinite ease-in-out;
+}
+
+@keyframes cornerPulse {
+  0%, 100% {
+    opacity: 0.5;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+/* Recognition indicator */
+.recognition-indicator {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: 180px;
+  height: 80px;
+  border: 2px dashed rgba(99, 102, 241, 0.6);
+  border-radius: 4px;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.recognition-active .recognition-indicator {
+  opacity: 1;
+  animation: recognitionPulse 1.5s infinite;
+}
+
+@keyframes recognitionPulse {
+  0%, 100% {
+    border-color: rgba(99, 102, 241, 0.6);
+    box-shadow: 0 0 0 rgba(99, 102, 241, 0);
+  }
+  50% {
+    border-color: rgba(99, 102, 241, 1);
+    box-shadow: 0 0 15px rgba(99, 102, 241, 0.3);
+  }
+}
+
+/* Focus indicators */
+.scan-focus-point {
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  border: 2px solid rgba(16, 185, 129, 0.8);
+  opacity: 0;
+  transform: scale(0.5);
+  pointer-events: none;
+}
+
+.scan-focus-point.active {
+  opacity: 1;
+  animation: focusPointAnimation 0.8s forwards;
+}
+
+@keyframes focusPointAnimation {
+  0% {
+    transform: scale(0.5);
+    opacity: 1;
+  }
+  70% {
+    transform: scale(1.2);
+    opacity: 0.7;
+  }
+  100% {
+    transform: scale(1.5);
+    opacity: 0;
+  }
+}
+
+/* Processing overlay animation */
+.processing-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(255, 255, 255, 0.8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+}
+
+.processing .processing-overlay {
+  opacity: 1;
+}
+
+.processing-icon {
+  display: inline-block;
+  width: 40px;
+  height: 40px;
+  border: 3px solid rgba(99, 102, 241, 0.3);
+  border-radius: 50%;
+  border-top-color: rgba(99, 102, 241, 1);
+  animation: spin 1s infinite linear;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Active scanning button glow */
+.scan-active-button {
+  position: relative;
+  overflow: hidden;
+}
+
+.scan-active-button::after {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(
+    circle,
+    rgba(99, 102, 241, 0.4) 0%,
+    transparent 70%
+  );
+  animation: scanButtonGlow 2s infinite;
+  opacity: 0.7;
+  mix-blend-mode: screen;
+  pointer-events: none;
+}
+
+@keyframes scanButtonGlow {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 0.5;
+  }
+  50% {
+    transform: scale(1.05);
+    opacity: 0.7;
+  }
+}
