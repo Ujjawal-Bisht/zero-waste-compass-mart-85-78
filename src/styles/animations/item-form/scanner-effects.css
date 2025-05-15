@@ -5,6 +5,9 @@
 .viewport {
   position: relative;
   overflow: hidden;
+  border-radius: 12px;
+  box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.3);
+  transition: all 0.3s ease;
 }
 
 .viewport::after {
@@ -20,6 +23,10 @@
     rgba(139, 92, 246, 0.08)
   );
   pointer-events: none;
+}
+
+.viewport:hover {
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.5), 0 10px 20px rgba(0, 0, 0, 0.1);
 }
 
 /* Enhanced scan line with double effect */
@@ -39,6 +46,7 @@
     0 0 8px rgba(79, 70, 229, 0.6),
     0 0 12px rgba(79, 70, 229, 0.4);
   z-index: 10;
+  animation: scanLine 2s cubic-bezier(0.5, 0, 0.5, 1) infinite;
 }
 
 .scan-line::before, 
@@ -85,17 +93,36 @@
   }
 }
 
+/* Scanner line animation */
+@keyframes scanLine {
+  0% {
+    top: 15%;
+    opacity: 0.5;
+  }
+  50% {
+    top: 85%;
+    opacity: 1;
+  }
+  100% {
+    top: 15%;
+    opacity: 0.5;
+  }
+}
+
 /* Enhanced detection animation */
 .barcode-detected {
-  animation: detectionFlash 0.5s ease;
+  animation: detectionFlash 0.8s ease;
 }
 
 @keyframes detectionFlash {
-  0%, 100% {
+  0% {
     box-shadow: 0 0 0 rgba(16, 185, 129, 0);
   }
   50% {
     box-shadow: 0 0 50px rgba(16, 185, 129, 0.9);
+  }
+  100% {
+    box-shadow: 0 0 0 rgba(16, 185, 129, 0);
   }
 }
 
@@ -148,15 +175,50 @@
   height: 20px;
   border-color: rgba(99, 102, 241, 0.8);
   border-style: solid;
+  border-width: 0;
   animation: cornerPulse 2s infinite ease-in-out;
+}
+
+.scan-corner-tl {
+  top: 10px;
+  left: 10px;
+  border-top-width: 3px;
+  border-left-width: 3px;
+  border-top-left-radius: 4px;
+}
+
+.scan-corner-tr {
+  top: 10px;
+  right: 10px;
+  border-top-width: 3px;
+  border-right-width: 3px;
+  border-top-right-radius: 4px;
+}
+
+.scan-corner-bl {
+  bottom: 10px;
+  left: 10px;
+  border-bottom-width: 3px;
+  border-left-width: 3px;
+  border-bottom-left-radius: 4px;
+}
+
+.scan-corner-br {
+  bottom: 10px;
+  right: 10px;
+  border-bottom-width: 3px;
+  border-right-width: 3px;
+  border-bottom-right-radius: 4px;
 }
 
 @keyframes cornerPulse {
   0%, 100% {
     opacity: 0.5;
+    border-color: rgba(99, 102, 241, 0.5);
   }
   50% {
     opacity: 1;
+    border-color: rgba(99, 102, 241, 1);
   }
 }
 
@@ -288,4 +350,106 @@
     transform: scale(1.05);
     opacity: 0.7;
   }
+}
+
+/* Enhanced animation for barcode detection success */
+.barcode-success {
+  animation: successPop 0.5s ease-out;
+}
+
+@keyframes successPop {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+  75% {
+    transform: scale(0.98);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+/* Scanner button animations */
+.scanner-button {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+}
+
+.scanner-button::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -75%;
+  width: 50%;
+  height: 100%;
+  background: linear-gradient(
+    to right,
+    transparent,
+    rgba(255, 255, 255, 0.3),
+    transparent
+  );
+  transform: skewX(-25deg);
+  animation: scannerButtonShine 3s infinite;
+}
+
+@keyframes scannerButtonShine {
+  0% {
+    left: -75%;
+  }
+  100% {
+    left: 150%;
+  }
+}
+
+/* Scanner initialization animation */
+.scanner-init {
+  position: relative;
+}
+
+.scanner-init::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    45deg,
+    rgba(99, 102, 241, 0.1),
+    rgba(139, 92, 246, 0.1)
+  );
+  animation: scannerInitPulse 2s infinite;
+}
+
+@keyframes scannerInitPulse {
+  0%, 100% {
+    opacity: 0.2;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+/* Scanner progress indicator animation */
+.scan-progress-container {
+  width: 100%;
+  height: 4px;
+  background: rgba(99, 102, 241, 0.2);
+  border-radius: 2px;
+  overflow: hidden;
+  margin-top: 8px;
+}
+
+.scan-progress-bar {
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    rgba(99, 102, 241, 0.7),
+    rgba(139, 92, 246, 0.7)
+  );
+  width: 0%;
+  border-radius: 2px;
+  transition: width 0.2s ease;
+  box-shadow: 0 0 8px rgba(99, 102, 241, 0.4);
 }

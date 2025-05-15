@@ -13,8 +13,8 @@ interface ScannerConfig {
     type: string;
     target: string | HTMLElement;
     constraints: {
-      width?: number;
-      height?: number;
+      width?: { min: number } | number;
+      height?: { min: number } | number;
       facingMode?: string;
       deviceId?: string;
       aspectRatio?: { min: number; max: number };
@@ -46,7 +46,7 @@ export const initializeScanner = async (options: ScannerOptions): Promise<void> 
       inputStream: {
         name: 'Live',
         type: 'LiveStream',
-        target: document.querySelector(`#${options.containerId}`) || options.containerId,
+        target: document.querySelector(`#${options.containerId}`) as HTMLElement || options.containerId,
         constraints: {
           width: { min: 640 },
           height: { min: 480 },
@@ -121,8 +121,9 @@ export const initializeScanner = async (options: ScannerOptions): Promise<void> 
 
 /**
  * Attempt to select the optimal camera for barcode scanning
+ * Returns the selected camera ID or null if not available
  */
-async function selectOptimalCamera(config: ScannerConfig) {
+export const selectOptimalCamera = async (config?: ScannerConfig): Promise<string | null> => {
   try {
     const devices = await navigator.mediaDevices.enumerateDevices();
     const videoDevices = devices.filter(device => device.kind === 'videoinput');
@@ -138,7 +139,10 @@ async function selectOptimalCamera(config: ScannerConfig) {
       );
       
       if (backCamera) {
-        config.inputStream.constraints.deviceId = backCamera.deviceId;
+        if (config) {
+          config.inputStream.constraints.deviceId = backCamera.deviceId;
+        }
+        return backCamera.deviceId;
       }
     }
     
@@ -154,9 +158,11 @@ async function selectOptimalCamera(config: ScannerConfig) {
         // Handle focus mode if available
         if ('focusMode' in capabilities) {
           // @ts-ignore - focusMode is not in TypeScript definitions but may be available
-          config.inputStream.constraints.advanced = [
-            { focusMode: 'continuous' }
-          ];
+          if (config) {
+            config.inputStream.constraints.advanced = [
+              { focusMode: 'continuous' }
+            ];
+          }
         }
       } catch (e) {
         console.warn('Could not set advanced camera features:', e);
@@ -164,13 +170,18 @@ async function selectOptimalCamera(config: ScannerConfig) {
       
       // Stop the test stream
       tracks.forEach(track => track.stop());
+      
+      // Return the device ID of the first track
+      return tracks[0].getSettings().deviceId || null;
     }
     
+    return null;
   } catch (error) {
     console.warn('Could not select optimal camera:', error);
     // Fallback to default camera selection
+    return null;
   }
-}
+};
 
 /**
  * Stop the barcode scanner.
@@ -180,10 +191,37 @@ export const stopScanner = (): void => {
 };
 
 /**
+ * Toggle the torch/flashlight if the device supports it
+ */
+export const toggleTorch = async (on: boolean): Promise<boolean> => {
+  try {
+    const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
+    const track = stream.getVideoTracks()[0];
+    
+    // Check if torch is supported
+    const capabilities = track.getCapabilities();
+    if (!('torch' in capabilities)) {
+      console.log('Torch not supported on this device');
+      return false;
+    }
+    
+    // Toggle torch
+    await track.applyConstraints({
+      advanced: [{ torch: on }]
+    });
+    
+    return true;
+  } catch (error) {
+    console.error('Error toggling torch:', error);
+    return false;
+  }
+};
+
+/**
  * Draw a highlight box around the detected barcode.
  */
 function drawDetectedBarcode(box: { x: number; y: number }[]) {
-  const canvas = document.querySelector('canvas.drawingBuffer');
+  const canvas = document.querySelector('canvas.drawingBuffer') as HTMLCanvasElement | null;
   if (!canvas) return;
   
   const ctx = canvas.getContext('2d');

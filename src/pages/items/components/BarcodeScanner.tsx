@@ -1,3 +1,4 @@
+
 import React, { useState, useRef, useEffect } from 'react';
 import { Barcode, Camera, Scan } from 'lucide-react';
 import { toast } from 'sonner';
@@ -7,7 +8,10 @@ import Quagga from 'quagga';
 import BarcodeScannerDialog from './barcode/BarcodeScannerDialog';
 import { initializeScanner, stopScanner, selectOptimalCamera } from './barcode/scannerUtils';
 import { motion } from 'framer-motion';
-import { barcodeDatabase } from '../data/barcodeDatabase';
+import { barcodeDatabase, getProductByBarcode } from '../data/barcodeDatabase';
+import { useLocalStorage } from '../hooks/useLocalStorage';
+import { Item } from '@/types';
+import { v4 as uuidv4 } from 'uuid';
 
 interface BarcodeScannerProps {
   onBarcodeDetected: (barcode: string) => void;
@@ -25,6 +29,9 @@ export const BarcodeScanner: React.FC<BarcodeScannerProps> = ({ onBarcodeDetecte
   const quaggaInitialized = useRef(false);
   const detectionCount = useRef<Record<string, number>>({});
   const progressIntervalRef = useRef<number | null>(null);
+  
+  // Add products to local storage
+  const [savedProducts, setSavedProducts] = useLocalStorage<Item[]>('seller-products', []);
 
   // Reset state when dialog opens
   useEffect(() => {
@@ -76,6 +83,63 @@ export const BarcodeScanner: React.FC<BarcodeScannerProps> = ({ onBarcodeDetecte
     };
   }, [isDialogOpen, isScanning]);
 
+  // Add a product from the barcode database to the product list
+  const addBarcodeProduct = (barcode: string) => {
+    const product = getProductByBarcode(barcode);
+    if (!product) return;
+
+    // Check if product already exists
+    const existingProduct = savedProducts.find(p => 
+      p.name === product.name && 
+      p.originalPrice === product.originalPrice
+    );
+
+    if (existingProduct) {
+      // Update quantity if product exists
+      const updatedProducts = savedProducts.map(p => {
+        if (p.name === product.name && p.originalPrice === product.originalPrice) {
+          return {
+            ...p,
+            quantity: (p.quantity || 0) + (product.quantity || 1)
+          };
+        }
+        return p;
+      });
+      setSavedProducts(updatedProducts);
+      toast.success(`Updated quantity of ${product.name}`);
+    } else {
+      // Create new product
+      const newItem: Item = {
+        id: uuidv4(),
+        name: product.name,
+        description: product.description || "",
+        category: product.category,
+        imageUrl: product.imageUrl || "https://via.placeholder.com/150",
+        expiryDate: product.expiryDays ? 
+          new Date(Date.now() + product.expiryDays * 24 * 60 * 60 * 1000).toISOString().split('T')[0] : 
+          undefined,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+        status: "available",
+        userId: "user123",
+        userName: "Current User",
+        userPhoto: null,
+        location: {
+          address: "Current Location",
+          lat: 0,
+          lng: 0,
+        },
+        quantity: product.quantity || 1,
+        originalPrice: product.originalPrice,
+        currentPrice: product.currentPrice,
+        dynamicPricingEnabled: true,
+      };
+
+      setSavedProducts([...savedProducts, newItem]);
+      toast.success(`Added ${product.name} to your inventory!`);
+    }
+  };
+
   const handleDetected = (result: any) => {
     if (result && result.codeResult && result.codeResult.code) {
       const code = result.codeResult.code;
@@ -93,6 +157,9 @@ export const BarcodeScanner: React.FC<BarcodeScannerProps> = ({ onBarcodeDetecte
         const foundProduct = barcodeDatabase[code];
         if (foundProduct) {
           setScanFeedback(`Found product: ${foundProduct.name}`);
+          
+          // Add the product to inventory
+          addBarcodeProduct(code);
         }
         
         // Visual feedback
@@ -160,7 +227,7 @@ export const BarcodeScanner: React.FC<BarcodeScannerProps> = ({ onBarcodeDetecte
     
     try {
       // Try to select the optimal camera (back camera if available)
-      const optimalCameraId = await selectOptimalCamera();
+      await selectOptimalCamera();
       
       if (scannerRef.current) {
         initializeScanner({
