@@ -1,3 +1,4 @@
+
 import { useState, useRef, useEffect } from 'react';
 import { toast } from 'sonner';
 import { initializeScanner, stopScanner, selectOptimalCamera } from '../components/barcode/scannerUtils';
@@ -12,6 +13,8 @@ export const useBarcodeScanner = (onBarcodeDetected: (barcode: string) => void) 
   const [scanFeedback, setScanFeedback] = useState('');
   const [hasPermission, setHasPermission] = useState<boolean | null>(null);
   const [scanProgress, setScanProgress] = useState(0);
+  const [scanStatus, setScanStatus] = useState<'idle' | 'scanning' | 'success' | 'error'>('idle');
+  
   const scannerRef = useRef<HTMLDivElement>(null);
   const scanLineRef = useRef<HTMLDivElement>(null);
   const quaggaInitialized = useRef(false);
@@ -90,6 +93,7 @@ export const useBarcodeScanner = (onBarcodeDetected: (barcode: string) => void) 
         setBarcodeResult(code);
         setScanFeedback(`Barcode detected: ${code}`);
         setScanProgress(100);
+        setScanStatus('success');
         
         // Check if code exists in database
         const foundProduct = getProductByBarcode(code);
@@ -136,6 +140,7 @@ export const useBarcodeScanner = (onBarcodeDetected: (barcode: string) => void) 
     toast.error('Could not access camera. Please check permissions.');
     setIsScanning(false);
     setHasPermission(false);
+    setScanStatus('error');
     quaggaInitialized.current = false;
   };
 
@@ -155,9 +160,10 @@ export const useBarcodeScanner = (onBarcodeDetected: (barcode: string) => void) 
     }
   };
 
-  const startScanner = async () => {
+  const startScanner = async (options = {}) => {
     setIsScanning(true);
     setScanFeedback('Initializing camera...');
+    setScanStatus('scanning');
     detectionCount.current = {}; // Reset detection counter
     setScanProgress(5); // Start progress indicator
     
@@ -169,7 +175,8 @@ export const useBarcodeScanner = (onBarcodeDetected: (barcode: string) => void) 
         initializeScanner({
           containerId: scannerRef.current.id || 'scanner',
           onDetected: handleDetected,
-          onError: handleScannerError
+          onError: handleScannerError,
+          ...options // Apply custom scanner options
         });
         
         // On successful initialization
@@ -180,6 +187,7 @@ export const useBarcodeScanner = (onBarcodeDetected: (barcode: string) => void) 
       }
     } catch (error) {
       console.error("Failed to initialize scanner:", error);
+      setScanStatus('error');
       handleScannerError(error instanceof Error ? error : new Error('Failed to start scanner'));
     }
   };
@@ -217,6 +225,8 @@ export const useBarcodeScanner = (onBarcodeDetected: (barcode: string) => void) 
     setScanFeedback,
     scanProgress,
     setScanProgress,
+    scanStatus,
+    setScanStatus,
     hasPermission,
     scannerRef,
     scanLineRef,
@@ -226,6 +236,7 @@ export const useBarcodeScanner = (onBarcodeDetected: (barcode: string) => void) 
       setBarcodeResult(null);
       setScanFeedback('');
       setScanProgress(0);
+      setScanStatus('scanning');
       detectionCount.current = {};
       startScanner();
     }

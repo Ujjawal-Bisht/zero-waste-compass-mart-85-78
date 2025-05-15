@@ -1,0 +1,6 @@
+
+/* Main barcode animations index */
+@import './scan-animation.css';
+@import './scan-progress.css';
+@import './scan-feedback.css';
+@import './scanner-ui.css';

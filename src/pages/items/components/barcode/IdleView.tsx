@@ -1,8 +1,9 @@
 
 import React from 'react';
-import { Scan } from 'lucide-react';
+import { Scan, Info } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { motion } from 'framer-motion';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 
 interface IdleViewProps {
   onStartScanner: () => void;
@@ -49,10 +50,43 @@ const IdleView: React.FC<IdleViewProps> = ({ onStartScanner }) => {
       </motion.div>
       
       <div className="text-center">
-        <h3 className="font-medium text-indigo-800 text-lg mb-2">Ready to Scan</h3>
+        <div className="flex items-center justify-center gap-1 mb-2">
+          <h3 className="font-medium text-indigo-800 text-lg">Ready to Scan</h3>
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger>
+                <Info className="h-4 w-4 text-indigo-400" />
+              </TooltipTrigger>
+              <TooltipContent>
+                <p className="text-xs max-w-xs">
+                  This scanner supports various barcode formats including EAN, UPC, Code 128, and QR codes.
+                </p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+        </div>
         <p className="text-center text-sm text-indigo-600 mb-4 max-w-xs">
           Position your camera in front of the barcode to quickly scan and fill item details automatically
         </p>
+        
+        <div className="grid grid-cols-2 gap-2 mb-4 text-xs text-gray-600">
+          <div className="flex items-center">
+            <span className="w-2 h-2 bg-green-400 rounded-full mr-1.5"></span>
+            <span>Reliable Detection</span>
+          </div>
+          <div className="flex items-center">
+            <span className="w-2 h-2 bg-blue-400 rounded-full mr-1.5"></span>
+            <span>Auto-Fill Details</span>
+          </div>
+          <div className="flex items-center">
+            <span className="w-2 h-2 bg-indigo-400 rounded-full mr-1.5"></span>
+            <span>Multiple Formats</span>
+          </div>
+          <div className="flex items-center">
+            <span className="w-2 h-2 bg-purple-400 rounded-full mr-1.5"></span>
+            <span>Camera Controls</span>
+          </div>
+        </div>
       </div>
       
       <motion.div

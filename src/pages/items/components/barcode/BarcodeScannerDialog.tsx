@@ -10,6 +10,8 @@ import { motion } from "framer-motion";
 import IdleView from "./IdleView";
 import ScannerView from "./ScannerView";
 import { useBarcodeScanner } from "../../hooks/useBarcodeScanner";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Label } from "@/components/ui/label";
 
 interface BarcodeScannerDialogProps {
   isOpen: boolean;
@@ -23,6 +25,11 @@ const BarcodeScannerDialog: React.FC<BarcodeScannerDialogProps> = ({
   onBarcodeDetected,
 }) => {
   const [view, setView] = useState<"idle" | "scanning">("idle");
+  const [scannerSettings, setScannerSettings] = useState({
+    format: "all",
+    resolution: "hd",
+    frequency: "normal"
+  });
 
   const {
     isScanning,
@@ -34,7 +41,8 @@ const BarcodeScannerDialog: React.FC<BarcodeScannerDialogProps> = ({
     scanLineRef,
     startScanner,
     stopScanner,
-    resetScanner
+    resetScanner,
+    scanStatus
   } = useBarcodeScanner(onBarcodeDetected);
 
   // Reset to idle view when dialog closes
@@ -48,12 +56,28 @@ const BarcodeScannerDialog: React.FC<BarcodeScannerDialogProps> = ({
   const handleStartScanner = () => {
     setView("scanning");
     setIsScanning(true);
-    startScanner();
+    
+    // Apply custom scanner settings
+    const options = {
+      format: scannerSettings.format,
+      resolution: scannerSettings.resolution,
+      frequency: scannerSettings.frequency === "high" ? 15 : 
+                scannerSettings.frequency === "low" ? 5 : 10
+    };
+    
+    startScanner(options);
   };
 
   const handleStopScanner = () => {
     stopScanner();
     setView("idle");
+  };
+  
+  const handleSettingsChange = (key: string, value: string) => {
+    setScannerSettings(prev => ({
+      ...prev,
+      [key]: value
+    }));
   };
 
   return (
@@ -74,7 +98,68 @@ const BarcodeScannerDialog: React.FC<BarcodeScannerDialogProps> = ({
           transition={{ duration: 0.3 }}
         >
           {view === "idle" ? (
-            <IdleView onStartScanner={handleStartScanner} />
+            <>
+              <IdleView onStartScanner={handleStartScanner} />
+              
+              {/* Scanner settings */}
+              <div className="mt-4 p-4 bg-gray-50 rounded-lg space-y-3">
+                <h3 className="font-medium text-sm text-gray-700">Scanner Settings</h3>
+                
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="space-y-1">
+                    <Label htmlFor="format-select" className="text-xs">Barcode Format</Label>
+                    <Select 
+                      value={scannerSettings.format} 
+                      onValueChange={(value) => handleSettingsChange('format', value)}
+                    >
+                      <SelectTrigger id="format-select" className="h-8 text-xs">
+                        <SelectValue placeholder="Select format" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all">All Formats</SelectItem>
+                        <SelectItem value="ean">EAN / UPC</SelectItem>
+                        <SelectItem value="code128">Code 128</SelectItem>
+                        <SelectItem value="qrcode">QR Code</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  
+                  <div className="space-y-1">
+                    <Label htmlFor="resolution-select" className="text-xs">Resolution</Label>
+                    <Select 
+                      value={scannerSettings.resolution} 
+                      onValueChange={(value) => handleSettingsChange('resolution', value)}
+                    >
+                      <SelectTrigger id="resolution-select" className="h-8 text-xs">
+                        <SelectValue placeholder="Select resolution" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="sd">Standard (480p)</SelectItem>
+                        <SelectItem value="hd">High (720p)</SelectItem>
+                        <SelectItem value="fullhd">Full HD (1080p)</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  
+                  <div className="space-y-1">
+                    <Label htmlFor="frequency-select" className="text-xs">Scan Frequency</Label>
+                    <Select 
+                      value={scannerSettings.frequency} 
+                      onValueChange={(value) => handleSettingsChange('frequency', value)}
+                    >
+                      <SelectTrigger id="frequency-select" className="h-8 text-xs">
+                        <SelectValue placeholder="Select frequency" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="low">Low (Battery Saving)</SelectItem>
+                        <SelectItem value="normal">Normal</SelectItem>
+                        <SelectItem value="high">High (Better Detection)</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+              </div>
+            </>
           ) : (
             <ScannerView
               scannerRef={scannerRef}
@@ -84,6 +169,7 @@ const BarcodeScannerDialog: React.FC<BarcodeScannerDialogProps> = ({
               onStopScanner={handleStopScanner}
               onResetScanner={resetScanner}
               barcodeResult={barcodeResult}
+              scanStatus={scanStatus}
             />
           )}
         </motion.div>

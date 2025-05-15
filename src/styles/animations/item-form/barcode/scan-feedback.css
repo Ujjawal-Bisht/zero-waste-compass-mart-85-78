@@ -1,0 +1,56 @@
+
+/* Scanner feedback animations */
+.scan-feedback {
+  background-color: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(5px);
+  color: white;
+  padding: 0.75rem;
+  border-radius: 0.5rem;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+}
+
+.scan-feedback-success {
+  background-color: rgba(16, 185, 129, 0.8);
+}
+
+.scan-feedback-error {
+  background-color: rgba(239, 68, 68, 0.8);
+}
+
+.scan-feedback-warning {
+  background-color: rgba(245, 158, 11, 0.8);
+}
+
+.scan-feedback-indicator {
+  display: inline-block;
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 50%;
+  margin-right: 0.5rem;
+  vertical-align: middle;
+}
+
+.scan-feedback-indicator-processing {
+  background-color: rgba(99, 102, 241, 0.8);
+  animation: pulse 1.5s infinite ease-in-out;
+}
+
+.scan-feedback-indicator-success {
+  background-color: rgb(16, 185, 129);
+}
+
+.scan-feedback-indicator-error {
+  background-color: rgb(239, 68, 68);
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 0.5;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.3);
+  }
+}

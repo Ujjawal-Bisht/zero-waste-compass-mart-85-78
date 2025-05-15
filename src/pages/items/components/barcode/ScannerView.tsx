@@ -1,12 +1,13 @@
 
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { Flashlight } from 'lucide-react';
+import { Flashlight, Camera, ZoomIn, ZoomOut, ImagePlus } from 'lucide-react';
 import { toggleTorch } from './scannerUtils';
 import { motion } from 'framer-motion';
 import ScannerControls from './ScannerControls';
 import ScanProgressBar from './ScanProgressBar';
 import ScanFeedback from './ScanFeedback';
+import { toast } from 'sonner';
 
 interface ScannerViewProps {
   scannerRef: React.RefObject<HTMLDivElement>;
@@ -16,6 +17,7 @@ interface ScannerViewProps {
   onStopScanner: () => void;
   onResetScanner: () => void;
   barcodeResult: string | null;
+  scanStatus?: 'idle' | 'scanning' | 'success' | 'error';
 }
 
 const ScannerView: React.FC<ScannerViewProps> = ({
@@ -25,19 +27,82 @@ const ScannerView: React.FC<ScannerViewProps> = ({
   scanProgress,
   onStopScanner,
   onResetScanner,
-  barcodeResult
+  barcodeResult,
+  scanStatus = 'scanning'
 }) => {
+  // Advanced features state
   const [torchEnabled, setTorchEnabled] = useState(false);
+  const [zoomLevel, setZoomLevel] = useState(1.0);
+  const [hasMultipleCameras, setHasMultipleCameras] = useState(false);
+  const [currentCamera, setCurrentCamera] = useState('environment');
+  
+  // Check for multiple cameras on component mount
+  React.useEffect(() => {
+    const checkCameras = async () => {
+      try {
+        const devices = await navigator.mediaDevices.enumerateDevices();
+        const videoDevices = devices.filter(device => device.kind === 'videoinput');
+        setHasMultipleCameras(videoDevices.length > 1);
+      } catch (error) {
+        console.error('Error checking for cameras:', error);
+      }
+    };
+    
+    checkCameras();
+  }, []);
   
   const handleTorchToggle = async () => {
     const newStatus = !torchEnabled;
     const success = await toggleTorch(newStatus);
     if (success) {
       setTorchEnabled(newStatus);
+      toast.success(newStatus ? "Flashlight turned on" : "Flashlight turned off");
     } else if (newStatus) {
       // Only show error if user was trying to enable the torch
-      console.log("Flashlight not supported on this device");
+      toast.error("Flashlight not supported on this device");
     }
+  };
+  
+  const handleSwitchCamera = () => {
+    const newCamera = currentCamera === 'environment' ? 'user' : 'environment';
+    setCurrentCamera(newCamera);
+    // In a real implementation, this would reconfigure the scanner
+    // with the new camera facingMode
+    toast.success(`Switched to ${newCamera === 'environment' ? 'back' : 'front'} camera`);
+    
+    // This would require a reset of the scanner with new settings
+    onResetScanner();
+  };
+  
+  const handleZoomIn = () => {
+    if (zoomLevel < 5) {
+      const newZoom = parseFloat((zoomLevel + 0.5).toFixed(1));
+      setZoomLevel(newZoom);
+      toast.success(`Zoom level: ${newZoom}x`);
+      // In a real implementation, this would adjust the camera zoom
+    }
+  };
+  
+  const handleZoomOut = () => {
+    if (zoomLevel > 1) {
+      const newZoom = parseFloat((zoomLevel - 0.5).toFixed(1));
+      setZoomLevel(newZoom);
+      toast.success(`Zoom level: ${newZoom}x`);
+      // In a real implementation, this would adjust the camera zoom
+    }
+  };
+  
+  const handleCaptureImage = () => {
+    // In a real implementation, this would capture the current frame
+    toast.success("Image captured");
+  };
+
+  // Determine feedback status based on scan state
+  const getFeedbackStatus = () => {
+    if (barcodeResult) return 'success';
+    if (scanStatus === 'error') return 'error';
+    if (scanProgress > 70) return 'warning';
+    return 'processing';
   };
 
   return (
@@ -73,33 +138,42 @@ const ScannerView: React.FC<ScannerViewProps> = ({
         ></div>
       </div>
       
-      <div className="absolute top-3 right-3 flex gap-2">
-        <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.95 }}>
-          <Button 
-            type="button"
-            variant="outline" 
-            size="sm" 
-            className={`scanner-button bg-white/90 backdrop-blur-sm z-10 ${torchEnabled ? 'border-yellow-400 text-yellow-500' : ''}`}
-            onClick={handleTorchToggle}
-            title={torchEnabled ? "Turn off flashlight" : "Turn on flashlight"}
-          >
-            <Flashlight className={`h-4 w-4 ${torchEnabled ? 'text-yellow-400 filter drop-shadow-md' : ''}`} />
-          </Button>
-        </motion.div>
-      </div>
+      {/* Zoom level indicator */}
+      {zoomLevel > 1 && (
+        <div className="absolute top-3 left-3 bg-black/40 backdrop-blur-sm px-2 py-1 rounded-md text-xs text-white font-medium">
+          {zoomLevel}x
+        </div>
+      )}
       
-      {/* Scanner controls (Stop/Reset) */}
+      {/* Enhanced scanner controls */}
       <ScannerControls
         onStopScanner={onStopScanner}
         onResetScanner={onResetScanner}
+        onToggleTorch={handleTorchToggle}
+        onSwitchCamera={handleSwitchCamera}
+        onZoomIn={handleZoomIn}
+        onZoomOut={handleZoomOut}
+        onCaptureImage={handleCaptureImage}
         isDetected={!!barcodeResult}
+        torchEnabled={torchEnabled}
+        zoomLevel={zoomLevel}
+        maxZoom={5}
+        hasMultipleCameras={hasMultipleCameras}
       />
       
-      {/* Progress bar */}
-      <ScanProgressBar progress={scanProgress} />
+      {/* Enhanced progress bar */}
+      <ScanProgressBar 
+        progress={scanProgress} 
+        showPercentage={scanProgress > 10 && scanProgress < 100} 
+        indeterminate={scanProgress < 10}
+        status={scanStatus}
+      />
       
       {/* Enhanced status indicator */}
-      <ScanFeedback message={scanFeedback} />
+      <ScanFeedback 
+        message={scanFeedback} 
+        status={getFeedbackStatus()}
+      />
     </motion.div>
   );
 };

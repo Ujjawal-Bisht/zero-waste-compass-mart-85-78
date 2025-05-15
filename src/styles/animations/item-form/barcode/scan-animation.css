@@ -1,0 +1,60 @@
+
+/* Scanner animations */
+.scan-line {
+  animation: scanLine 2s ease-in-out infinite;
+  box-shadow: 0 0 8px rgba(79, 70, 229, 0.6);
+}
+
+@keyframes scanLine {
+  0% {
+    top: 30%;
+    opacity: 0.5;
+  }
+  50% {
+    top: 70%;
+    opacity: 1;
+  }
+  100% {
+    top: 30%;
+    opacity: 0.5;
+  }
+}
+
+.scan-target {
+  animation: targetPulse 2s infinite;
+}
+
+@keyframes targetPulse {
+  0%, 100% {
+    box-shadow: 0 0 0 rgba(79, 70, 229, 0);
+  }
+  50% {
+    box-shadow: 0 0 15px rgba(79, 70, 229, 0.5);
+  }
+}
+
+.barcode-detected {
+  animation: detectedFlash 0.5s ease;
+}
+
+@keyframes detectedFlash {
+  0%, 100% {
+    box-shadow: 0 0 0 rgba(16, 185, 129, 0);
+  }
+  50% {
+    box-shadow: 0 0 40px rgba(16, 185, 129, 0.8);
+  }
+}
+
+.success-pulse {
+  animation: successPulseEffect 2s ease infinite;
+}
+
+@keyframes successPulseEffect {
+  0%, 100% {
+    box-shadow: 0 0 0 0 rgba(99, 102, 241, 0);
+  }
+  50% {
+    box-shadow: 0 0 20px rgba(99, 102, 241, 0.5);
+  }
+}
