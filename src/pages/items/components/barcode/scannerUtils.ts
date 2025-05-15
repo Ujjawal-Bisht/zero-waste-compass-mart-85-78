@@ -93,9 +93,11 @@ export const initializeScanner = ({
       
       // Set up processing feedback
       Quagga.onProcessed((result) => {
-        const canvas = document.querySelector('canvas.drawingBuffer');
-        if (!canvas) return;
+        const drawingCanvas = document.querySelector('canvas.drawingBuffer');
+        if (!drawingCanvas) return;
         
+        // We need to specifically cast to HTMLCanvasElement to access getContext
+        const canvas = drawingCanvas as HTMLCanvasElement;
         const ctx = canvas.getContext('2d');
         if (!ctx) return;
         
