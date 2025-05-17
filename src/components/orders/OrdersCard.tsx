@@ -12,7 +12,7 @@ interface OrdersCardProps {
   orders: Order[];
   onViewDetails: (orderId: string) => void;
   onUpdateStatus: (orderId: string, newStatus: Order['status']) => void;
-  onContactBuyer: (buyerName: string) => void;
+  onContactBuyer: (buyerId: string, buyerName: string) => void;
   onPrintInvoice: (orderId: string) => void;
   onSendShippingUpdate: (orderId: string) => void;
   onCancelOrder: (orderId: string) => void;

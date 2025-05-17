@@ -8,16 +8,16 @@ import { motion } from 'framer-motion';
 
 interface PriceQuantityFieldsProps {
   form: UseFormReturn<ItemFormValues, any, undefined>;
-  isOriginalPriceUpdated?: boolean;
-  isCurrentPriceUpdated?: boolean;
+  isPriceUpdated?: boolean;
   isQuantityUpdated?: boolean;
+  dynamicPricingEnabled?: boolean;
 }
 
 const PriceQuantityFields: React.FC<PriceQuantityFieldsProps> = ({ 
   form, 
-  isOriginalPriceUpdated = false,
-  isCurrentPriceUpdated = false,
-  isQuantityUpdated = false
+  isPriceUpdated = false,
+  isQuantityUpdated = false,
+  dynamicPricingEnabled = false
 }) => {
   const originalPriceRef = useRef<HTMLInputElement>(null);
   const currentPriceRef = useRef<HTMLInputElement>(null);
@@ -25,7 +25,7 @@ const PriceQuantityFields: React.FC<PriceQuantityFieldsProps> = ({
 
   // Apply animation to original price field
   useEffect(() => {
-    if (isOriginalPriceUpdated && originalPriceRef.current) {
+    if (isPriceUpdated && originalPriceRef.current) {
       const input = originalPriceRef.current;
       input.classList.add('form-field-success');
       
@@ -35,11 +35,11 @@ const PriceQuantityFields: React.FC<PriceQuantityFieldsProps> = ({
       
       return () => clearTimeout(timer);
     }
-  }, [isOriginalPriceUpdated]);
+  }, [isPriceUpdated]);
 
   // Apply animation to current price field
   useEffect(() => {
-    if (isCurrentPriceUpdated && currentPriceRef.current) {
+    if (isPriceUpdated && currentPriceRef.current) {
       const input = currentPriceRef.current;
       input.classList.add('form-field-success');
       
@@ -49,7 +49,7 @@ const PriceQuantityFields: React.FC<PriceQuantityFieldsProps> = ({
       
       return () => clearTimeout(timer);
     }
-  }, [isCurrentPriceUpdated]);
+  }, [isPriceUpdated]);
 
   // Apply animation to quantity field
   useEffect(() => {

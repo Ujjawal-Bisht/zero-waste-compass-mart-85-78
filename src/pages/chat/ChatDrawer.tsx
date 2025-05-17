@@ -44,7 +44,7 @@ export const ChatDrawer: React.FC<ChatDrawerProps> = ({
   useEffect(() => {
     if (open && recipientId && messages.length === 0) {
       // Add a welcome message based on the recipient type
-      const welcomeMessage = {
+      const welcomeMessage: Message = {
         id: Date.now().toString(),
         content: recipientType === 'seller' 
           ? `Hello! Thanks for your order. How can I help you with your purchase?` 
