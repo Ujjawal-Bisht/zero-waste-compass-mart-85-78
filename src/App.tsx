@@ -19,6 +19,7 @@ import Login from "./pages/auth/Login";
 import Register from "./pages/auth/Register";
 import AddItem from "./pages/items/AddItem";
 import MyOrders from "./pages/orders/MyOrders";
+import Cart from "./pages/cart/Cart";
 
 // Seller Pages
 import SellerDashboard from "./pages/seller/Dashboard";
@@ -60,6 +61,7 @@ const App = () => (
               <Route path="/marketplace" element={<Marketplace />} />
               <Route path="/profile" element={<Profile />} />
               <Route path="/orders" element={<MyOrders />} />
+              <Route path="/cart" element={<Cart />} />
               
               {/* Only show Add Item for sellers */}
               <Route path="/items/add" element={

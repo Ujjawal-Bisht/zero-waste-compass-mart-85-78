@@ -47,6 +47,25 @@ const NavButtons: React.FC<NavButtonsProps> = ({ isSellerPortal }) => {
         </motion.div>
       )}
       
+      {/* Show My Cart button for buyers */}
+      {!isSellerPortal && (
+        <motion.div
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
+          className="navbar-item"
+        >
+          <Button 
+            variant="outline"
+            size="sm"
+            onClick={() => navigate('/cart')} 
+            className="hidden md:flex items-center gap-2 hover:bg-gray-100 transition-colors buyer-button-3d button-bounce button-shimmer"
+          >
+            <ShoppingCart className="h-4 w-4" /> 
+            <span>My Cart</span>
+          </Button>
+        </motion.div>
+      )}
+      
       {/* Show My Orders button for buyers */}
       {!isSellerPortal && (
         <motion.div

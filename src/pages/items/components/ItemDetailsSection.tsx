@@ -39,8 +39,8 @@ const ItemDetailsSection: React.FC<ItemDetailsSectionProps> = ({
           
           <PriceQuantityFields 
             form={form} 
-            isPriceUpdated={Boolean(isPriceUpdated)}
             isQuantityUpdated={Boolean(isQuantityUpdated)}
+            isPriceUpdated={Boolean(isPriceUpdated)}
           />
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

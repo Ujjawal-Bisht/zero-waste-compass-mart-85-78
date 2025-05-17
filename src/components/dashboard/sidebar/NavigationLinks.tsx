@@ -48,6 +48,11 @@ export const NavigationLinks: React.FC<NavigationLinksProps> = ({ isSeller, onIt
       icon: <Package className="mr-2 h-4 w-4" />,
     },
     {
+      title: 'My Cart',
+      href: '/cart',
+      icon: <ShoppingCart className="mr-2 h-4 w-4" />,
+    },
+    {
       title: 'My Orders',
       href: '/orders',
       icon: <ShoppingCart className="mr-2 h-4 w-4" />,
