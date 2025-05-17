@@ -11,9 +11,12 @@ import {
 } from '@/components/ui/card';
 import { motion } from 'framer-motion';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Shield, User } from 'lucide-react';
+import { Shield, User, BellRing, Share2 } from 'lucide-react';
 import PersonalInfoForm from './profile/PersonalInfoForm';
 import SecurityForm from './profile/SecurityForm';
+import SocialMediaConnections from './profile/SocialMediaConnections';
+import NotificationPreferences from './profile/NotificationPreferences';
+import { userService } from '@/services/user-service';
 
 const Profile: React.FC = () => {
   const { currentUser, updateProfile } = useAuth();
@@ -29,6 +32,24 @@ const Profile: React.FC = () => {
       };
       reader.readAsDataURL(file);
     }
+  };
+
+  const handleSocialMediaUpdate = async (values: {
+    twitter?: string;
+    facebook?: string;
+    instagram?: string;
+    linkedin?: string;
+  }) => {
+    await userService.updateSocialMedia(values);
+  };
+
+  const handleNotificationUpdate = async (values: {
+    email: boolean;
+    push: boolean;
+    sms: boolean;
+    marketingEmails: boolean;
+  }) => {
+    await userService.updateNotificationPreferences(values);
   };
 
   const fadeInVariants = {
@@ -49,12 +70,18 @@ const Profile: React.FC = () => {
       </motion.div>
       
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-        <TabsList className="grid w-full grid-cols-2 mb-8">
+        <TabsList className="grid w-full grid-cols-4 mb-8">
           <TabsTrigger value="profile" className="flex items-center gap-2">
             <User size={18} /> Profile
           </TabsTrigger>
           <TabsTrigger value="security" className="flex items-center gap-2">
             <Shield size={18} /> Security
+          </TabsTrigger>
+          <TabsTrigger value="social" className="flex items-center gap-2">
+            <Share2 size={18} /> Social
+          </TabsTrigger>
+          <TabsTrigger value="notifications" className="flex items-center gap-2">
+            <BellRing size={18} /> Notifications
           </TabsTrigger>
         </TabsList>
 
@@ -97,6 +124,25 @@ const Profile: React.FC = () => {
               </CardContent>
             </Card>
           </motion.div>
+        </TabsContent>
+
+        <TabsContent value="social">
+          <SocialMediaConnections 
+            initialValues={currentUser?.socialMedia}
+            onSave={handleSocialMediaUpdate}
+          />
+        </TabsContent>
+
+        <TabsContent value="notifications">
+          <NotificationPreferences 
+            initialValues={currentUser?.notificationPreferences || {
+              email: true,
+              push: true,
+              sms: false,
+              marketingEmails: false
+            }}
+            onSave={handleNotificationUpdate}
+          />
         </TabsContent>
       </Tabs>
     </div>

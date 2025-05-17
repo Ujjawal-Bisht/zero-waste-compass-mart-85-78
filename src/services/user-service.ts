@@ -42,6 +42,66 @@ export const userService = {
     }
   },
 
+  updateSocialMedia: async (socialMedia: {
+    twitter?: string;
+    facebook?: string;
+    instagram?: string;
+    linkedin?: string;
+  }): Promise<User | null> => {
+    try {
+      const currentUser = await userService.getCurrentUser();
+      
+      if (currentUser) {
+        const updatedUser = {
+          ...currentUser,
+          socialMedia: {
+            ...currentUser.socialMedia,
+            ...socialMedia
+          }
+        };
+        
+        localStorage.setItem("zwm_user", JSON.stringify(updatedUser));
+        console.log("Social media updated successfully:", updatedUser);
+        return updatedUser;
+      }
+      
+      return null;
+    } catch (error) {
+      console.error("Error updating social media:", error);
+      throw error;
+    }
+  },
+
+  updateNotificationPreferences: async (preferences: {
+    email?: boolean;
+    push?: boolean;
+    sms?: boolean;
+    marketingEmails?: boolean;
+  }): Promise<User | null> => {
+    try {
+      const currentUser = await userService.getCurrentUser();
+      
+      if (currentUser) {
+        const updatedUser = {
+          ...currentUser,
+          notificationPreferences: {
+            ...currentUser.notificationPreferences,
+            ...preferences
+          }
+        };
+        
+        localStorage.setItem("zwm_user", JSON.stringify(updatedUser));
+        console.log("Notification preferences updated successfully:", updatedUser);
+        return updatedUser;
+      }
+      
+      return null;
+    } catch (error) {
+      console.error("Error updating notification preferences:", error);
+      throw error;
+    }
+  },
+
   verifySellerAccount: async (businessDocuments: File[]): Promise<boolean> => {
     try {
       // Mock verification process

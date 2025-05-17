@@ -1,4 +1,3 @@
-
 export interface User {
   id: string;
   email: string | null;
@@ -20,6 +19,18 @@ export interface User {
   dob?: string;
   occupation?: string;
   organization?: string;
+  socialMedia?: {
+    twitter?: string;
+    facebook?: string;
+    instagram?: string;
+    linkedin?: string;
+  };
+  notificationPreferences?: {
+    email: boolean;
+    push: boolean;
+    sms: boolean;
+    marketingEmails: boolean;
+  };
 }
 
 export type ItemStatus = 'available' | 'donated' | 'expired' | 'flagged' | 'sold';
