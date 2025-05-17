@@ -38,6 +38,20 @@ const SellerOrders: React.FC = () => {
       createdAt: '2023-05-19T14:15:00',
       updatedAt: '2023-05-19T14:15:00',
     },
+    {
+      id: 'ORD003',
+      buyerId: 'buyer789',
+      buyerName: 'Alex Johnson',
+      sellerId: 'seller123',
+      items: [
+        { itemId: '3', name: 'Wireless Earbuds', quantity: 1, price: 1999.00 },
+      ],
+      status: 'out-for-delivery',
+      paymentStatus: 'paid',
+      totalAmount: 1999.00,
+      createdAt: '2023-05-18T09:30:00',
+      updatedAt: '2023-05-18T09:30:00',
+    },
   ]);
 
   const [chatOpen, setChatOpen] = useState(false);
@@ -60,7 +74,7 @@ const SellerOrders: React.FC = () => {
     
     toast({
       title: "Order Status Updated",
-      description: `Order ${orderId} is now ${newStatus}`,
+      description: `Order ${orderId} is now ${newStatus.replace('-', ' ')}`,
       duration: 3000,
     });
   };
@@ -73,14 +87,22 @@ const SellerOrders: React.FC = () => {
   const handlePrintInvoice = (orderId: string) => {
     const order = orders.find(o => o.id === orderId);
     if (order) {
-      generateInvoice(order);
+      if (order.status === 'out-for-delivery' || order.status === 'delivered') {
+        generateInvoice(order);
+        toast({
+          title: "Invoice Generated",
+          description: `Invoice for order ${orderId} has been generated.`,
+          duration: 3000,
+        });
+      } else {
+        toast({
+          title: "Cannot Generate Invoice",
+          description: "Invoices can only be generated for orders that are out for delivery or delivered.",
+          variant: "destructive",
+          duration: 3000,
+        });
+      }
     }
-    
-    toast({
-      title: "Print Invoice",
-      description: `Printing invoice for order ${orderId}`,
-      duration: 3000,
-    });
   };
 
   const handleSendShippingUpdate = (orderId: string) => {

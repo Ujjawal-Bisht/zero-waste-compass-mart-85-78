@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Badge } from '@/components/ui/badge';
-import { AlertTriangle, Package, Truck, Check } from 'lucide-react';
+import { motion } from 'framer-motion';
 import { Order } from '@/types';
 
 interface OrderStatusBadgeProps {
@@ -9,42 +9,47 @@ interface OrderStatusBadgeProps {
 }
 
 export const OrderStatusBadge: React.FC<OrderStatusBadgeProps> = ({ status }) => {
-  const getStatusBadge = (status: Order['status']) => {
-    switch(status) {
-      case 'pending':
-        return <Badge className="bg-amber-100 text-amber-800">Pending</Badge>;
-      case 'processing':
-        return <Badge className="bg-blue-100 text-blue-800">Processing</Badge>;
-      case 'shipped':
-        return <Badge className="bg-indigo-100 text-indigo-800">Shipped</Badge>;
-      case 'delivered':
-        return <Badge className="bg-green-100 text-green-800">Delivered</Badge>;
-      case 'cancelled':
-        return <Badge className="bg-red-100 text-red-800">Cancelled</Badge>;
-      default:
-        return <Badge>Unknown</Badge>;
-    }
+  const getStatusConfig = (status: Order['status']) => {
+    const configs = {
+      'pending': {
+        color: 'bg-amber-100 text-amber-800',
+        label: 'Pending'
+      },
+      'processing': {
+        color: 'bg-blue-100 text-blue-800',
+        label: 'Processing'
+      },
+      'shipped': {
+        color: 'bg-purple-100 text-purple-800',
+        label: 'Shipped'
+      },
+      'out-for-delivery': {
+        color: 'bg-orange-100 text-orange-800',
+        label: 'Out for Delivery'
+      },
+      'delivered': {
+        color: 'bg-green-100 text-green-800',
+        label: 'Delivered'
+      },
+      'cancelled': {
+        color: 'bg-red-100 text-red-800',
+        label: 'Cancelled'
+      }
+    };
+    
+    return configs[status] || { color: 'bg-gray-100 text-gray-800', label: 'Unknown' };
   };
 
-  const getStatusIcon = (status: Order['status']) => {
-    switch(status) {
-      case 'pending':
-        return <AlertTriangle className="h-5 w-5 text-amber-500" />;
-      case 'processing':
-        return <Package className="h-5 w-5 text-blue-500" />;
-      case 'shipped':
-        return <Truck className="h-5 w-5 text-indigo-500" />;
-      case 'delivered':
-        return <Check className="h-5 w-5 text-green-500" />;
-      default:
-        return <AlertTriangle className="h-5 w-5 text-red-500" />;
-    }
-  };
+  const { color, label } = getStatusConfig(status);
 
   return (
-    <div className="flex items-center gap-2">
-      {getStatusIcon(status)}
-      {getStatusBadge(status)}
-    </div>
+    <motion.div 
+      whileHover={{ scale: 1.05 }} 
+      transition={{ duration: 0.2 }}
+    >
+      <Badge className={`${color} badge-animate`}>
+        {label}
+      </Badge>
+    </motion.div>
   );
 };

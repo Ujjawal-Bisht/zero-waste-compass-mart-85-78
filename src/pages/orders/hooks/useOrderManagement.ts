@@ -46,7 +46,7 @@ const mockOrders: Order[] = [
       { itemId: "item-004", quantity: 3, price: 499, name: "Organic Bananas" },
       { itemId: "item-005", quantity: 2, price: 299, name: "Fresh Milk" }
     ],
-    status: "delivered",
+    status: "out-for-delivery",
     paymentStatus: "paid",
     totalAmount: 2095,
     createdAt: "2025-05-05T16:45:00Z",
@@ -77,7 +77,7 @@ export const useOrderManagement = () => {
   // Filter orders based on selected tab
   const filteredOrders = orders.filter(order => {
     if (selectedTab === 'all') return true;
-    if (selectedTab === 'active') return ['pending', 'processing', 'shipped'].includes(order.status);
+    if (selectedTab === 'active') return ['pending', 'processing', 'shipped', 'out-for-delivery'].includes(order.status);
     if (selectedTab === 'completed') return order.status === 'delivered' || order.status === 'cancelled';
     return true;
   });
@@ -100,10 +100,19 @@ export const useOrderManagement = () => {
   };
 
   const handleTrackOrder = (orderId: string) => {
-    toast({
-      title: "Tracking Information",
-      description: `Tracking details for order #${orderId.split('-')[1]} have been sent to your email.`,
-    });
+    const order = orders.find(o => o.id === orderId);
+    
+    if (order?.status === 'out-for-delivery') {
+      toast({
+        title: "Out for Delivery!",
+        description: `Your order #${orderId.split('-')[1]} is out for delivery today. It should arrive within a few hours.`,
+      });
+    } else {
+      toast({
+        title: "Tracking Information",
+        description: `Tracking details for order #${orderId.split('-')[1]} are now shown on this page.`,
+      });
+    }
   };
 
   const formatDate = (dateString: string) => {

@@ -1,3 +1,4 @@
+
 export interface User {
   id: string;
   email: string | null;
@@ -98,7 +99,7 @@ export interface Order {
   sellerId: string;
   sellerName?: string;
   items: OrderItem[];
-  status: 'pending' | 'processing' | 'shipped' | 'delivered' | 'cancelled';
+  status: 'pending' | 'processing' | 'shipped' | 'out-for-delivery' | 'delivered' | 'cancelled';
   paymentStatus: 'pending' | 'paid' | 'failed';
   totalAmount: number;
   createdAt: string;

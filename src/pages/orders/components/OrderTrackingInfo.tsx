@@ -2,11 +2,13 @@
 import React, { useState } from 'react';
 import { Card, CardHeader, CardContent, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Truck, Package, MapPin, CheckCircle, Loader, Clock, Calendar } from 'lucide-react';
+import { Truck, Package, MapPin, CheckCircle, Loader, Clock, Calendar, FileDown } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Order } from '@/types';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
+import { generateInvoice } from '@/utils/exportUtils';
+import { useToast } from '@/components/ui/use-toast';
 
 interface OrderTrackingInfoProps {
   orders: Order[];
@@ -19,7 +21,10 @@ export const OrderTrackingInfo: React.FC<OrderTrackingInfoProps> = ({
   onTrackOrder,
   formatDate
 }) => {
-  const shippedOrders = orders.filter(order => order.status === 'shipped');
+  const { toast } = useToast();
+  const shippedOrders = orders.filter(order => 
+    order.status === 'shipped' || order.status === 'out-for-delivery'
+  );
   const [expandedOrderId, setExpandedOrderId] = useState<string | null>(null);
   
   if (shippedOrders.length === 0) {
@@ -32,6 +37,7 @@ export const OrderTrackingInfo: React.FC<OrderTrackingInfoProps> = ({
       'pending': 0,
       'processing': 25,
       'shipped': 65,
+      'out-for-delivery': 85,
       'delivered': 100,
       'cancelled': 0
     };
@@ -40,6 +46,24 @@ export const OrderTrackingInfo: React.FC<OrderTrackingInfoProps> = ({
 
   const toggleExpandOrder = (orderId: string) => {
     setExpandedOrderId(expandedOrderId === orderId ? null : orderId);
+  };
+
+  const handleDownloadInvoice = (order: Order) => {
+    if (order.status === 'out-for-delivery' || order.status === 'delivered') {
+      generateInvoice(order);
+      toast({
+        title: "Invoice Downloaded",
+        description: `Invoice for order #${order.id.split('-')[1]} has been downloaded.`,
+        duration: 3000,
+      });
+    } else {
+      toast({
+        title: "Invoice Not Available",
+        description: "Invoices are only available for orders that are out for delivery or delivered.",
+        variant: "destructive",
+        duration: 3000,
+      });
+    }
   };
 
   return (
@@ -93,24 +117,45 @@ export const OrderTrackingInfo: React.FC<OrderTrackingInfoProps> = ({
                       </div>
                     </div>
                     <div className="flex items-center space-x-3 mt-3 md:mt-0">
-                      <Badge className="bg-indigo-100 text-indigo-800 hover:bg-indigo-200">
-                        {order.status.charAt(0).toUpperCase() + order.status.slice(1)}
+                      <Badge className={`bg-indigo-100 text-indigo-800 hover:bg-indigo-200`}>
+                        {order.status.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ')}
                       </Badge>
-                      <motion.div
-                        whileHover={{ scale: 1.05 }}
-                        whileTap={{ scale: 0.95 }}
-                      >
-                        <Button 
-                          size="sm"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            onTrackOrder(order.id);
-                          }} 
-                          className="transition-all bg-gradient-to-r from-purple-500 to-indigo-500 hover:from-purple-600 hover:to-indigo-600 text-white shadow-md hover:shadow-lg"
+                      <div className="flex space-x-2">
+                        {(order.status === 'out-for-delivery' || order.status === 'delivered') && (
+                          <motion.div
+                            whileHover={{ scale: 1.05 }}
+                            whileTap={{ scale: 0.95 }}
+                          >
+                            <Button 
+                              size="sm"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleDownloadInvoice(order);
+                              }} 
+                              variant="outline"
+                              className="flex items-center text-indigo-700 border-indigo-200 hover:bg-indigo-50"
+                            >
+                              <FileDown className="h-4 w-4 mr-1" />
+                              Invoice
+                            </Button>
+                          </motion.div>
+                        )}
+                        <motion.div
+                          whileHover={{ scale: 1.05 }}
+                          whileTap={{ scale: 0.95 }}
                         >
-                          Track Package
-                        </Button>
-                      </motion.div>
+                          <Button 
+                            size="sm"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              onTrackOrder(order.id);
+                            }} 
+                            className="transition-all bg-gradient-to-r from-purple-500 to-indigo-500 hover:from-purple-600 hover:to-indigo-600 text-white shadow-md hover:shadow-lg"
+                          >
+                            Track Package
+                          </Button>
+                        </motion.div>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -130,11 +175,12 @@ export const OrderTrackingInfo: React.FC<OrderTrackingInfoProps> = ({
                             <h4 className="text-sm font-medium">Shipping Progress</h4>
                             <span className="text-xs text-gray-500">Estimated delivery: {new Date(new Date(order.updatedAt).getTime() + 7 * 24 * 60 * 60 * 1000).toLocaleDateString()}</span>
                           </div>
-                          <Progress value={getProgressValue(order.status)} className="h-2 bg-gray-200" indicatorClassName="bg-gradient-to-r from-purple-500 to-indigo-500" />
+                          <Progress value={getProgressValue(order.status)} className="h-2 bg-gray-200" />
                           <div className="flex justify-between text-xs text-gray-500 mt-1">
                             <span>Order Placed</span>
                             <span>Processing</span>
                             <span>Shipped</span>
+                            <span>Out for Delivery</span>
                             <span>Delivered</span>
                           </div>
                         </div>
@@ -187,35 +233,69 @@ export const OrderTrackingInfo: React.FC<OrderTrackingInfoProps> = ({
                               </div>
                             </motion.div>
                             
-                            <motion.div 
-                              className="flex items-start space-x-2"
-                              initial={{ x: -20, opacity: 0 }}
-                              animate={{ x: 0, opacity: 1 }}
-                              transition={{ delay: 0.4 }}
-                            >
-                              <div className="mt-0.5">
-                                <Loader className="h-4 w-4 text-blue-500 animate-spin" />
-                              </div>
-                              <div>
-                                <p className="text-sm font-medium">In Transit</p>
-                                <p className="text-xs text-gray-500">Package is on its way</p>
-                              </div>
-                            </motion.div>
+                            {order.status === 'out-for-delivery' || order.status === 'delivered' ? (
+                              <motion.div 
+                                className="flex items-start space-x-2"
+                                initial={{ x: -20, opacity: 0 }}
+                                animate={{ x: 0, opacity: 1 }}
+                                transition={{ delay: 0.4 }}
+                              >
+                                <div className="mt-0.5">
+                                  <CheckCircle className="h-4 w-4 text-green-500" />
+                                </div>
+                                <div>
+                                  <p className="text-sm font-medium">Out for Delivery</p>
+                                  <p className="text-xs text-gray-500">{formatDate(new Date(new Date(order.updatedAt).getTime() + 2 * 24 * 60 * 60 * 1000).toISOString())}</p>
+                                </div>
+                              </motion.div>
+                            ) : (
+                              <motion.div 
+                                className="flex items-start space-x-2 opacity-50"
+                                initial={{ x: -20, opacity: 0 }}
+                                animate={{ x: 0, opacity: 0.5 }}
+                                transition={{ delay: 0.4 }}
+                              >
+                                <div className="mt-0.5">
+                                  <Clock className="h-4 w-4 text-gray-400" />
+                                </div>
+                                <div>
+                                  <p className="text-sm font-medium">Out for Delivery</p>
+                                  <p className="text-xs text-gray-500">Coming soon</p>
+                                </div>
+                              </motion.div>
+                            )}
                             
-                            <motion.div 
-                              className="flex items-start space-x-2 opacity-50"
-                              initial={{ x: -20, opacity: 0 }}
-                              animate={{ x: 0, opacity: 0.5 }}
-                              transition={{ delay: 0.5 }}
-                            >
-                              <div className="mt-0.5">
-                                <Clock className="h-4 w-4 text-gray-400" />
-                              </div>
-                              <div>
-                                <p className="text-sm font-medium">Estimated Delivery</p>
-                                <p className="text-xs text-gray-500">{new Date(new Date(order.updatedAt).getTime() + 7 * 24 * 60 * 60 * 1000).toLocaleDateString()}</p>
-                              </div>
-                            </motion.div>
+                            {order.status === 'delivered' ? (
+                              <motion.div 
+                                className="flex items-start space-x-2"
+                                initial={{ x: -20, opacity: 0 }}
+                                animate={{ x: 0, opacity: 1 }}
+                                transition={{ delay: 0.5 }}
+                              >
+                                <div className="mt-0.5">
+                                  <CheckCircle className="h-4 w-4 text-green-500" />
+                                </div>
+                                <div>
+                                  <p className="text-sm font-medium">Delivered</p>
+                                  <p className="text-xs text-gray-500">{formatDate(new Date(new Date(order.updatedAt).getTime() + 7 * 24 * 60 * 60 * 1000).toISOString())}</p>
+                                </div>
+                              </motion.div>
+                            ) : (
+                              <motion.div 
+                                className="flex items-start space-x-2 opacity-50"
+                                initial={{ x: -20, opacity: 0 }}
+                                animate={{ x: 0, opacity: 0.5 }}
+                                transition={{ delay: 0.5 }}
+                              >
+                                <div className="mt-0.5">
+                                  <Clock className="h-4 w-4 text-gray-400" />
+                                </div>
+                                <div>
+                                  <p className="text-sm font-medium">Delivery</p>
+                                  <p className="text-xs text-gray-500">Expected: {new Date(new Date(order.updatedAt).getTime() + 7 * 24 * 60 * 60 * 1000).toLocaleDateString()}</p>
+                                </div>
+                              </motion.div>
+                            )}
                           </div>
                         </div>
                         

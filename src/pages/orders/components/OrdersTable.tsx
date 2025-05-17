@@ -82,6 +82,7 @@ export const OrdersTable: React.FC<OrdersTableProps> = ({
             <TableCell className="text-right">
               <OrderActionButtons
                 status={order.status}
+                order={order}
                 onCancel={() => onCancelOrder(order.id)}
                 onTrack={() => onTrackOrder(order.id)}
               />

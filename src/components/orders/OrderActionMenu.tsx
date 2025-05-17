@@ -9,9 +9,10 @@ import {
   DropdownMenuLabel,
 } from '@/components/ui/dropdown-menu';
 import { Button } from '@/components/ui/button';
-import { MoreVertical, Mail, Printer, MessageCircle } from 'lucide-react';
+import { MoreVertical, Mail, Printer, MessageCircle, FileDown, Truck } from 'lucide-react';
 import { Order } from '@/types';
 import { generateInvoice } from '@/utils/exportUtils';
+import { toast } from '@/components/ui/use-toast';
 
 interface OrderActionMenuProps {
   order: Order;
@@ -33,7 +34,21 @@ const OrderActionMenu: React.FC<OrderActionMenuProps> = ({
   onCancelOrder
 }) => {
   const handleGenerateInvoice = () => {
-    generateInvoice(order);
+    if (order.status === 'out-for-delivery' || order.status === 'delivered') {
+      generateInvoice(order);
+      toast({
+        title: "Invoice Generated",
+        description: `Invoice for order ${order.id} has been generated.`,
+        duration: 3000,
+      });
+    } else {
+      toast({
+        title: "Cannot Generate Invoice",
+        description: "Invoices can only be generated for orders that are out for delivery or delivered.",
+        variant: "destructive",
+        duration: 3000,
+      });
+    }
   };
 
   return (
@@ -65,7 +80,7 @@ const OrderActionMenu: React.FC<OrderActionMenuProps> = ({
           onClick={handleGenerateInvoice}
           className="flex items-center cursor-pointer"
         >
-          <Printer className="h-4 w-4 mr-2" />
+          <FileDown className="h-4 w-4 mr-2" />
           Generate Invoice
         </DropdownMenuItem>
         
@@ -96,6 +111,15 @@ const OrderActionMenu: React.FC<OrderActionMenuProps> = ({
           >
             <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-2 text-purple-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M7 19a2 2 0 0 1-2-2"/><path d="M17 19a2 2 0 0 0 2-2"/><path d="M3 17h18"/><path d="M6 17V6a1 1 0 0 1 1-1h5"/><path d="M9 5H8"/><path d="M17 8v9"/><path d="M13 8a3 3 0 1 1 6 0v1H13V8Z"/></svg>
             Set as Shipped
+          </DropdownMenuItem>
+        )}
+        {order.status !== 'out-for-delivery' && (
+          <DropdownMenuItem 
+            onClick={() => onUpdateStatus(order.id, 'out-for-delivery')}
+            className="cursor-pointer"
+          >
+            <Truck className="h-4 w-4 mr-2 text-orange-500" />
+            Set as Out for Delivery
           </DropdownMenuItem>
         )}
         {order.status !== 'delivered' && (
