@@ -6,7 +6,6 @@ import LogoSection from './header/LogoSection';
 import NavButtons from './header/NavButtons';
 import SellerButtons from './header/SellerButtons';
 import NotificationsPopover from '../layouts/NotificationsPopover';
-import MiniCart from '../cart/MiniCart';
 import UserMenu from '../layouts/UserMenu';
 
 const DashboardHeader: React.FC = () => {
@@ -34,9 +33,6 @@ const DashboardHeader: React.FC = () => {
           
           {/* Navigation buttons */}
           <NavButtons isSellerPortal={Boolean(isSellerPortal)} />
-          
-          {/* Mini Cart */}
-          <MiniCart />
           
           {/* Notification bell */}
           <NotificationsPopover />

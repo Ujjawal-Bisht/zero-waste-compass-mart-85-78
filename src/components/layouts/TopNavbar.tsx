@@ -2,13 +2,11 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Bell, Menu } from 'lucide-react';
+import { Menu } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { useAuth } from '@/contexts/auth';
-import MiniCart from '../cart/MiniCart';
-import UserMenu from './UserMenu';
 import NotificationsPopover from './NotificationsPopover';
+import UserMenu from './UserMenu';
 
 interface TopNavbarProps {
   onMenuClick?: () => void;
@@ -42,7 +40,6 @@ const TopNavbar: React.FC<TopNavbarProps> = ({ onMenuClick }) => {
           </div>
 
           <div className="flex items-center space-x-2">
-            <MiniCart />
             <NotificationsPopover />
             <UserMenu />
           </div>
