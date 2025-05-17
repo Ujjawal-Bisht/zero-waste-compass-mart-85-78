@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { useToast } from '@/components/ui/use-toast';
 import { useNavigate } from 'react-router-dom';
 import { useCart } from '@/hooks/useCart';
@@ -7,6 +7,8 @@ import TopNavbar from '@/components/layouts/TopNavbar';
 import CartHeader from './components/CartHeader';
 import CartItems from './components/CartItems';
 import OrderSummary from './components/OrderSummary';
+import PaymentModal from '@/components/PaymentModal';
+import { v4 as uuidv4 } from 'uuid';
 
 const Cart: React.FC = () => {
   const { toast } = useToast();
@@ -17,8 +19,12 @@ const Cart: React.FC = () => {
     updateQuantity, 
     getCartTotal, 
     getCartCount,
+    clearCart,
     isLoading
   } = useCart();
+  
+  const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
+  const [orderId] = useState(uuidv4());
 
   const removeItem = (id: string) => {
     removeFromCart(id);
@@ -29,15 +35,26 @@ const Cart: React.FC = () => {
   };
 
   const updateItemQuantity = (id: string, delta: number) => {
-    updateQuantity(id, delta);
+    const item = cartItems.find(item => item.id === id);
+    if (item) {
+      updateQuantity(id, item.quantity + delta);
+    }
   };
 
   const checkoutHandler = () => {
-    toast({
-      title: "Checkout initiated",
-      description: "Processing your order...",
-    });
-    // In a real app, you would redirect to a checkout page or API
+    setIsPaymentModalOpen(true);
+  };
+  
+  const handlePaymentComplete = () => {
+    // Clear the cart after successful payment
+    setTimeout(() => {
+      clearCart();
+      toast({
+        title: "Order placed successfully",
+        description: "Your order has been placed and will be processed shortly.",
+      });
+      navigate('/dashboard');
+    }, 2000);
   };
 
   if (isLoading) {
@@ -72,6 +89,14 @@ const Cart: React.FC = () => {
             />
           </div>
         </div>
+        
+        <PaymentModal 
+          open={isPaymentModalOpen}
+          onOpenChange={setIsPaymentModalOpen}
+          amount={getCartTotal()}
+          orderId={orderId}
+          onPaymentComplete={handlePaymentComplete}
+        />
       </div>
     </>
   );

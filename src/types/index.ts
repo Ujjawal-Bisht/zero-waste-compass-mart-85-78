@@ -3,13 +3,19 @@ export type ItemCategory =
   | 'clothing'
   | 'electronics'
   | 'furniture'
-  | 'household';
+  | 'household'
+  | 'books'
+  | 'toys'
+  | 'medicine'
+  | 'other';
 
 export type ItemStatus = 
   | 'available' 
+  | 'sold' 
+  | 'reserved' 
   | 'flagged' 
-  | 'sold_out' 
-  | 'draft';
+  | 'donated' 
+  | 'expired';
 
 export interface Item {
   id: string;
@@ -39,4 +45,43 @@ export interface Item {
     strategy: string;
     automaticAdjustment: boolean;
   };
+}
+
+export interface User {
+  id: string;
+  email: string;
+  displayName?: string;
+  photoURL?: string | null;
+  isSeller?: boolean;
+  isAdmin?: boolean;
+}
+
+export interface Order {
+  id: string;
+  buyerId: string;
+  sellerId?: string;
+  items: OrderItem[];
+  totalAmount: number;
+  status: 'pending' | 'processing' | 'shipped' | 'delivered' | 'cancelled';
+  createdAt: string;
+  updatedAt: string;
+  paymentMethod?: string;
+  paymentStatus?: 'pending' | 'paid' | 'failed';
+  shippingAddress: string;
+  trackingInfo?: {
+    trackingId?: string;
+    carrier?: string;
+    estimatedDelivery?: string;
+    currentLocation?: string;
+    status?: string;
+  };
+}
+
+export interface OrderItem {
+  id: string;
+  productId: string;
+  name: string;
+  price: number;
+  quantity: number;
+  imageUrl?: string;
 }

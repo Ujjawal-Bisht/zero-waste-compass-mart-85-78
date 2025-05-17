@@ -7,6 +7,8 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { ShoppingCart, Filter, PackageOpen, Clock } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useCart } from '@/hooks/useCart';
+import { v4 as uuidv4 } from 'uuid';
 
 type Product = {
   id: string;
@@ -14,6 +16,7 @@ type Product = {
   price: number;
   category: string;
   seller: string;
+  sellerId: string;
   rating: number;
   image: string;
   expiryDate: string;
@@ -22,51 +25,100 @@ type Product = {
 
 const mockProducts: Product[] = [
   {
-    id: '1',
+    id: uuidv4(),
     name: 'Organic Apples',
     price: 299,
     category: 'Food',
     seller: 'Fresh Farms',
+    sellerId: 'seller-1',
     rating: 4.5,
     image: 'https://images.unsplash.com/photo-1570913149827-d2ac84ab3f9a?q=80&w=100',
     expiryDate: '2025-05-27'
   },
   {
-    id: '2',
+    id: uuidv4(),
     name: 'Wireless Headphones',
     price: 4999,
     category: 'Electronics',
     seller: 'Tech World',
+    sellerId: 'seller-2',
     rating: 4.2,
     image: 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?q=80&w=100',
     expiryDate: '2026-12-31'
   },
   {
-    id: '3',
+    id: uuidv4(),
     name: 'Fresh Milk (1L)',
     price: 79,
     category: 'Food',
     seller: 'Dairy Delight',
+    sellerId: 'seller-3',
     rating: 4.3,
     image: 'https://images.unsplash.com/photo-1563636619-e9143da7973b?q=80&w=100',
     expiryDate: '2025-05-19'
   },
   {
-    id: '4',
+    id: uuidv4(),
     name: 'Smart Watch',
     price: 6999,
     category: 'Electronics',
     seller: 'Tech Galaxy',
+    sellerId: 'seller-4',
     rating: 4.7,
     image: 'https://images.unsplash.com/photo-1546868871-7041f2a55e12?q=80&w=100',
     expiryDate: '2026-10-15'
   },
+  {
+    id: uuidv4(),
+    name: 'Organic Bananas',
+    price: 99,
+    category: 'Food',
+    seller: 'Fresh Farms',
+    sellerId: 'seller-1',
+    rating: 4.4,
+    image: 'https://images.unsplash.com/photo-1543218024-57a70143c369?q=80&w=100',
+    expiryDate: '2025-05-22'
+  },
+  {
+    id: uuidv4(),
+    name: 'Cotton T-Shirt Pack',
+    price: 999,
+    category: 'Clothing',
+    seller: 'Fashion Hub',
+    sellerId: 'seller-5',
+    rating: 4.6,
+    image: 'https://images.unsplash.com/photo-1618354691373-d851c5c3a990?q=80&w=100',
+    expiryDate: '2026-05-15'
+  },
+  {
+    id: uuidv4(),
+    name: 'Recycled Paper Notebooks',
+    price: 399,
+    category: 'Stationery',
+    seller: 'Eco Supplies',
+    sellerId: 'seller-6',
+    rating: 4.8,
+    image: 'https://images.unsplash.com/photo-1531346878377-a5be20888e57?q=80&w=100',
+    expiryDate: '2026-12-31'
+  },
+  {
+    id: uuidv4(),
+    name: 'Reusable Water Bottle',
+    price: 699,
+    category: 'Household',
+    seller: 'Green Living',
+    sellerId: 'seller-7',
+    rating: 4.9,
+    image: 'https://images.unsplash.com/photo-1602143407151-7111542de6e8?q=80&w=100',
+    expiryDate: '2026-12-31'
+  }
 ];
 
 const Marketplace: React.FC = () => {
   const { toast } = useToast();
   const [activeCategory, setActiveCategory] = useState('all');
   const [products, setProducts] = useState<Product[]>([]);
+  const { addToCart } = useCart();
 
   // Calculate dynamic pricing based on expiry dates
   useEffect(() => {
@@ -101,11 +153,18 @@ const Marketplace: React.FC = () => {
     setProducts(updatedProducts);
   }, []);
 
-  const addToCart = (product: Product) => {
-    toast({
-      title: "Added to cart!",
-      description: `${product.name} has been added to your cart.`,
-      variant: "default",
+  const handleAddToCart = (product: Product) => {
+    const discountedPrice = product.discountPercentage 
+      ? product.price - (product.price * product.discountPercentage / 100)
+      : product.price;
+      
+    addToCart({
+      id: product.id,
+      name: product.name,
+      price: discountedPrice,
+      image: product.image,
+      expiryDate: product.expiryDate,
+      sellerId: product.sellerId
     });
   };
 
@@ -154,6 +213,7 @@ const Marketplace: React.FC = () => {
           <TabsTrigger value="food" className="tab-animate">Food</TabsTrigger>
           <TabsTrigger value="electronics" className="tab-animate">Electronics</TabsTrigger>
           <TabsTrigger value="clothing" className="tab-animate">Clothing</TabsTrigger>
+          <TabsTrigger value="household" className="tab-animate">Household</TabsTrigger>
         </TabsList>
         
         <TabsContent value="all" className="mt-6">
@@ -164,7 +224,7 @@ const Marketplace: React.FC = () => {
             animate="visible"
           >
             {products.map(product => (
-              <ProductCard key={product.id} product={product} onAddToCart={addToCart} />
+              <ProductCard key={product.id} product={product} onAddToCart={handleAddToCart} />
             ))}
           </motion.div>
         </TabsContent>
@@ -179,7 +239,7 @@ const Marketplace: React.FC = () => {
             {products
               .filter(p => p.category.toLowerCase() === 'food')
               .map(product => (
-                <ProductCard key={product.id} product={product} onAddToCart={addToCart} />
+                <ProductCard key={product.id} product={product} onAddToCart={handleAddToCart} />
               ))}
           </motion.div>
         </TabsContent>
@@ -194,30 +254,38 @@ const Marketplace: React.FC = () => {
             {products
               .filter(p => p.category.toLowerCase() === 'electronics')
               .map(product => (
-                <ProductCard key={product.id} product={product} onAddToCart={addToCart} />
+                <ProductCard key={product.id} product={product} onAddToCart={handleAddToCart} />
               ))}
           </motion.div>
         </TabsContent>
         
         <TabsContent value="clothing" className="mt-6">
           <motion.div 
-            className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 items-center justify-center"
+            className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6"
             variants={containerVariants}
             initial="hidden"
             animate="visible"
           >
-            <div className="col-span-full text-center py-8">
-              <motion.div
-                initial={{ scale: 0.8, opacity: 0 }}
-                animate={{ scale: 1, opacity: 1 }}
-                transition={{ delay: 0.2, duration: 0.5 }}
-                className="flex flex-col items-center"
-              >
-                <PackageOpen className="mx-auto h-12 w-12 text-gray-400 mb-4 animate-pulse-slow" />
-                <h3 className="text-lg font-medium">No clothing items available right now</h3>
-                <p className="text-gray-500">Check back soon for new arrivals</p>
-              </motion.div>
-            </div>
+            {products
+              .filter(p => p.category.toLowerCase() === 'clothing')
+              .map(product => (
+                <ProductCard key={product.id} product={product} onAddToCart={handleAddToCart} />
+              ))}
+          </motion.div>
+        </TabsContent>
+        
+        <TabsContent value="household" className="mt-6">
+          <motion.div 
+            className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6"
+            variants={containerVariants}
+            initial="hidden"
+            animate="visible"
+          >
+            {products
+              .filter(p => p.category.toLowerCase() === 'household')
+              .map(product => (
+                <ProductCard key={product.id} product={product} onAddToCart={handleAddToCart} />
+              ))}
           </motion.div>
         </TabsContent>
       </Tabs>

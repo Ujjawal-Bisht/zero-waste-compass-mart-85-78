@@ -1,5 +1,7 @@
 
 import { useState, useEffect } from 'react';
+import { toast } from 'sonner';
+import { v4 as uuidv4 } from 'uuid';
 
 export type CartItem = {
   id: string;
@@ -8,6 +10,7 @@ export type CartItem = {
   quantity: number;
   image: string;
   expiryDate?: string;
+  sellerId?: string;
 };
 
 export function useCart() {
@@ -37,6 +40,7 @@ export function useCart() {
   }, [cartItems, isLoading]);
   
   const addToCart = (item: Omit<CartItem, 'quantity'>) => {
+    console.log("Adding to cart:", item);
     setCartItems(prevItems => {
       // Check if the item is already in the cart
       const existingItemIndex = prevItems.findIndex(cartItem => cartItem.id === item.id);
@@ -54,21 +58,23 @@ export function useCart() {
         return [...prevItems, { ...item, quantity: 1 }];
       }
     });
+
+    toast.success(`${item.name} added to cart`);
   };
   
   const removeFromCart = (itemId: string) => {
     setCartItems(prevItems => prevItems.filter(item => item.id !== itemId));
   };
   
-  const updateQuantity = (itemId: string, quantity: number) => {
-    if (quantity <= 0) {
+  const updateQuantity = (itemId: string, newQuantity: number) => {
+    if (newQuantity <= 0) {
       removeFromCart(itemId);
       return;
     }
     
     setCartItems(prevItems => 
       prevItems.map(item => 
-        item.id === itemId ? { ...item, quantity } : item
+        item.id === itemId ? { ...item, quantity: newQuantity } : item
       )
     );
   };
