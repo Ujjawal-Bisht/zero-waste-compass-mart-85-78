@@ -2,10 +2,10 @@
 import React from 'react';
 import { UseFormReturn } from 'react-hook-form';
 import { Card, CardContent } from '@/components/ui/card';
-import { ItemNameField } from './details/ItemNameField';
-import { PriceQuantityFields } from './details/PriceQuantityFields';
-import { CategoryField } from './details/CategoryField';
-import { ExpiryDatePicker } from './ExpiryDatePicker';
+import ItemNameField from './details/ItemNameField';
+import PriceQuantityFields from './details/PriceQuantityFields';
+import CategoryField from './details/CategoryField';
+import ExpiryDatePicker from './ExpiryDatePicker';
 import { ItemFormValues } from '../schemas/itemFormSchema';
 
 export interface ItemDetailsSectionProps {
