@@ -1,130 +1,222 @@
 
 import { useState, useRef, useEffect } from 'react';
-import { Message } from '@/types/chat';
+import { Message, MessageCategory } from '@/types/chat';
 
 export function useChatMessages() {
   const [messages, setMessages] = useState<Message[]>([
     {
       id: 1,
-      content: "👋 Hi there! I'm your AI assistant. How can I help you today?",
+      content: "👋 Hi there! I'm your ZeroBot AI assistant v3.0. How can I help you today?",
       sender: 'bot',
       timestamp: new Date(),
+      category: 'general',
     },
   ]);
   const [isTyping, setIsTyping] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [conversationContext, setConversationContext] = useState<MessageCategory>('general');
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const typingSpeed = useRef(30); // Words per minute typing speed
 
-  // AI assistant responses for orders
-  const orderResponses = [
-    "Your order is being processed and should ship within 1-2 business days.",
-    "I checked your order status - it has been shipped and should arrive by Wednesday.",
-    "Good news! The delivery service shows your package is out for delivery today!",
-    "I found your order in our system. Your items are being prepared for shipping.",
-    "According to our records, your payment was successful and your order is confirmed.",
-    "I've notified our shipping department about your inquiry. They'll prioritize your order.",
-    "Your package has been dispatched from our warehouse and is on its way to the carrier facility.",
-    "The estimated delivery date for your order is this Friday. You'll receive a notification once it's out for delivery.",
-    "Our records show your order was delivered yesterday. If you haven't received it, please let me know so I can investigate.",
-    "I've checked the tracking information, and your package is currently in transit through our shipping partner's network."
-  ];
+  // AI assistant response categories with more specific, helpful responses
+  const responseData = {
+    tracking: [
+      "I've located your package! It's currently at the local distribution center and will be delivered tomorrow between 9 AM and 12 PM. You'll receive real-time updates on your app.",
+      "Your package is out for delivery today! The delivery window is between 2 PM and 6 PM. The driver will send you a notification when they're about 30 minutes away.",
+      "According to our tracking system, your package has cleared customs and is now in transit domestically. Expected delivery is within 2-3 business days.",
+      "I've checked your tracking details, and your order was picked up by our courier at 10:15 AM today. It's en route to the regional sorting facility and remains on schedule.",
+      "The latest tracking shows your package was loaded onto the delivery vehicle at 8:30 AM. It's part of today's route, so you should receive it before 8 PM tonight.",
+      "There's a slight delay with your package due to weather conditions affecting shipping routes. The updated delivery date is Monday, and you'll get automatic updates."
+    ],
+    invoice: [
+      "Your invoice is ready! You can download a detailed breakdown of all charges directly from your order details page. Would you like me to email you a copy as well?",
+      "I've generated an updated invoice with the recent discount applied to your order. Check your email inbox within the next 5 minutes or access it from your account dashboard.",
+      "For tax purposes, all invoices include our company registration details. Your recent purchase invoice is available in both PDF and CSV formats for your accounting needs.",
+      "The invoice for your 'out for delivery' order is now available for immediate download. It includes all warranty information and return policy details.",
+      "Since your order was marked as delivered, the final invoice has been automatically generated. You'll find it in your account under 'Order History'."
+    ],
+    order: [
+      "Your order #ZWM-7829 is being processed and will ship within 24 hours. I've added a complimentary eco-friendly tote bag to your package as a thank you!",
+      "I've checked your order status - it shipped this morning and will arrive by Wednesday. The carrier will send you a text message with a 2-hour delivery window.",
+      "Great news! Your order is out for delivery today. Our driver will take a photo of the package at your doorstep once it's delivered for added security.",
+      "I found your order details. Your sustainable kitchenware items are being prepared for shipping from our closest zero-waste facility to minimize carbon footprint.",
+      "Your payment was successfully processed, and your order is confirmed. Would you like to track your carbon offset for this purchase?",
+      "I've notified our fulfillment center about your inquiry. Your order is being prioritized, and we've updated your delivery preference to 'plastic-free packaging'."
+    ],
+    product: [
+      "This product is made from 100% post-consumer recycled materials and is completely biodegradable. It comes with a 2-year warranty against defects.",
+      "The reusable container you're asking about is dishwasher safe, microwave safe, and free from BPA, phthalates, and other harmful chemicals.",
+      "Our bamboo utensil set is sustainably harvested and treated with food-safe natural oils. Each set prevents approximately 730 plastic utensils from entering landfills annually.",
+      "The dimensions are 10\" x 12\" x 5\", and the product weighs just 1.2 pounds, making it perfect for everyday use or travel. It's designed to replace 4-6 single-use items.",
+      "This zero-waste starter kit includes 8 essential items to begin your sustainability journey: reusable bags, beeswax wraps, bamboo toothbrush, shampoo bar, safety razor, cloth napkins, stainless steel straws, and a coffee thermos.",
+      "The ingredient list includes only plant-derived components: coconut oil, shea butter, essential oils, and natural colorants. It's certified cruelty-free and vegan."
+    ],
+    sustainability: [
+      "Reducing food waste is one of the most effective climate actions! Try meal planning, proper food storage, and composting to minimize your environmental impact.",
+      "The average American uses 156 plastic water bottles annually. Switching to a reusable bottle can save money while preventing plastic pollution.",
+      "Clothing swaps are a fantastic way to refresh your wardrobe sustainably. They create community connections while extending the lifecycle of garments.",
+      "Indoor plants like snake plants and pothos not only beautify your space but also naturally filter air pollutants, reducing the need for air purifiers.",
+      "Creating a 'no junk mail' system can save up to 100 pounds of paper waste per household annually. Try digital subscriptions and opt-out of catalog mailings.",
+      "Implementing 'Meatless Mondays' can reduce your carbon footprint by approximately 8 pounds of emissions weekly - that's over 400 pounds per year!"
+    ],
+    climate: [
+      "Every reused item prevents approximately 4.4 pounds of carbon emissions on average. Last year, Zero Waste Mart users collectively prevented over 2.3 million pounds of CO2!",
+      "The carbon footprint of recycling varies widely: aluminum recycling saves 95% of the energy needed for virgin production, while paper saves about 60%.",
+      "Food waste produces methane in landfills - a greenhouse gas 25 times more potent than CO2. Composting instead can reduce your climate impact significantly.",
+      "While individual actions matter, corporate and policy changes create the biggest impact. Our community activism section connects you with local climate initiatives.",
+      "Thrift shopping for clothing can reduce the carbon footprint of your wardrobe by up to 82% compared to buying new fast fashion items.",
+      "Our local climate impact calculator shows your ecosystem's specific vulnerabilities and suggests targeted actions for your region."
+    ],
+    personal: [
+      "Based on your purchase history, you've prevented approximately 267 single-use items from entering landfills this year! Would you like to set a new goal for next quarter?",
+      "I notice you're building a zero-waste kitchen collection. Have you tried our silicone food storage bags? They're particularly compatible with your existing purchases.",
+      "Your sustainability score is in the top 15% of our community! Would you like to share your journey and tips with other members?",
+      "Looking at your previous questions, I think you might enjoy our upcoming workshop on home composting systems for small spaces. Should I send you details?",
+      "Your search history suggests interest in zero-waste personal care. Our newly added bamboo razor with replaceable blades has received excellent reviews from similar users.",
+      "Based on your location, there's a community garden within 2 miles of you that accepts compost contributions. Would you like information about getting involved?"
+    ]
+  };
 
-  // AI assistant responses for product questions
-  const productResponses = [
-    "This product is made from 100% organic materials and is eco-friendly.",
-    "The item you're asking about is currently in stock and ready to ship.",
-    "This product comes with a 1-year warranty against manufacturer defects.",
-    "The size dimensions are 10\" x 12\" x 5\". Let me know if you need more specific measurements.",
-    "This product is suitable for both indoor and outdoor use.",
-    "We have this item available in blue, red, and green colors.",
-    "The product is made in India using traditional crafting techniques that have been passed down for generations.",
-    "This item requires minimal maintenance - just wipe with a damp cloth periodically to keep it clean.",
-    "The weight of this product is approximately 2.5 kg, making it easy to move around as needed.",
-    "If you're looking for accessories to go with this product, I recommend checking out our complementary collection."
-  ];
-
-  // AI assistant responses for general questions
+  // General responses for any topic
   const generalResponses = [
-    "I'd be happy to help with that question. Let me check our knowledge base.",
-    "Thanks for reaching out! I'll find that information for you right away.",
-    "Great question! Here's what I can tell you about that.",
-    "I appreciate your patience. Let me find the answer for you.",
-    "I'm here to assist you with any questions you have about our products and services.",
-    "I'd recommend checking our FAQ page for more detailed information on this topic.",
-    "That's an interesting question. Based on my information, here's what I can share with you.",
-    "I understand how important this is. Let me provide you with the most accurate information we have available.",
-    "Thank you for your question. I'll do my best to provide a comprehensive answer.",
-    "I'm checking our resources to give you the most up-to-date information on this topic."
-  ];
-
-  // New detailed responses for tracking inquiries
-  const trackingResponses = [
-    "I can see your package is currently out for delivery! The delivery window is between 2 PM and 6 PM today. You'll receive a notification just before arrival.",
-    "Your package is currently at our local distribution center. It's scheduled for delivery tomorrow between 9 AM and 12 PM. The driver will call you 30 minutes before arrival.",
-    "According to our tracking system, your package has passed customs clearance and is now in domestic transit. It should be delivered within the next 2-3 business days.",
-    "I've checked the detailed tracking, and your order was picked up by our courier partner at 10:15 AM today. It's now en route to the regional sorting facility and remains on schedule for delivery by Friday.",
-    "The tracking information shows your package has been loaded onto the delivery vehicle at 8:30 AM today. It's part of today's delivery route, so you should receive it before 8 PM tonight.",
-    "Our system indicates a slight delay with your package due to weather conditions affecting the shipping route. The new estimated delivery date is Monday. I've arranged for an automated update to be sent to you when it's out for delivery."
-  ];
-
-  // New detailed responses for invoice and receipt questions
-  const invoiceResponses = [
-    "Your invoice is now available for download from your order details page. It includes a detailed breakdown of all charges, including taxes and shipping costs. If you need a specific format for your accounting purposes, please let me know.",
-    "I've generated an updated invoice that includes the recent discount we applied to your order. You should see it in your email inbox within the next 5 minutes. The PDF is also available in your account dashboard.",
-    "For tax purposes, all our invoices include our company registration number and tax ID. The invoice for your recent purchase has been generated and is available in both PDF and CSV formats.",
-    "I notice you're asking about an invoice for a recent order that's marked as 'out for delivery.' I'm pleased to confirm that your invoice is now ready and available for download directly from the tracking page.",
-    "The system shows your order has been marked as delivered, so your final invoice has been generated automatically. It includes all the relevant details for your records and warranty claims if needed in the future."
+    "I appreciate your question! Here's what I can tell you about that...",
+    "That's an excellent topic. Based on the latest sustainability research...",
+    "I'd be happy to help with that! Here's what our zero waste experts recommend...",
+    "Great question! From an environmental perspective...",
+    "Thanks for asking about that! Here's what sustainable practices suggest...",
+    "I understand how important this is. The most eco-friendly approach would be..."
   ];
 
   useEffect(() => {
     scrollToBottom();
   }, [messages]);
 
+  useEffect(() => {
+    // Analyze conversation to determine context for better responses
+    if (messages.length > 1) {
+      analyzeConversationContext();
+    }
+  }, [messages]);
+
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   };
 
-  const generateAIResponse = (userMessage: string) => {
-    // Simple keyword detection to provide more relevant responses
-    const lowerCaseMessage = userMessage.toLowerCase();
-    let responseArray = generalResponses;
+  // New function to analyze conversation context for more relevant responses
+  const analyzeConversationContext = () => {
+    // Get the last 3 user messages for context
+    const recentUserMessages = messages
+      .filter(msg => msg.sender === 'user')
+      .slice(-3)
+      .map(msg => msg.content.toLowerCase());
+    
+    if (recentUserMessages.length === 0) return;
+    
+    const combinedText = recentUserMessages.join(' ');
+    
+    // Check for context keywords
+    const contextMap: {[key: string]: MessageCategory} = {
+      'track': 'tracking',
+      'shipping': 'tracking',
+      'delivery': 'tracking', 
+      'package': 'tracking',
+      'where': 'tracking',
+      
+      'invoice': 'invoice',
+      'receipt': 'invoice',
+      'bill': 'invoice',
+      'payment': 'invoice',
+      
+      'order': 'order',
+      'purchased': 'order',
+      'buy': 'order',
+      'cancel': 'order',
+      
+      'product': 'product',
+      'item': 'product', 
+      'material': 'product',
+      'made': 'product',
+      
+      'sustainability': 'sustainability',
+      'sustainable': 'sustainability',
+      'eco': 'sustainability',
+      'green': 'sustainability',
+      'environment': 'sustainability',
+      
+      'climate': 'climate',
+      'carbon': 'climate',
+      'emissions': 'climate',
+      'global warming': 'climate',
+      
+      'my': 'personal',
+      'me': 'personal',
+      'i': 'personal',
+      'account': 'personal',
+    };
+    
+    // Determine primary context from the conversation
+    let maxHits = 0;
+    let primaryContext: MessageCategory = 'general';
+    
+    Object.entries(contextMap).forEach(([keyword, category]) => {
+      const regex = new RegExp(keyword, 'gi');
+      const matches = combinedText.match(regex)?.length || 0;
+      
+      if (matches > maxHits) {
+        maxHits = matches;
+        primaryContext = category;
+      }
+    });
+    
+    setConversationContext(primaryContext);
+  };
 
-    // Check for tracking-related keywords
-    if (
-      lowerCaseMessage.includes('track') || 
-      lowerCaseMessage.includes('where is') || 
-      lowerCaseMessage.includes('delivery status') || 
-      lowerCaseMessage.includes('package location') ||
-      lowerCaseMessage.includes('shipping status')
-    ) {
-      responseArray = trackingResponses;
+  // Calculate typing time based on message length
+  const calculateTypingTime = (message: string): number => {
+    const wordCount = message.split(' ').length;
+    const wordsPerMs = typingSpeed.current / (60 * 1000); // Words per millisecond
+    const typingTimeMs = wordCount / wordsPerMs;
+    
+    // Set minimum and maximum typing time
+    const minTime = 1000; // Minimum 1 second
+    const maxTime = 3500; // Maximum 3.5 seconds
+    
+    return Math.max(minTime, Math.min(typingTimeMs, maxTime));
+  };
+
+  const generateAIResponse = (userMessage: string): string => {
+    // Select appropriate response based on conversation context
+    let responseArray = generalResponses;
+    
+    switch(conversationContext) {
+      case 'tracking':
+        responseArray = responseData.tracking;
+        break;
+      case 'invoice':
+        responseArray = responseData.invoice;
+        break; 
+      case 'order':
+        responseArray = responseData.order;
+        break;
+      case 'product':
+        responseArray = responseData.product;
+        break;
+      case 'sustainability':
+        responseArray = responseData.sustainability;
+        break;
+      case 'climate':
+        responseArray = responseData.climate;
+        break;
+      case 'personal':
+        responseArray = responseData.personal;
+        break;
+      default:
+        responseArray = generalResponses;
     }
-    // Check for invoice-related keywords
-    else if (
-      lowerCaseMessage.includes('invoice') || 
-      lowerCaseMessage.includes('receipt') || 
-      lowerCaseMessage.includes('bill') || 
-      lowerCaseMessage.includes('payment proof')
-    ) {
-      responseArray = invoiceResponses;
-    }
-    // Check for order-related keywords
-    else if (
-      lowerCaseMessage.includes('order') ||
-      lowerCaseMessage.includes('shipping') ||
-      lowerCaseMessage.includes('delivery') ||
-      lowerCaseMessage.includes('package')
-    ) {
-      responseArray = orderResponses;
-    } 
-    // Check for product-related keywords
-    else if (
-      lowerCaseMessage.includes('product') ||
-      lowerCaseMessage.includes('item') ||
-      lowerCaseMessage.includes('material') ||
-      lowerCaseMessage.includes('size') ||
-      lowerCaseMessage.includes('color')
-    ) {
-      responseArray = productResponses;
+
+    // For personalized responses, check for name reference
+    if (conversationContext === 'personal' && userMessage.toLowerCase().includes('name')) {
+      return "I see you're asking about personal information. While I don't have access to your full profile, you can update your name and other details in the Profile section of your account settings.";
     }
 
     return responseArray[Math.floor(Math.random() * responseArray.length)];
@@ -139,26 +231,86 @@ export function useChatMessages() {
       content,
       sender: 'user',
       timestamp: new Date(),
+      category: 'general',
     };
 
     setMessages((prev) => [...prev, userMessage]);
     setIsTyping(true);
 
-    // Simulate AI thinking and typing with variable response time
-    const thinkingTime = 1000 + Math.random() * 1500; // Between 1-2.5 seconds
+    // Generate response text
+    const responseContent = generateAIResponse(content);
     
+    // Calculate typing time based on message length
+    const thinkingTime = 500; // Base thinking time
+    const typingTime = calculateTypingTime(responseContent);
+    
+    // Simulate AI thinking then typing with variable response time
     setTimeout(() => {
       const aiResponse: Message = {
         id: Date.now() + 1,
-        content: generateAIResponse(content),
+        content: responseContent,
         sender: 'bot',
         timestamp: new Date(),
+        category: conversationContext,
       };
 
       setMessages((prev) => [...prev, aiResponse]);
       setIsTyping(false);
-    }, thinkingTime);
+    }, thinkingTime + typingTime);
   };
 
-  return { messages, isTyping, sendMessage, messagesEndRef };
+  const getSuggestedQuestions = (): string[] => {
+    // Return contextual suggested questions based on the current conversation
+    switch(conversationContext) {
+      case 'tracking':
+        return [
+          "When will my package arrive?",
+          "Is there a delay with my order?",
+          "Can I change my delivery address?",
+          "How do I track my recent order?"
+        ];
+      case 'product':
+        return [
+          "What materials is this made from?",
+          "Is this product recyclable?",
+          "How long does this product last?",
+          "Is there a warranty on this item?"
+        ];
+      case 'sustainability':
+        return [
+          "How can I reduce my plastic usage?",
+          "What are the best composting methods?",
+          "How to start a zero-waste lifestyle?",
+          "Which products have the lowest environmental impact?"
+        ];
+      default:
+        return [
+          "How does Zero Waste Mart work?",
+          "What impact have we made so far?",
+          "Tips for sustainable living?",
+          "How can I track my environmental impact?"
+        ];
+    }
+  };
+
+  const searchMessages = (query: string) => {
+    if (!query.trim()) return messages;
+    
+    const lowerCaseQuery = query.toLowerCase();
+    return messages.filter(message => 
+      message.content.toLowerCase().includes(lowerCaseQuery)
+    );
+  };
+
+  return { 
+    messages, 
+    isTyping, 
+    sendMessage, 
+    messagesEndRef,
+    conversationContext,
+    getSuggestedQuestions,
+    searchQuery,
+    setSearchQuery,
+    searchMessages
+  };
 }

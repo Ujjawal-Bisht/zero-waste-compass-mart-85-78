@@ -1,11 +1,11 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import ChatHeader from './ChatHeader';
 import ChatMessage from './ChatMessage';
 import ChatInput from './ChatInput';
 import TypingIndicator from './TypingIndicator';
-import { Message } from '@/types/chat';
+import { Message, MessageCategory } from '@/types/chat';
 
 interface ChatBotWindowProps {
   isOpen: boolean;
@@ -14,6 +14,11 @@ interface ChatBotWindowProps {
   isTyping: boolean;
   onSendMessage: (message: string) => void;
   messagesEndRef: React.RefObject<HTMLDivElement>;
+  conversationContext?: MessageCategory;
+  suggestedQuestions: string[];
+  searchQuery: string;
+  onSearchChange: (query: string) => void;
+  filteredMessages?: Message[];
 }
 
 const ChatBotWindow: React.FC<ChatBotWindowProps> = ({
@@ -22,8 +27,29 @@ const ChatBotWindow: React.FC<ChatBotWindowProps> = ({
   messages,
   isTyping,
   onSendMessage,
-  messagesEndRef
+  messagesEndRef,
+  conversationContext = 'general',
+  suggestedQuestions,
+  searchQuery,
+  onSearchChange,
+  filteredMessages
 }) => {
+  const displayMessages = searchQuery ? filteredMessages || [] : messages;
+  const [showScrollButton, setShowScrollButton] = useState(false);
+
+  // Handle scroll to show/hide the scroll to bottom button
+  const handleScroll = (e: React.UIEvent<HTMLDivElement>) => {
+    const { scrollTop, scrollHeight, clientHeight } = e.currentTarget;
+    
+    // Show button when scrolled up more than 100px from bottom
+    setShowScrollButton(scrollTop < scrollHeight - clientHeight - 100);
+  };
+
+  // Scroll to bottom function for manual triggering
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  };
+
   return (
     <AnimatePresence>
       {isOpen && (
@@ -34,23 +60,67 @@ const ChatBotWindow: React.FC<ChatBotWindowProps> = ({
           exit={{ scale: 0.8, opacity: 0, y: 20 }}
           transition={{ type: "spring", stiffness: 300, damping: 25 }}
         >
-          {/* Header */}
-          <ChatHeader onClose={onClose} />
+          {/* Header with context indication */}
+          <ChatHeader 
+            onClose={onClose} 
+            context={conversationContext} 
+          />
 
-          {/* Messages */}
-          <div className="flex-1 overflow-y-auto p-4 space-y-4">
-            {messages.map((msg, index) => (
-              <ChatMessage key={msg.id} message={msg} index={index} />
+          {/* Messages area with search results handling */}
+          <div 
+            className="flex-1 overflow-y-auto p-4 space-y-4 scroll-smooth"
+            onScroll={handleScroll}
+          >
+            {searchQuery && displayMessages.length === 0 ? (
+              <div className="flex flex-col items-center justify-center h-full text-gray-500">
+                <p>No messages matching "{searchQuery}"</p>
+              </div>
+            ) : searchQuery ? (
+              <div className="mb-4 pb-2 border-b border-gray-100">
+                <p className="text-xs text-gray-500">
+                  Found {displayMessages.length} results for "{searchQuery}"
+                </p>
+              </div>
+            ) : null}
+            
+            {displayMessages.map((msg, index) => (
+              <ChatMessage 
+                key={msg.id} 
+                message={msg} 
+                index={index} 
+                highlightSearch={searchQuery}
+              />
             ))}
             
             {/* Typing indicator */}
-            {isTyping && <TypingIndicator />}
+            {isTyping && <TypingIndicator context={conversationContext} />}
             
             <div ref={messagesEndRef} />
           </div>
 
-          {/* Input */}
-          <ChatInput onSendMessage={onSendMessage} />
+          {/* Scroll to bottom button */}
+          <AnimatePresence>
+            {showScrollButton && (
+              <motion.button
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: 10 }}
+                className="absolute bottom-20 right-4 bg-zwm-primary text-white rounded-full w-8 h-8 flex items-center justify-center shadow-md"
+                onClick={scrollToBottom}
+              >
+                ↓
+              </motion.button>
+            )}
+          </AnimatePresence>
+
+          {/* Enhanced input with context and search */}
+          <ChatInput 
+            onSendMessage={onSendMessage} 
+            conversationContext={conversationContext}
+            suggestedQuestions={suggestedQuestions}
+            searchQuery={searchQuery}
+            onSearchChange={onSearchChange}
+          />
         </motion.div>
       )}
     </AnimatePresence>
