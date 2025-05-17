@@ -242,9 +242,19 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, onAddToCart }) => {
     return Math.floor((expiry.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
   };
 
+  // Define the itemVariants here
+  const cardItemVariants = {
+    hidden: { y: 20, opacity: 0 },
+    visible: { 
+      y: 0, 
+      opacity: 1,
+      transition: { type: 'spring', stiffness: 100 }
+    }
+  };
+
   return (
     <motion.div
-      variants={itemVariants}
+      variants={cardItemVariants}
       whileHover={{ y: -10, transition: { duration: 0.3 } }}
       className="h-full"
     >

@@ -13,6 +13,7 @@ interface OrdersContentProps {
   formatDate: (date: string) => string;
   onCancelOrder: (orderId: string) => void;
   onTrackOrder: (orderId: string) => void;
+  onChatWithSeller?: (sellerId: string, sellerName?: string) => void;
 }
 
 export const OrdersContent: React.FC<OrdersContentProps> = ({
@@ -20,7 +21,8 @@ export const OrdersContent: React.FC<OrdersContentProps> = ({
   selectedTab,
   formatDate,
   onCancelOrder,
-  onTrackOrder
+  onTrackOrder,
+  onChatWithSeller
 }) => {
   return (
     <motion.div variants={{ hidden: { opacity: 0 }, visible: { opacity: 1 } }}>
@@ -38,6 +40,7 @@ export const OrdersContent: React.FC<OrdersContentProps> = ({
               formatDate={formatDate}
               onCancelOrder={onCancelOrder}
               onTrackOrder={onTrackOrder}
+              onChatWithSeller={onChatWithSeller}
             />
           ) : (
             <EmptyOrdersState selectedTab={selectedTab} />

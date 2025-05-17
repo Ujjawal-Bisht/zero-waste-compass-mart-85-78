@@ -10,6 +10,7 @@ const mockOrders: Order[] = [
     buyerId: "buyer-001",
     buyerName: "John Doe",
     sellerId: "seller-001",
+    sellerName: "Fresh Farms",
     items: [
       { itemId: "item-001", quantity: 2, price: 1299, name: "Organic Apples" },
       { itemId: "item-002", quantity: 1, price: 799, name: "Fresh Bread" }
@@ -25,6 +26,7 @@ const mockOrders: Order[] = [
     buyerId: "buyer-001",
     buyerName: "John Doe",
     sellerId: "seller-002",
+    sellerName: "Tech World",
     items: [
       { itemId: "item-003", quantity: 1, price: 6999, name: "Wireless Headphones" }
     ],
@@ -39,6 +41,7 @@ const mockOrders: Order[] = [
     buyerId: "buyer-001",
     buyerName: "John Doe",
     sellerId: "seller-003",
+    sellerName: "Dairy Delight",
     items: [
       { itemId: "item-004", quantity: 3, price: 499, name: "Organic Bananas" },
       { itemId: "item-005", quantity: 2, price: 299, name: "Fresh Milk" }
@@ -54,6 +57,7 @@ const mockOrders: Order[] = [
     buyerId: "buyer-001",
     buyerName: "John Doe",
     sellerId: "seller-004",
+    sellerName: "Fashion Styles",
     items: [
       { itemId: "item-006", quantity: 1, price: 2499, name: "Cotton T-Shirt" }
     ],

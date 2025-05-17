@@ -1,10 +1,11 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { OrdersHeader } from './components/OrdersHeader';
 import { OrdersContent } from './components/OrdersContent';
 import { OrderTrackingInfo } from './components/OrderTrackingInfo';
 import { useOrderManagement } from './hooks/useOrderManagement';
+import { ChatDrawer } from '../chat/ChatDrawer';
 
 const MyOrders: React.FC = () => {
   const {
@@ -15,6 +16,15 @@ const MyOrders: React.FC = () => {
     handleTrackOrder,
     formatDate
   } = useOrderManagement();
+
+  const [chatOpen, setChatOpen] = useState(false);
+  const [currentChat, setCurrentChat] = useState<{ sellerId: string, sellerName?: string }>({ sellerId: '' });
+
+  // Handle opening chat with seller
+  const handleChatWithSeller = (sellerId: string, sellerName?: string) => {
+    setCurrentChat({ sellerId, sellerName });
+    setChatOpen(true);
+  };
 
   // Animation variants
   const containerVariants = {
@@ -46,6 +56,7 @@ const MyOrders: React.FC = () => {
           formatDate={formatDate}
           onCancelOrder={handleCancelOrder}
           onTrackOrder={handleTrackOrder}
+          onChatWithSeller={handleChatWithSeller}
         />
 
         {/* Order Tracking Information */}
@@ -55,6 +66,15 @@ const MyOrders: React.FC = () => {
           formatDate={formatDate}
         />
       </motion.div>
+
+      {/* Chat Drawer */}
+      <ChatDrawer 
+        open={chatOpen} 
+        onClose={() => setChatOpen(false)} 
+        recipientId={currentChat.sellerId}
+        recipientName={currentChat.sellerName || 'Seller'}
+        recipientType="seller"
+      />
     </div>
   );
 };

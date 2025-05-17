@@ -90,12 +90,13 @@ export interface OrderItem {
   name?: string;
 }
 
-// Extend the Order interface to include the buyerName field
+// Extend the Order interface to include the buyerName and sellerName fields
 export interface Order {
   id: string;
   buyerId: string;
   buyerName?: string;
   sellerId: string;
+  sellerName?: string;
   items: OrderItem[];
   status: 'pending' | 'processing' | 'shipped' | 'delivered' | 'cancelled';
   paymentStatus: 'pending' | 'paid' | 'failed';

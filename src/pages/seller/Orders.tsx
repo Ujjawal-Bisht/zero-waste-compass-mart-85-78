@@ -5,6 +5,7 @@ import { toast } from '@/components/ui/use-toast';
 import { Order } from '@/types';
 import OrdersCard from '@/components/orders/OrdersCard';
 import { generateInvoice } from '@/utils/exportUtils';
+import { ChatDrawer } from '../chat/ChatDrawer';
 
 const SellerOrders: React.FC = () => {
   // This would be replaced with actual data from a database
@@ -39,6 +40,9 @@ const SellerOrders: React.FC = () => {
     },
   ]);
 
+  const [chatOpen, setChatOpen] = useState(false);
+  const [currentChat, setCurrentChat] = useState<{ buyerId: string, buyerName: string }>({ buyerId: '', buyerName: '' });
+
   const handleViewDetails = (orderId: string) => {
     toast({
       title: "View Order Details",
@@ -61,12 +65,9 @@ const SellerOrders: React.FC = () => {
     });
   };
 
-  const handleContactBuyer = (buyerName: string) => {
-    toast({
-      title: "Contact Buyer",
-      description: `Sending message to ${buyerName}`,
-      duration: 3000,
-    });
+  const handleContactBuyer = (buyerId: string, buyerName: string) => {
+    setCurrentChat({ buyerId, buyerName });
+    setChatOpen(true);
   };
 
   const handlePrintInvoice = (orderId: string) => {
@@ -139,6 +140,15 @@ const SellerOrders: React.FC = () => {
         onPrintInvoice={handlePrintInvoice}
         onSendShippingUpdate={handleSendShippingUpdate}
         onCancelOrder={handleCancelOrder}
+      />
+
+      {/* Chat Drawer */}
+      <ChatDrawer 
+        open={chatOpen} 
+        onClose={() => setChatOpen(false)} 
+        recipientId={currentChat.buyerId}
+        recipientName={currentChat.buyerName}
+        recipientType="buyer"
       />
     </motion.div>
   );

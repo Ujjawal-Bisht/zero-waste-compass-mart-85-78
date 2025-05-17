@@ -6,19 +6,23 @@ import { Order } from '@/types';
 import { OrderStatusBadge } from './OrderStatusBadge';
 import { OrderItemsList } from './OrderItemsList';
 import { OrderActionButtons } from './OrderActionButtons';
+import { Button } from '@/components/ui/button';
+import { MessageCircle } from 'lucide-react';
 
 interface OrdersTableProps {
   orders: Order[];
   formatDate: (date: string) => string;
   onCancelOrder: (orderId: string) => void;
   onTrackOrder: (orderId: string) => void;
+  onChatWithSeller?: (sellerId: string, sellerName?: string) => void;
 }
 
 export const OrdersTable: React.FC<OrdersTableProps> = ({
   orders,
   formatDate,
   onCancelOrder,
-  onTrackOrder
+  onTrackOrder,
+  onChatWithSeller
 }) => {
   const itemVariants = {
     hidden: { opacity: 0, y: 20 },
@@ -34,6 +38,7 @@ export const OrdersTable: React.FC<OrdersTableProps> = ({
           <TableHead>Items</TableHead>
           <TableHead>Total</TableHead>
           <TableHead>Status</TableHead>
+          <TableHead>Seller</TableHead>
           <TableHead className="text-right">Actions</TableHead>
         </TableRow>
       </TableHeader>
@@ -58,6 +63,21 @@ export const OrdersTable: React.FC<OrdersTableProps> = ({
             <TableCell>₹{order.totalAmount.toFixed(2)}</TableCell>
             <TableCell>
               <OrderStatusBadge status={order.status} />
+            </TableCell>
+            <TableCell>
+              <div className="flex items-center gap-2">
+                <span>{order.sellerName || "Unknown Seller"}</span>
+                {onChatWithSeller && (
+                  <Button 
+                    variant="ghost" 
+                    size="icon" 
+                    className="h-8 w-8 text-blue-500" 
+                    onClick={() => onChatWithSeller(order.sellerId, order.sellerName)}
+                  >
+                    <MessageCircle className="h-4 w-4" />
+                  </Button>
+                )}
+              </div>
             </TableCell>
             <TableCell className="text-right">
               <OrderActionButtons

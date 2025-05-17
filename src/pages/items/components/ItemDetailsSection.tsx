@@ -6,11 +6,22 @@ import ItemNameField from './details/ItemNameField';
 import PriceQuantityFields from './details/PriceQuantityFields';
 import CategoryField from './details/CategoryField';
 import ExpiryDatePicker from './ExpiryDatePicker';
-import { ItemFormValues } from '../schemas/itemFormSchema';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
-import { InfoCircle } from 'lucide-react';
+import { Info } from 'lucide-react';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+
+export interface ItemFormValues {
+  name?: string;
+  description?: string;
+  category?: 'food' | 'clothing' | 'electronics' | 'furniture' | 'household' | 'books' | 'toys' | 'medicine' | 'other';
+  expiryDate?: Date;
+  address?: string;
+  originalPrice?: number;
+  currentPrice?: number;
+  quantity?: number;
+  dynamicPricingEnabled?: boolean;
+}
 
 export interface ItemDetailsSectionProps {
   form: UseFormReturn<ItemFormValues>;
@@ -30,7 +41,7 @@ const ItemDetailsSection: React.FC<ItemDetailsSectionProps> = ({
   isCategoryUpdated
 }) => {
   // Get dynamicPricingEnabled value from form
-  const dynamicPricingEnabled = form.watch('dynamicPricingEnabled');
+  const dynamicPricingEnabled = form.watch('dynamicPricingEnabled') || false;
 
   return (
     <Card>
@@ -62,7 +73,7 @@ const ItemDetailsSection: React.FC<ItemDetailsSectionProps> = ({
               <TooltipProvider>
                 <Tooltip>
                   <TooltipTrigger asChild>
-                    <InfoCircle className="h-4 w-4 ml-1 text-indigo-500" />
+                    <Info className="h-4 w-4 ml-1 text-indigo-500" />
                   </TooltipTrigger>
                   <TooltipContent className="max-w-xs">
                     <p>AI Dynamic Pricing automatically adjusts the price based on expiry date, reducing waste and maximizing sales. Prices will be automatically discounted as the expiry date approaches.</p>

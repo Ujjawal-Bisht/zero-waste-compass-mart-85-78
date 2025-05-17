@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { 
   DropdownMenu,
@@ -8,7 +9,7 @@ import {
   DropdownMenuLabel,
 } from '@/components/ui/dropdown-menu';
 import { Button } from '@/components/ui/button';
-import { MoreVertical, Mail, Printer } from 'lucide-react';
+import { MoreVertical, Mail, Printer, MessageCircle } from 'lucide-react';
 import { Order } from '@/types';
 import { generateInvoice } from '@/utils/exportUtils';
 
@@ -16,7 +17,7 @@ interface OrderActionMenuProps {
   order: Order;
   onViewDetails: (orderId: string) => void;
   onUpdateStatus: (orderId: string, newStatus: Order['status']) => void;
-  onContactBuyer: (buyerName: string) => void;
+  onContactBuyer: (buyerId: string, buyerName: string) => void;
   onPrintInvoice: (orderId: string) => void;
   onSendShippingUpdate: (orderId: string) => void;
   onCancelOrder: (orderId: string) => void;
@@ -50,6 +51,14 @@ const OrderActionMenu: React.FC<OrderActionMenuProps> = ({
         >
           <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-2" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
           View details
+        </DropdownMenuItem>
+        
+        <DropdownMenuItem 
+          onClick={() => onContactBuyer(order.buyerId, order.buyerName)}
+          className="flex items-center cursor-pointer"
+        >
+          <MessageCircle className="h-4 w-4 mr-2" />
+          Chat with customer
         </DropdownMenuItem>
         
         <DropdownMenuItem 
@@ -101,7 +110,7 @@ const OrderActionMenu: React.FC<OrderActionMenuProps> = ({
         
         <DropdownMenuSeparator />
         <DropdownMenuItem 
-          onClick={() => onContactBuyer(order.buyerName)}
+          onClick={() => onContactBuyer(order.buyerId, order.buyerName)}
           className="cursor-pointer"
         >
           <Mail className="h-4 w-4 mr-2" />

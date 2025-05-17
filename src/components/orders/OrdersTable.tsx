@@ -9,16 +9,17 @@ import {
   TableRow 
 } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
-import { Clock, IndianRupee, ShoppingCart } from 'lucide-react';
+import { Clock, IndianRupee, ShoppingCart, MessageCircle } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { Order } from '@/types';
 import OrderActionMenu from './OrderActionMenu';
+import { Button } from '@/components/ui/button';
 
 interface OrdersTableProps {
   orders: Order[];
   onViewDetails: (orderId: string) => void;
   onUpdateStatus: (orderId: string, newStatus: Order['status']) => void;
-  onContactBuyer: (buyerName: string) => void;
+  onContactBuyer: (buyerId: string, buyerName: string) => void;
   onPrintInvoice: (orderId: string) => void;
   onSendShippingUpdate: (orderId: string) => void;
   onCancelOrder: (orderId: string) => void;
@@ -125,7 +126,19 @@ const OrdersTable: React.FC<OrdersTableProps> = ({
               whileHover={{ backgroundColor: "rgba(243, 244, 246, 0.8)", x: 3 }}
             >
               <TableCell className="font-medium">{order.id}</TableCell>
-              <TableCell>{order.buyerName}</TableCell>
+              <TableCell>
+                <div className="flex items-center gap-2">
+                  {order.buyerName}
+                  <Button 
+                    variant="ghost" 
+                    size="icon" 
+                    className="h-8 w-8 text-blue-500"
+                    onClick={() => onContactBuyer(order.buyerId, order.buyerName)}
+                  >
+                    <MessageCircle className="h-4 w-4" />
+                  </Button>
+                </div>
+              </TableCell>
               <TableCell>
                 <div className="flex items-center">
                   <Clock size={14} className="mr-1 text-gray-400" />
