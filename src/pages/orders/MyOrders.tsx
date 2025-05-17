@@ -6,6 +6,7 @@ import { OrdersContent } from './components/OrdersContent';
 import { OrderTrackingInfo } from './components/OrderTrackingInfo';
 import { useOrderManagement } from './hooks/useOrderManagement';
 import { ChatDrawer } from '../chat/ChatDrawer';
+import TopNavbar from '@/components/layouts/TopNavbar';
 
 const MyOrders: React.FC = () => {
   const {
@@ -39,43 +40,46 @@ const MyOrders: React.FC = () => {
   };
 
   return (
-    <div className="container mx-auto py-8 max-w-6xl">
-      <motion.div
-        initial="hidden"
-        animate="visible"
-        variants={containerVariants}
-      >
-        <OrdersHeader 
-          selectedTab={selectedTab} 
-          setSelectedTab={setSelectedTab} 
-        />
+    <>
+      <TopNavbar />
+      <div className="container mx-auto py-8 max-w-6xl">
+        <motion.div
+          initial="hidden"
+          animate="visible"
+          variants={containerVariants}
+        >
+          <OrdersHeader 
+            selectedTab={selectedTab} 
+            setSelectedTab={setSelectedTab} 
+          />
 
-        <OrdersContent 
-          filteredOrders={filteredOrders}
-          selectedTab={selectedTab}
-          formatDate={formatDate}
-          onCancelOrder={handleCancelOrder}
-          onTrackOrder={handleTrackOrder}
-          onChatWithSeller={handleChatWithSeller}
-        />
+          <OrdersContent 
+            filteredOrders={filteredOrders}
+            selectedTab={selectedTab}
+            formatDate={formatDate}
+            onCancelOrder={handleCancelOrder}
+            onTrackOrder={handleTrackOrder}
+            onChatWithSeller={handleChatWithSeller}
+          />
 
-        {/* Order Tracking Information */}
-        <OrderTrackingInfo 
-          orders={filteredOrders}
-          onTrackOrder={handleTrackOrder}
-          formatDate={formatDate}
-        />
-      </motion.div>
+          {/* Order Tracking Information */}
+          <OrderTrackingInfo 
+            orders={filteredOrders}
+            onTrackOrder={handleTrackOrder}
+            formatDate={formatDate}
+          />
+        </motion.div>
 
-      {/* Chat Drawer */}
-      <ChatDrawer 
-        open={chatOpen} 
-        onClose={() => setChatOpen(false)} 
-        recipientId={currentChat.sellerId}
-        recipientName={currentChat.sellerName || 'Seller'}
-        recipientType="seller"
-      />
-    </div>
+        {/* Chat Drawer */}
+        <ChatDrawer 
+          open={chatOpen} 
+          onClose={() => setChatOpen(false)} 
+          recipientId={currentChat.sellerId}
+          recipientName={currentChat.sellerName || 'Seller'}
+          recipientType="seller"
+        />
+      </div>
+    </>
   );
 };
 

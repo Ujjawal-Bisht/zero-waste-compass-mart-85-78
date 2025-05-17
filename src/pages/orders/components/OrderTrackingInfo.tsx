@@ -9,6 +9,7 @@ import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { generateInvoice } from '@/utils/exportUtils';
 import { useToast } from '@/components/ui/use-toast';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 
 interface OrderTrackingInfoProps {
   orders: Order[];
@@ -26,6 +27,8 @@ export const OrderTrackingInfo: React.FC<OrderTrackingInfoProps> = ({
     order.status === 'shipped' || order.status === 'out-for-delivery'
   );
   const [expandedOrderId, setExpandedOrderId] = useState<string | null>(null);
+  const [mapDialogOpen, setMapDialogOpen] = useState(false);
+  const [selectedLocation, setSelectedLocation] = useState<string | null>(null);
   
   if (shippedOrders.length === 0) {
     return null;
@@ -46,6 +49,11 @@ export const OrderTrackingInfo: React.FC<OrderTrackingInfoProps> = ({
 
   const toggleExpandOrder = (orderId: string) => {
     setExpandedOrderId(expandedOrderId === orderId ? null : orderId);
+  };
+
+  const handleViewOnMap = (address: string) => {
+    setSelectedLocation(address);
+    setMapDialogOpen(true);
   };
 
   const handleDownloadInvoice = (order: Order) => {
@@ -311,7 +319,15 @@ export const OrderTrackingInfo: React.FC<OrderTrackingInfoProps> = ({
                                 className="mt-2"
                                 whileHover={{ scale: 1.02 }}
                               >
-                                <Button size="sm" variant="outline" className="text-xs h-7 border-indigo-200 text-indigo-700 hover:bg-indigo-100">
+                                <Button 
+                                  size="sm" 
+                                  variant="outline" 
+                                  className="text-xs h-7 border-indigo-200 text-indigo-700 hover:bg-indigo-100"
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    handleViewOnMap("123 Main Street, Apt 4B, City Name, State, 123456");
+                                  }}
+                                >
                                   View on Map
                                 </Button>
                               </motion.div>
@@ -344,6 +360,30 @@ export const OrderTrackingInfo: React.FC<OrderTrackingInfoProps> = ({
           </AnimatePresence>
         </CardContent>
       </Card>
+
+      {/* Map Dialog */}
+      <Dialog open={mapDialogOpen} onOpenChange={setMapDialogOpen}>
+        <DialogContent className="sm:max-w-lg">
+          <DialogHeader>
+            <DialogTitle>View Delivery Location</DialogTitle>
+          </DialogHeader>
+          <div className="h-80 w-full relative">
+            <iframe
+              title="Location Map"
+              width="100%"
+              height="100%"
+              frameBorder="0"
+              style={{ border: 0, borderRadius: '0.5rem' }}
+              src={`https://maps.google.com/maps?q=${encodeURIComponent(selectedLocation || '')}&t=&z=13&ie=UTF8&iwloc=&output=embed`}
+              allowFullScreen
+            ></iframe>
+          </div>
+          <div className="mt-2 p-3 bg-indigo-50 rounded-lg text-xs text-indigo-700">
+            <p className="font-medium">Delivery Address:</p>
+            <p className="mt-1">{selectedLocation}</p>
+          </div>
+        </DialogContent>
+      </Dialog>
     </motion.div>
   );
 };

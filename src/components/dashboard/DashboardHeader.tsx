@@ -5,8 +5,9 @@ import { useAuth } from '@/contexts/auth';
 import LogoSection from './header/LogoSection';
 import NavButtons from './header/NavButtons';
 import SellerButtons from './header/SellerButtons';
-import NotificationSection from './header/NotificationSection';
-import UserAvatar from './header/UserAvatar';
+import NotificationsPopover from '../layouts/NotificationsPopover';
+import MiniCart from '../cart/MiniCart';
+import UserMenu from '../layouts/UserMenu';
 
 const DashboardHeader: React.FC = () => {
   const { currentUser } = useAuth();
@@ -34,11 +35,14 @@ const DashboardHeader: React.FC = () => {
           {/* Navigation buttons */}
           <NavButtons isSellerPortal={Boolean(isSellerPortal)} />
           
-          {/* Notification bell */}
-          <NotificationSection />
+          {/* Mini Cart */}
+          <MiniCart />
           
-          {/* User avatar */}
-          <UserAvatar currentUser={currentUser} />
+          {/* Notification bell */}
+          <NotificationsPopover />
+          
+          {/* User menu */}
+          <UserMenu />
         </div>
       </motion.div>
     </header>
