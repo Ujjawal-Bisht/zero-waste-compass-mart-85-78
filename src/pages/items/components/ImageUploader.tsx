@@ -1,77 +1,113 @@
 
-import React from 'react';
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import React, { useState, useRef } from 'react';
+import { Button } from '@/components/ui/button';
+import { ImageIcon, Upload } from 'lucide-react';
 
 interface ImageUploaderProps {
-  imagePreview: string | null;
-  setImagePreview: React.Dispatch<React.SetStateAction<string | null>>;
+  imagePreview: string;
+  setImagePreview: (url: string) => void;
 }
 
 export const ImageUploader: React.FC<ImageUploaderProps> = ({ imagePreview, setImagePreview }) => {
-  const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = () => {
-        setImagePreview(reader.result as string);
-      };
-      reader.readAsDataURL(file);
+  const [isDragging, setIsDragging] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragging(true);
+  };
+  
+  const handleDragLeave = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragging(false);
+  };
+  
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragging(false);
+    
+    if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+      const file = e.dataTransfer.files[0];
+      if (file.type.startsWith('image/')) {
+        handleImageUpload(file);
+      }
     }
   };
-
+  
+  const handleImageUpload = (file: File) => {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      if (e.target && typeof e.target.result === 'string') {
+        setImagePreview(e.target.result);
+      }
+    };
+    reader.readAsDataURL(file);
+  };
+  
+  const handleClick = () => {
+    if (fileInputRef.current) {
+      fileInputRef.current.click();
+    }
+  };
+  
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      handleImageUpload(e.target.files[0]);
+    }
+  };
+  
   return (
-    <div className="space-y-2">
-      <div className="font-medium text-sm">Item Image</div>
-      <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center transition-all hover:border-zwm-primary">
-        {imagePreview ? (
-          <div className="relative">
-            <img
-              src={imagePreview}
-              alt="Preview"
-              className="mx-auto h-48 object-cover rounded-md animate-fade-in"
-            />
-            <Button
-              type="button"
-              variant="outline"
-              size="sm"
-              className="absolute top-2 right-2 bg-white/80 hover:bg-white transition-colors"
-              onClick={() => setImagePreview(null)}
-            >
-              Remove
-            </Button>
+    <div 
+      className={`border-2 border-dashed rounded-lg p-6 text-center cursor-pointer transition-all hover:bg-gray-50 ${isDragging ? 'border-blue-500 bg-blue-50' : 'border-gray-300'}`}
+      onDragOver={handleDragOver}
+      onDragLeave={handleDragLeave}
+      onDrop={handleDrop}
+      onClick={handleClick}
+    >
+      <input 
+        type="file" 
+        className="hidden" 
+        accept="image/*" 
+        ref={fileInputRef}
+        onChange={handleFileChange}
+      />
+      
+      {imagePreview ? (
+        <div className="relative">
+          <img 
+            src={imagePreview} 
+            alt="Preview" 
+            className="mx-auto max-h-64 rounded shadow"
+          />
+          <Button 
+            variant="outline" 
+            size="sm" 
+            className="mt-3 bg-white"
+            onClick={(e) => {
+              e.stopPropagation();
+              setImagePreview('');
+            }}
+          >
+            Change Image
+          </Button>
+        </div>
+      ) : (
+        <div className="space-y-2">
+          <div className="flex justify-center">
+            <ImageIcon className="h-12 w-12 text-gray-400" />
           </div>
-        ) : (
-          <>
-            <div className="text-zwm-primary mb-2 animate-float">
-              <svg className="mx-auto h-12 w-12" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
-              </svg>
-            </div>
-            <p className="text-sm text-gray-500">
-              Click to upload an image or drag and drop
+          <div>
+            <p className="font-medium text-sm">
+              Drag & drop an image, or click to browse
             </p>
-            <p className="text-xs text-gray-400 mt-1">
-              PNG, JPG or WEBP (max. 5MB)
+            <p className="text-xs text-gray-500 mt-1">
+              JPG, PNG or GIF (max 5MB)
             </p>
-            <Input
-              type="file"
-              accept="image/*"
-              className="hidden"
-              id="image-upload"
-              onChange={handleImageChange}
-            />
-            <Button
-              type="button"
-              variant="outline"
-              className="mt-4 transition-all hover:border-zwm-primary"
-              onClick={() => document.getElementById('image-upload')?.click()}
-            >
-              Select Image
-            </Button>
-          </>
-        )}
-      </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
+
+export default ImageUploader;

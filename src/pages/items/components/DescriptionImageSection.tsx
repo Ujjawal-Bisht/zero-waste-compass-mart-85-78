@@ -1,11 +1,11 @@
 
 import React from 'react';
 import { UseFormReturn } from 'react-hook-form';
-import { FormField, FormItem, FormLabel, FormControl, FormMessage } from '@/components/ui/form';
-import { ItemFormValues } from '../schemas/itemFormSchema';
+import { Card, CardContent } from '@/components/ui/card';
+import { FormField, FormItem, FormLabel, FormControl, FormDescription } from '@/components/ui/form';
 import { Textarea } from '@/components/ui/textarea';
-import ImageUploader from './ImageUploader';
-import ExpiryDatePicker from './ExpiryDatePicker';
+import { ImageUploader } from './ImageUploader';
+import { ItemFormValues } from '../schemas/itemFormSchema';
 
 interface DescriptionImageSectionProps {
   form: UseFormReturn<ItemFormValues>;
@@ -14,48 +14,48 @@ interface DescriptionImageSectionProps {
   isDescriptionUpdated?: boolean;
 }
 
-const DescriptionImageSection: React.FC<DescriptionImageSectionProps> = ({
-  form,
-  imagePreview,
+const DescriptionImageSection: React.FC<DescriptionImageSectionProps> = ({ 
+  form, 
+  imagePreview, 
   setImagePreview,
-  isDescriptionUpdated = false
+  isDescriptionUpdated
 }) => {
   return (
-    <div className="space-y-6">
-      <div className="space-y-4">
-        <h2 className="text-lg font-medium">Description & Media</h2>
+    <Card>
+      <CardContent className="pt-6">
+        <h3 className="text-lg font-semibold mb-4">Description & Image</h3>
         
-        <FormField
-          control={form.control}
-          name="description"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Description</FormLabel>
-              <FormControl>
-                <Textarea 
-                  placeholder="Describe your item in detail..." 
-                  className={`min-h-[120px] resize-y transition-all hover:border-zwm-primary focus:border-zwm-primary ${isDescriptionUpdated ? 'form-field-success' : ''}`}
-                  {...field} 
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <ImageUploader 
-            imagePreview={imagePreview} 
-            setImagePreview={setImagePreview} 
+        <div className="space-y-6">
+          <FormField
+            control={form.control}
+            name="description"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel className="text-base">Description</FormLabel>
+                <FormControl>
+                  <Textarea
+                    placeholder="Describe your item in detail..." 
+                    className={`h-24 resize-none transition-all ${isDescriptionUpdated ? 'border-green-500 bg-green-50' : ''}`}
+                    {...field}
+                  />
+                </FormControl>
+                <FormDescription>
+                  Include details like condition, features, etc.
+                </FormDescription>
+              </FormItem>
+            )}
           />
           
-          <ExpiryDatePicker 
-            form={form}
-            isUpdated={false}
-          />
+          <div>
+            <FormLabel className="text-base block mb-2">Item Image</FormLabel>
+            <ImageUploader 
+              imagePreview={imagePreview} 
+              setImagePreview={setImagePreview}
+            />
+          </div>
         </div>
-      </div>
-    </div>
+      </CardContent>
+    </Card>
   );
 };
 
