@@ -1,26 +1,86 @@
 
-/* Tab and card animations */
-
-/* Tab selection animation */
-.tabs-selection-indicator {
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+/* Tab animations */
+.tab-animate {
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s ease;
 }
 
-/* Dynamic account type styles */
-.buyer-gradient {
-  background: linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(99, 102, 241, 0.1));
+.tab-animate::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, #6366f1, #8b5cf6);
+  transform: scaleX(0);
+  transition: transform 0.3s ease;
 }
 
-.seller-gradient {
-  background: linear-gradient(135deg, rgba(245, 158, 11, 0.1), rgba(234, 88, 12, 0.1));
+.tab-animate[data-state="active"]::after {
+  transform: scaleX(1);
 }
 
-/* Card hover effects */
-.login-card {
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
+.tab-animate:hover::after {
+  transform: scaleX(0.5);
 }
 
-.login-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+.tab-animate[data-state="active"]:hover::after {
+  transform: scaleX(1);
+}
+
+/* Card hover effects for tabs */
+[role="tablist"] {
+  background: rgba(249, 250, 251, 0.7);
+  backdrop-filter: blur(8px);
+  border-radius: 9999px;
+  padding: 0.25rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+[role="tab"] {
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+[role="tab"]::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(45deg, rgba(99, 102, 241, 0.1), rgba(139, 92, 246, 0.1));
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  border-radius: inherit;
+  z-index: -1;
+}
+
+[role="tab"]:hover::before {
+  opacity: 1;
+}
+
+[role="tab"][data-state="active"] {
+  background: linear-gradient(45deg, #6366f1, #8b5cf6);
+  color: white;
+  box-shadow: 0 2px 5px rgba(99, 102, 241, 0.3);
+}
+
+/* Tab content fade-in effect */
+[role="tabpanel"] {
+  animation: tabFadeIn 0.5s ease forwards;
+}
+
+@keyframes tabFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }

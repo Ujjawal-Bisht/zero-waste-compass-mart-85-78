@@ -7,6 +7,10 @@ import PriceQuantityFields from './details/PriceQuantityFields';
 import CategoryField from './details/CategoryField';
 import ExpiryDatePicker from './ExpiryDatePicker';
 import { ItemFormValues } from '../schemas/itemFormSchema';
+import { Switch } from '@/components/ui/switch';
+import { Label } from '@/components/ui/label';
+import { InfoCircle } from 'lucide-react';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 
 export interface ItemDetailsSectionProps {
   form: UseFormReturn<ItemFormValues>;
@@ -25,6 +29,9 @@ const ItemDetailsSection: React.FC<ItemDetailsSectionProps> = ({
   isQuantityUpdated,
   isCategoryUpdated
 }) => {
+  // Get dynamicPricingEnabled value from form
+  const dynamicPricingEnabled = form.watch('dynamicPricingEnabled');
+
   return (
     <Card>
       <CardContent className="pt-6">
@@ -41,7 +48,29 @@ const ItemDetailsSection: React.FC<ItemDetailsSectionProps> = ({
             form={form} 
             isQuantityUpdated={Boolean(isQuantityUpdated)}
             isPriceUpdated={Boolean(isPriceUpdated)}
+            dynamicPricingEnabled={dynamicPricingEnabled}
           />
+          
+          <div className="flex items-center space-x-2 mb-4 py-2 px-3 bg-indigo-50 rounded-md border border-indigo-100">
+            <Switch
+              id="dynamic-pricing"
+              checked={dynamicPricingEnabled}
+              onCheckedChange={(checked) => form.setValue('dynamicPricingEnabled', checked)}
+            />
+            <Label htmlFor="dynamic-pricing" className="text-sm font-medium flex items-center cursor-pointer">
+              Enable AI Dynamic Pricing
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <InfoCircle className="h-4 w-4 ml-1 text-indigo-500" />
+                  </TooltipTrigger>
+                  <TooltipContent className="max-w-xs">
+                    <p>AI Dynamic Pricing automatically adjusts the price based on expiry date, reducing waste and maximizing sales. Prices will be automatically discounted as the expiry date approaches.</p>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+            </Label>
+          </div>
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <CategoryField 

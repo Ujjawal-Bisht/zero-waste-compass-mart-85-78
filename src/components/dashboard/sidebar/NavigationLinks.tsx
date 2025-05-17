@@ -3,7 +3,7 @@ import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
-import { Home, Package, ShoppingCart, User, PlusCircle } from 'lucide-react';
+import { Home, Package, ShoppingCart, User, PlusCircle, Truck } from 'lucide-react';
 
 interface NavigationLink {
   title: string;
@@ -55,7 +55,7 @@ export const NavigationLinks: React.FC<NavigationLinksProps> = ({ isSeller, onIt
     {
       title: 'My Orders',
       href: '/orders',
-      icon: <ShoppingCart className="mr-2 h-4 w-4" />,
+      icon: <Truck className="mr-2 h-4 w-4" />, // Changed from ShoppingCart to Truck
     },
     {
       title: 'Profile',

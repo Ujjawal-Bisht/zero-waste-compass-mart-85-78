@@ -1,197 +1,128 @@
 
-/* Product-specific animations */
+/* Add the following new animations to the existing product.css file */
 
-/* Product row hover animation */
-.table-row-animate {
-  transition: all 0.3s ease;
+/* New product card animations */
+.product-card-enhanced {
+  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  position: relative;
+  overflow: hidden;
+}
+
+.product-card-enhanced::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(circle, rgba(255,255,255,0.8) 0%, rgba(255,255,255,0) 70%);
+  transform: rotate(45deg);
+  opacity: 0;
+  transition: opacity 0.6s ease;
+}
+
+.product-card-enhanced:hover::before {
+  opacity: 0.5;
+  animation: shimmerCard 1.5s ease-in-out;
+}
+
+@keyframes shimmerCard {
+  0% {
+    transform: translate(-100%, -100%) rotate(45deg);
+  }
+  100% {
+    transform: translate(100%, 100%) rotate(45deg);
+  }
+}
+
+/* Dynamic pricing animation */
+.price-dynamic {
   position: relative;
 }
 
-.table-row-animate:before {
+.price-dynamic::after {
+  content: 'AI Priced';
+  position: absolute;
+  top: -20px;
+  right: 0;
+  font-size: 10px;
+  color: #7c3aed;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.price-dynamic:hover::after {
+  opacity: 1;
+}
+
+/* Dynamic discount badge */
+.discount-badge {
+  animation: pulseBadge 2s infinite;
+  box-shadow: 0 0 0 rgba(239, 68, 68, 0.4);
+}
+
+@keyframes pulseBadge {
+  0% {
+    box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4);
+  }
+  70% {
+    box-shadow: 0 0 0 10px rgba(239, 68, 68, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(239, 68, 68, 0);
+  }
+}
+
+/* Expiry date countdown animation */
+.expiry-countdown {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 6px;
+  background: linear-gradient(to right, #fcd34d, #f59e0b);
+  border-radius: 4px;
+  color: white;
+  font-size: 10px;
+  font-weight: 600;
+  position: relative;
+  overflow: hidden;
+}
+
+.expiry-countdown::before {
   content: '';
   position: absolute;
   left: 0;
   top: 0;
   height: 100%;
-  width: 0;
-  background: linear-gradient(to right, rgba(99, 102, 241, 0.3), transparent);
-  transition: width 0.3s ease;
-  z-index: 0;
-}
-
-.table-row-animate:hover:before {
-  width: 4px;
-}
-
-/* Product card animations */
-.product-card {
-  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-}
-
-.product-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
-}
-
-/* Badge animations */
-.badge-animate {
-  transition: all 0.3s ease;
-  position: relative;
-  overflow: hidden;
-}
-
-.badge-animate:after {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: -100%;
   width: 100%;
-  height: 100%;
-  background: linear-gradient(
-    90deg,
-    transparent,
-    rgba(255, 255, 255, 0.3),
-    transparent
-  );
-  transition: left 0.5s ease;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+  transform: translateX(-100%);
+  animation: shimmerExpiry 2s infinite;
 }
 
-.badge-animate:hover:after {
-  left: 100%;
-}
-
-/* Menu icon animations */
-.menu-icon {
-  transition: all 0.3s ease;
-  position: relative;
-}
-
-.menu-icon:hover {
-  background-color: rgba(99, 102, 241, 0.1);
-  transform: rotate(90deg);
-}
-
-/* Dropdown menu animations */
-.table-dropdown-content {
-  animation: scaleIn 0.2s ease forwards;
-  transform-origin: top right;
-}
-
-@keyframes scaleIn {
-  from {
-    opacity: 0;
-    transform: scale(0.9);
+@keyframes shimmerExpiry {
+  100% {
+    transform: translateX(100%);
   }
-  to {
-    opacity: 1;
+}
+
+/* Rupee symbol animation */
+.rupee-symbol {
+  display: inline-block;
+  margin-right: 2px;
+  animation: scaleRupee 2s infinite alternate;
+}
+
+@keyframes scaleRupee {
+  from {
     transform: scale(1);
   }
-}
-
-/* Action buttons hover effects */
-.action-view:hover svg {
-  color: #3b82f6;
-  transform: scale(1.2);
-  transition: all 0.2s ease;
-}
-
-.action-edit:hover svg {
-  color: #10b981;
-  transform: scale(1.2);
-  transition: all 0.2s ease;
-}
-
-.action-delete:hover svg {
-  color: #ef4444;
-  transform: scale(1.2);
-  transition: all 0.2s ease;
-}
-
-/* Success pulse animation for newly added items */
-.success-pulse {
-  animation: successPulse 1.5s ease-in-out;
-}
-
-@keyframes successPulse {
-  0%, 100% {
-    box-shadow: 0 0 0 rgba(16, 185, 129, 0);
-  }
-  50% {
-    box-shadow: 0 0 20px rgba(16, 185, 129, 0.6);
+  to {
+    transform: scale(1.1);
   }
 }
 
-/* Enhanced button animations for product actions */
-.button-shimmer {
-  position: relative;
-  overflow: hidden;
-}
-
-.button-shimmer::after {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: -100%;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(
-    90deg,
-    transparent,
-    rgba(255, 255, 255, 0.3),
-    transparent
-  );
-  transition: left 0.7s ease;
-}
-
-.button-shimmer:hover::after {
-  left: 100%;
-}
-
-/* Price pulse animation */
-.price-pulse {
-  position: relative;
-}
-
-.price-pulse::before {
-  content: '';
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  background: rgba(16, 185, 129, 0.2);
-  border-radius: 4px;
-  opacity: 0;
-  animation: pricePulse 2s infinite;
-}
-
-@keyframes pricePulse {
-  0% {
-    transform: scale(0.95);
-    opacity: 0;
-  }
-  50% {
-    transform: scale(1.05);
-    opacity: 0.5;
-  }
-  100% {
-    transform: scale(0.95);
-    opacity: 0;
-  }
-}
-
-/* Table row card hover effect */
-tr.table-row-animate {
-  transition: all 0.3s ease;
-}
-
-tr.table-row-animate:hover {
-  z-index: 10;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-  transform: translateY(-2px);
-}
-
-/* Filter button animations */
+/* Improved filter button */
 .filter-button {
-  transition: all 0.3s ease;
   position: relative;
   overflow: hidden;
 }
@@ -199,139 +130,22 @@ tr.table-row-animate:hover {
 .filter-button::after {
   content: '';
   position: absolute;
-  width: 100%;
-  height: 100%;
   top: 0;
   left: -100%;
-  background: linear-gradient(90deg, transparent, rgba(99, 102, 241, 0.2), transparent);
-  transition: left 0.5s ease;
-}
-
-.filter-button:hover::after {
-  left: 100%;
-}
-
-.filter-button.active {
-  background: linear-gradient(135deg, #6366f1, #8b5cf6);
-  color: white;
-}
-
-/* Card section header animation */
-.card-header-animate {
-  position: relative;
-  overflow: hidden;
-}
-
-.card-header-animate::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
   width: 100%;
-  height: 2px;
-  background: linear-gradient(90deg, #6366f1, #8b5cf6, #6366f1);
-  background-size: 200% 100%;
-  animation: gradientMove 3s infinite linear;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(139, 92, 246, 0.3), transparent);
+  animation: filterButtonShimmer 3s infinite;
 }
 
-@keyframes gradientMove {
+@keyframes filterButtonShimmer {
   0% {
-    background-position: 0% 0;
-  }
-  100% {
-    background-position: 200% 0;
-  }
-}
-
-/* Empty state animations */
-.empty-state-animate {
-  animation: float 6s ease-in-out infinite;
-}
-
-@keyframes float {
-  0%, 100% {
-    transform: translateY(0);
+    left: -100%;
   }
   50% {
-    transform: translateY(-10px);
-  }
-}
-
-/* Status indicator animations */
-.status-indicator {
-  position: relative;
-  display: inline-block;
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-}
-
-.status-indicator.available {
-  background-color: #10b981;
-  box-shadow: 0 0 0 rgba(16, 185, 129, 0.4);
-  animation: statusPulse 2s infinite;
-}
-
-.status-indicator.flagged {
-  background-color: #f59e0b;
-  box-shadow: 0 0 0 rgba(245, 158, 11, 0.4);
-  animation: statusPulse 2s infinite;
-}
-
-.status-indicator.expired {
-  background-color: #ef4444;
-  box-shadow: 0 0 0 rgba(239, 68, 68, 0.4);
-  animation: statusPulse 2s infinite;
-}
-
-@keyframes statusPulse {
-  0% {
-    box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.4);
-  }
-  70% {
-    box-shadow: 0 0 0 6px rgba(16, 185, 129, 0);
+    left: 100%;
   }
   100% {
-    box-shadow: 0 0 0 0 rgba(16, 185, 129, 0);
-  }
-}
-
-/* Sort header animations */
-th.sort-header {
-  transition: all 0.2s ease;
-}
-
-th.sort-header:hover {
-  background-color: rgba(99, 102, 241, 0.05);
-  color: #4f46e5;
-}
-
-/* Sort icon animation */
-.sort-icon {
-  transition: all 0.3s ease;
-}
-
-.sort-active .sort-icon {
-  transform: rotate(180deg);
-}
-
-/* Card content loading skeleton animation */
-.skeleton {
-  background: linear-gradient(
-    90deg,
-    rgba(226, 232, 240, 0.6) 25%,
-    rgba(241, 245, 249, 0.6) 37%,
-    rgba(226, 232, 240, 0.6) 63%
-  );
-  background-size: 400% 100%;
-  animation: skeletonLoading 1.4s ease infinite;
-}
-
-@keyframes skeletonLoading {
-  0% {
-    background-position: 100% 50%;
-  }
-  100% {
-    background-position: 0 50%;
+    left: 100%;
   }
 }
