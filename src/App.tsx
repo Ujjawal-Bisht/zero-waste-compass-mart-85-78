@@ -18,6 +18,7 @@ import Profile from "./pages/Profile";
 import Login from "./pages/auth/Login";
 import Register from "./pages/auth/Register";
 import AddItem from "./pages/items/AddItem";
+import MyOrders from "./pages/orders/MyOrders";
 
 // Seller Pages
 import SellerDashboard from "./pages/seller/Dashboard";
@@ -56,13 +57,16 @@ const App = () => (
             {/* Protected Dashboard Routes */}
             <Route element={<PrivateRoute><DashboardLayout /></PrivateRoute>}>
               <Route path="/dashboard" element={<Dashboard />} />
-              <Route path="/marketplace" element={
+              <Route path="/marketplace" element={<Marketplace />} />
+              <Route path="/profile" element={<Profile />} />
+              <Route path="/orders" element={<MyOrders />} />
+              
+              {/* Only show Add Item for sellers */}
+              <Route path="/items/add" element={
                 <SellerRoute>
-                  <Navigate to="/seller/dashboard" replace />
+                  <AddItem />
                 </SellerRoute>
               } />
-              <Route path="/profile" element={<Profile />} />
-              <Route path="/items/add" element={<AddItem />} />
               
               {/* Seller Routes */}
               <Route path="/seller/*" element={

@@ -1,9 +1,11 @@
 
-import React from 'react';
+import React, { useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Form } from '@/components/ui/form';
 import { useItemForm } from '../hooks/useItemForm';
 import FormSections from './form/FormSections';
 import FormButtons from './form/FormButtons';
+import { useAuth } from '@/contexts/auth';
 
 interface ItemFormProps {
   onBarcodeDetected?: (barcode: string, item: any) => void;
@@ -11,6 +13,16 @@ interface ItemFormProps {
 }
 
 const ItemForm: React.FC<ItemFormProps> = ({ onBarcodeDetected, onFormSuccess }) => {
+  const { currentUser } = useAuth();
+  const navigate = useNavigate();
+  
+  // Redirect non-sellers away from the form
+  useEffect(() => {
+    if (currentUser && !currentUser.isSeller) {
+      navigate('/dashboard');
+    }
+  }, [currentUser, navigate]);
+  
   const {
     form,
     imagePreview,
@@ -23,6 +35,11 @@ const ItemForm: React.FC<ItemFormProps> = ({ onBarcodeDetected, onFormSuccess })
     onBarcodeDetected, 
     onFormSuccess 
   });
+
+  // If user is not a seller, don't render the form
+  if (currentUser && !currentUser.isSeller) {
+    return null;
+  }
 
   return (
     <Form {...form}>

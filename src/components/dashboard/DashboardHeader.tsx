@@ -1,11 +1,11 @@
 
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '@/contexts/auth';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Input } from '@/components/ui/input';
-import { Search, Plus, Home } from 'lucide-react';
+import { Search, Plus, Home, ShoppingCart, Package } from 'lucide-react';
 import { motion } from 'framer-motion';
 import NotificationCenter from '@/components/NotificationCenter';
 import { Logo } from '@/components/ui/logo';
@@ -93,6 +93,7 @@ const DashboardHeader: React.FC = () => {
             </motion.div>
           )}
 
+          {/* Navigation buttons */}
           <Button
             variant="outline"
             size="sm"
@@ -103,6 +104,44 @@ const DashboardHeader: React.FC = () => {
             <span className="relative">Home</span>
           </Button>
           
+          {/* Show Marketplace button for buyers */}
+          {!isSellerPortal && (
+            <motion.div
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              className="navbar-item"
+            >
+              <Button 
+                variant="outline"
+                size="sm"
+                onClick={() => navigate('/marketplace')} 
+                className="hidden md:flex items-center gap-2 hover:bg-gray-100 transition-colors buyer-button-3d button-bounce button-shimmer"
+              >
+                <Package className="h-4 w-4" /> 
+                <span>Marketplace</span>
+              </Button>
+            </motion.div>
+          )}
+          
+          {/* Show My Orders button for buyers */}
+          {!isSellerPortal && (
+            <motion.div
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              className="navbar-item"
+            >
+              <Button 
+                variant="outline"
+                size="sm"
+                onClick={() => navigate('/orders')} 
+                className="hidden md:flex items-center gap-2 hover:bg-gray-100 transition-colors buyer-button-3d button-bounce button-shimmer"
+              >
+                <ShoppingCart className="h-4 w-4" /> 
+                <span>My Orders</span>
+              </Button>
+            </motion.div>
+          )}
+          
           <motion.div
             whileHover={{ rotate: [0, -5, 5, 0], scale: 1.05 }}
             transition={{ duration: 0.5 }}
@@ -111,20 +150,23 @@ const DashboardHeader: React.FC = () => {
             <NotificationCenter />
           </motion.div>
           
-          <motion.div
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            className="navbar-item"
-          >
-            <Button 
-              onClick={() => navigate('/items/add')} 
-              className={currentUser?.isSeller ? "seller-button-gradient button-pulse-glow" : "buyer-button-gradient button-pulse-glow"}
+          {/* Only show Add Item button for sellers */}
+          {isSellerPortal && (
+            <motion.div
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              className="navbar-item"
             >
-              <Plus className="h-4 w-4 mr-1" /> Add Item
-            </Button>
-          </motion.div>
+              <Button 
+                onClick={() => navigate('/items/add')} 
+                className="seller-button-gradient button-pulse-glow"
+              >
+                <Plus className="h-4 w-4 mr-1" /> Add Item
+              </Button>
+            </motion.div>
+          )}
           
-          {/* Remove Profile text/info from top right avatar area */}
+          {/* Avatar area */}
           <motion.div 
             className="flex items-center cursor-pointer navbar-item"
             whileHover={{ scale: 1.05 }}
@@ -137,8 +179,6 @@ const DashboardHeader: React.FC = () => {
                 {getInitials(currentUser?.displayName)}
               </AvatarFallback>
             </Avatar>
-            {/* Remove profile/name and account type text */}
-            {/* No text or "Profile" here, only the thumbnail */}
           </motion.div>
         </div>
       </motion.div>
@@ -147,4 +187,3 @@ const DashboardHeader: React.FC = () => {
 };
 
 export default DashboardHeader;
-

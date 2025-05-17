@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { cn } from '@/lib/utils';
@@ -27,8 +28,8 @@ export const DashboardSidebar = ({ className, onClose, ...props }: SidebarNavPro
   const { currentUser, logout } = useAuth();
   const isSeller = currentUser?.isSeller;
   
-  // Add "Profile" back to navigation menu, remove from top right later
-  const navigationLinks = [
+  // Different navigation links for buyers and sellers
+  const navigationLinks = isSeller ? [
     {
       title: 'Dashboard',
       href: '/dashboard',
@@ -38,6 +39,27 @@ export const DashboardSidebar = ({ className, onClose, ...props }: SidebarNavPro
       title: 'Add Item',
       href: '/items/add',
       icon: <PlusCircle className="mr-2 h-4 w-4" />,
+    },
+    {
+      title: 'Profile',
+      href: '/profile',
+      icon: <User className="mr-2 h-4 w-4" />,
+    }
+  ] : [
+    {
+      title: 'Dashboard',
+      href: '/dashboard',
+      icon: <Home className="mr-2 h-4 w-4" />,
+    },
+    {
+      title: 'Marketplace',
+      href: '/marketplace',
+      icon: <Package className="mr-2 h-4 w-4" />,
+    },
+    {
+      title: 'My Orders',
+      href: '/orders',
+      icon: <ShoppingCart className="mr-2 h-4 w-4" />,
     },
     {
       title: 'Profile',

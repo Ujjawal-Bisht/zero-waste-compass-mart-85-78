@@ -4,6 +4,7 @@ import { FormField, FormItem, FormLabel, FormControl, FormMessage } from '@/comp
 import { Input } from '@/components/ui/input';
 import { UseFormReturn } from 'react-hook-form';
 import { ItemFormValues } from '../../schemas/itemFormSchema';
+import { MapPin } from 'lucide-react';
 
 interface AddressFieldProps {
   form: UseFormReturn<ItemFormValues, any, undefined>;
@@ -36,12 +37,15 @@ const AddressField: React.FC<AddressFieldProps> = ({ form, isUpdated = false }) 
         <FormItem>
           <FormLabel>Location</FormLabel>
           <FormControl>
-            <Input 
-              placeholder="Enter address" 
-              {...field} 
-              className="transition-all hover:border-zwm-primary focus:border-zwm-primary" 
-              ref={inputRef}
-            />
+            <div className="relative">
+              <MapPin className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
+              <Input 
+                placeholder="Enter address" 
+                {...field} 
+                className="pl-10 transition-all hover:border-zwm-primary focus:border-zwm-primary" 
+                ref={inputRef}
+              />
+            </div>
           </FormControl>
           <FormMessage />
         </FormItem>
