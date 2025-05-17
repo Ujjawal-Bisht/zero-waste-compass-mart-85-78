@@ -1,8 +1,8 @@
-
 import React, { useEffect, useState } from 'react';
-import { MapPin, Building, MapPinned } from 'lucide-react';
+import { MapPin, Building, MapPinned, Navigation, Map } from 'lucide-react';
 import { FormField, FormItem, FormLabel, FormControl, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
 import { UseFormReturn } from 'react-hook-form';
 import { motion } from 'framer-motion';
 import { 
@@ -14,6 +14,8 @@ import {
 } from '@/components/ui/select';
 import { COUNTRY_CODES } from '@/utils/countryCodes';
 import { INDIAN_STATES, getCitiesByState } from '@/utils/indianGeographicData';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { toast } from 'sonner';
 
 interface AddressSectionProps {
   form: UseFormReturn<any>;
@@ -28,6 +30,7 @@ const AddressSection: React.FC<AddressSectionProps> = ({
 }) => {
   const [selectedState, setSelectedState] = useState<string>("");
   const [availableCities, setAvailableCities] = useState<string[]>([]);
+  const [mapDialogOpen, setMapDialogOpen] = useState(false);
   const addressFieldName = isBusiness ? "businessAddress" : "address";
   const title = isBusiness ? "Business Address" : (isSeller ? "Address Information" : "Address Information (Optional)");
   
@@ -76,6 +79,41 @@ const AddressSection: React.FC<AddressSectionProps> = ({
     }
   };
 
+  const handleUseCurrentLocation = () => {
+    if (navigator.geolocation) {
+      toast.info("Getting your current location...");
+      
+      navigator.geolocation.getCurrentPosition(
+        async (position) => {
+          // In a real app, we would use reverse geocoding here
+          // For now, we'll just set some placeholder data
+          const { latitude, longitude } = position.coords;
+          
+          try {
+            toast.success("Location successfully retrieved");
+            form.setValue(addressFieldName, `Location coordinates: ${latitude.toFixed(6)}, ${longitude.toFixed(6)}`);
+          } catch (error) {
+            toast.error("Couldn't determine your address");
+          }
+        },
+        (error) => {
+          toast.error("Couldn't access your location. Please check your browser permissions.");
+        }
+      );
+    } else {
+      toast.error("Geolocation is not supported by your browser");
+    }
+  };
+
+  const handleChooseOnMap = () => {
+    setMapDialogOpen(true);
+  };
+
+  const handleMapSelection = (address: string) => {
+    form.setValue(addressFieldName, address);
+    setMapDialogOpen(false);
+  };
+
   return (
     <motion.div 
       className="space-y-4 pt-4 border-t border-gray-200"
@@ -114,6 +152,30 @@ const AddressSection: React.FC<AddressSectionProps> = ({
           )}
         />
       </motion.div>
+
+      <div className="flex space-x-2">
+        <Button
+          type="button"
+          variant="outline"
+          size="sm"
+          onClick={handleChooseOnMap}
+          className="flex items-center gap-2"
+        >
+          <Map size={16} className="text-gray-600" />
+          Choose on map
+        </Button>
+
+        <Button
+          type="button"
+          variant="outline"
+          size="sm"
+          onClick={handleUseCurrentLocation}
+          className="flex items-center gap-2"
+        >
+          <Navigation size={16} className="text-gray-600" />
+          Use current location
+        </Button>
+      </div>
       
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <motion.div variants={itemVariants}>
@@ -243,6 +305,31 @@ const AddressSection: React.FC<AddressSectionProps> = ({
           />
         </motion.div>
       </div>
+
+      {/* Map selection dialog */}
+      <Dialog open={mapDialogOpen} onOpenChange={setMapDialogOpen}>
+        <DialogContent className="sm:max-w-lg">
+          <DialogHeader>
+            <DialogTitle>Choose location on map</DialogTitle>
+          </DialogHeader>
+          <div className="h-80 w-full relative border rounded-md">
+            <div className="absolute inset-0 flex items-center justify-center bg-gray-100">
+              <p className="text-center text-gray-500">Map interface would go here</p>
+              <p className="text-sm text-gray-400 absolute bottom-4">
+                In a production app, this would be an interactive map
+              </p>
+            </div>
+          </div>
+          <div className="flex justify-end space-x-2">
+            <Button variant="outline" onClick={() => setMapDialogOpen(false)}>
+              Cancel
+            </Button>
+            <Button onClick={() => handleMapSelection("123 Selected Location St, Example City")}>
+              Confirm Location
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </motion.div>
   );
 };

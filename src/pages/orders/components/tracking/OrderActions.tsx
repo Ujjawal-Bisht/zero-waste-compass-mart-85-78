@@ -2,16 +2,13 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
-import { FileDown } from 'lucide-react';
 
 interface OrderActionsProps {
   orderId: string;
-  onDownloadInvoice: () => void;
 }
 
 const OrderActions: React.FC<OrderActionsProps> = ({
   orderId,
-  onDownloadInvoice
 }) => {
   return (
     <div className="flex justify-end">
