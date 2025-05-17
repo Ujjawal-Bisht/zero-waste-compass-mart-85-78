@@ -1,231 +1,157 @@
 
 import React, { useState } from 'react';
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
+import { useToast } from '@/components/ui/use-toast';
+import { Card, CardContent } from '@/components/ui/card';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { ShoppingCart, Search, Filter, Package, Star } from 'lucide-react';
-import { useToast } from "@/components/ui/use-toast";
+import { Button } from '@/components/ui/button';
+import { ShoppingCart, Filter, PackageOpen } from 'lucide-react';
 import { motion } from 'framer-motion';
-import { Item, ItemCategory } from '@/types';
-import mockItems from '@/data/mockData';
+
+type Product = {
+  id: string;
+  name: string;
+  price: number;
+  category: string;
+  seller: string;
+  rating: number;
+  image: string;
+};
+
+const mockProducts: Product[] = [
+  {
+    id: '1',
+    name: 'Organic Apples',
+    price: 5.99,
+    category: 'Food',
+    seller: 'Fresh Farms',
+    rating: 4.5,
+    image: 'https://images.unsplash.com/photo-1570913149827-d2ac84ab3f9a?q=80&w=100',
+  },
+  {
+    id: '2',
+    name: 'Wireless Headphones',
+    price: 89.99,
+    category: 'Electronics',
+    seller: 'Tech World',
+    rating: 4.2,
+    image: 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?q=80&w=100',
+  },
+];
 
 const Marketplace: React.FC = () => {
   const { toast } = useToast();
-  const [searchQuery, setSearchQuery] = useState('');
-  const [selectedCategory, setSelectedCategory] = useState<ItemCategory | 'all'>('all');
-  const [sortBy, setSortBy] = useState('newest');
-  
-  // Filter items based on search, category, and availability
-  const filteredItems = mockItems
-    .filter(item => item.status === 'available') // Only show available items
-    .filter(item => 
-      searchQuery 
-        ? item.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
-          item.description.toLowerCase().includes(searchQuery.toLowerCase())
-        : true
-    )
-    .filter(item => 
-      selectedCategory !== 'all' 
-        ? item.category === selectedCategory 
-        : true
-    );
-  
-  // Sort items
-  const sortedItems = [...filteredItems].sort((a, b) => {
-    if (sortBy === 'newest') {
-      return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
-    }
-    if (sortBy === 'price_low') {
-      return (a.currentPrice || 0) - (b.currentPrice || 0);
-    }
-    if (sortBy === 'price_high') {
-      return (b.currentPrice || 0) - (a.currentPrice || 0);
-    }
-    return 0;
-  });
+  const [activeCategory, setActiveCategory] = useState('all');
 
-  const handleAddToCart = (item: Item) => {
+  const addToCart = (product: Product) => {
     toast({
-      title: "Added to Cart",
-      description: `${item.name} has been added to your cart.`,
-      variant: "success",
+      title: "Added to cart!",
+      description: `${product.name} has been added to your cart.`,
+      variant: "default",
     });
   };
 
-  const categories: { value: ItemCategory | 'all', label: string }[] = [
-    { value: 'all', label: 'All Categories' },
-    { value: 'food', label: 'Food' },
-    { value: 'clothing', label: 'Clothing' },
-    { value: 'electronics', label: 'Electronics' },
-    { value: 'furniture', label: 'Furniture' },
-    { value: 'household', label: 'Household' },
-    { value: 'books', label: 'Books' },
-    { value: 'toys', label: 'Toys' },
-    { value: 'medicine', label: 'Medicine' },
-    { value: 'other', label: 'Other' }
-  ];
-
-  // Function to format date
-  const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
-    const now = new Date();
-    const diffTime = Math.abs(now.getTime() - date.getTime());
-    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-    
-    if (diffDays <= 1) return 'Today';
-    if (diffDays <= 2) return 'Yesterday';
-    if (diffDays <= 7) return `${diffDays} days ago`;
-    
-    return new Intl.DateTimeFormat('en-US', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric',
-    }).format(date);
-  };
-
   return (
-    <div className="container mx-auto py-8 px-4">
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
-        className="space-y-8"
-      >
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-          <div>
-            <h1 className="text-3xl font-bold tracking-tight">Marketplace</h1>
-            <p className="text-muted-foreground mt-1">Browse available items</p>
-          </div>
-          
-          <div className="flex flex-wrap gap-3 items-center">
-            <div className="relative w-full md:w-auto">
-              <Search className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
-              <Input 
-                type="search" 
-                placeholder="Search items..." 
-                className="pl-10 md:w-[250px] bg-gray-50 border-gray-100"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-              />
-            </div>
-            
-            <Select value={selectedCategory} onValueChange={(value) => setSelectedCategory(value as ItemCategory | 'all')}>
-              <SelectTrigger className="w-full md:w-[180px]">
-                <SelectValue placeholder="Category" />
-              </SelectTrigger>
-              <SelectContent>
-                {categories.map(category => (
-                  <SelectItem key={category.value} value={category.value}>
-                    {category.label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-            
-            <Select value={sortBy} onValueChange={setSortBy}>
-              <SelectTrigger className="w-full md:w-[180px]">
-                <SelectValue placeholder="Sort by" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="newest">Newest</SelectItem>
-                <SelectItem value="price_low">Price: Low to High</SelectItem>
-                <SelectItem value="price_high">Price: High to Low</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-        </div>
-
-        {sortedItems.length > 0 ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-            {sortedItems.map((item) => (
-              <motion.div
-                key={item.id}
-                whileHover={{ y: -5, boxShadow: "0 10px 25px -5px rgba(0, 0, 0, 0.1)" }}
-                className="h-full"
-              >
-                <Card className="overflow-hidden h-full flex flex-col">
-                  <div className="relative h-48 overflow-hidden">
-                    <img 
-                      src={item.imageUrl} 
-                      alt={item.name} 
-                      className="w-full h-full object-cover transition-transform duration-300 hover:scale-105"
-                    />
-                    <div className="absolute top-2 right-2">
-                      <Badge className="bg-green-100 text-green-800 hover:bg-green-200">
-                        Available
-                      </Badge>
-                    </div>
-                    {item.dynamicPricingEnabled && (
-                      <div className="absolute bottom-2 left-2">
-                        <Badge className="bg-amber-100 text-amber-800 hover:bg-amber-200">
-                          Dynamic Pricing
-                        </Badge>
-                      </div>
-                    )}
-                  </div>
-                  
-                  <CardHeader className="pb-2">
-                    <div className="flex justify-between items-start">
-                      <CardTitle className="text-lg line-clamp-1">{item.name}</CardTitle>
-                      <div className="flex items-center text-amber-500">
-                        <Star className="h-4 w-4 fill-amber-500" />
-                        <span className="text-xs ml-1">4.5</span>
-                      </div>
-                    </div>
-                    <div className="flex items-center text-xs text-gray-500 mt-1">
-                      <Package className="h-3 w-3 mr-1" /> {item.category}
-                      <span className="mx-2">•</span>
-                      {formatDate(item.createdAt)}
-                    </div>
-                  </CardHeader>
-                  
-                  <CardContent className="py-2 flex-grow">
-                    <p className="text-sm text-gray-600 line-clamp-3">{item.description}</p>
-                  </CardContent>
-                  
-                  <CardFooter className="pt-2">
-                    <div className="flex items-center justify-between w-full">
-                      <div className="flex flex-col">
-                        <span className="text-sm text-gray-500">Price</span>
-                        <span className="font-bold text-xl">
-                          ${item.currentPrice?.toFixed(2) || item.originalPrice?.toFixed(2) || "N/A"}
-                        </span>
-                      </div>
-                      
-                      <Button 
-                        onClick={() => handleAddToCart(item)} 
-                        className="buyer-button-gradient"
-                      >
-                        <ShoppingCart className="h-4 w-4 mr-2" /> Add to Cart
-                      </Button>
-                    </div>
-                  </CardFooter>
-                </Card>
-              </motion.div>
+    <div className="container mx-auto px-4 py-8">
+      <div className="flex justify-between items-center mb-8">
+        <h1 className="text-3xl font-bold">Marketplace</h1>
+        <Button variant="outline" size="sm">
+          <Filter className="mr-2 h-4 w-4" /> Filter
+        </Button>
+      </div>
+      
+      <Tabs defaultValue="all" className="mb-8">
+        <TabsList>
+          <TabsTrigger value="all">All</TabsTrigger>
+          <TabsTrigger value="food">Food</TabsTrigger>
+          <TabsTrigger value="electronics">Electronics</TabsTrigger>
+          <TabsTrigger value="clothing">Clothing</TabsTrigger>
+        </TabsList>
+        
+        <TabsContent value="all" className="mt-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+            {mockProducts.map(product => (
+              <ProductCard key={product.id} product={product} onAddToCart={addToCart} />
             ))}
           </div>
-        ) : (
-          <div className="flex flex-col items-center justify-center py-16">
-            <Package className="h-16 w-16 text-gray-300 mb-4" />
-            <h3 className="text-xl font-medium">No items found</h3>
-            <p className="text-muted-foreground text-center max-w-md">
-              We couldn't find any items matching your search criteria. Try adjusting your filters or check back later.
-            </p>
-            <Button 
-              onClick={() => {
-                setSearchQuery('');
-                setSelectedCategory('all');
-              }} 
-              className="mt-4"
-            >
-              Clear Filters
+        </TabsContent>
+        
+        <TabsContent value="food" className="mt-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+            {mockProducts
+              .filter(p => p.category.toLowerCase() === 'food')
+              .map(product => (
+                <ProductCard key={product.id} product={product} onAddToCart={addToCart} />
+              ))}
+          </div>
+        </TabsContent>
+        
+        <TabsContent value="electronics" className="mt-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+            {mockProducts
+              .filter(p => p.category.toLowerCase() === 'electronics')
+              .map(product => (
+                <ProductCard key={product.id} product={product} onAddToCart={addToCart} />
+              ))}
+          </div>
+        </TabsContent>
+        
+        <TabsContent value="clothing" className="mt-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+            <div className="col-span-full text-center py-8">
+              <PackageOpen className="mx-auto h-12 w-12 text-gray-400 mb-4" />
+              <h3 className="text-lg font-medium">No clothing items available right now</h3>
+              <p className="text-gray-500">Check back soon for new arrivals</p>
+            </div>
+          </div>
+        </TabsContent>
+      </Tabs>
+    </div>
+  );
+};
+
+interface ProductCardProps {
+  product: Product;
+  onAddToCart: (product: Product) => void;
+}
+
+const ProductCard: React.FC<ProductCardProps> = ({ product, onAddToCart }) => {
+  return (
+    <motion.div
+      whileHover={{ y: -5 }}
+      transition={{ duration: 0.3 }}
+    >
+      <Card className="overflow-hidden h-full flex flex-col">
+        <div className="h-40 bg-gray-100 relative">
+          <img 
+            src={product.image} 
+            alt={product.name}
+            className="w-full h-full object-cover"
+          />
+          <Badge className="absolute top-2 right-2">{product.category}</Badge>
+        </div>
+        <CardContent className="pt-4 flex-grow flex flex-col">
+          <div className="mb-4 flex-grow">
+            <h3 className="font-medium">{product.name}</h3>
+            <p className="text-sm text-gray-500">Sold by {product.seller}</p>
+            <div className="flex items-center mt-1">
+              {[...Array(5)].map((_, i) => (
+                <span key={i} className={`text-sm ${i < Math.floor(product.rating) ? 'text-yellow-500' : 'text-gray-300'}`}>
+                  ★
+                </span>
+              ))}
+              <span className="text-xs ml-1 text-gray-500">{product.rating}</span>
+            </div>
+          </div>
+          <div className="mt-2 flex justify-between items-center">
+            <p className="font-bold">${product.price.toFixed(2)}</p>
+            <Button size="sm" onClick={() => onAddToCart(product)}>
+              <ShoppingCart className="h-4 w-4 mr-1" /> Add
             </Button>
           </div>
-        )}
-      </motion.div>
-    </div>
+        </CardContent>
+      </Card>
+    </motion.div>
   );
 };
 
