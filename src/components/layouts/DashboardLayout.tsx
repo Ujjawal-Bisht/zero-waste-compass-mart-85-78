@@ -27,15 +27,15 @@ const DashboardLayout: React.FC = () => {
           variant="ghost" 
           size="icon" 
           onClick={toggleSidebar}
-          className="menu-button button-transition fixed top-4 left-4 z-50 border border-gray-300 bg-white hover:bg-gray-100"
+          className="menu-button button-transition fixed top-4 left-4 z-50 border border-gray-200 bg-white hover:bg-gray-100"
         >
           {sidebarOpen ? (
             <X className="h-5 w-5 text-gray-700" />
           ) : (
             <div className="flex flex-col items-center justify-center space-y-1.5">
-              <span className="h-0.5 w-5 bg-gray-700 menu-line menu-line-1"></span>
-              <span className="h-0.5 w-5 bg-gray-700 menu-line menu-line-2"></span>
-              <span className="h-0.5 w-5 bg-gray-700 menu-line menu-line-3"></span>
+              <span className="h-0.5 w-5 bg-gray-600 menu-line menu-line-1"></span>
+              <span className="h-0.5 w-5 bg-gray-600 menu-line menu-line-2"></span>
+              <span className="h-0.5 w-5 bg-gray-600 menu-line menu-line-3"></span>
             </div>
           )}
         </Button>
