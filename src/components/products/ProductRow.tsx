@@ -3,7 +3,7 @@ import React from 'react';
 import { Item } from '@/types';
 import { motion } from 'framer-motion';
 import { Badge } from '@/components/ui/badge';
-import { IndianRupee } from 'lucide-react';
+import { IndianRupee, TrendingUp, TrendingDown } from 'lucide-react';
 import ProductActionMenu from './ProductActionMenu';
 
 interface ProductRowProps {
@@ -29,6 +29,18 @@ const ProductRow: React.FC<ProductRowProps> = ({
   };
   
   const days = daysUntilExpiry();
+
+  // Calculate price trend
+  const priceTrend = () => {
+    if (!product.originalPrice) return 'neutral';
+    
+    const ratio = product.currentPrice / product.originalPrice;
+    if (ratio < 0.95) return 'down';
+    if (ratio > 1.05) return 'up';
+    return 'neutral';
+  };
+  
+  const trend = priceTrend();
   
   return (
     <motion.tr 
@@ -76,11 +88,19 @@ const ProductRow: React.FC<ProductRowProps> = ({
         <div className="flex items-center">
           <IndianRupee size={14} className="mr-1" />
           <motion.span 
-            className={product.dynamicPricingEnabled ? "price-pulse font-medium" : "font-medium"}
-            whileHover={product.dynamicPricingEnabled ? { scale: 1.15, color: "#10B981" } : { scale: 1.05 }}
+            className={`font-medium ${
+              trend === 'down' ? 'text-green-600' : 
+              trend === 'up' ? 'text-red-600' : ''
+            }`}
+            whileHover={product.dynamicPricingEnabled ? { scale: 1.15 } : { scale: 1.05 }}
             transition={{ type: "spring", stiffness: 400 }}
           >
             {product.currentPrice.toFixed(2)}
+            {trend !== 'neutral' && (
+              <span className="ml-1">
+                {trend === 'down' ? <TrendingDown size={14} className="inline" /> : <TrendingUp size={14} className="inline" />}
+              </span>
+            )}
           </motion.span>
           {product.originalPrice && product.originalPrice > product.currentPrice && (
             <motion.span 
@@ -95,15 +115,20 @@ const ProductRow: React.FC<ProductRowProps> = ({
         </div>
         {product.dynamicPricingEnabled && (
           <motion.div 
-            className="text-xs text-green-600 flex items-center mt-1"
+            className="text-xs text-indigo-600 flex items-center mt-1"
             animate={{ 
               opacity: [0.8, 1, 0.8],
               scale: [1, 1.03, 1]
             }}
             transition={{ repeat: Infinity, duration: 2 }}
           >
-            <span className="h-1.5 w-1.5 rounded-full bg-green-500 mr-1 animate-pulse"></span>
+            <span className="h-1.5 w-1.5 rounded-full bg-indigo-500 mr-1 animate-pulse"></span>
             Dynamic pricing
+            {product.dynamicPricingSettings?.strategy && (
+              <span className="ml-1 text-gray-500">
+                ({product.dynamicPricingSettings.strategy.split('-')[0]})
+              </span>
+            )}
           </motion.div>
         )}
       </td>

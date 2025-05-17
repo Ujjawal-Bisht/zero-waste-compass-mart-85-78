@@ -1,118 +1,42 @@
-export interface User {
-  id: string;
-  email: string | null;
-  phoneNumber?: string;
-  displayName: string | null;
-  photoURL: string | null;
-  isAdmin: boolean;
-  businessName?: string;
-  businessType?: 'retailer' | 'distributor' | 'manufacturer' | 'individual';
-  isSeller?: boolean;
-  trustScore?: number;
-  verified?: boolean;
-  address?: string;
-  city?: string;
-  state?: string;
-  zipCode?: string;
-  country?: string;
-  bio?: string;
-  dob?: string;
-  occupation?: string;
-  organization?: string;
-  socialMedia?: {
-    twitter?: string;
-    facebook?: string;
-    instagram?: string;
-    linkedin?: string;
-  };
-  notificationPreferences?: {
-    email: boolean;
-    push: boolean;
-    sms: boolean;
-    marketingEmails: boolean;
-  };
-}
-
-export type ItemStatus = 'available' | 'donated' | 'expired' | 'flagged' | 'sold';
-
 export type ItemCategory = 
   | 'food'
   | 'clothing'
   | 'electronics'
   | 'furniture'
-  | 'household'
-  | 'books'
-  | 'toys'
-  | 'medicine'
-  | 'other';
+  | 'household';
 
-export interface ItemLocation {
-  address: string;
-  lat: number;
-  lng: number;
-}
+export type ItemStatus = 
+  | 'available' 
+  | 'flagged' 
+  | 'sold_out' 
+  | 'draft';
 
 export interface Item {
   id: string;
   name: string;
-  description: string;
+  description?: string;
   category: ItemCategory;
-  imageUrl: string;
+  imageUrl?: string;
   expiryDate: string;
   createdAt: string;
-  updatedAt: string;
+  updatedAt?: string;
   status: ItemStatus;
   userId: string;
   userName: string;
   userPhoto: string | null;
-  location: ItemLocation;
-  quantity?: number;
-  originalPrice?: number;
-  currentPrice?: number;
-  dynamicPricingEnabled?: boolean;
-}
-
-export interface ItemFormData {
-  name: string;
-  description: string;
-  category: ItemCategory;
-  image: File | null;
-  expiryDate: Date;
-  address: string;
-  quantity?: number;
-  originalPrice?: number;
-  dynamicPricingEnabled?: boolean;
-}
-
-export interface Review {
-  id: string;
-  sellerId: string;
-  buyerId: string;
-  orderId: string;
-  rating: number;
-  comment?: string;
-  createdAt: string;
-}
-
-// Extend the OrderItem interface to include the name field
-export interface OrderItem {
-  itemId: string;
+  location: {
+    address: string;
+    lat: number;
+    lng: number;
+  };
   quantity: number;
-  price: number;
-  name?: string;
-}
-
-// Extend the Order interface to include the buyerName and sellerName fields
-export interface Order {
-  id: string;
-  buyerId: string;
-  buyerName?: string;
-  sellerId: string;
-  sellerName?: string;
-  items: OrderItem[];
-  status: 'pending' | 'processing' | 'shipped' | 'out-for-delivery' | 'delivered' | 'cancelled';
-  paymentStatus: 'pending' | 'paid' | 'failed';
-  totalAmount: number;
-  createdAt: string;
-  updatedAt: string;
+  originalPrice?: number;
+  currentPrice: number;
+  dynamicPricingEnabled?: boolean;
+  dynamicPricingSettings?: {
+    minPrice: number;
+    maxPrice: number;
+    strategy: string;
+    automaticAdjustment: boolean;
+  };
 }

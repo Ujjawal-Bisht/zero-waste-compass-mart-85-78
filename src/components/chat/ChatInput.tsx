@@ -1,5 +1,5 @@
 
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { Send, Mic, MicOff, Search } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -25,8 +25,12 @@ const ChatInput: React.FC<ChatInputProps> = ({
   const [message, setMessage] = useState('');
   const [isRecording, setIsRecording] = useState(false);
   const [showSearch, setShowSearch] = useState(false);
+  const [audioBlob, setAudioBlob] = useState<Blob | null>(null);
   const mediaRecorder = useRef<MediaRecorder | null>(null);
   const recordedChunks = useRef<Blob[]>([]);
+  const audioContext = useRef<AudioContext | null>(null);
+  const analyser = useRef<AnalyserNode | null>(null);
+  const audioStream = useRef<MediaStream | null>(null);
   
   // Suggestions by category
   const defaultSuggestions = {
@@ -56,6 +60,22 @@ const ChatInput: React.FC<ChatInputProps> = ({
     ]
   };
 
+  // Initialize audio context
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      audioContext.current = new (window.AudioContext || (window as any).webkitAudioContext)();
+    }
+    
+    return () => {
+      if (audioStream.current) {
+        audioStream.current.getTracks().forEach(track => track.stop());
+      }
+      if (audioContext.current && audioContext.current.state !== 'closed') {
+        audioContext.current.close();
+      }
+    };
+  }, []);
+
   // Get suggestions based on context or use provided ones
   const getSuggestions = () => {
     if (suggestedQuestions.length > 0) {
@@ -80,20 +100,47 @@ const ChatInput: React.FC<ChatInputProps> = ({
     }
   };
 
+  // Audio visualization setup
+  const setupAudioAnalyser = (stream: MediaStream) => {
+    if (!audioContext.current) return;
+    
+    const source = audioContext.current.createMediaStreamSource(stream);
+    analyser.current = audioContext.current.createAnalyser();
+    analyser.current.fftSize = 256;
+    source.connect(analyser.current);
+    
+    // Note: We don't connect to destination to avoid feedback
+    // source.connect(audioContext.current.destination);
+  };
+
   const toggleRecording = async () => {
     if (isRecording) {
       stopRecording();
     } else {
-      startRecording();
+      await startRecording();
     }
   };
 
   const startRecording = async () => {
     try {
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      const stream = await navigator.mediaDevices.getUserMedia({ 
+        audio: { 
+          echoCancellation: true,
+          noiseSuppression: true,
+          autoGainControl: true
+        } 
+      });
+      
+      audioStream.current = stream;
+      setupAudioAnalyser(stream);
       recordedChunks.current = [];
       
-      const recorder = new MediaRecorder(stream);
+      const recorder = new MediaRecorder(stream, {
+        mimeType: MediaRecorder.isTypeSupported('audio/webm') 
+          ? 'audio/webm' 
+          : 'audio/mp3'
+      });
+      
       mediaRecorder.current = recorder;
       
       recorder.ondataavailable = (e) => {
@@ -103,21 +150,22 @@ const ChatInput: React.FC<ChatInputProps> = ({
       };
       
       recorder.onstop = async () => {
-        const audioBlob = new Blob(recordedChunks.current, { type: 'audio/webm' });
+        const audioBlob = new Blob(recordedChunks.current, { 
+          type: MediaRecorder.isTypeSupported('audio/webm') 
+            ? 'audio/webm' 
+            : 'audio/mp3'
+        });
+        
+        setAudioBlob(audioBlob);
         recordedChunks.current = [];
         
-        // In a real app, you'd send this to a speech-to-text API
-        // For now, let's simulate with a timeout and a placeholder message
-        toast.info("Processing your voice message...");
-        
-        setTimeout(() => {
-          const fakeTranscription = "How can I reduce my plastic usage at home?";
-          setMessage(fakeTranscription);
-          toast.success("Voice message processed!");
-        }, 1500);
+        // Process the audio
+        processAudioToText(audioBlob);
         
         // Release mic access
-        stream.getTracks().forEach(track => track.stop());
+        if (audioStream.current) {
+          audioStream.current.getTracks().forEach(track => track.stop());
+        }
       };
       
       recorder.start();
@@ -136,6 +184,72 @@ const ChatInput: React.FC<ChatInputProps> = ({
       setIsRecording(false);
       toast.info("Recording stopped, processing...");
     }
+  };
+  
+  const processAudioToText = async (audioBlob: Blob) => {
+    // In a real application, you would send this to a Speech-to-Text API
+    // Here we're simulating the response with predefined messages based on context
+    
+    toast.info("Processing your voice message...");
+    
+    // Simulate processing time
+    setTimeout(() => {
+      // Generate contextual transcription based on current conversation context
+      let fakeTranscription = "";
+      
+      switch(conversationContext) {
+        case 'sustainability':
+          fakeTranscription = "How can I reduce plastic waste in my daily routine?";
+          break;
+        case 'climate':
+          fakeTranscription = "What's the carbon footprint of recycling compared to composting?";
+          break;
+        case 'tracking':
+          fakeTranscription = "Where is my package right now?";
+          break;
+        case 'order':
+          fakeTranscription = "I need to change my delivery address for order ZWM-7829.";
+          break;
+        case 'product':
+          fakeTranscription = "Are your bamboo products sustainably sourced?";
+          break;
+        case 'invoice':
+          fakeTranscription = "Can I get a receipt for my last purchase?";
+          break;
+        case 'personal':
+          fakeTranscription = "How much waste have I saved this month?";
+          break;
+        default:
+          fakeTranscription = "Tell me more about Zero Waste Mart's sustainability initiatives.";
+      }
+      
+      setMessage(fakeTranscription);
+      toast.success("Voice message processed!");
+    }, 1200);
+    
+    // In a production environment, you would use a real speech-to-text API like:
+    /*
+    const formData = new FormData();
+    formData.append('audio', audioBlob);
+    
+    try {
+      const response = await fetch('/api/speech-to-text', {
+        method: 'POST',
+        body: formData
+      });
+      
+      if (response.ok) {
+        const { text } = await response.json();
+        setMessage(text);
+        toast.success("Voice message processed!");
+      } else {
+        toast.error("Failed to process voice message");
+      }
+    } catch (error) {
+      console.error('Speech to text error:', error);
+      toast.error("Could not process voice message");
+    }
+    */
   };
 
   const toggleSearch = () => {
@@ -176,7 +290,7 @@ const ChatInput: React.FC<ChatInputProps> = ({
           onClick={toggleRecording}
           variant="outline"
           size="icon"
-          className={isRecording ? "bg-red-100 text-red-500 animate-pulse" : "bg-white"}
+          className={isRecording ? "bg-red-100 text-red-500 recording-pulse" : "bg-white"}
           title={isRecording ? "Stop recording" : "Start voice message"}
         >
           {isRecording ? <MicOff size={18} /> : <Mic size={18} />}

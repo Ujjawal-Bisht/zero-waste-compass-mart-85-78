@@ -1,32 +1,47 @@
 
 import React from 'react';
-import { motion } from 'framer-motion';
+import { MoreVertical, FileDown, Phone, MessageSquare } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 
-interface OrderActionsProps {
+export interface OrderActionsProps {
   orderId: string;
+  onDownloadInvoice?: () => void;
 }
 
-const OrderActions: React.FC<OrderActionsProps> = ({
-  orderId,
+const OrderActions: React.FC<OrderActionsProps> = ({ 
+  orderId, 
+  onDownloadInvoice 
 }) => {
   return (
-    <div className="flex justify-end">
-      <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-        <Button 
-          size="sm" 
-          variant="outline" 
-          className="flex items-center text-indigo-600"
-          onClick={(e) => {
-            e.stopPropagation();
-            window.open(`mailto:support@example.com?subject=Question about order ${orderId}`);
-          }}
-        >
-          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-1"><path d="M7 9l5 3.5L17 9"/><path d="M2 7v10c0 1.1.9 2 2 2h16a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2Z"/></svg>
-          Contact Support
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button variant="ghost" size="sm">
+          <MoreVertical className="h-4 w-4" />
         </Button>
-      </motion.div>
-    </div>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="end" className="w-48">
+        {onDownloadInvoice && (
+          <DropdownMenuItem onClick={onDownloadInvoice}>
+            <FileDown className="mr-2 h-4 w-4" />
+            <span>Download Invoice</span>
+          </DropdownMenuItem>
+        )}
+        <DropdownMenuItem>
+          <Phone className="mr-2 h-4 w-4" />
+          <span>Contact Support</span>
+        </DropdownMenuItem>
+        <DropdownMenuItem>
+          <MessageSquare className="mr-2 h-4 w-4" />
+          <span>Message Seller</span>
+        </DropdownMenuItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
   );
 };
 

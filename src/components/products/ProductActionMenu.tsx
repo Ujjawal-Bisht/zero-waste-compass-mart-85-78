@@ -8,19 +8,22 @@ import {
   DropdownMenuSeparator,
 } from '@/components/ui/dropdown-menu';
 import { Button } from '@/components/ui/button';
-import { MoreHorizontal } from 'lucide-react';
+import { MoreHorizontal, TrendingUp } from 'lucide-react';
 import { toast } from 'sonner';
 import { useLocalStorage } from '@/pages/items/hooks/useLocalStorage';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { ActionMenuProps } from './menu/types';
 import BasicActions from './menu/BasicActions';
 import CategoryMenu from './menu/CategoryMenu';
 import EnhancedActions from './menu/EnhancedActions';
 import DeleteMenuItem from './menu/DeleteMenuItem';
+import DynamicPricingDialog from './menu/DynamicPricingDialog';
 
 const ProductActionMenu: React.FC<ActionMenuProps> = ({ product }) => {
   const [selectedCategory, setSelectedCategory] = useState<string>(product.category);
   const [savedProducts, setSavedProducts] = useLocalStorage<Item[]>('seller-products', []);
+  const [showDynamicPricing, setShowDynamicPricing] = useState(false);
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   const handleEditProduct = (productId: string) => {
     toast.info("Editing product", {
@@ -156,18 +159,38 @@ const ProductActionMenu: React.FC<ActionMenuProps> = ({ product }) => {
   };
 
   const handleToggleDynamicPricing = (product: Item) => {
+    setShowDynamicPricing(true);
+  };
+
+  const handleUpdateDynamicPricing = (settings: {
+    enabled: boolean;
+    minPrice?: number;
+    maxPrice?: number;
+    strategy?: string;
+    automaticAdjustment?: boolean;
+  }) => {
     // Update the product dynamic pricing status in local storage
     const updatedProducts = savedProducts.map(p => {
       if (p.id === product.id) {
-        return { ...p, dynamicPricingEnabled: !p.dynamicPricingEnabled };
+        return { 
+          ...p, 
+          dynamicPricingEnabled: settings.enabled,
+          dynamicPricingSettings: {
+            minPrice: settings.minPrice || p.currentPrice * 0.7,
+            maxPrice: settings.maxPrice || p.currentPrice * 1.3,
+            strategy: settings.strategy || 'demand-based',
+            automaticAdjustment: settings.automaticAdjustment || false
+          }
+        };
       }
       return p;
     });
     
     setSavedProducts(updatedProducts);
+    setShowDynamicPricing(false);
     
     toast.success("Dynamic pricing updated", {
-      description: `Dynamic pricing ${!product.dynamicPricingEnabled ? 'enabled' : 'disabled'} for "${product.name}"`,
+      description: `Dynamic pricing ${settings.enabled ? 'enabled' : 'disabled'} for "${product.name}"`,
       duration: 3000,
     });
   };
@@ -187,47 +210,62 @@ const ProductActionMenu: React.FC<ActionMenuProps> = ({ product }) => {
   };
 
   return (
-    <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <motion.div whileHover={{ rotate: 90, scale: 1.1 }} whileTap={{ scale: 0.9 }}>
-          <Button variant="ghost" className="h-8 w-8 p-0 menu-icon">
-            <MoreHorizontal className="h-4 w-4" />
-          </Button>
-        </motion.div>
-      </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="table-dropdown-content w-56">
-        <BasicActions 
-          product={product}
-          onViewDetails={handleViewDetails}
-          onEditProduct={handleEditProduct}
-          onDuplicateProduct={handleDuplicateProduct}
-        />
-        
-        {/* Category Change Option */}
-        <CategoryMenu 
-          selectedCategory={selectedCategory}
-          onCategoryChange={handleChangeCategory}
-        />
-        
-        <DropdownMenuSeparator />
-        
-        <EnhancedActions 
-          product={product}
-          onToggleDynamicPricing={handleToggleDynamicPricing}
-          onPromoteProduct={handlePromoteProduct}
-          onPrintLabel={handlePrintLabel}
-          onSetAlert={handleSetAlert}
-          onDownloadProductData={handleDownloadProductData}
-          onAnalyticsView={handleAnalyticsView}
-          onShareProduct={handleShareProduct}
-          onToggleVisibility={handleToggleVisibility}
-        />
-        
-        <DropdownMenuSeparator />
-        
-        <DeleteMenuItem onClick={() => handleDeleteProduct(product.id)} />
-      </DropdownMenuContent>
-    </DropdownMenu>
+    <>
+      <DropdownMenu onOpenChange={setIsMenuOpen}>
+        <DropdownMenuTrigger asChild>
+          <motion.div 
+            whileHover={{ rotate: 90, scale: 1.1 }} 
+            whileTap={{ scale: 0.9 }}
+            initial={false}
+            animate={isMenuOpen ? { rotate: 90 } : { rotate: 0 }}
+            transition={{ duration: 0.2 }}
+          >
+            <Button variant="ghost" className="h-8 w-8 p-0 menu-icon">
+              <MoreHorizontal className="h-4 w-4" />
+            </Button>
+          </motion.div>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="end" className="table-dropdown-content w-56">
+          <BasicActions 
+            product={product}
+            onViewDetails={handleViewDetails}
+            onEditProduct={handleEditProduct}
+            onDuplicateProduct={handleDuplicateProduct}
+          />
+          
+          {/* Category Change Option */}
+          <CategoryMenu 
+            selectedCategory={selectedCategory}
+            onCategoryChange={handleChangeCategory}
+          />
+          
+          <DropdownMenuSeparator />
+          
+          <EnhancedActions 
+            product={product}
+            onToggleDynamicPricing={handleToggleDynamicPricing}
+            onPromoteProduct={handlePromoteProduct}
+            onPrintLabel={handlePrintLabel}
+            onSetAlert={handleSetAlert}
+            onDownloadProductData={handleDownloadProductData}
+            onAnalyticsView={handleAnalyticsView}
+            onShareProduct={handleShareProduct}
+            onToggleVisibility={handleToggleVisibility}
+          />
+          
+          <DropdownMenuSeparator />
+          
+          <DeleteMenuItem onClick={() => handleDeleteProduct(product.id)} />
+        </DropdownMenuContent>
+      </DropdownMenu>
+      
+      <DynamicPricingDialog 
+        isOpen={showDynamicPricing} 
+        onClose={() => setShowDynamicPricing(false)}
+        onSave={handleUpdateDynamicPricing}
+        product={product}
+      />
+    </>
   );
 };
 
