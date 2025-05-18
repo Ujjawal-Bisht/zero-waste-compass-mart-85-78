@@ -12,8 +12,11 @@ const ZeroBotHeader: React.FC<ZeroBotHeaderProps> = ({ onClose }) => {
   return (
     <div className="flex items-center justify-between">
       <CardTitle className="text-base font-medium flex items-center">
-        <Bot className="mr-2 h-5 w-5" />
+        <div className="bg-emerald-100 p-1.5 rounded-full mr-2">
+          <Bot className="h-4 w-4 text-emerald-600" />
+        </div>
         ZeroBot Assistant
+        <span className="ml-2 text-xs bg-emerald-100 text-emerald-800 px-1.5 py-0.5 rounded-full">v5.0</span>
       </CardTitle>
       <Button 
         variant="ghost" 

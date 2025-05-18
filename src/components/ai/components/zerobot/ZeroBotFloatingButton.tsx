@@ -18,7 +18,7 @@ const ZeroBotFloatingButton: React.FC<ZeroBotFloatingButtonProps> = ({ onClick }
     >
       <Button
         onClick={onClick}
-        className="rounded-full h-14 w-14 bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white shadow-lg"
+        className="rounded-full h-14 w-14 bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white shadow-lg"
         size="icon"
       >
         <Bot className="h-6 w-6" />
