@@ -291,6 +291,9 @@ export function useZeroBot(initialPrompt?: string, sellerMode = false) {
     setShowSettings,
     messagesEndRef,
     
+    // User info
+    currentUser,
+    
     // Handlers
     handleSendMessage,
     handleKeyPress,
