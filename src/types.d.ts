@@ -12,7 +12,16 @@ export interface User {
   verified?: boolean;
 }
 
-export type ItemCategory = 'food' | 'clothing' | 'electronics' | 'household' | 'furniture' | 'other';
+export type ItemCategory = 
+  | 'food'
+  | 'clothing'
+  | 'electronics'
+  | 'household'
+  | 'furniture'
+  | 'other'
+  | 'books'
+  | 'toys'
+  | 'medicine';
 
 export interface Item {
   id: string;
@@ -53,13 +62,24 @@ export interface Order {
   id: string;
   userId: string;
   buyerId?: string;
+  sellerId?: string;  // Added for order tracking
   status: OrderStatus;
   totalAmount: number;
   items: OrderItem[];
   createdAt: string;
   updatedAt: string;
   buyerName?: string;
+  sellerName?: string; // Added for order display
   paymentStatus?: string;
+  paymentMethod?: string;
+  shippingAddress: string;
+  trackingInfo?: {
+    trackingId?: string;
+    carrier?: string;
+    estimatedDelivery?: string;
+    currentLocation?: string;
+    status?: string;
+  };
 }
 
 export interface OrderItem {
@@ -68,8 +88,10 @@ export interface OrderItem {
   productId: string;
   quantity: number;
   price: number;
-  productName: string;
-  productImage: string;
+  name: string;  // Changed from productName
+  productName?: string; // For backward compatibility
+  productImage?: string;
+  imageUrl?: string; // For consistency
 }
 
 export interface ItemStatus {
@@ -99,4 +121,18 @@ export interface CartItem {
   name: string;
   price: number;
   image: string;
+}
+
+// For Task Scheduler
+export interface Task {
+  id: string;
+  name: string;
+  task_type: string;
+  schedule: string;
+  parameters: Record<string, any>;
+  enabled: boolean;
+  last_run: string;
+  next_run: string;
+  created_at: string;
+  updated_at: string;
 }

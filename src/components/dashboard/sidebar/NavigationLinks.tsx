@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '@/contexts/auth';
@@ -26,6 +27,18 @@ interface NavigationLinksProps {
   onItemClick?: () => void;
 }
 
+interface NavItemType {
+  path: string;
+  icon: React.ReactNode;
+  label: string;
+  highlight?: boolean;
+}
+
+interface MenuSection {
+  title: string;
+  items: NavItemType[];
+}
+
 const NavigationLinks: React.FC<NavigationLinksProps> = ({ isSeller, onItemClick }) => {
   const location = useLocation();
   const { currentUser } = useAuth();
@@ -38,7 +51,7 @@ const NavigationLinks: React.FC<NavigationLinksProps> = ({ isSeller, onItemClick
   const inactiveClass = "text-gray-100 hover:bg-white/10";
 
   // Improved buyer menu sections with better organization and additional categories
-  const buyerMenuSections = [
+  const buyerMenuSections: MenuSection[] = [
     {
       title: "Main Navigation",
       items: [
@@ -66,7 +79,7 @@ const NavigationLinks: React.FC<NavigationLinksProps> = ({ isSeller, onItemClick
     },
   ];
 
-  const sellerMenuSections = [
+  const sellerMenuSections: MenuSection[] = [
     {
       title: "Seller Dashboard",
       items: [
@@ -78,7 +91,7 @@ const NavigationLinks: React.FC<NavigationLinksProps> = ({ isSeller, onItemClick
     }
   ];
 
-  const adminMenuItems = [
+  const adminMenuItems: NavItemType[] = [
     { path: "/admin/panel", icon: <Shield size={18} />, label: "Admin Panel" }
   ];
 
@@ -178,6 +191,7 @@ const NavigationLinks: React.FC<NavigationLinksProps> = ({ isSeller, onItemClick
                   path={item.path} 
                   icon={item.icon} 
                   label={item.label}
+                  highlight={item.highlight}
                   index={index}
                 />
               );

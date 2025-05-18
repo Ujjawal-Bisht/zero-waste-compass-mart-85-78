@@ -2,6 +2,20 @@
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { motion } from 'framer-motion';
+import { 
+  BarChart, 
+  Bar, 
+  XAxis, 
+  YAxis, 
+  CartesianGrid, 
+  Tooltip, 
+  ResponsiveContainer, 
+  LineChart, 
+  Line 
+} from 'recharts';
+import { useAuth } from '@/contexts/auth';
+import { IndianRupee, TrendingUp, TrendingDown, CalendarCheck, Calendar } from 'lucide-react';
+import { format, subMonths, startOfYear } from 'date-fns';
 
 // Mock data for statistics
 const revenueData = [
@@ -13,75 +27,226 @@ const revenueData = [
   { month: 'Jun', revenue: 820000, profit: 240000 },
 ];
 
+// Daily revenue data for the last 30 days
+const generateDailyRevenueData = () => {
+  const data = [];
+  for (let i = 29; i >= 0; i--) {
+    const date = subMonths(new Date(), 0);
+    date.setDate(date.getDate() - i);
+    data.push({
+      date: format(date, 'dd MMM'),
+      revenue: Math.floor(Math.random() * 30000) + 5000,
+    });
+  }
+  return data;
+};
+
+const dailyRevenueData = generateDailyRevenueData();
+
+// Yearly revenue data
+const yearlyRevenueData = [
+  { year: '2023', revenue: 8500000, profit: 2500000 },
+  { year: '2024', revenue: 10200000, profit: 3100000, projected: true },
+];
+
 const StatisticsTab: React.FC = () => {
+  const { currentUser } = useAuth();
+  const todayCollection = 28500;
+  const yearToDateRevenue = 4580000;
+  const lastYearRevenue = 3750000;
+  const yearOverYearGrowth = ((yearToDateRevenue - lastYearRevenue) / lastYearRevenue) * 100;
+  const isGrowthPositive = yearOverYearGrowth > 0;
+  
+  const startYear = startOfYear(new Date());
+  const currentDate = new Date();
+  const yearProgress = ((currentDate.getTime() - startYear.getTime()) / 
+    (365 * 24 * 60 * 60 * 1000)) * 100;
+  
   return (
     <motion.div
       initial={{ opacity: 0, scale: 0.95 }}
       animate={{ opacity: 1, scale: 1 }}
       transition={{ duration: 0.3 }}
+      className="space-y-6"
     >
-      <Card className="shadow-pop hover:shadow-lg transition-all duration-300">
-        <CardHeader>
-          <CardTitle>Revenue & Profit Statistics</CardTitle>
-          <CardDescription>Performance overview for your business</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="p-4 bg-muted rounded-lg shadow-sm">
-              <h3 className="text-lg font-semibold mb-1">Last Month Revenue</h3>
-              <p className="text-3xl font-bold text-zwm-primary">₹8,20,000</p>
-              <p className="text-sm text-muted-foreground">+14.7% from previous month</p>
+      {/* Today's Collection and Yearly Revenue Overview */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <Card className="shadow-md hover:shadow-lg transition-shadow duration-300">
+          <CardHeader className="pb-2">
+            <CardTitle className="flex items-center text-lg font-semibold">
+              <CalendarCheck className="mr-2 h-5 w-5 text-zwm-primary" />
+              Today's Collection
+            </CardTitle>
+            <CardDescription>Revenue collected today</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <motion.div 
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              transition={{ delay: 0.2 }}
+              className="flex items-baseline"
+            >
+              <span className="text-3xl font-extrabold text-zwm-primary flex items-center">
+                <IndianRupee className="h-6 w-6" />
+                {todayCollection.toLocaleString('en-IN')}
+              </span>
+              <span className="ml-2 text-sm text-muted-foreground">
+                as of {format(new Date(), 'h:mm a')}
+              </span>
+            </motion.div>
+            
+            <div className="mt-4">
+              <p className="text-sm text-muted-foreground">Today vs. Yesterday</p>
+              <div className="flex items-center mt-1">
+                <TrendingUp className="h-4 w-4 text-green-500 mr-1" />
+                <span className="text-sm font-medium text-green-500">+12.4%</span>
+                <span className="ml-2 text-xs text-muted-foreground">↑ ₹3,150</span>
+              </div>
             </div>
-            <div className="p-4 bg-muted rounded-lg shadow-sm">
-              <h3 className="text-lg font-semibold mb-1">Last Month Profit</h3>
-              <p className="text-3xl font-bold text-green-500">₹2,40,000</p>
-              <p className="text-sm text-muted-foreground">+12.5% from previous month</p>
+          </CardContent>
+        </Card>
+        
+        <Card className="shadow-md hover:shadow-lg transition-shadow duration-300">
+          <CardHeader className="pb-2">
+            <CardTitle className="flex items-center text-lg font-semibold">
+              <Calendar className="mr-2 h-5 w-5 text-zwm-primary" />
+              Yearly Revenue
+            </CardTitle>
+            <CardDescription>Performance for {new Date().getFullYear()}</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <motion.div 
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              transition={{ delay: 0.2 }}
+              className="flex items-baseline"
+            >
+              <span className="text-3xl font-extrabold text-zwm-primary flex items-center">
+                <IndianRupee className="h-6 w-6" />
+                {(yearToDateRevenue / 100000).toFixed(1)}L
+              </span>
+              <span className="ml-2 text-sm text-muted-foreground">
+                YTD ({yearProgress.toFixed(0)}% of year)
+              </span>
+            </motion.div>
+            
+            <div className="mt-4">
+              <p className="text-sm text-muted-foreground">Year-over-Year Growth</p>
+              <div className="flex items-center mt-1">
+                {isGrowthPositive ? (
+                  <>
+                    <TrendingUp className="h-4 w-4 text-green-500 mr-1" />
+                    <span className="text-sm font-medium text-green-500">+{yearOverYearGrowth.toFixed(1)}%</span>
+                  </>
+                ) : (
+                  <>
+                    <TrendingDown className="h-4 w-4 text-red-500 mr-1" />
+                    <span className="text-sm font-medium text-red-500">{yearOverYearGrowth.toFixed(1)}%</span>
+                  </>
+                )}
+                <span className="ml-2 text-xs text-muted-foreground">vs last year</span>
+              </div>
             </div>
-          </div>
+          </CardContent>
+        </Card>
+      </div>
 
-          <div className="mt-8 h-80">
-            <h3 className="text-lg font-semibold mb-4">6-Month Performance</h3>
-            <div className="h-full w-full">
-              <div className="grid grid-cols-6 h-64 gap-1 relative">
-                {revenueData.map((item, index) => (
-                  <div key={index} className="flex flex-col justify-end items-center gap-1">
-                    <div className="w-full flex justify-center items-end gap-1 h-full">
-                      <div 
-                        className="w-5 bg-zwm-primary rounded-t-sm" 
-                        style={{ height: `${(item.revenue / 1000000) * 100}%` }}
-                        title={`Revenue: ₹${(item.revenue/1000).toLocaleString('en-IN')}`}
-                      />
-                      <div 
-                        className="w-5 bg-green-500 rounded-t-sm" 
-                        style={{ height: `${(item.profit / 1000000) * 100}%` }}
-                        title={`Profit: ₹${(item.profit/1000).toLocaleString('en-IN')}`}
-                      />
-                    </div>
-                    <span className="text-xs">{item.month}</span>
-                  </div>
-                ))}
-                
-                {/* Y-axis label */}
-                <div className="absolute -left-6 top-0 h-full flex flex-col justify-between text-xs text-muted-foreground">
-                  <span>₹10L</span>
-                  <span>₹7.5L</span>
-                  <span>₹5L</span>
-                  <span>₹2.5L</span>
-                  <span>₹0</span>
-                </div>
-              </div>
-              
-              <div className="flex justify-center gap-6 mt-4">
-                <div className="flex items-center gap-2">
-                  <div className="w-3 h-3 bg-zwm-primary rounded-full"></div>
-                  <span className="text-sm">Revenue</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <div className="w-3 h-3 bg-green-500 rounded-full"></div>
-                  <span className="text-sm">Profit</span>
-                </div>
-              </div>
-            </div>
+      {/* Monthly Revenue & Profit Chart */}
+      <Card className="shadow-md hover:shadow-lg transition-shadow duration-300">
+        <CardHeader>
+          <CardTitle>Monthly Revenue & Profit</CardTitle>
+          <CardDescription>Performance overview for the last 6 months</CardDescription>
+        </CardHeader>
+        <CardContent className="pt-2">
+          <div className="h-80 w-full">
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart
+                data={revenueData}
+                margin={{ top: 20, right: 30, left: 20, bottom: 20 }}
+              >
+                <CartesianGrid strokeDasharray="3 3" vertical={false} />
+                <XAxis dataKey="month" />
+                <YAxis
+                  tickFormatter={(value) => `₹${(value/100000).toFixed(1)}L`}
+                />
+                <Tooltip
+                  formatter={(value) => [`₹${(Number(value)/1000).toLocaleString('en-IN')}K`]}
+                  labelFormatter={(label) => `${label} 2024`}
+                />
+                <Bar dataKey="revenue" fill="#8b5cf6" name="Revenue" radius={[4, 4, 0, 0]} />
+                <Bar dataKey="profit" fill="#10b981" name="Profit" radius={[4, 4, 0, 0]} />
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Daily Revenue Trend */}
+      <Card className="shadow-md hover:shadow-lg transition-shadow duration-300">
+        <CardHeader>
+          <CardTitle>Daily Revenue Trend</CardTitle>
+          <CardDescription>30-day revenue performance</CardDescription>
+        </CardHeader>
+        <CardContent className="pt-2">
+          <div className="h-64 w-full">
+            <ResponsiveContainer width="100%" height="100%">
+              <LineChart
+                data={dailyRevenueData}
+                margin={{ top: 20, right: 30, left: 20, bottom: 20 }}
+              >
+                <CartesianGrid strokeDasharray="3 3" vertical={false} />
+                <XAxis dataKey="date" />
+                <YAxis
+                  tickFormatter={(value) => `₹${(value/1000).toFixed(0)}K`}
+                />
+                <Tooltip
+                  formatter={(value) => [`₹${Number(value).toLocaleString('en-IN')}`]}
+                  labelFormatter={(label) => `${label}`}
+                />
+                <Line
+                  type="monotone"
+                  dataKey="revenue"
+                  stroke="#8b5cf6"
+                  strokeWidth={2}
+                  dot={{ fill: '#8b5cf6', r: 4 }}
+                  activeDot={{ r: 6, fill: '#8b5cf6', stroke: '#fff', strokeWidth: 2 }}
+                  name="Daily Revenue"
+                />
+              </LineChart>
+            </ResponsiveContainer>
+          </div>
+        </CardContent>
+      </Card>
+      
+      {/* Annual Performance Comparison */}
+      <Card className="shadow-md hover:shadow-lg transition-shadow duration-300">
+        <CardHeader>
+          <CardTitle>Annual Performance</CardTitle>
+          <CardDescription>Yearly revenue and profit comparison</CardDescription>
+        </CardHeader>
+        <CardContent className="pt-2">
+          <div className="h-64 w-full">
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart
+                data={yearlyRevenueData}
+                margin={{ top: 20, right: 30, left: 20, bottom: 20 }}
+              >
+                <CartesianGrid strokeDasharray="3 3" vertical={false} />
+                <XAxis dataKey="year" />
+                <YAxis
+                  tickFormatter={(value) => `₹${(value/1000000).toFixed(1)}M`}
+                />
+                <Tooltip
+                  formatter={(value, name, props) => {
+                    const formatted = `₹${(Number(value)/1000000).toFixed(2)}M`;
+                    const item = yearlyRevenueData.find(d => d.year === props.payload.year);
+                    return [formatted + (item?.projected ? ' (Projected)' : ''), name];
+                  }}
+                />
+                <Bar dataKey="revenue" fill="#8b5cf6" name="Revenue" radius={[4, 4, 0, 0]} />
+                <Bar dataKey="profit" fill="#10b981" name="Profit" radius={[4, 4, 0, 0]} />
+              </BarChart>
+            </ResponsiveContainer>
           </div>
         </CardContent>
       </Card>

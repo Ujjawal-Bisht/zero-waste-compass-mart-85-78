@@ -50,7 +50,7 @@ const AuthCallback = () => {
         
         console.log("Successfully exchanged code for session", data.session);
         
-        // FIXED: Properly handle seller status from URL parameter to take precedence
+        // Determine if user is a seller - prioritize URL parameter FIRST
         let userIsSeller = false;
         
         // First check URL parameter (this takes precedence)
@@ -58,17 +58,18 @@ const AuthCallback = () => {
           userIsSeller = true;
           console.log("User is seller based on URL parameter");
         } 
-        // Then check session metadata if URL parameter wasn't set
+        // Then check user metadata
         else if (data.session.user?.user_metadata?.is_seller === true) {
           userIsSeller = true;
           console.log("User is seller based on session metadata");
         }
         
         console.log("Final seller status:", userIsSeller);
-
-        // Store the seller status in the session if it came from URL
-        if (userIsSeller && !data.session.user?.user_metadata?.is_seller) {
+        
+        // Ensure the seller status is properly set in the user metadata
+        if (userIsSeller) {
           try {
+            console.log("Updating user metadata with seller status");
             await supabase.auth.updateUser({
               data: { is_seller: true }
             });
@@ -76,10 +77,7 @@ const AuthCallback = () => {
           } catch (updateError) {
             console.error("Failed to update user metadata:", updateError);
           }
-        }
-        
-        // Redirect based on determined role
-        if (userIsSeller) {
+          
           console.log("Redirecting to seller dashboard");
           navigate('/seller/dashboard');
         } else {
