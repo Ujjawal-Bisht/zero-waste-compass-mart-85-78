@@ -54,7 +54,7 @@ const ChatBotWindow: React.FC<ChatBotWindowProps> = ({
     <AnimatePresence>
       {isOpen && (
         <motion.div 
-          className="fixed bottom-6 right-6 w-80 sm:w-96 h-96 bg-white rounded-2xl shadow-2xl flex flex-col overflow-hidden border border-gray-200 z-50 bot-entrance"
+          className="fixed bottom-6 right-6 w-[90vw] max-w-[450px] h-[80vh] max-h-[600px] bg-white rounded-2xl shadow-2xl flex flex-col overflow-hidden border border-gray-200 z-50"
           initial={{ scale: 0.8, opacity: 0, y: 20 }}
           animate={{ scale: 1, opacity: 1, y: 0 }}
           exit={{ scale: 0.8, opacity: 0, y: 20 }}
@@ -68,7 +68,7 @@ const ChatBotWindow: React.FC<ChatBotWindowProps> = ({
 
           {/* Messages area with search results handling */}
           <div 
-            className="flex-1 overflow-y-auto p-4 space-y-4 scroll-smooth"
+            className="flex-1 overflow-y-auto p-4 space-y-4 scroll-smooth bg-gray-50"
             onScroll={handleScroll}
           >
             {searchQuery && displayMessages.length === 0 ? (
@@ -85,7 +85,7 @@ const ChatBotWindow: React.FC<ChatBotWindowProps> = ({
             
             {displayMessages.map((msg, index) => (
               <ChatMessage 
-                key={msg.id} 
+                key={msg.id || `msg-${index}`}
                 message={msg} 
                 index={index} 
                 highlightSearch={searchQuery}
@@ -105,7 +105,7 @@ const ChatBotWindow: React.FC<ChatBotWindowProps> = ({
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: 10 }}
-                className="absolute bottom-20 right-4 bg-zwm-primary text-white rounded-full w-8 h-8 flex items-center justify-center shadow-md"
+                className="absolute bottom-20 right-4 bg-purple-500 text-white rounded-full w-8 h-8 flex items-center justify-center shadow-md"
                 onClick={scrollToBottom}
               >
                 ↓

@@ -1,7 +1,6 @@
 
 import React from 'react';
 import ZeroBot3 from './ai/ZeroBot3';
-import ZeroBot5 from './ai/ZeroBot5';
 
 interface ChatBotProps {
   initialPrompt?: string;
@@ -22,20 +21,25 @@ const ChatBot: React.FC<ChatBotProps> = ({
   enableVoice = true,
   enableRealtime = true,
   showAnalytics = true,
-  version = 3 // Set default version to 3
+  version = 3 // Default to version 3
 }) => {
-  // Use version prop to determine which bot to render
+  // Use version 3 as default, and only render v5 if specifically requested
   if (version === 5) {
+    // Import is done dynamically to avoid loading v5 when not needed
+    const ZeroBot5 = React.lazy(() => import('./ai/ZeroBot5'));
+    
     return (
-      <ZeroBot5
-        initialPrompt={initialPrompt}
-        showInitially={showInitially}
-        enableVoice={enableVoice}
-        enableRealtime={enableRealtime}
-        showAnalytics={showAnalytics}
-        sellerMode={sellerMode}
-        theme={theme}
-      />
+      <React.Suspense fallback={<div>Loading...</div>}>
+        <ZeroBot5
+          initialPrompt={initialPrompt}
+          showInitially={showInitially}
+          enableVoice={enableVoice}
+          enableRealtime={enableRealtime}
+          showAnalytics={showAnalytics}
+          sellerMode={sellerMode}
+          theme={theme}
+        />
+      </React.Suspense>
     );
   }
   

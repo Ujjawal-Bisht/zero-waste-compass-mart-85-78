@@ -20,7 +20,7 @@ const ChatBotButton: React.FC<ChatBotButtonProps> = ({ onClick, isOpen, hasUnrea
     >
       <Button
         onClick={onClick}
-        className={`rounded-full h-14 w-14 p-0 zwm-gradient shadow-lg hover:shadow-xl pulse-glow float-button ${isOpen ? 'hidden' : ''}`}
+        className={`rounded-full h-14 w-14 p-0 bg-gradient-to-r from-purple-500 to-indigo-600 text-white shadow-lg hover:shadow-xl ${isOpen ? 'hidden' : ''}`}
         aria-label="Open chat"
       >
         <MessageCircle size={24} />

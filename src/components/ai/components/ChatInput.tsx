@@ -30,13 +30,13 @@ const ChatInput: React.FC<ChatInputProps> = ({
   stopRecording
 }) => {
   return (
-    <div className="p-2 border-t flex items-end gap-2">
+    <div className="p-3 border-t flex items-end gap-2 bg-white">
       <Input
         value={inputValue}
         onChange={(e) => setInputValue(e.target.value)}
         onKeyDown={handleKeyPress}
-        placeholder="Type your message..."
-        className="flex-1"
+        placeholder="Message ZeroBot AI..."
+        className="flex-1 border-gray-200 focus-visible:ring-purple-500"
         disabled={isSearching || isProcessing}
       />
       
@@ -62,12 +62,12 @@ const ChatInput: React.FC<ChatInputProps> = ({
         </Button>
         
         <Button
-          className="h-9 w-9 bg-emerald-500 hover:bg-emerald-600"
+          className="h-9 w-9 bg-purple-500 hover:bg-purple-600"
           size="icon"
           onClick={handleSendMessage}
           disabled={!inputValue.trim() || isProcessing || isSearching}
         >
-          <Send size={16} />
+          <Send size={16} className="text-white" />
         </Button>
       </div>
     </div>

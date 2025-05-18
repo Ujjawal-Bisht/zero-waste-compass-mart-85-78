@@ -57,13 +57,7 @@ const MyOrders: React.FC = () => {
           animate="visible"
           variants={containerVariants}
         >
-          <div className="mb-6">
-            <h1 className="text-3xl font-bold">My Orders</h1>
-            <p className="text-muted-foreground mt-2">
-              Track and manage all your purchases in one place
-            </p>
-          </div>
-
+          {/* Stats Section */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
             <motion.div 
               variants={containerVariants}

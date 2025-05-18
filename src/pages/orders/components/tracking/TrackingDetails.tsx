@@ -94,6 +94,7 @@ const TrackingDetails: React.FC<TrackingDetailsProps> = ({
             <OrderActions 
               orderId={order.id}
               onDownloadInvoice={() => onDownloadInvoice(order)}
+              showCallOption={order.status === 'out-for-delivery'}
             />
           </div>
         </div>
