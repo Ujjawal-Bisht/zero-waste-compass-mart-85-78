@@ -13,12 +13,11 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { useToast } from '@/components/ui/use-toast';
+import { toast } from 'sonner';
 
 const UserMenu: React.FC = () => {
-  const { currentUser } = useAuth();
+  const { currentUser, logout } = useAuth();
   const navigate = useNavigate();
-  const { toast } = useToast();
   const [open, setOpen] = useState(false);
 
   const getInitials = (name: string | null) => {
@@ -31,14 +30,14 @@ const UserMenu: React.FC = () => {
       .substring(0, 2);
   };
 
-  const handleLogout = () => {
-    // In a real app, we would call auth.signOut() here
-    toast({
-      title: "Logged out",
-      description: "You have been logged out successfully.",
-    });
-    // Navigate to login page
-    navigate('/login');
+  const handleLogout = async () => {
+    try {
+      await logout();
+      navigate('/login');
+    } catch (error) {
+      console.error('Logout failed:', error);
+      toast.error('Failed to log out. Please try again.');
+    }
   };
 
   return (

@@ -17,6 +17,7 @@ import NotFound from "./pages/NotFound";
 import Profile from "./pages/Profile";
 import Login from "./pages/auth/Login";
 import Register from "./pages/auth/Register";
+import AuthCallback from "./pages/auth/AuthCallback";
 import AddItem from "./pages/items/AddItem";
 import MyOrders from "./pages/orders/MyOrders";
 import Cart from "./pages/cart/Cart";
@@ -54,6 +55,7 @@ const App = () => (
               <Route path="/login" element={<Login />} />
               <Route path="/register" element={<Register />} />
             </Route>
+            <Route path="/auth/callback" element={<AuthCallback />} />
             
             {/* Protected Dashboard Routes */}
             <Route element={<PrivateRoute><DashboardLayout /></PrivateRoute>}>

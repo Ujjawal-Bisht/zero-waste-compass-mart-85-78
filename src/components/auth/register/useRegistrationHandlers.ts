@@ -1,107 +1,99 @@
 
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { toast } from 'sonner';
 import { useAuth } from '@/contexts/auth';
-import { z } from 'zod';
-import { userSchema, sellerSchema } from '../schemas/registerSchema';
+import { toast } from 'sonner';
 
 export const useRegistrationHandlers = () => {
-  const { register: registerUser, googleLogin, phoneLogin } = useAuth();
-  const navigate = useNavigate();
+  const { register, googleLogin, phoneLogin } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
   const [captchaValue, setCaptchaValue] = useState<string | null>(null);
-
-  const handleRegistrationAttempt = async (
-    callback: () => Promise<any>, 
-    successMessage: string,
-    redirectPath: string,
-    errorMessage: string = 'Failed to create account. Please try again.'
-  ) => {
+  const navigate = useNavigate();
+  
+  const onSubmitBuyer = async (values: {
+    name: string;
+    email: string;
+    password: string;
+    confirmPassword: string;
+  }) => {
     if (!captchaValue) {
       toast.error('Please verify that you are not a robot');
       return;
     }
-
+    
     try {
       setIsLoading(true);
-      await callback();
-      toast.success(successMessage);
-      navigate(redirectPath);
+      await register(values.email, values.password, values.name);
+      navigate('/dashboard');
     } catch (error) {
-      console.error('Registration error:', error);
-      toast.error(errorMessage);
+      console.error('Buyer registration error:', error);
+      // Error is already handled in the register function
     } finally {
       setIsLoading(false);
     }
   };
-
-  const onSubmitBuyer = async (values: z.infer<typeof userSchema>) => {
-    const extraUserDetails = {
-      phoneNumber: values.phone,
-      address: values.address,
-      city: values.city,
-      state: values.state,
-      zipCode: values.zipCode,
-      country: values.country,
-      dob: values.dob,
-      isSeller: false
+  
+  const onSubmitSeller = async (values: {
+    name: string;
+    email: string;
+    password: string;
+    confirmPassword: string;
+    businessName: string;
+    businessType: 'retailer' | 'distributor' | 'manufacturer' | 'individual';
+    address: {
+      street: string;
+      city: string;
+      state: string;
+      zipCode: string;
+      country: string;
     };
+  }) => {
+    if (!captchaValue) {
+      toast.error('Please verify that you are not a robot');
+      return;
+    }
     
-    await handleRegistrationAttempt(
-      async () => await registerUser(values.email, values.password, values.name, extraUserDetails),
-      'Account created successfully!',
-      '/dashboard'
-    );
+    try {
+      setIsLoading(true);
+      await register(values.email, values.password, values.name, {
+        businessName: values.businessName,
+        businessType: values.businessType,
+        isSeller: true
+      });
+      navigate('/seller/dashboard');
+    } catch (error) {
+      console.error('Seller registration error:', error);
+      // Error is already handled in the register function
+    } finally {
+      setIsLoading(false);
+    }
   };
-
-  const onSubmitSeller = async (values: z.infer<typeof sellerSchema>) => {
-    const sellerDetails = {
-      businessName: values.businessName,
-      businessType: values.businessType,
-      isSeller: values.isSeller,
-      phoneNumber: values.phone,
-      address: values.address || values.businessAddress,
-      city: values.city,
-      state: values.state,
-      zipCode: values.zipCode,
-      country: values.country,
-      taxId: values.taxId,
-      website: values.website,
-    };
-    
-    await handleRegistrationAttempt(
-      async () => await registerUser(values.email, values.password, values.name, sellerDetails),
-      'Seller account created successfully!',
-      '/seller/profile',
-      'Failed to create seller account. Please try again.'
-    );
+  
+  const handleGoogleLogin = (accountType: 'buyer' | 'seller') => async () => {
+    try {
+      setIsLoading(true);
+      await googleLogin(accountType);
+      // The page will be redirected by Google OAuth, so no navigate needed here
+    } catch (error) {
+      console.error('Google login error:', error);
+      // Error is already handled in the googleLogin function
+    } finally {
+      setIsLoading(false);
+    }
   };
-
-  const handleGoogleLogin = async (accountType: 'buyer' | 'seller') => {
-    await handleRegistrationAttempt(
-      async () => {
-        const user = await googleLogin(accountType);
-        return user; // Return the user but don't use the return value in handleRegistrationAttempt
-      },
-      'Successfully signed in with Google!',
-      accountType === 'seller' ? '/seller/dashboard' : '/dashboard',
-      'Failed to sign in with Google.'
-    );
+  
+  const handlePhoneRegistration = (accountType: 'buyer' | 'seller') => async (phoneNumber: string) => {
+    try {
+      setIsLoading(true);
+      await phoneLogin(phoneNumber, accountType);
+    } catch (error) {
+      console.error('Phone registration error:', error);
+      // Error is already handled in the phoneLogin function
+    } finally {
+      setIsLoading(false);
+    }
   };
-
-  const handlePhoneRegistration = (accountType: 'buyer' | 'seller') => (phoneNumber: string) => {
-    handleRegistrationAttempt(
-      async () => {
-        const result = await phoneLogin(phoneNumber, accountType);
-        return result; // Return the result but don't use the return value in handleRegistrationAttempt
-      },
-      'Account created successfully with phone verification!',
-      accountType === 'seller' ? '/seller/dashboard' : '/dashboard',
-      'Failed to create account with phone. Please try again.'
-    );
-  };
-
+  
   return {
     isLoading,
     captchaValue,

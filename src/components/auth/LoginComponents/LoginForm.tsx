@@ -41,17 +41,11 @@ const LoginForm: React.FC<LoginFormProps> = ({ onAccountTypeChange }) => {
 
     try {
       setIsLoading(true);
-      // Add account type to email for mock service to determine account type
-      const emailWithType = accountType === 'seller' 
-        ? `seller_${values.email}` 
-        : values.email;
-        
-      await login(emailWithType, values.password);
-      toast.success(`Successfully signed in as ${accountType}!`);
+      await login(values.email, values.password);
       navigate(accountType === 'seller' ? '/seller/dashboard' : '/dashboard');
     } catch (error) {
       console.error('Login error:', error);
-      toast.error('Failed to sign in. Please check your credentials.');
+      // Error is already handled in the login function
     } finally {
       setIsLoading(false);
     }
@@ -60,21 +54,11 @@ const LoginForm: React.FC<LoginFormProps> = ({ onAccountTypeChange }) => {
   const handleGoogleLogin = async () => {
     try {
       setIsLoading(true);
-      console.log("Attempting Google login from UI as", accountType);
-      
-      // Pass accountType to googleLogin
-      const user = await googleLogin(accountType);
-      console.log("Google login successful, user:", user);
-      
-      // Determine where to navigate based on user properties
-      if (user.isSeller) {
-        navigate('/seller/dashboard');
-      } else {
-        navigate('/dashboard');
-      }
+      await googleLogin(accountType);
+      // The page will be redirected by Google OAuth, so no navigate needed here
     } catch (error) {
       console.error('Google login error in UI:', error);
-      toast.error('Failed to sign in with Google. Please try again.');
+      // Error is already handled in the googleLogin function
     } finally {
       setIsLoading(false);
     }
@@ -83,12 +67,10 @@ const LoginForm: React.FC<LoginFormProps> = ({ onAccountTypeChange }) => {
   const handlePhoneLogin = async (phoneNumber: string) => {
     try {
       setIsLoading(true);
-      // Pass account type to phoneLogin
       await phoneLogin(phoneNumber, accountType);
-      navigate(accountType === 'seller' ? '/seller/dashboard' : '/dashboard');
     } catch (error) {
       console.error('Phone login error:', error);
-      toast.error('Failed to sign in with phone number.');
+      // Error is already handled in the phoneLogin function
     } finally {
       setIsLoading(false);
     }

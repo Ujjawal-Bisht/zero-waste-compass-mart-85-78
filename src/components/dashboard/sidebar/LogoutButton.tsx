@@ -3,12 +3,24 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { LogOut } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from '@/contexts/auth';
+import { toast } from 'sonner';
 
-interface LogoutButtonProps {
-  onLogout: () => Promise<void>;
-}
+export const LogoutButton: React.FC = () => {
+  const { logout } = useAuth();
+  const navigate = useNavigate();
 
-export const LogoutButton: React.FC<LogoutButtonProps> = ({ onLogout }) => {
+  const handleLogout = async () => {
+    try {
+      await logout();
+      navigate('/login');
+    } catch (error) {
+      console.error('Logout failed:', error);
+      toast.error('Failed to log out. Please try again.');
+    }
+  };
+
   return (
     <motion.div
       whileHover={{ x: 5, backgroundColor: "rgba(239, 68, 68, 0.2)" }}
@@ -17,7 +29,7 @@ export const LogoutButton: React.FC<LogoutButtonProps> = ({ onLogout }) => {
       <Button 
         className="w-full justify-start text-white hover:bg-white hover:bg-opacity-10 logout-button" 
         variant="ghost" 
-        onClick={onLogout}
+        onClick={handleLogout}
       >
         <motion.div
           whileHover={{ rotate: 10 }}
@@ -30,3 +42,5 @@ export const LogoutButton: React.FC<LogoutButtonProps> = ({ onLogout }) => {
     </motion.div>
   );
 };
+
+export default LogoutButton;

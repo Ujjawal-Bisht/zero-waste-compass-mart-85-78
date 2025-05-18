@@ -1,9 +1,10 @@
+
 import React, { createContext, useState, useEffect } from 'react';
 import { toast } from 'sonner';
-import { authService } from '@/services/auth-service';
-import { userService } from '@/services/user-service';
 import { User } from '@/types';
 import { AuthContextType } from './auth-types';
+import { supabase } from '@/integrations/supabase/client';
+import { Session } from '@supabase/supabase-js';
 
 // Create the context with undefined as initial value
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -14,52 +15,100 @@ interface AuthProviderProps {
 
 export const AuthContextProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [currentUser, setCurrentUser] = useState<User | null>(null);
+  const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const loadUser = async () => {
-      try {
-        setLoading(true);
-        // Try to load user from localStorage first for persistence
-        const storedUser = localStorage.getItem("zwm_user");
-        if (storedUser) {
-          setCurrentUser(JSON.parse(storedUser));
-          setLoading(false);
-          // Also update user object from backend in background
-          try {
-            const updatedUser = await userService.getCurrentUser();
-            if (updatedUser) {
-              setCurrentUser(updatedUser);
-              localStorage.setItem("zwm_user", JSON.stringify(updatedUser));
-            }
-          } catch (error) {
-            // Do nothing, just use local user info
-          }
-          return;
-        }
-        // If not in local storage, get from userService
-        const user = await userService.getCurrentUser();
+    // Set up the auth state change listener first
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, currentSession) => {
+      setSession(currentSession);
+      
+      if (currentSession?.user) {
+        const user: User = {
+          id: currentSession.user.id,
+          email: currentSession.user.email || '',
+          displayName: currentSession.user.user_metadata.full_name || '',
+          photoURL: currentSession.user.user_metadata.avatar_url || null,
+          isAdmin: false, // Default, will be updated from profile
+          isSeller: false, // Default, will be updated from profile
+        };
         setCurrentUser(user);
-      } catch (error) {
-        console.error("Failed to load user:", error);
+        
+        // Fetch additional profile data without blocking
+        setTimeout(() => {
+          fetchUserProfile(currentSession.user.id);
+        }, 0);
+      } else {
         setCurrentUser(null);
-      } finally {
-        setLoading(false);
       }
-    };
+    });
 
-    loadUser();
+    // Then check for an existing session
+    supabase.auth.getSession().then(({ data: { session: currentSession } }) => {
+      setSession(currentSession);
+
+      if (currentSession?.user) {
+        const user: User = {
+          id: currentSession.user.id,
+          email: currentSession.user.email || '',
+          displayName: currentSession.user.user_metadata.full_name || '',
+          photoURL: currentSession.user.user_metadata.avatar_url || null,
+          isAdmin: false, // Default, will be updated from profile
+          isSeller: false, // Default, will be updated from profile
+        };
+        setCurrentUser(user);
+        
+        // Fetch additional profile data
+        fetchUserProfile(currentSession.user.id);
+      }
+      
+      setLoading(false);
+    });
+
+    return () => {
+      subscription.unsubscribe();
+    };
   }, []);
+
+  const fetchUserProfile = async (userId: string) => {
+    try {
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('id', userId)
+        .single();
+      
+      if (error) {
+        console.error('Error fetching profile:', error);
+        return;
+      }
+
+      if (data && currentUser) {
+        const updatedUser: User = {
+          ...currentUser,
+          displayName: data.full_name || currentUser.displayName,
+          photoURL: data.avatar_url || currentUser.photoURL,
+          isSeller: data.is_seller || false,
+        };
+        setCurrentUser(updatedUser);
+      }
+    } catch (error) {
+      console.error("Failed to fetch user profile:", error);
+    }
+  };
 
   const login = async (email: string, password: string) => {
     try {
       setLoading(true);
-      const user = await authService.login(email, password);
-      setCurrentUser(user);
+      const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+      
+      if (error) throw error;
+      
       toast.success("Logged in successfully!");
-    } catch (error) {
+      return data.user;
+    } catch (error: any) {
       console.error("Login error:", error);
-      toast.error("Failed to log in");
+      toast.error(error.message || "Failed to log in");
       throw error;
     } finally {
       setLoading(false);
@@ -70,13 +119,27 @@ export const AuthContextProvider: React.FC<AuthProviderProps> = ({ children }) =
     try {
       setLoading(true);
       console.log(`Starting Google authentication flow as ${accountType}...`);
-      const user = await authService.googleLogin(accountType);
-      setCurrentUser(user);
-      toast.success("Logged in with Google successfully!");
-      return user;
-    } catch (error) {
+      
+      const { data, error } = await supabase.auth.signInWithOAuth({ 
+        provider: 'google',
+        options: {
+          redirectTo: `${window.location.origin}/auth/callback`,
+          queryParams: {
+            access_type: 'offline',
+            prompt: 'consent',
+          },
+          // Store account type in user metadata
+          data: { is_seller: accountType === 'seller' }
+        },
+      });
+      
+      if (error) throw error;
+      
+      // This won't actually execute as the user is redirected to Google
+      return {} as User;
+    } catch (error: any) {
       console.error("Google authentication error:", error);
-      toast.error("Failed to log in with Google");
+      toast.error(error.message || "Failed to log in with Google");
       throw error;
     } finally {
       setLoading(false);
@@ -86,12 +149,21 @@ export const AuthContextProvider: React.FC<AuthProviderProps> = ({ children }) =
   const phoneLogin = async (phoneNumber: string, accountType: 'buyer' | 'seller' = 'buyer') => {
     try {
       setLoading(true);
-      const result = await authService.phoneLogin(phoneNumber, accountType);
+      
+      const { data, error } = await supabase.auth.signInWithOtp({ 
+        phone: phoneNumber,
+        options: {
+          data: { is_seller: accountType === 'seller' }
+        }
+      });
+      
+      if (error) throw error;
+      
       toast.success("OTP sent to your phone number!");
-      return result;
-    } catch (error) {
+      return { verificationId: data.session?.user.id || '' };
+    } catch (error: any) {
       console.error("Phone login error:", error);
-      toast.error("Failed to send OTP");
+      toast.error(error.message || "Failed to send OTP");
       throw error;
     } finally {
       setLoading(false);
@@ -101,12 +173,15 @@ export const AuthContextProvider: React.FC<AuthProviderProps> = ({ children }) =
   const logout = async () => {
     try {
       setLoading(true);
-      await authService.logout();
+      const { error } = await supabase.auth.signOut();
+      
+      if (error) throw error;
+      
       setCurrentUser(null);
       toast.success("Logged out successfully!");
-    } catch (error) {
+    } catch (error: any) {
       console.error("Logout error:", error);
-      toast.error("Failed to log out");
+      toast.error(error.message || "Failed to log out");
       throw error;
     } finally {
       setLoading(false);
@@ -120,26 +195,54 @@ export const AuthContextProvider: React.FC<AuthProviderProps> = ({ children }) =
   }) => {
     try {
       setLoading(true);
-      // This should use authService.register, but we're simulating here
-      const mockUser = {
-        id: "user456",
-        email,
-        displayName: name,
-        photoURL: null,
-        isAdmin: false,
-        isSeller: businessDetails?.isSeller || false,
-        businessName: businessDetails?.businessName,
-        businessType: businessDetails?.businessType,
-        trustScore: businessDetails?.isSeller ? 0 : undefined,
-        verified: false,
-      };
       
-      setCurrentUser(mockUser);
-      localStorage.setItem("zwm_user", JSON.stringify(mockUser));
-      toast.success("Registration successful!");
-    } catch (error) {
+      const { data, error } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          data: {
+            full_name: name,
+            is_seller: businessDetails?.isSeller || false,
+            business_name: businessDetails?.businessName,
+            business_type: businessDetails?.businessType,
+          },
+          emailRedirectTo: `${window.location.origin}/auth/callback`
+        }
+      });
+      
+      if (error) throw error;
+      
+      // If isSeller is true, update the profile
+      if (businessDetails?.isSeller && data.user) {
+        const { error: profileError } = await supabase
+          .from('profiles')
+          .update({ is_seller: true })
+          .eq('id', data.user.id);
+          
+        if (profileError) {
+          console.error("Error updating profile:", profileError);
+        }
+        
+        // Create a seller profile if needed
+        if (businessDetails.businessName && businessDetails.businessType) {
+          const { error: sellerProfileError } = await supabase
+            .from('seller_profiles')
+            .insert({
+              id: data.user.id,
+              business_name: businessDetails.businessName,
+              business_type: businessDetails.businessType,
+            });
+            
+          if (sellerProfileError) {
+            console.error("Error creating seller profile:", sellerProfileError);
+          }
+        }
+      }
+      
+      toast.success("Registration successful! Please check your email for verification.");
+    } catch (error: any) {
       console.error("Registration error:", error);
-      toast.error("Failed to register");
+      toast.error(error.message || "Failed to register");
       throw error;
     } finally {
       setLoading(false);
@@ -149,11 +252,16 @@ export const AuthContextProvider: React.FC<AuthProviderProps> = ({ children }) =
   const resetPassword = async (email: string) => {
     try {
       setLoading(true);
-      await authService.resetPassword(email);
+      const { error } = await supabase.auth.resetPasswordForEmail(email, {
+        redirectTo: `${window.location.origin}/auth/reset-password`,
+      });
+      
+      if (error) throw error;
+      
       toast.success("Password reset instructions sent to your email!");
-    } catch (error) {
+    } catch (error: any) {
       console.error("Reset password error:", error);
-      toast.error("Failed to send password reset email");
+      toast.error(error.message || "Failed to send password reset email");
       throw error;
     } finally {
       setLoading(false);
@@ -163,42 +271,75 @@ export const AuthContextProvider: React.FC<AuthProviderProps> = ({ children }) =
   const updateProfile = async (data: Partial<User>) => {
     try {
       setLoading(true);
-      const updatedUser = await userService.updateProfile(data);
-      if (updatedUser) {
-        setCurrentUser(updatedUser);
-        toast.success("Profile updated successfully!");
+      
+      if (!currentUser) throw new Error("No authenticated user");
+      
+      // Update user metadata if needed
+      if (data.displayName || data.photoURL) {
+        const { error: authError } = await supabase.auth.updateUser({
+          data: {
+            full_name: data.displayName,
+            avatar_url: data.photoURL,
+          }
+        });
+        
+        if (authError) throw authError;
       }
-    } catch (error) {
+      
+      // Update profile in the profiles table
+      const { error: profileError } = await supabase
+        .from('profiles')
+        .update({
+          full_name: data.displayName,
+          avatar_url: data.photoURL,
+          is_seller: data.isSeller,
+        })
+        .eq('id', currentUser.id);
+        
+      if (profileError) throw profileError;
+      
+      // Fetch the updated profile
+      const updatedUser = {
+        ...currentUser,
+        ...data
+      };
+      
+      setCurrentUser(updatedUser);
+      toast.success("Profile updated successfully!");
+      return updatedUser;
+    } catch (error: any) {
       console.error("Update profile error:", error);
-      toast.error("Failed to update profile");
+      toast.error(error.message || "Failed to update profile");
       throw error;
     } finally {
       setLoading(false);
     }
   };
 
-  const isAdmin = () => {
-    return currentUser?.isAdmin === true;
-  };
-
-  const isSeller = () => {
-    return currentUser?.isSeller === true;
-  };
-
   const verifySellerAccount = async (businessDocuments: File[]) => {
     try {
       setLoading(true);
-      const success = await userService.verifySellerAccount(businessDocuments);
-      if (success) {
-        const user = await userService.getCurrentUser();
-        setCurrentUser(user);
-        toast.success("Seller account verification request submitted successfully!");
-      } else {
-        toast.error("Failed to submit seller account verification request");
-      }
-    } catch (error) {
+      
+      if (!currentUser) throw new Error("No authenticated user");
+      
+      // Upload documents to storage (in a real implementation)
+      console.log("Processing seller verification documents:", businessDocuments.length, "files submitted");
+      
+      // Update seller profile verification status
+      const { error } = await supabase
+        .from('seller_profiles')
+        .update({ 
+          verified: false // Set to pending in a real implementation
+        })
+        .eq('id', currentUser.id);
+        
+      if (error) throw error;
+      
+      toast.success("Seller account verification request submitted successfully!");
+      return true;
+    } catch (error: any) {
       console.error("Seller account verification error:", error);
-      toast.error("Failed to submit seller account verification request");
+      toast.error(error.message || "Failed to submit seller account verification request");
       throw error;
     } finally {
       setLoading(false);
