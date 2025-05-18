@@ -16,11 +16,22 @@ interface LoginFormProps {
 }
 
 const LoginForm: React.FC<LoginFormProps> = ({ onAccountTypeChange }) => {
-  const { login, googleLogin, phoneLogin } = useAuth();
+  const { login, googleLogin, phoneLogin, currentUser } = useAuth();
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
   const [captchaValue, setCaptchaValue] = useState<string | null>(null);
   const [accountType, setAccountType] = useState<'buyer' | 'seller'>('buyer');
+
+  // Redirect if already logged in
+  useEffect(() => {
+    if (currentUser) {
+      if (currentUser.isSeller) {
+        navigate('/seller/dashboard');
+      } else {
+        navigate('/dashboard');
+      }
+    }
+  }, [currentUser, navigate]);
 
   // Notify parent component when account type changes
   useEffect(() => {
@@ -42,7 +53,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ onAccountTypeChange }) => {
     try {
       setIsLoading(true);
       await login(values.email, values.password);
-      navigate(accountType === 'seller' ? '/seller/dashboard' : '/dashboard');
+      // Navigation will happen in the useEffect when currentUser updates
     } catch (error) {
       console.error('Login error:', error);
       // Error is already handled in the login function

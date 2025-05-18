@@ -54,7 +54,7 @@ export const DashboardSidebar = ({ className, onClose, ...props }: SidebarNavPro
         />
         
         <div className="mt-auto px-3 py-2">
-          <LogoutButton onLogout={handleLogout} />
+          <LogoutButton className="" onLogout={handleLogout} />
         </div>
       </div>
     </Sidebar>

@@ -9,15 +9,21 @@ import { toast } from 'sonner';
 
 interface LogoutButtonProps {
   className?: string;
+  onLogout?: () => void;
 }
 
-export const LogoutButton: React.FC<LogoutButtonProps> = ({ className }) => {
+export const LogoutButton: React.FC<LogoutButtonProps> = ({ className, onLogout }) => {
   const { logout } = useAuth();
   const navigate = useNavigate();
 
   const handleLogout = async () => {
     try {
       await logout();
+      
+      if (onLogout) {
+        onLogout();
+      }
+      
       navigate('/login');
     } catch (error) {
       console.error('Logout failed:', error);

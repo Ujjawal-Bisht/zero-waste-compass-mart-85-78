@@ -45,9 +45,12 @@ const AuthCallback = () => {
         }
         
         console.log("Successfully exchanged code for session", data.session);
-        // Check user metadata for roles
+        
+        // Check if user is a seller from the session or URL parameter
         const isSeller = data.session.user?.user_metadata?.is_seller === true || 
                         searchParams.get('is_seller') === 'true';
+        
+        console.log("Is seller account:", isSeller);
         
         // Redirect based on user role
         if (isSeller) {

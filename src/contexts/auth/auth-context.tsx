@@ -1,3 +1,4 @@
+
 import React, { createContext, useState, useEffect } from 'react';
 import { toast } from 'sonner';
 import { User } from '@/types';
@@ -24,13 +25,16 @@ export const AuthContextProvider: React.FC<AuthProviderProps> = ({ children }) =
       setSession(currentSession);
       
       if (currentSession?.user) {
+        // Check if user is a seller directly from metadata
+        const isSeller = currentSession.user.user_metadata?.is_seller === true;
+        
         const user: User = {
           id: currentSession.user.id,
           email: currentSession.user.email || '',
           displayName: currentSession.user.user_metadata?.full_name || '',
           photoURL: currentSession.user.user_metadata?.avatar_url || null,
           isAdmin: false, // Default, will be updated from profile
-          isSeller: false, // Default, will be updated from profile
+          isSeller: isSeller, // Set directly from metadata first
           businessName: currentSession.user.user_metadata?.business_name,
           businessType: currentSession.user.user_metadata?.business_type,
           trustScore: currentSession.user.user_metadata?.trust_score,
@@ -41,7 +45,6 @@ export const AuthContextProvider: React.FC<AuthProviderProps> = ({ children }) =
         // Fetch additional profile data without blocking
         setTimeout(() => {
           fetchUserProfile(currentSession.user.id);
-          // Don't check 2FA status here as table doesn't exist yet
         }, 0);
       } else {
         setCurrentUser(null);
@@ -54,13 +57,16 @@ export const AuthContextProvider: React.FC<AuthProviderProps> = ({ children }) =
       setSession(currentSession);
 
       if (currentSession?.user) {
+        // Check if user is a seller directly from metadata
+        const isSeller = currentSession.user.user_metadata?.is_seller === true;
+        
         const user: User = {
           id: currentSession.user.id,
           email: currentSession.user.email || '',
           displayName: currentSession.user.user_metadata?.full_name || '',
           photoURL: currentSession.user.user_metadata?.avatar_url || null,
           isAdmin: false, // Default, will be updated from profile
-          isSeller: false, // Default, will be updated from profile
+          isSeller: isSeller, // Set directly from metadata first
           businessName: currentSession.user.user_metadata?.business_name,
           businessType: currentSession.user.user_metadata?.business_type,
           trustScore: currentSession.user.user_metadata?.trust_score,
@@ -98,7 +104,8 @@ export const AuthContextProvider: React.FC<AuthProviderProps> = ({ children }) =
           ...currentUser,
           displayName: data.display_name || currentUser.displayName,
           photoURL: data.avatar_url || currentUser.photoURL,
-          isSeller: data.is_seller || false,
+          isSeller: data.is_seller || currentUser.isSeller || false,
+          isAdmin: data.is_admin || currentUser.isAdmin || false
         };
         setCurrentUser(updatedUser);
       }
