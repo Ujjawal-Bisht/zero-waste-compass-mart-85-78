@@ -1,9 +1,13 @@
 
-import { Navigate } from "react-router-dom";
+import { Navigate, Outlet } from "react-router-dom";
 import { useAuth } from "@/contexts/auth";
 import { Loader2 } from "lucide-react";
 
-const AdminRoute = ({ children }: { children: React.ReactNode }) => {
+interface AdminRouteProps {
+  children?: React.ReactNode;
+}
+
+const AdminRoute = ({ children }: AdminRouteProps) => {
   const { currentUser, loading } = useAuth();
 
   if (loading) {
@@ -22,7 +26,7 @@ const AdminRoute = ({ children }: { children: React.ReactNode }) => {
     return <Navigate to="/dashboard" replace />;
   }
 
-  return <>{children}</>;
+  return children ? <>{children}</> : <Outlet />;
 };
 
 export default AdminRoute;

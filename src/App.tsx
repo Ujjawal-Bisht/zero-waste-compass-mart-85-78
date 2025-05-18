@@ -26,47 +26,50 @@ import MyOrders from './pages/orders/MyOrders';
 import AdvancedFeatures from './pages/services/AdvancedFeatures';
 import { Toaster } from '@/components/ui/sonner';
 import ZeroBot from '@/components/ai/ZeroBot'; // Import ZeroBot component
+import { AuthProvider } from '@/contexts/auth'; // Import AuthProvider
 
 function App() {
   return (
-    <BrowserRouter>
-      <Routes>
-        <Route path="/" element={<Index />} />
-        <Route element={<AuthLayout />}>
-          <Route path="/login" element={<Login />} />
-          <Route path="/register" element={<Register />} />
-        </Route>
-        <Route path="/auth/callback" element={<AuthCallback />} />
+    <AuthProvider>
+      <BrowserRouter>
+        <Routes>
+          <Route path="/" element={<Index />} />
+          <Route element={<AuthLayout />}>
+            <Route path="/login" element={<Login />} />
+            <Route path="/register" element={<Register />} />
+          </Route>
+          <Route path="/auth/callback" element={<AuthCallback />} />
 
-        <Route element={<PrivateRoute />}>
-          <Route element={<DashboardLayout />}>
-            <Route path="/dashboard" element={<Dashboard />} />
-            <Route path="/profile" element={<Profile />} />
-            <Route path="/marketplace" element={<Marketplace />} />
-            <Route path="/cart" element={<Cart />} />
-            <Route path="/orders" element={<MyOrders />} />
-            <Route path="/advanced-features" element={<AdvancedFeatures />} />
+          <Route element={<PrivateRoute />}>
+            <Route element={<DashboardLayout />}>
+              <Route path="/dashboard" element={<Dashboard />} />
+              <Route path="/profile" element={<Profile />} />
+              <Route path="/marketplace" element={<Marketplace />} />
+              <Route path="/cart" element={<Cart />} />
+              <Route path="/orders" element={<MyOrders />} />
+              <Route path="/advanced-features" element={<AdvancedFeatures />} />
 
-            <Route element={<SellerRoute />}>
-              <Route path="/seller/dashboard" element={<SellerDashboard />} />
-              <Route path="/seller/profile" element={<SellerProfile />} />
-              <Route path="/seller/products" element={<SellerProducts />} />
-              <Route path="/seller/orders" element={<SellerOrders />} />
-              <Route path="/items/add" element={<AddItem />} />
-            </Route>
+              <Route element={<SellerRoute />}>
+                <Route path="/seller/dashboard" element={<SellerDashboard />} />
+                <Route path="/seller/profile" element={<SellerProfile />} />
+                <Route path="/seller/products" element={<SellerProducts />} />
+                <Route path="/seller/orders" element={<SellerOrders />} />
+                <Route path="/items/add" element={<AddItem />} />
+              </Route>
 
-            <Route element={<AdminRoute />}>
-              <Route path="/admin/panel" element={<AdminPanel />} />
+              <Route element={<AdminRoute />}>
+                <Route path="/admin/panel" element={<AdminPanel />} />
+              </Route>
             </Route>
           </Route>
-        </Route>
 
-        <Route path="*" element={<NotFound />} />
-      </Routes>
-      
-      <Toaster richColors />
-      <ZeroBot /> {/* Add ZeroBot to be accessible across the entire app */}
-    </BrowserRouter>
+          <Route path="*" element={<NotFound />} />
+        </Routes>
+        
+        <Toaster richColors />
+        <ZeroBot />
+      </BrowserRouter>
+    </AuthProvider>
   );
 }
 

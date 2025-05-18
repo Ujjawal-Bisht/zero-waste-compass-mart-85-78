@@ -1,9 +1,13 @@
 
-import { Navigate } from "react-router-dom";
+import { Navigate, Outlet } from "react-router-dom";
 import { useAuth } from "@/contexts/auth";
 import { Loader2 } from "lucide-react";
 
-const PrivateRoute = ({ children }: { children: React.ReactNode }) => {
+interface PrivateRouteProps {
+  children?: React.ReactNode;
+}
+
+const PrivateRoute = ({ children }: PrivateRouteProps) => {
   const { currentUser, loading } = useAuth();
 
   if (loading) {
@@ -21,7 +25,7 @@ const PrivateRoute = ({ children }: { children: React.ReactNode }) => {
     return <Navigate to="/login" replace />;
   }
 
-  return <>{children}</>;
+  return children ? <>{children}</> : <Outlet />;
 };
 
 export default PrivateRoute;
