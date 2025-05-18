@@ -1,10 +1,10 @@
 
 import React, { useState, useEffect } from 'react';
-import { Item } from '@/types';
+import { motion } from 'framer-motion';
 import TableHeader from './TableHeader';
-import TableColumnHeader from './TableColumnHeader';
 import ProductsTableBody from './ProductsTableBody';
 import TablePagination from './TablePagination';
+import { Item } from '@/types';
 
 interface ProductsTableProps {
   products: Item[];
@@ -14,175 +14,90 @@ interface ProductsTableProps {
   handleAddProduct: () => void;
 }
 
-const ProductsTable: React.FC<ProductsTableProps> = ({ 
-  products: initialProducts, 
-  getCategoryBadgeColor, 
-  getStatusBadgeColor, 
+const ProductsTable: React.FC<ProductsTableProps> = ({
+  products,
+  getCategoryBadgeColor,
+  getStatusBadgeColor,
   formatDate,
   handleAddProduct
 }) => {
-  const [searchTerm, setSearchTerm] = useState('');
   const [sortField, setSortField] = useState<string | null>(null);
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
-  const [products, setProducts] = useState(initialProducts);
-  const [isRefreshing, setIsRefreshing] = useState(false);
-  
-  // Sort and filter products
-  const handleSortChange = (field: string) => {
-    if (sortField === field) {
-      // Toggle direction if clicking the same field
-      setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc');
-    } else {
-      // Set new field and default to ascending
-      setSortField(field);
-      setSortDirection('asc');
-    }
-  };
+  const [sortedProducts, setSortedProducts] = useState<Item[]>(products);
+  const [animateSort, setAnimateSort] = useState(false);
 
-  // Reset sorting and filtering
-  const handleRefresh = () => {
-    setIsRefreshing(true);
-    setSearchTerm('');
-    setSortField(null);
-    setProducts(initialProducts);
-    
-    setTimeout(() => {
-      setIsRefreshing(false);
-    }, 600);
-  };
-
-  // Apply search and sorting
   useEffect(() => {
-    let result = [...initialProducts];
+    setSortedProducts(products);
+  }, [products]);
+
+  const handleSortChange = (field: string) => {
+    let direction: 'asc' | 'desc' = 'asc';
     
-    // Apply search
-    if (searchTerm) {
-      result = result.filter(product => 
-        product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        product.category.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        product.status.toLowerCase().includes(searchTerm.toLowerCase())
-      );
+    if (sortField === field) {
+      direction = sortDirection === 'asc' ? 'desc' : 'asc';
     }
     
-    // Apply sorting
-    if (sortField) {
-      result.sort((a, b) => {
-        let valueA: any;
-        let valueB: any;
-        
-        switch(sortField) {
-          case 'name':
-            valueA = a.name.toLowerCase();
-            valueB = b.name.toLowerCase();
-            break;
-          case 'category':
-            valueA = a.category.toLowerCase();
-            valueB = b.category.toLowerCase();
-            break;
-          case 'price':
-            valueA = a.currentPrice;
-            valueB = b.currentPrice;
-            break;
-          case 'quantity':
-            valueA = a.quantity;
-            valueB = b.quantity;
-            break;
-          case 'expiry':
-            valueA = new Date(a.expiryDate).getTime();
-            valueB = new Date(b.expiryDate).getTime();
-            break;
-          case 'status':
-            valueA = a.status.toLowerCase();
-            valueB = b.status.toLowerCase();
-            break;
-          default:
-            valueA = a[sortField as keyof Item];
-            valueB = b[sortField as keyof Item];
-        }
-        
-        if (valueA < valueB) return sortDirection === 'asc' ? -1 : 1;
-        if (valueA > valueB) return sortDirection === 'asc' ? 1 : -1;
-        return 0;
-      });
-    }
+    setSortField(field);
+    setSortDirection(direction);
+    setAnimateSort(true);
+
+    // Sort the products
+    const sorted = [...sortedProducts].sort((a, b) => {
+      if (field === 'name') {
+        return direction === 'asc' 
+          ? a.name.localeCompare(b.name) 
+          : b.name.localeCompare(a.name);
+      } else if (field === 'price') {
+        return direction === 'asc' 
+          ? a.price - b.price 
+          : b.price - a.price;
+      } else if (field === 'category') {
+        return direction === 'asc' 
+          ? a.category.localeCompare(b.category) 
+          : b.category.localeCompare(a.category);
+      } else if (field === 'status') {
+        return direction === 'asc' 
+          ? a.status.localeCompare(b.status) 
+          : b.status.localeCompare(a.status);
+      } else if (field === 'createdAt') {
+        return direction === 'asc' 
+          ? new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime() 
+          : new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+      }
+      return 0;
+    });
     
-    setProducts(result);
-  }, [initialProducts, searchTerm, sortField, sortDirection]);
+    setSortedProducts(sorted);
+
+    setTimeout(() => setAnimateSort(false), 300);
+  };
 
   return (
-    <div className="space-y-4">
-      {/* Search and filter controls */}
-      <TableHeader
-        searchTerm={searchTerm}
-        setSearchTerm={setSearchTerm}
-        isRefreshing={isRefreshing}
-        handleRefresh={handleRefresh}
-      />
-      
-      <div className="rounded-md border bg-white shadow-sm overflow-hidden">
-        <div className="overflow-x-auto">
-          <table className="min-w-full divide-y divide-gray-200">
-            <thead className="bg-gray-50">
-              <tr>
-                <TableColumnHeader
-                  label="Product"
-                  field="name"
-                  sortField={sortField}
-                  sortDirection={sortDirection}
-                  handleSortChange={handleSortChange}
-                />
-                <TableColumnHeader
-                  label="Category"
-                  field="category"
-                  sortField={sortField}
-                  sortDirection={sortDirection}
-                  handleSortChange={handleSortChange}
-                />
-                <TableColumnHeader
-                  label="Price"
-                  field="price"
-                  sortField={sortField}
-                  sortDirection={sortDirection}
-                  handleSortChange={handleSortChange}
-                />
-                <TableColumnHeader
-                  label="Qty"
-                  field="quantity"
-                  sortField={sortField}
-                  sortDirection={sortDirection}
-                  handleSortChange={handleSortChange}
-                />
-                <TableColumnHeader
-                  label="Expiry"
-                  field="expiry"
-                  sortField={sortField}
-                  sortDirection={sortDirection}
-                  handleSortChange={handleSortChange}
-                />
-                <TableColumnHeader
-                  label="Status"
-                  field="status"
-                  sortField={sortField}
-                  sortDirection={sortDirection}
-                  handleSortChange={handleSortChange}
-                />
-                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Actions
-                </th>
-              </tr>
-            </thead>
-            <ProductsTableBody 
-              products={products}
-              getCategoryBadgeColor={getCategoryBadgeColor}
-              getStatusBadgeColor={getStatusBadgeColor}
-              formatDate={formatDate}
-              handleAddProduct={handleAddProduct}
-            />
-          </table>
-        </div>
-        <TablePagination totalItems={products.length} />
+    <motion.div 
+      className="bg-white shadow rounded-lg overflow-hidden"
+      initial={{ opacity: 0, y: 10 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5 }}
+    >
+      <div className="overflow-x-auto">
+        <table className="min-w-full divide-y divide-gray-200">
+          <TableHeader 
+            sortField={sortField}
+            sortDirection={sortDirection}
+            handleSortChange={handleSortChange}
+            animateSort={animateSort}
+          />
+          <ProductsTableBody 
+            products={sortedProducts}
+            getCategoryBadgeColor={getCategoryBadgeColor}
+            getStatusBadgeColor={getStatusBadgeColor}
+            formatDate={formatDate}
+            handleAddProduct={handleAddProduct}
+          />
+        </table>
       </div>
-    </div>
+      <TablePagination totalItems={sortedProducts.length} />
+    </motion.div>
   );
 };
 

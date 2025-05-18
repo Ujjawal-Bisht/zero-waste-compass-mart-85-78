@@ -1,48 +1,55 @@
 
-/* Table-specific button animations */
+/* Table-specific animations */
 
-.table-action-button {
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+/* Row hover effect */
+.table-row-hover {
+  transition: all 0.2s ease;
 }
 
-.table-action-button:hover {
+.table-row-hover:hover {
   transform: translateY(-2px);
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  background-color: rgba(99, 102, 241, 0.04);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
 }
 
-.table-action-button:active {
-  transform: translateY(0);
+/* Table cell animation */
+@keyframes cellFadeIn {
+  from { opacity: 0; transform: translateX(10px); }
+  to { opacity: 1; transform: translateX(0); }
 }
 
-/* Action button hover effects */
-.action-view:hover {
-  background-color: rgba(59, 130, 246, 0.1);
-  color: #3b82f6;
+.animate-cell {
+  animation: cellFadeIn 0.4s ease forwards;
 }
 
-.action-edit:hover {
-  background-color: rgba(16, 185, 129, 0.1);
-  color: #10b981;
+/* Header sort animation */
+@keyframes sortPulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.2); }
+  100% { transform: scale(1); }
 }
 
-.action-delete:hover {
-  background-color: rgba(239, 68, 68, 0.1);
-  color: #ef4444;
+.sort-animation {
+  animation: sortPulse 0.3s ease;
 }
 
-/* Dropdown menu animation for table actions */
-.table-dropdown-content {
-  transform-origin: top right;
-  animation: dropdown-appear 0.25s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+/* Table action buttons hover */
+.table-action-hover {
+  transition: all 0.2s ease;
 }
 
-@keyframes dropdown-appear {
-  from {
-    opacity: 0;
-    transform: scale(0.95) translateY(-5px);
-  }
-  to {
-    opacity: 1;
-    transform: scale(1) translateY(0);
-  }
+.table-action-hover:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+/* Animated checkbox */
+.checkbox-pop input:checked + div {
+  animation: checkPop 0.3s ease-out;
+}
+
+@keyframes checkPop {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.2); }
+  100% { transform: scale(1); }
 }

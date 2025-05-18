@@ -2,9 +2,9 @@
 import React from 'react';
 import { Item } from '@/types';
 import { motion } from 'framer-motion';
-import { Badge } from '@/components/ui/badge';
-import { IndianRupee, TrendingUp, TrendingDown } from 'lucide-react';
 import ProductActionMenu from './ProductActionMenu';
+import { Badge } from '@/components/ui/badge';
+import { CheckCircle, AlertCircle, Clock } from 'lucide-react';
 
 interface ProductRowProps {
   product: Item;
@@ -13,179 +13,81 @@ interface ProductRowProps {
   formatDate: (dateString: string) => string;
 }
 
-const ProductRow: React.FC<ProductRowProps> = ({ 
-  product, 
-  getCategoryBadgeColor, 
-  getStatusBadgeColor, 
-  formatDate 
+const ProductRow: React.FC<ProductRowProps> = ({
+  product,
+  getCategoryBadgeColor,
+  getStatusBadgeColor,
+  formatDate
 }) => {
-  // Calculate days until expiry
-  const daysUntilExpiry = () => {
-    const today = new Date();
-    const expiryDate = new Date(product.expiryDate);
-    const diffTime = expiryDate.getTime() - today.getTime();
-    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-    return diffDays;
+  const getStatusIcon = (status: string) => {
+    switch(status.toLowerCase()) {
+      case 'active':
+        return <CheckCircle className="h-4 w-4 text-green-500" />;
+      case 'out of stock':
+        return <AlertCircle className="h-4 w-4 text-red-500" />;
+      case 'pending':
+        return <Clock className="h-4 w-4 text-yellow-500" />;
+      default:
+        return null;
+    }
   };
-  
-  const days = daysUntilExpiry();
 
-  // Calculate price trend
-  const priceTrend = () => {
-    if (!product.originalPrice) return 'neutral';
-    
-    const ratio = product.currentPrice / product.originalPrice;
-    if (ratio < 0.95) return 'down';
-    if (ratio > 1.05) return 'up';
-    return 'neutral';
-  };
-  
-  const trend = priceTrend();
-  
   return (
     <motion.tr 
-      className="table-row-animate hover:bg-gray-50 relative"
-      whileHover={{ backgroundColor: "rgba(243, 244, 246, 0.8)", x: 3, boxShadow: "0 4px 12px rgba(0, 0, 0, 0.1)" }}
+      className="bg-white border-b hover:bg-gray-50 table-row-hover"
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.3 }}
+      exit={{ opacity: 0, y: -10 }}
+      whileHover={{ backgroundColor: "rgba(249, 250, 251, 1)" }}
+      transition={{ duration: 0.2 }}
+      layout
     >
       <td className="px-6 py-4 whitespace-nowrap">
-        <div className="flex items-center">
-          <motion.div 
-            className="h-12 w-12 flex-shrink-0 rounded-md bg-gray-100 overflow-hidden shadow-sm border border-gray-200"
-            whileHover={{ scale: 1.15, rotate: 5, boxShadow: "0 8px 15px rgba(0, 0, 0, 0.1)" }}
-            transition={{ type: "spring", stiffness: 400, damping: 10 }}
-          >
-            {product.imageUrl && (
-              <img src={product.imageUrl} alt={product.name} className="h-12 w-12 rounded-md object-cover" />
-            )}
-          </motion.div>
-          <div className="ml-4">
-            <motion.div 
-              className="text-sm font-medium text-gray-900"
-              whileHover={{ color: "#4F46E5", x: 2 }}
-              transition={{ duration: 0.2 }}
-            >
-              {product.name}
-            </motion.div>
-            <div className="text-xs text-gray-500 mt-1">ID: {product.id.substring(0, 8)}...</div>
-          </div>
+        <div className="h-10 w-10 rounded-full overflow-hidden bg-gray-100 flex items-center justify-center">
+          <motion.img 
+            src={product.imageUrl} 
+            alt={product.name}
+            className="h-full w-full object-cover"
+            whileHover={{ scale: 1.15 }}
+            transition={{ duration: 0.2 }}
+          />
         </div>
       </td>
-      <td className="px-6 py-4 whitespace-nowrap">
+      <motion.td className="px-6 py-4 whitespace-nowrap animate-cell" style={{ animationDelay: '0.05s' }}>
+        <div className="text-sm font-medium text-gray-900">{product.name}</div>
+      </motion.td>
+      <motion.td className="px-6 py-4 whitespace-nowrap animate-cell" style={{ animationDelay: '0.1s' }}>
+        <div className="text-sm text-gray-900">${product.price.toFixed(2)}</div>
+      </motion.td>
+      <motion.td className="px-6 py-4 whitespace-nowrap animate-cell" style={{ animationDelay: '0.15s' }}>
+        <Badge className={`${getCategoryBadgeColor(product.category)}`}>
+          {product.category}
+        </Badge>
+      </motion.td>
+      <motion.td className="px-6 py-4 whitespace-nowrap animate-cell" style={{ animationDelay: '0.2s' }}>
         <motion.div 
-          whileHover={{ scale: 1.1 }}
-          whileTap={{ scale: 0.95 }}
-          transition={{ type: "spring", stiffness: 500 }}
+          className="flex items-center"
+          whileHover={{ x: 3 }}
+          transition={{ type: "spring", stiffness: 400, damping: 10 }}
         >
-          <Badge className={`${getCategoryBadgeColor(product.category)} badge-animate`}>
-            {product.category.charAt(0).toUpperCase() + product.category.slice(1)}
+          {getStatusIcon(product.status)}
+          <Badge className={`ml-1 ${getStatusBadgeColor(product.status)}`}>
+            {product.status}
           </Badge>
         </motion.div>
-      </td>
-      <td className="px-6 py-4 whitespace-nowrap text-sm">
-        <div className="flex items-center">
-          <IndianRupee size={14} className="mr-1" />
-          <motion.span 
-            className={`font-medium ${
-              trend === 'down' ? 'text-green-600' : 
-              trend === 'up' ? 'text-red-600' : ''
-            }`}
-            whileHover={product.dynamicPricingEnabled ? { scale: 1.15 } : { scale: 1.05 }}
-            transition={{ type: "spring", stiffness: 400 }}
-          >
-            {product.currentPrice.toFixed(2)}
-            {trend !== 'neutral' && (
-              <span className="ml-1">
-                {trend === 'down' ? <TrendingDown size={14} className="inline" /> : <TrendingUp size={14} className="inline" />}
-              </span>
-            )}
-          </motion.span>
-          {product.originalPrice && product.originalPrice > product.currentPrice && (
-            <motion.span 
-              className="text-xs text-gray-500 line-through ml-2"
-              initial={{ opacity: 0.7 }}
-              whileHover={{ opacity: 1 }}
-            >
-              <IndianRupee size={10} className="inline mr-0.5" />
-              {product.originalPrice.toFixed(2)}
-            </motion.span>
-          )}
-        </div>
-        {product.dynamicPricingEnabled && (
-          <motion.div 
-            className="text-xs text-indigo-600 flex items-center mt-1"
-            animate={{ 
-              opacity: [0.8, 1, 0.8],
-              scale: [1, 1.03, 1]
-            }}
-            transition={{ repeat: Infinity, duration: 2 }}
-          >
-            <span className="h-1.5 w-1.5 rounded-full bg-indigo-500 mr-1 animate-pulse"></span>
-            Dynamic pricing
-            {product.dynamicPricingSettings?.strategy && (
-              <span className="ml-1 text-gray-500">
-                ({product.dynamicPricingSettings.strategy.split('-')[0]})
-              </span>
-            )}
-          </motion.div>
-        )}
-      </td>
-      <td className="px-6 py-4 whitespace-nowrap text-sm">
+      </motion.td>
+      <motion.td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 animate-cell" style={{ animationDelay: '0.25s' }}>
+        {formatDate(product.createdAt)}
+      </motion.td>
+      <motion.td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium animate-cell" style={{ animationDelay: '0.3s' }}>
         <motion.div 
-          className={`inline-flex items-center justify-center px-2 py-1 rounded-full ${
-            product.quantity < 5 ? 'bg-red-100 text-red-800' : 'bg-blue-100 text-blue-800'
-          }`}
-          whileHover={{ scale: 1.1, y: -2 }}
-          animate={product.quantity < 5 ? { 
-            scale: [1, 1.05, 1],
-            boxShadow: ["0 0 0 rgba(239, 68, 68, 0)", "0 0 10px rgba(239, 68, 68, 0.5)", "0 0 0 rgba(239, 68, 68, 0)"]
-          } : {}}
-          transition={{ duration: 1.5, repeat: product.quantity < 5 ? Infinity : 0 }}
-        >
-          {product.quantity}
-          {product.quantity < 5 && (
-            <span className="ml-1 text-xs text-red-600">(Low)</span>
-          )}
-        </motion.div>
-      </td>
-      <td className="px-6 py-4 whitespace-nowrap text-sm">
-        <div className="flex flex-col">
-          <motion.span 
-            className="font-medium"
-            whileHover={{ color: days <= 14 ? "#EF4444" : "#3B82F6" }}
-          >
-            {formatDate(product.expiryDate)}
-          </motion.span>
-          {days <= 30 && (
-            <motion.span 
-              className={`text-xs mt-1 ${days <= 7 ? 'text-red-600' : days <= 14 ? 'text-amber-600' : 'text-blue-600'}`}
-              animate={days <= 7 ? { 
-                scale: [1, 1.1, 1],
-                opacity: [0.8, 1, 0.8]
-              } : {}}
-              transition={{ repeat: days <= 7 ? Infinity : 0, duration: 1.5 }}
-            >
-              {days <= 0 ? 'Expired!' : `${days} days left`}
-            </motion.span>
-          )}
-        </div>
-      </td>
-      <td className="px-6 py-4 whitespace-nowrap">
-        <motion.div 
-          whileHover={{ scale: 1.1, y: -2 }}
+          className="table-action-hover"
+          whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
-          transition={{ type: "spring", stiffness: 400 }}
         >
-          <Badge className={`${getStatusBadgeColor(product.status)} badge-animate`}>
-            {product.status.charAt(0).toUpperCase() + product.status.slice(1)}
-          </Badge>
+          <ProductActionMenu product={product} />
         </motion.div>
-      </td>
-      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-        <ProductActionMenu product={product} />
-      </td>
+      </motion.td>
     </motion.tr>
   );
 };

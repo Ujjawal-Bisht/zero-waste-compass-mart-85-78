@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import ProductRow from '../ProductRow';
 import EmptyProductsView from './EmptyProductsView';
 import { Item } from '@/types';
@@ -26,17 +26,28 @@ const ProductsTableBody: React.FC<ProductsTableBodyProps> = ({
     visible: { 
       opacity: 1,
       transition: { 
-        staggerChildren: 0.1,
-        delayChildren: 0.2
+        staggerChildren: 0.08,
+        delayChildren: 0.1
       } 
+    },
+    exit: {
+      opacity: 0,
+      transition: {
+        staggerChildren: 0.05,
+        staggerDirection: -1
+      }
     }
   };
 
   if (products.length === 0) {
     return (
-      <tbody>
+      <motion.tbody
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.4 }}
+      >
         <EmptyProductsView handleAddProduct={handleAddProduct} />
-      </tbody>
+      </motion.tbody>
     );
   }
 
@@ -45,16 +56,19 @@ const ProductsTableBody: React.FC<ProductsTableBodyProps> = ({
       variants={containerVariants}
       initial="hidden"
       animate="visible"
+      exit="exit"
     >
-      {products.map((product) => (
-        <ProductRow 
-          key={product.id}
-          product={product}
-          getCategoryBadgeColor={getCategoryBadgeColor}
-          getStatusBadgeColor={getStatusBadgeColor}
-          formatDate={formatDate}
-        />
-      ))}
+      <AnimatePresence>
+        {products.map((product, index) => (
+          <ProductRow 
+            key={product.id}
+            product={product}
+            getCategoryBadgeColor={getCategoryBadgeColor}
+            getStatusBadgeColor={getStatusBadgeColor}
+            formatDate={formatDate}
+          />
+        ))}
+      </AnimatePresence>
     </motion.tbody>
   );
 };

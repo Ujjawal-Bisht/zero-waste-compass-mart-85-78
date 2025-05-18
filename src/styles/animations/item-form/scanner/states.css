@@ -1,86 +1,90 @@
 
-/* Camera warming up effect */
-.camera-starting {
+/* Scanner states animations */
+.scanner-idle {
   position: relative;
-  overflow: hidden;
 }
 
-.camera-starting::before {
-  content: '';
+.scanner-idle::after {
+  content: 'Ready to scan';
   position: absolute;
-  inset: 0;
-  background: linear-gradient(
-    135deg,
-    rgba(0, 0, 0, 0.05),
-    rgba(0, 0, 0, 0.2)
-  );
-  animation: cameraWarmup 1s ease-out forwards;
-}
-
-@keyframes cameraWarmup {
-  from {
-    opacity: 1;
-  }
-  to {
-    opacity: 0;
-  }
-}
-
-/* Processing overlay animation */
-.processing-overlay {
-  position: absolute;
-  inset: 0;
-  background: rgba(255, 255, 255, 0.8);
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  bottom: -30px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(99, 102, 241, 0.1);
+  color: rgba(99, 102, 241, 0.8);
+  padding: 4px 12px;
+  border-radius: 12px;
+  font-size: 12px;
+  white-space: nowrap;
   opacity: 0;
-  pointer-events: none;
   transition: opacity 0.3s ease;
 }
 
-.processing .processing-overlay {
+.scanner-idle:hover::after {
   opacity: 1;
 }
 
-.processing-icon {
-  display: inline-block;
-  width: 40px;
-  height: 40px;
-  border: 3px solid rgba(99, 102, 241, 0.3);
-  border-radius: 50%;
-  border-top-color: rgba(99, 102, 241, 1);
-  animation: spin 1s infinite linear;
-}
-
-@keyframes spin {
-  to {
-    transform: rotate(360deg);
-  }
-}
-
-/* Scanner initialization animation */
-.scanner-init {
+/* Scanning animation */
+.scanner-active {
   position: relative;
+  overflow: hidden;
+  animation: activePulse 2s infinite;
 }
 
-.scanner-init::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(
-    45deg,
-    rgba(99, 102, 241, 0.1),
-    rgba(139, 92, 246, 0.1)
-  );
-  animation: scannerInitPulse 2s infinite;
-}
-
-@keyframes scannerInitPulse {
+@keyframes activePulse {
   0%, 100% {
-    opacity: 0.2;
+    box-shadow: 0 0 0 0 rgba(99, 102, 241, 0);
   }
   50% {
-    opacity: 0.5;
+    box-shadow: 0 0 0 8px rgba(99, 102, 241, 0.3);
+  }
+}
+
+/* Success state */
+.scanner-success {
+  position: relative;
+  box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.6);
+  animation: successBounce 0.5s;
+}
+
+@keyframes successBounce {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+/* Error state */
+.scanner-error {
+  position: relative;
+  box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.6);
+  animation: errorShake 0.4s;
+}
+
+@keyframes errorShake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-5px); }
+  50% { transform: translateX(5px); }
+  75% { transform: translateX(-5px); }
+}
+
+/* Detected item highlight */
+.detected-item {
+  outline: 2px solid rgba(16, 185, 129, 0.5);
+  position: relative;
+  animation: detectedPulse 1.5s infinite;
+}
+
+@keyframes detectedPulse {
+  0%, 100% {
+    box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.3);
+  }
+  50% {
+    box-shadow: 0 0 0 8px rgba(16, 185, 129, 0);
   }
 }
