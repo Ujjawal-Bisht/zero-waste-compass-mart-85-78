@@ -9,6 +9,33 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      email_templates: {
+        Row: {
+          body: string
+          created_at: string
+          id: string
+          name: string
+          subject: string
+          updated_at: string
+        }
+        Insert: {
+          body: string
+          created_at?: string
+          id?: string
+          name: string
+          subject: string
+          updated_at?: string
+        }
+        Update: {
+          body?: string
+          created_at?: string
+          id?: string
+          name?: string
+          subject?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       notifications: {
         Row: {
           created_at: string
@@ -321,6 +348,45 @@ export type Database = {
           },
         ]
       }
+      scheduled_tasks: {
+        Row: {
+          created_at: string
+          enabled: boolean
+          id: string
+          last_run: string | null
+          name: string
+          next_run: string
+          parameters: Json | null
+          schedule: string
+          task_type: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          enabled?: boolean
+          id?: string
+          last_run?: string | null
+          name: string
+          next_run: string
+          parameters?: Json | null
+          schedule: string
+          task_type: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          enabled?: boolean
+          id?: string
+          last_run?: string | null
+          name?: string
+          next_run?: string
+          parameters?: Json | null
+          schedule?: string
+          task_type?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       seller_profiles: {
         Row: {
           business_address: string | null
@@ -362,6 +428,77 @@ export type Database = {
           website?: string | null
         }
         Relationships: []
+      }
+      subscriptions: {
+        Row: {
+          created_at: string
+          id: string
+          status: string
+          stripe_customer_id: string | null
+          stripe_subscription_id: string | null
+          subscription_end: string | null
+          subscription_tier: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          status?: string
+          stripe_customer_id?: string | null
+          stripe_subscription_id?: string | null
+          subscription_end?: string | null
+          subscription_tier?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          status?: string
+          stripe_customer_id?: string | null
+          stripe_subscription_id?: string | null
+          subscription_end?: string | null
+          subscription_tier?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      task_history: {
+        Row: {
+          completed_at: string | null
+          id: string
+          result: string | null
+          started_at: string
+          status: string
+          task_id: string
+        }
+        Insert: {
+          completed_at?: string | null
+          id?: string
+          result?: string | null
+          started_at?: string
+          status: string
+          task_id: string
+        }
+        Update: {
+          completed_at?: string | null
+          id?: string
+          result?: string | null
+          started_at?: string
+          status?: string
+          task_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "task_history_task_id_fkey"
+            columns: ["task_id"]
+            isOneToOne: false
+            referencedRelation: "scheduled_tasks"
+            referencedColumns: ["id"]
+          },
+        ]
       }
     }
     Views: {

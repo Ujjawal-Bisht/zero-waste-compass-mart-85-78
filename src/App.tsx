@@ -1,9 +1,8 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 
 // Authentication Context
 import { AuthProvider } from "./contexts/auth";
@@ -39,64 +38,82 @@ import SellerRoute from "./components/auth/SellerRoute";
 
 const queryClient = new QueryClient();
 
-const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <AuthProvider>
-        <Toaster />
-        <Sonner />
-        <BrowserRouter>
-          <Routes>
-            {/* Public Routes */}
-            <Route path="/" element={<LandingPage />} />
-            
-            {/* Auth Routes */}
-            <Route element={<AuthLayout />}>
-              <Route path="/login" element={<Login />} />
-              <Route path="/register" element={<Register />} />
-            </Route>
-            <Route path="/auth/callback" element={<AuthCallback />} />
-            
-            {/* Protected Dashboard Routes */}
-            <Route element={<PrivateRoute><DashboardLayout /></PrivateRoute>}>
-              <Route path="/dashboard" element={<Dashboard />} />
-              <Route path="/marketplace" element={<Marketplace />} />
-              <Route path="/profile" element={<Profile />} />
-              <Route path="/orders" element={<MyOrders />} />
-              <Route path="/cart" element={<Cart />} />
+function App() {
+  return (
+    <QueryClientProvider client={queryClient}>
+      <TooltipProvider>
+        <AuthProvider>
+          <Toaster />
+          <Sonner />
+          <Router>
+            <Routes>
+              {/* Public Routes */}
+              <Route path="/" element={<LandingPage />} />
               
-              {/* Only show Add Item for sellers */}
-              <Route path="/items/add" element={
-                <SellerRoute>
-                  <AddItem />
-                </SellerRoute>
+              {/* Auth Routes */}
+              <Route element={<AuthLayout />}>
+                <Route path="/login" element={<Login />} />
+                <Route path="/register" element={<Register />} />
+              </Route>
+              <Route path="/auth/callback" element={<AuthCallback />} />
+              
+              {/* Protected Dashboard Routes */}
+              <Route element={<PrivateRoute><DashboardLayout /></PrivateRoute>}>
+                <Route path="/dashboard" element={<Dashboard />} />
+                <Route path="/marketplace" element={<Marketplace />} />
+                <Route path="/profile" element={<Profile />} />
+                <Route path="/orders" element={<MyOrders />} />
+                <Route path="/cart" element={<Cart />} />
+                
+                {/* Only show Add Item for sellers */}
+                <Route path="/items/add" element={
+                  <SellerRoute>
+                    <AddItem />
+                  </SellerRoute>
+                } />
+                
+                {/* Seller Routes */}
+                <Route path="/seller/*" element={
+                  <SellerRoute>
+                    <Routes>
+                      <Route path="dashboard" element={<SellerDashboard />} />
+                      <Route path="products" element={<SellerProducts />} />
+                      <Route path="orders" element={<SellerOrders />} />
+                      <Route path="profile" element={<SellerProfile />} />
+                    </Routes>
+                  </SellerRoute>
+                } />
+              </Route>
+              
+              {/* Admin Routes */}
+              <Route element={<AdminRoute><DashboardLayout /></AdminRoute>}>
+                <Route path="/admin" element={<AdminPanel />} />
+              </Route>
+              
+              {/* Add new routes for advanced features */}
+              <Route path="/advanced-features" element={
+                <PrivateRoute>
+                  <DashboardLayout>
+                    <AdvancedFeatures />
+                  </DashboardLayout>
+                </PrivateRoute>
+              } />
+              <Route path="/admin/panel" element={
+                <AdminRoute>
+                  <DashboardLayout>
+                    <AdminPanel />
+                  </DashboardLayout>
+                </AdminRoute>
               } />
               
-              {/* Seller Routes */}
-              <Route path="/seller/*" element={
-                <SellerRoute>
-                  <Routes>
-                    <Route path="dashboard" element={<SellerDashboard />} />
-                    <Route path="products" element={<SellerProducts />} />
-                    <Route path="orders" element={<SellerOrders />} />
-                    <Route path="profile" element={<SellerProfile />} />
-                  </Routes>
-                </SellerRoute>
-              } />
-            </Route>
-            
-            {/* Admin Routes */}
-            <Route element={<AdminRoute><DashboardLayout /></AdminRoute>}>
-              <Route path="/admin" element={<AdminPanel />} />
-            </Route>
-            
-            {/* Catch-all Route */}
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-        </BrowserRouter>
-      </AuthProvider>
-    </TooltipProvider>
-  </QueryClientProvider>
-);
+              {/* Catch-all Route */}
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </Router>
+        </AuthProvider>
+      </TooltipProvider>
+    </QueryClientProvider>
+  );
+}
 
 export default App;
