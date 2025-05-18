@@ -69,29 +69,33 @@ export const useRegistrationHandlers = () => {
     }
   };
   
-  const handleGoogleLogin = (accountType: 'buyer' | 'seller') => async () => {
-    try {
-      setIsLoading(true);
-      await googleLogin(accountType);
-      // The page will be redirected by Google OAuth, so no navigate needed here
-    } catch (error) {
-      console.error('Google login error:', error);
-      // Error is already handled in the googleLogin function
-    } finally {
-      setIsLoading(false);
-    }
+  const handleGoogleLogin = (accountType: 'buyer' | 'seller') => {
+    return async () => {
+      try {
+        setIsLoading(true);
+        await googleLogin(accountType);
+        // The page will be redirected by Google OAuth, so no navigate needed here
+      } catch (error) {
+        console.error('Google login error:', error);
+        // Error is already handled in the googleLogin function
+      } finally {
+        setIsLoading(false);
+      }
+    };
   };
   
-  const handlePhoneRegistration = (accountType: 'buyer' | 'seller') => async (phoneNumber: string) => {
-    try {
-      setIsLoading(true);
-      await phoneLogin(phoneNumber, accountType);
-    } catch (error) {
-      console.error('Phone registration error:', error);
-      // Error is already handled in the phoneLogin function
-    } finally {
-      setIsLoading(false);
-    }
+  const handlePhoneRegistration = (accountType: 'buyer' | 'seller') => {
+    return async (phoneNumber: string) => {
+      try {
+        setIsLoading(true);
+        await phoneLogin(phoneNumber, accountType);
+      } catch (error) {
+        console.error('Phone registration error:', error);
+        // Error is already handled in the phoneLogin function
+      } finally {
+        setIsLoading(false);
+      }
+    };
   };
   
   return {

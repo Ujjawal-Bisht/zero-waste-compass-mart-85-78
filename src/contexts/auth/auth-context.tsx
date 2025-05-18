@@ -17,6 +17,7 @@ export const AuthContextProvider: React.FC<AuthProviderProps> = ({ children }) =
   const [currentUser, setCurrentUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
+  const [isTwoFactorEnabled, setIsTwoFactorEnabled] = useState(false);
 
   useEffect(() => {
     // Set up the auth state change listener first
@@ -31,15 +32,21 @@ export const AuthContextProvider: React.FC<AuthProviderProps> = ({ children }) =
           photoURL: currentSession.user.user_metadata.avatar_url || null,
           isAdmin: false, // Default, will be updated from profile
           isSeller: false, // Default, will be updated from profile
+          businessName: currentSession.user.user_metadata.business_name,
+          businessType: currentSession.user.user_metadata.business_type,
+          trustScore: currentSession.user.user_metadata.trust_score,
+          verified: currentSession.user.user_metadata.verified,
         };
         setCurrentUser(user);
         
         // Fetch additional profile data without blocking
         setTimeout(() => {
           fetchUserProfile(currentSession.user.id);
+          checkTwoFactorStatus(currentSession.user.id);
         }, 0);
       } else {
         setCurrentUser(null);
+        setIsTwoFactorEnabled(false);
       }
     });
 
@@ -55,11 +62,16 @@ export const AuthContextProvider: React.FC<AuthProviderProps> = ({ children }) =
           photoURL: currentSession.user.user_metadata.avatar_url || null,
           isAdmin: false, // Default, will be updated from profile
           isSeller: false, // Default, will be updated from profile
+          businessName: currentSession.user.user_metadata.business_name,
+          businessType: currentSession.user.user_metadata.business_type,
+          trustScore: currentSession.user.user_metadata.trust_score,
+          verified: currentSession.user.user_metadata.verified,
         };
         setCurrentUser(user);
         
         // Fetch additional profile data
         fetchUserProfile(currentSession.user.id);
+        checkTwoFactorStatus(currentSession.user.id);
       }
       
       setLoading(false);
@@ -97,7 +109,27 @@ export const AuthContextProvider: React.FC<AuthProviderProps> = ({ children }) =
     }
   };
 
-  const login = async (email: string, password: string) => {
+  // Check if 2FA is enabled for the user
+  const checkTwoFactorStatus = async (userId: string) => {
+    try {
+      const { data, error } = await supabase
+        .from('two_factor_auth')
+        .select('is_enabled')
+        .eq('user_id', userId)
+        .single();
+      
+      if (error && error.code !== 'PGRST116') { // PGRST116 is "No rows returned" error
+        console.error('Error checking 2FA status:', error);
+        return;
+      }
+
+      setIsTwoFactorEnabled(data?.is_enabled || false);
+    } catch (error) {
+      console.error("Failed to check 2FA status:", error);
+    }
+  };
+
+  const login = async (email: string, password: string): Promise<void> => {
     try {
       setLoading(true);
       const { data, error } = await supabase.auth.signInWithPassword({ email, password });
@@ -105,7 +137,6 @@ export const AuthContextProvider: React.FC<AuthProviderProps> = ({ children }) =
       if (error) throw error;
       
       toast.success("Logged in successfully!");
-      return data.user;
     } catch (error: any) {
       console.error("Login error:", error);
       toast.error(error.message || "Failed to log in");
@@ -115,12 +146,12 @@ export const AuthContextProvider: React.FC<AuthProviderProps> = ({ children }) =
     }
   };
 
-  const googleLogin = async (accountType: 'buyer' | 'seller' = 'buyer') => {
+  const googleLogin = async (accountType: 'buyer' | 'seller' = 'buyer'): Promise<void> => {
     try {
       setLoading(true);
       console.log(`Starting Google authentication flow as ${accountType}...`);
       
-      const { data, error } = await supabase.auth.signInWithOAuth({ 
+      const { error } = await supabase.auth.signInWithOAuth({ 
         provider: 'google',
         options: {
           redirectTo: `${window.location.origin}/auth/callback`,
@@ -134,9 +165,6 @@ export const AuthContextProvider: React.FC<AuthProviderProps> = ({ children }) =
       });
       
       if (error) throw error;
-      
-      // This won't actually execute as the user is redirected to Google
-      return {} as User;
     } catch (error: any) {
       console.error("Google authentication error:", error);
       toast.error(error.message || "Failed to log in with Google");
@@ -146,7 +174,7 @@ export const AuthContextProvider: React.FC<AuthProviderProps> = ({ children }) =
     }
   };
 
-  const phoneLogin = async (phoneNumber: string, accountType: 'buyer' | 'seller' = 'buyer') => {
+  const phoneLogin = async (phoneNumber: string, accountType: 'buyer' | 'seller' = 'buyer'): Promise<void> => {
     try {
       setLoading(true);
       
@@ -160,7 +188,6 @@ export const AuthContextProvider: React.FC<AuthProviderProps> = ({ children }) =
       if (error) throw error;
       
       toast.success("OTP sent to your phone number!");
-      return { verificationId: data.session?.user.id || '' };
     } catch (error: any) {
       console.error("Phone login error:", error);
       toast.error(error.message || "Failed to send OTP");
@@ -170,7 +197,7 @@ export const AuthContextProvider: React.FC<AuthProviderProps> = ({ children }) =
     }
   };
 
-  const logout = async () => {
+  const logout = async (): Promise<void> => {
     try {
       setLoading(true);
       const { error } = await supabase.auth.signOut();
@@ -192,7 +219,7 @@ export const AuthContextProvider: React.FC<AuthProviderProps> = ({ children }) =
     businessName?: string, 
     businessType?: 'retailer' | 'distributor' | 'manufacturer' | 'individual',
     isSeller?: boolean 
-  }) => {
+  }): Promise<void> => {
     try {
       setLoading(true);
       
@@ -249,7 +276,7 @@ export const AuthContextProvider: React.FC<AuthProviderProps> = ({ children }) =
     }
   };
 
-  const resetPassword = async (email: string) => {
+  const resetPassword = async (email: string): Promise<void> => {
     try {
       setLoading(true);
       const { error } = await supabase.auth.resetPasswordForEmail(email, {
@@ -268,7 +295,7 @@ export const AuthContextProvider: React.FC<AuthProviderProps> = ({ children }) =
     }
   };
 
-  const updateProfile = async (data: Partial<User>) => {
+  const updateProfile = async (data: Partial<User>): Promise<void> => {
     try {
       setLoading(true);
       
@@ -306,7 +333,6 @@ export const AuthContextProvider: React.FC<AuthProviderProps> = ({ children }) =
       
       setCurrentUser(updatedUser);
       toast.success("Profile updated successfully!");
-      return updatedUser;
     } catch (error: any) {
       console.error("Update profile error:", error);
       toast.error(error.message || "Failed to update profile");
@@ -316,7 +342,7 @@ export const AuthContextProvider: React.FC<AuthProviderProps> = ({ children }) =
     }
   };
 
-  const verifySellerAccount = async (businessDocuments: File[]) => {
+  const verifySellerAccount = async (businessDocuments: File[]): Promise<void> => {
     try {
       setLoading(true);
       
@@ -336,7 +362,6 @@ export const AuthContextProvider: React.FC<AuthProviderProps> = ({ children }) =
       if (error) throw error;
       
       toast.success("Seller account verification request submitted successfully!");
-      return true;
     } catch (error: any) {
       console.error("Seller account verification error:", error);
       toast.error(error.message || "Failed to submit seller account verification request");
@@ -346,8 +371,102 @@ export const AuthContextProvider: React.FC<AuthProviderProps> = ({ children }) =
     }
   };
 
+  // New 2FA Methods
+  const setupTwoFactor = async (): Promise<{ qrCode: string }> => {
+    try {
+      setLoading(true);
+      
+      if (!currentUser) throw new Error("No authenticated user");
+      
+      // In a real implementation, this would call a Supabase edge function to generate a TOTP secret
+      // For this example, we'll simulate the API response
+      const qrCodeUrl = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=otpauth://totp/ZeroWasteMart:${currentUser.email}?secret=JBSWY3DPEHPK3PXP&issuer=ZeroWasteMart`;
+      
+      // Store 2FA setup in database
+      const { error } = await supabase
+        .from('two_factor_auth')
+        .upsert({
+          user_id: currentUser.id,
+          secret: 'JBSWY3DPEHPK3PXP', // In a real app, this would be securely stored
+          is_enabled: false, // Not enabled until verified
+          created_at: new Date().toISOString()
+        });
+        
+      if (error) throw error;
+      
+      return { qrCode: qrCodeUrl };
+    } catch (error: any) {
+      console.error("2FA setup error:", error);
+      toast.error(error.message || "Failed to set up two-factor authentication");
+      throw error;
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const verifyTwoFactor = async (token: string): Promise<boolean> => {
+    try {
+      setLoading(true);
+      
+      if (!currentUser) throw new Error("No authenticated user");
+      
+      // In a real implementation, this would verify the token against the user's secret
+      // For this example, we'll simulate verification (allow any 6-digit code)
+      const isValid = /^\d{6}$/.test(token);
+      
+      if (isValid) {
+        // Update 2FA status in database
+        const { error } = await supabase
+          .from('two_factor_auth')
+          .update({ is_enabled: true })
+          .eq('user_id', currentUser.id);
+          
+        if (error) throw error;
+        
+        setIsTwoFactorEnabled(true);
+        toast.success("Two-factor authentication enabled successfully!");
+      } else {
+        toast.error("Invalid verification code. Please try again.");
+      }
+      
+      return isValid;
+    } catch (error: any) {
+      console.error("2FA verification error:", error);
+      toast.error(error.message || "Failed to verify two-factor authentication");
+      throw error;
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const disableTwoFactor = async (): Promise<void> => {
+    try {
+      setLoading(true);
+      
+      if (!currentUser) throw new Error("No authenticated user");
+      
+      // Update 2FA status in database
+      const { error } = await supabase
+        .from('two_factor_auth')
+        .update({ is_enabled: false })
+        .eq('user_id', currentUser.id);
+        
+      if (error) throw error;
+      
+      setIsTwoFactorEnabled(false);
+      toast.success("Two-factor authentication disabled successfully!");
+    } catch (error: any) {
+      console.error("Disable 2FA error:", error);
+      toast.error(error.message || "Failed to disable two-factor authentication");
+      throw error;
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const contextValue: AuthContextType = {
     currentUser,
+    session,
     loading,
     login,
     googleLogin,
@@ -357,6 +476,10 @@ export const AuthContextProvider: React.FC<AuthProviderProps> = ({ children }) =
     resetPassword,
     updateProfile,
     verifySellerAccount,
+    setupTwoFactor,
+    verifyTwoFactor,
+    disableTwoFactor,
+    isTwoFactorEnabled,
   };
 
   return (

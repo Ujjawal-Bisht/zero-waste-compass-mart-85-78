@@ -7,7 +7,11 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/auth';
 import { toast } from 'sonner';
 
-export const LogoutButton: React.FC = () => {
+interface LogoutButtonProps {
+  className?: string;
+}
+
+export const LogoutButton: React.FC<LogoutButtonProps> = ({ className }) => {
   const { logout } = useAuth();
   const navigate = useNavigate();
 
@@ -25,6 +29,7 @@ export const LogoutButton: React.FC = () => {
     <motion.div
       whileHover={{ x: 5, backgroundColor: "rgba(239, 68, 68, 0.2)" }}
       whileTap={{ scale: 0.95 }}
+      className={className}
     >
       <Button 
         className="w-full justify-start text-white hover:bg-white hover:bg-opacity-10 logout-button" 
