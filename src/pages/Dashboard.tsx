@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useToast } from "@/components/ui/use-toast";
-import mockItems from '@/data/mockData';
+import { mockItems } from '@/data/mockData'; // <-- changed this line to named import
 import { Item, ItemStatus } from '@/types';
 
 // Dashboard Components
