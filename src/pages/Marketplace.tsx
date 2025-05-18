@@ -4,7 +4,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { ShoppingCart, Filter, PackageOpen, Clock } from 'lucide-react';
+import { ShoppingCart, Filter, PackageOpen, Clock, Star } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useCart } from '@/hooks/useCart';
 import { supabase } from '@/integrations/supabase/client';
@@ -21,9 +21,10 @@ type Product = {
   image: string;
   expiryDate: string;
   discountPercentage?: number;
+  inStock?: boolean;
 };
 
-// This will be replaced with real data from Supabase when available
+// Expanded product list with more categories
 const mockProducts: Product[] = [
   {
     id: uuidv4(),
@@ -34,7 +35,8 @@ const mockProducts: Product[] = [
     sellerId: 'seller-1',
     rating: 4.5,
     image: 'https://images.unsplash.com/photo-1570913149827-d2ac84ab3f9a?q=80&w=100',
-    expiryDate: '2025-05-27'
+    expiryDate: '2025-05-27',
+    inStock: true
   },
   {
     id: uuidv4(),
@@ -45,7 +47,8 @@ const mockProducts: Product[] = [
     sellerId: 'seller-2',
     rating: 4.2,
     image: 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?q=80&w=100',
-    expiryDate: '2026-12-31'
+    expiryDate: '2026-12-31',
+    inStock: true
   },
   {
     id: uuidv4(),
@@ -56,7 +59,8 @@ const mockProducts: Product[] = [
     sellerId: 'seller-3',
     rating: 4.3,
     image: 'https://images.unsplash.com/photo-1563636619-e9143da7973b?q=80&w=100',
-    expiryDate: '2025-05-19'
+    expiryDate: '2025-05-19',
+    inStock: true
   },
   {
     id: uuidv4(),
@@ -67,8 +71,10 @@ const mockProducts: Product[] = [
     sellerId: 'seller-4',
     rating: 4.7,
     image: 'https://images.unsplash.com/photo-1546868871-7041f2a55e12?q=80&w=100',
-    expiryDate: '2026-10-15'
+    expiryDate: '2026-10-15',
+    inStock: true
   },
+  // New products in existing categories
   {
     id: uuidv4(),
     name: 'Organic Bananas',
@@ -78,7 +84,8 @@ const mockProducts: Product[] = [
     sellerId: 'seller-1',
     rating: 4.4,
     image: 'https://images.unsplash.com/photo-1543218024-57a70143c369?q=80&w=100',
-    expiryDate: '2025-05-22'
+    expiryDate: '2025-05-22',
+    inStock: true
   },
   {
     id: uuidv4(),
@@ -89,7 +96,8 @@ const mockProducts: Product[] = [
     sellerId: 'seller-5',
     rating: 4.6,
     image: 'https://images.unsplash.com/photo-1618354691373-d851c5c3a990?q=80&w=100',
-    expiryDate: '2026-05-15'
+    expiryDate: '2026-05-15',
+    inStock: true
   },
   {
     id: uuidv4(),
@@ -100,7 +108,8 @@ const mockProducts: Product[] = [
     sellerId: 'seller-6',
     rating: 4.8,
     image: 'https://images.unsplash.com/photo-1531346878377-a5be20888e57?q=80&w=100',
-    expiryDate: '2026-12-31'
+    expiryDate: '2026-12-31',
+    inStock: true
   },
   {
     id: uuidv4(),
@@ -111,7 +120,57 @@ const mockProducts: Product[] = [
     sellerId: 'seller-7',
     rating: 4.9,
     image: 'https://images.unsplash.com/photo-1602143407151-7111542de6e8?q=80&w=100',
-    expiryDate: '2026-12-31'
+    expiryDate: '2026-12-31',
+    inStock: true
+  },
+  // New products with new categories
+  {
+    id: uuidv4(),
+    name: 'Yoga Mat',
+    price: 1499,
+    category: 'Sports',
+    seller: 'Fitness Gear',
+    sellerId: 'seller-8',
+    rating: 4.7,
+    image: 'https://images.unsplash.com/photo-1592432678016-e910b452f9a2?q=80&w=100',
+    expiryDate: '2026-12-31',
+    inStock: true
+  },
+  {
+    id: uuidv4(),
+    name: 'Essential Oil Diffuser',
+    price: 1999,
+    category: 'Wellness',
+    seller: 'Aroma Haven',
+    sellerId: 'seller-9',
+    rating: 4.8,
+    image: 'https://images.unsplash.com/photo-1608571423902-eed4a5ad8108?q=80&w=100',
+    expiryDate: '2026-12-31',
+    inStock: true
+  },
+  {
+    id: uuidv4(),
+    name: 'Indoor Plants Set',
+    price: 1299,
+    category: 'Garden',
+    seller: 'Green Thumb',
+    sellerId: 'seller-10',
+    rating: 4.6,
+    image: 'https://images.unsplash.com/photo-1491147334573-44cbb4602074?q=80&w=100',
+    expiryDate: '2025-07-15',
+    inStock: true
+  },
+  {
+    id: uuidv4(),
+    name: 'Handmade Soap Set',
+    price: 599,
+    category: 'Beauty',
+    seller: 'Natural Essence',
+    sellerId: 'seller-11',
+    rating: 4.9,
+    image: 'https://images.unsplash.com/photo-1600857544200-b2f666a9a2ec?q=80&w=100',
+    expiryDate: '2026-03-10',
+    inStock: true
   }
 ];
 
@@ -121,6 +180,9 @@ const Marketplace: React.FC = () => {
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const { addToCart } = useCart();
+
+  // Get all unique categories from products
+  const categories = ['all', ...Array.from(new Set(mockProducts.map(p => p.category.toLowerCase())))];
 
   // Fetch products from Supabase (simulated for now)
   useEffect(() => {
@@ -265,85 +327,33 @@ const Marketplace: React.FC = () => {
       
       <Tabs defaultValue="all" className="mb-8">
         <TabsList className="mb-8 overflow-x-auto flex whitespace-nowrap p-1 bg-gradient-to-r from-purple-50 to-indigo-50 rounded-lg">
-          <TabsTrigger value="all" className="tab-animate">All</TabsTrigger>
-          <TabsTrigger value="food" className="tab-animate">Food</TabsTrigger>
-          <TabsTrigger value="electronics" className="tab-animate">Electronics</TabsTrigger>
-          <TabsTrigger value="clothing" className="tab-animate">Clothing</TabsTrigger>
-          <TabsTrigger value="household" className="tab-animate">Household</TabsTrigger>
+          {categories.map((category) => (
+            <TabsTrigger 
+              key={category}
+              value={category} 
+              className="tab-animate capitalize"
+            >
+              {category}
+            </TabsTrigger>
+          ))}
         </TabsList>
         
-        <TabsContent value="all" className="mt-6">
-          <motion.div 
-            className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6"
-            variants={containerVariants}
-            initial="hidden"
-            animate="visible"
-          >
-            {products.map(product => (
-              <ProductCard key={product.id} product={product} onAddToCart={handleAddToCart} />
-            ))}
-          </motion.div>
-        </TabsContent>
-        
-        <TabsContent value="food" className="mt-6">
-          <motion.div 
-            className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6"
-            variants={containerVariants}
-            initial="hidden"
-            animate="visible"
-          >
-            {products
-              .filter(p => p.category.toLowerCase() === 'food')
-              .map(product => (
-                <ProductCard key={product.id} product={product} onAddToCart={handleAddToCart} />
-              ))}
-          </motion.div>
-        </TabsContent>
-        
-        <TabsContent value="electronics" className="mt-6">
-          <motion.div 
-            className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6"
-            variants={containerVariants}
-            initial="hidden"
-            animate="visible"
-          >
-            {products
-              .filter(p => p.category.toLowerCase() === 'electronics')
-              .map(product => (
-                <ProductCard key={product.id} product={product} onAddToCart={handleAddToCart} />
-              ))}
-          </motion.div>
-        </TabsContent>
-        
-        <TabsContent value="clothing" className="mt-6">
-          <motion.div 
-            className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6"
-            variants={containerVariants}
-            initial="hidden"
-            animate="visible"
-          >
-            {products
-              .filter(p => p.category.toLowerCase() === 'clothing')
-              .map(product => (
-                <ProductCard key={product.id} product={product} onAddToCart={handleAddToCart} />
-              ))}
-          </motion.div>
-        </TabsContent>
-        
-        <TabsContent value="household" className="mt-6">
-          <motion.div 
-            className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6"
-            variants={containerVariants}
-            initial="hidden"
-            animate="visible"
-          >
-            {products
-              .filter(p => p.category.toLowerCase() === 'household')
-              .map(product => (
-                <ProductCard key={product.id} product={product} onAddToCart={handleAddToCart} />
-              ))}
-          </motion.div>
-        </TabsContent>
+        {categories.map((category) => (
+          <TabsContent key={category} value={category} className="mt-6">
+            <motion.div 
+              className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6"
+              variants={containerVariants}
+              initial="hidden"
+              animate="visible"
+            >
+              {products
+                .filter(p => category === 'all' || p.category.toLowerCase() === category)
+                .map(product => (
+                  <ProductCard key={product.id} product={product} onAddToCart={handleAddToCart} />
+                ))}
+            </motion.div>
+          </TabsContent>
+        ))}
       </Tabs>
     </div>
   );
@@ -437,7 +447,12 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, onAddToCart }) => {
               )}
             </div>
             <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}>
-              <Button size="sm" onClick={() => onAddToCart(product)} className="bg-gradient-to-r from-indigo-500 to-purple-500 hover:from-indigo-600 hover:to-purple-600 text-white">
+              <Button 
+                size="sm" 
+                onClick={() => onAddToCart(product)} 
+                disabled={!product.inStock}
+                className="bg-gradient-to-r from-indigo-500 to-purple-500 hover:from-indigo-600 hover:to-purple-600 text-white"
+              >
                 <ShoppingCart className="h-4 w-4 mr-1" /> Add
               </Button>
             </motion.div>

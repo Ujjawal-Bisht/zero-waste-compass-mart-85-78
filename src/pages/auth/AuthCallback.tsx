@@ -50,15 +50,24 @@ const AuthCallback = () => {
         
         console.log("Successfully exchanged code for session", data.session);
         
-        // Determine if user is a seller - first check URL parameter, then session metadata
-        // This ensures the user's selection on the login page takes precedence
-        const userIsSeller = isSeller || 
-                           data.session.user?.user_metadata?.is_seller === true;
+        // FIXED: Properly handle seller status from URL parameter to take precedence
+        let userIsSeller = false;
+        
+        // First check URL parameter (this takes precedence)
+        if (isSeller) {
+          userIsSeller = true;
+          console.log("User is seller based on URL parameter");
+        } 
+        // Then check session metadata if URL parameter wasn't set
+        else if (data.session.user?.user_metadata?.is_seller === true) {
+          userIsSeller = true;
+          console.log("User is seller based on session metadata");
+        }
         
         console.log("Final seller status:", userIsSeller);
 
         // Store the seller status in the session if it came from URL
-        if (isSeller && !data.session.user?.user_metadata?.is_seller) {
+        if (userIsSeller && !data.session.user?.user_metadata?.is_seller) {
           try {
             await supabase.auth.updateUser({
               data: { is_seller: true }

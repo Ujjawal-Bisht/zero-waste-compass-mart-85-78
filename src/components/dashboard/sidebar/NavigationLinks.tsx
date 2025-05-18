@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '@/contexts/auth';
@@ -14,7 +13,10 @@ import {
   Shield,
   User,
   Zap,
-  BookOpen
+  BookOpen,
+  Heart,
+  Tag,
+  Coffee
 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
@@ -35,12 +37,13 @@ const NavigationLinks: React.FC<NavigationLinksProps> = ({ isSeller, onItemClick
   const activeClass = "bg-gradient-to-r from-zwm-primary/15 to-zwm-secondary/15 text-zwm-primary font-medium";
   const inactiveClass = "text-gray-100 hover:bg-white/10";
 
+  // Improved buyer menu sections with better organization and additional categories
   const buyerMenuSections = [
     {
       title: "Main Navigation",
       items: [
         { path: "/dashboard", icon: <Home size={18} />, label: "Dashboard" },
-        { path: "/marketplace", icon: <Store size={18} />, label: "Marketplace" },
+        { path: "/marketplace", icon: <Store size={18} />, label: "Marketplace", highlight: true },
         { path: "/orders", icon: <Box size={18} />, label: "My Orders" },
       ]
     },
@@ -48,14 +51,17 @@ const NavigationLinks: React.FC<NavigationLinksProps> = ({ isSeller, onItemClick
       title: "Shopping",
       items: [
         { path: "/cart", icon: <ShoppingCart size={18} />, label: "Shopping Cart" },
-        { path: "/profile", icon: <User size={18} />, label: "My Profile" },
+        { path: "/favorites", icon: <Heart size={18} />, label: "Saved Items" },
+        { path: "/deals", icon: <Tag size={18} />, label: "Special Deals" },
       ]
     },
     {
       title: "Features",
       items: [
+        { path: "/profile", icon: <User size={18} />, label: "My Profile" },
         { path: "/chat", icon: <MessageSquare size={18} />, label: "Support Chat" },
-        { path: "/advanced-features", icon: <Sparkles size={18} />, label: "Advanced Features", highlight: true },
+        { path: "/advanced-features", icon: <Sparkles size={18} />, label: "Premium Features", highlight: true },
+        { path: "/community", icon: <Coffee size={18} />, label: "Community" },
       ]
     },
   ];
