@@ -1,13 +1,13 @@
+
 import { toast } from 'sonner';
 import { MessageCategory } from '@/types/chat';
 import { useState } from 'react';
 
 interface UseSettingsProps {
-  sellerMode: boolean;
   addBotMessage: (content: string, category?: MessageCategory, metadata?: any) => void;
 }
 
-export function useSettings(sellerMode: boolean, addBotMessage: UseSettingsProps['addBotMessage']) {
+export function useSettings({ addBotMessage }: UseSettingsProps) {
   const [showSettings, setShowSettings] = useState(false);
   const [realtimeActive, setRealtimeActive] = useState(true);
 
@@ -17,7 +17,7 @@ export function useSettings(sellerMode: boolean, addBotMessage: UseSettingsProps
     toast.success(`${newMode ? 'Enabled' : 'Disabled'} real-time response mode`);
   };
   
-  const clearChat = () => {
+  const clearChat = (sellerMode: boolean) => {
     // Re-add welcome message
     setTimeout(() => {
       addBotMessage(

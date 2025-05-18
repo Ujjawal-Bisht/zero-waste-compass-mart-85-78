@@ -17,7 +17,7 @@ export function useZeroBot(initialPrompt?: string, sellerMode = false) {
   const uiState = useUIState();
   const search = useSearch(chatMessages.messages);
   const voiceRecording = useVoiceRecording();
-  const settings = useSettings(sellerMode, chatMessages.addBotMessage);
+  const settings = useSettings({ addBotMessage: chatMessages.addBotMessage });
   
   // Create combined message handling hook with all dependencies
   const messageHandling = useMessageHandling({
@@ -29,10 +29,13 @@ export function useZeroBot(initialPrompt?: string, sellerMode = false) {
     setStreamedResponse: chatMessages.setStreamedResponse,
     setCurrentContext: chatMessages.setCurrentContext,
     isProcessing: chatMessages.isProcessing,
-    realtimeActive: uiState.realtimeActive,
+    realtimeActive: settings.realtimeActive,
     currentContext: chatMessages.currentContext,
     setSuggestions: chatMessages.setSuggestions,
   });
+  
+  // Combine the clear chat function with seller mode
+  const clearChat = () => settings.clearChat(sellerMode);
   
   return {
     // Messages and content
@@ -49,6 +52,7 @@ export function useZeroBot(initialPrompt?: string, sellerMode = false) {
     
     // Settings
     ...settings,
+    clearChat,
     
     // Message handling
     ...messageHandling,
