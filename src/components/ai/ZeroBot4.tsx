@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { AnimatePresence } from 'framer-motion';
-import { TabsContent } from '@/components/ui/tabs';
+import { Tabs, TabsContent } from '@/components/ui/tabs';
 import { useZeroBot } from './hooks/useZeroBot';
 import ZeroBotButton from './components/ZeroBotButton';
 import ZeroBotHeader from './components/ZeroBotHeader';
@@ -97,50 +97,52 @@ const ZeroBot4: React.FC<ZeroBot4Props> = ({
             
             {/* Content */}
             <div className="flex-1 flex flex-col overflow-hidden">
-              <TabsContent value="chat" className="flex-1 overflow-hidden flex flex-col mt-0 p-0">
-                <ZeroBotChatContent
-                  messages={bot.messages}
-                  filteredMessages={bot.filteredMessages}
-                  searchQuery={bot.searchQuery}
-                  setSearchQuery={bot.setSearchQuery}
-                  isSearching={bot.isSearching}
-                  toggleSearch={bot.toggleSearch}
-                  isProcessing={bot.isProcessing}
-                  streamedResponse={bot.streamedResponse}
-                  currentContext={bot.currentContext}
-                  sellerMode={sellerMode}
-                  inputValue={bot.inputValue}
-                  setInputValue={bot.setInputValue}
-                  suggestions={bot.suggestions}
-                  messagesEndRef={bot.messagesEndRef}
-                  currentUser={bot.currentUser}
-                  handleSendMessage={bot.handleSendMessage}
-                  handleKeyPress={bot.handleKeyPress}
-                  handleMessageReaction={bot.handleMessageReaction}
-                  cancelCurrentStream={bot.cancelCurrentStream}
-                  startRecording={enableVoice ? bot.startRecording : () => {}}
-                  stopRecording={bot.stopRecording}
-                  isRecording={bot.isRecording}
-                  handleSuggestionClick={bot.handleSuggestionClick}
-                />
-              </TabsContent>
-              
-              <TabsContent value="help" className="flex-1 overflow-auto mt-0 p-0">
-                <HelpTab
-                  helpTopics={helpTopics}
-                  sellerMode={sellerMode}
-                  onGetStartedClick={bot.handleGetStartedClick}
-                  onTopicClick={bot.handleTopicClick}
-                />
-              </TabsContent>
-              
-              <TabsContent value="analytics" className="flex-1 overflow-auto mt-0 p-0">
-                <AnalyticsTab
-                  mockAnalytics={mockAnalytics}
-                  sellerMode={sellerMode}
-                  onReturn={() => bot.setActiveTab('chat')}
-                />
-              </TabsContent>
+              <Tabs value={bot.activeTab}>
+                <TabsContent value="chat" className="flex-1 overflow-hidden flex flex-col mt-0 p-0">
+                  <ZeroBotChatContent
+                    messages={bot.messages}
+                    filteredMessages={bot.filteredMessages}
+                    searchQuery={bot.searchQuery}
+                    setSearchQuery={bot.setSearchQuery}
+                    isSearching={bot.isSearching}
+                    toggleSearch={bot.toggleSearch}
+                    isProcessing={bot.isProcessing}
+                    streamedResponse={bot.streamedResponse}
+                    currentContext={bot.currentContext}
+                    sellerMode={sellerMode}
+                    inputValue={bot.inputValue}
+                    setInputValue={bot.setInputValue}
+                    suggestions={bot.suggestions}
+                    messagesEndRef={bot.messagesEndRef}
+                    currentUser={bot.currentUser}
+                    handleSendMessage={bot.handleSendMessage}
+                    handleKeyPress={bot.handleKeyPress}
+                    handleMessageReaction={bot.handleMessageReaction}
+                    cancelCurrentStream={bot.cancelCurrentStream}
+                    startRecording={enableVoice ? bot.startRecording : () => {}}
+                    stopRecording={bot.stopRecording}
+                    isRecording={bot.isRecording}
+                    handleSuggestionClick={bot.handleSuggestionClick}
+                  />
+                </TabsContent>
+                
+                <TabsContent value="help" className="flex-1 overflow-auto mt-0 p-0">
+                  <HelpTab
+                    helpTopics={helpTopics}
+                    sellerMode={sellerMode}
+                    onGetStartedClick={bot.handleGetStartedClick}
+                    onTopicClick={bot.handleTopicClick}
+                  />
+                </TabsContent>
+                
+                <TabsContent value="analytics" className="flex-1 overflow-auto mt-0 p-0">
+                  <AnalyticsTab
+                    mockAnalytics={mockAnalytics}
+                    sellerMode={sellerMode}
+                    onReturn={() => bot.setActiveTab('chat')}
+                  />
+                </TabsContent>
+              </Tabs>
             </div>
             
             {/* Settings panel */}
