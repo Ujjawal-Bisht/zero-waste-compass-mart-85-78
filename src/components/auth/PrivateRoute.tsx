@@ -2,12 +2,13 @@
 import { Navigate, Outlet } from "react-router-dom";
 import { useAuth } from "@/contexts/auth";
 import { Loader2 } from "lucide-react";
+import React from "react";
 
 interface PrivateRouteProps {
   children?: React.ReactNode;
 }
 
-const PrivateRoute = ({ children }: PrivateRouteProps) => {
+const PrivateRoute: React.FC<PrivateRouteProps> = ({ children }) => {
   const { currentUser, loading } = useAuth();
 
   if (loading) {

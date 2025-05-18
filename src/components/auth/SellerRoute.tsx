@@ -2,12 +2,13 @@
 import { Navigate, Outlet } from "react-router-dom";
 import { useAuth } from "@/contexts/auth";
 import { Loader2 } from "lucide-react";
+import React from "react";
 
 interface SellerRouteProps {
   children?: React.ReactNode;
 }
 
-const SellerRoute = ({ children }: SellerRouteProps) => {
+const SellerRoute: React.FC<SellerRouteProps> = ({ children }) => {
   const { currentUser, loading } = useAuth();
 
   if (loading) {

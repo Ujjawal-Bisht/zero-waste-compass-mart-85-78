@@ -2,7 +2,7 @@
 import React from 'react';
 import { Outlet, Navigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/auth';
-import { Leaf } from 'lucide-react';
+import { Loader2 } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 const AuthLayout: React.FC = () => {
@@ -42,7 +42,7 @@ const AuthLayout: React.FC = () => {
         />
       </div>
       
-      <div className="py-12 sm:px-6 lg:px-8 z-10">
+      <div className="py-12 sm:px-6 lg:px-8 z-10 w-full">
         <Outlet />
       </div>
     </div>

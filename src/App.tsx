@@ -32,42 +32,44 @@ function App() {
   return (
     <AuthProvider>
       <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<Index />} />
-          <Route element={<AuthLayout />}>
-            <Route path="/login" element={<Login />} />
-            <Route path="/register" element={<Register />} />
-          </Route>
-          <Route path="/auth/callback" element={<AuthCallback />} />
+        <div className="app-container">
+          <Routes>
+            <Route path="/" element={<Index />} />
+            <Route element={<AuthLayout />}>
+              <Route path="/login" element={<Login />} />
+              <Route path="/register" element={<Register />} />
+            </Route>
+            <Route path="/auth/callback" element={<AuthCallback />} />
 
-          <Route element={<PrivateRoute />}>
-            <Route element={<DashboardLayout />}>
-              <Route path="/dashboard" element={<Dashboard />} />
-              <Route path="/profile" element={<Profile />} />
-              <Route path="/marketplace" element={<Marketplace />} />
-              <Route path="/cart" element={<Cart />} />
-              <Route path="/orders" element={<MyOrders />} />
-              <Route path="/advanced-features" element={<AdvancedFeatures />} />
+            <Route element={<PrivateRoute />}>
+              <Route element={<DashboardLayout />}>
+                <Route path="/dashboard" element={<Dashboard />} />
+                <Route path="/profile" element={<Profile />} />
+                <Route path="/marketplace" element={<Marketplace />} />
+                <Route path="/cart" element={<Cart />} />
+                <Route path="/orders" element={<MyOrders />} />
+                <Route path="/advanced-features" element={<AdvancedFeatures />} />
 
-              <Route element={<SellerRoute />}>
-                <Route path="/seller/dashboard" element={<SellerDashboard />} />
-                <Route path="/seller/profile" element={<SellerProfile />} />
-                <Route path="/seller/products" element={<SellerProducts />} />
-                <Route path="/seller/orders" element={<SellerOrders />} />
-                <Route path="/items/add" element={<AddItem />} />
-              </Route>
+                <Route element={<SellerRoute />}>
+                  <Route path="/seller/dashboard" element={<SellerDashboard />} />
+                  <Route path="/seller/profile" element={<SellerProfile />} />
+                  <Route path="/seller/products" element={<SellerProducts />} />
+                  <Route path="/seller/orders" element={<SellerOrders />} />
+                  <Route path="/items/add" element={<AddItem />} />
+                </Route>
 
-              <Route element={<AdminRoute />}>
-                <Route path="/admin/panel" element={<AdminPanel />} />
+                <Route element={<AdminRoute />}>
+                  <Route path="/admin/panel" element={<AdminPanel />} />
+                </Route>
               </Route>
             </Route>
-          </Route>
 
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-        
-        <Toaster richColors />
-        <ZeroBot />
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+          
+          <Toaster richColors />
+          <ZeroBot />
+        </div>
       </BrowserRouter>
     </AuthProvider>
   );

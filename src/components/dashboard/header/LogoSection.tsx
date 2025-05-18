@@ -18,9 +18,9 @@ const LogoSection: React.FC<LogoSectionProps> = ({ isMobile = false }) => {
 
   if (isMobile) {
     return (
-      <div className="flex items-center lg:hidden">
+      <div className="flex items-center w-full gap-3 lg:hidden">
         <motion.div 
-          className="cursor-pointer navbar-item" 
+          className="cursor-pointer navbar-item flex-shrink-0" 
           onClick={goToHome}
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
@@ -33,9 +33,9 @@ const LogoSection: React.FC<LogoSectionProps> = ({ isMobile = false }) => {
   }
 
   return (
-    <div className="hidden lg:flex items-center space-x-6">
+    <div className="hidden lg:flex items-center gap-6">
       <motion.div 
-        className="cursor-pointer navbar-item" 
+        className="cursor-pointer navbar-item flex-shrink-0" 
         onClick={goToHome}
         whileHover={{ scale: 1.05 }}
         whileTap={{ scale: 0.95 }}

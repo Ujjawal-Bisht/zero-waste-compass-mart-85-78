@@ -5,12 +5,12 @@ import LoginCard from '@/components/auth/LoginComponents/LoginCard';
 
 const Login: React.FC = () => {
   return (
-    <div className="flex items-center justify-center min-h-screen relative px-4">
+    <div className="flex items-center justify-center w-full min-h-full relative px-4 py-8">
       {/* Enhanced animated background */}
       <Background />
       
       {/* Center the login card with flex */}
-      <div className="flex items-center justify-center w-full">
+      <div className="flex items-center justify-center w-full z-10">
         <LoginCard />
       </div>
     </div>
