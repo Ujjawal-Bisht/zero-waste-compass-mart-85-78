@@ -1,4 +1,3 @@
-
 import { MessageCategory, Message } from '@/types/chat';
 import { debounce } from 'lodash';
 import { toast } from 'sonner';
@@ -379,12 +378,25 @@ class ZeroBotAIService {
     try {
       const detectedCategory = category || this.detectMessageContext(query);
       
+      // Modified to use console log instead of directly inserting to a table
+      // that might not exist yet
+      console.log("User interaction logged:", {
+        user_id: userId,
+        query: query,
+        category: detectedCategory,
+        timestamp: new Date().toISOString()
+      });
+      
+      // In a production environment, you would uncomment this code
+      // after creating the ai_interactions table in Supabase
+      /*
       await supabase.from('ai_interactions').insert({
         user_id: userId,
         query: query,
         category: detectedCategory,
         timestamp: new Date().toISOString()
       });
+      */
     } catch (error) {
       console.error("Failed to log user interaction:", error);
       // Non-critical error, don't throw
