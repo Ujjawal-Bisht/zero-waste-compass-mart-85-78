@@ -18,6 +18,10 @@ const AuthCallback = () => {
         
         // Get the URL parameters
         const code = searchParams.get('code');
+        // Check if the user is a seller directly from URL
+        const isSeller = searchParams.get('is_seller') === 'true';
+        
+        console.log("Is seller from URL:", isSeller);
         
         if (!code) {
           console.error("No code found in URL");
@@ -46,16 +50,31 @@ const AuthCallback = () => {
         
         console.log("Successfully exchanged code for session", data.session);
         
-        // Check if user is a seller from the session or URL parameter
-        const isSeller = data.session.user?.user_metadata?.is_seller === true || 
-                        searchParams.get('is_seller') === 'true';
+        // Determine if user is a seller - first check URL parameter, then session metadata
+        // This ensures the user's selection on the login page takes precedence
+        const userIsSeller = isSeller || 
+                           data.session.user?.user_metadata?.is_seller === true;
         
-        console.log("Is seller account:", isSeller);
+        console.log("Final seller status:", userIsSeller);
+
+        // Store the seller status in the session if it came from URL
+        if (isSeller && !data.session.user?.user_metadata?.is_seller) {
+          try {
+            await supabase.auth.updateUser({
+              data: { is_seller: true }
+            });
+            console.log("Updated user metadata with seller status");
+          } catch (updateError) {
+            console.error("Failed to update user metadata:", updateError);
+          }
+        }
         
-        // Redirect based on user role
-        if (isSeller) {
+        // Redirect based on determined role
+        if (userIsSeller) {
+          console.log("Redirecting to seller dashboard");
           navigate('/seller/dashboard');
         } else {
+          console.log("Redirecting to buyer dashboard");
           navigate('/dashboard');
         }
       } catch (error: any) {

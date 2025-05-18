@@ -66,6 +66,7 @@ function App() {
                 <Route path="/profile" element={<Profile />} />
                 <Route path="/orders" element={<MyOrders />} />
                 <Route path="/cart" element={<Cart />} />
+                <Route path="/advanced-features" element={<AdvancedFeatures />} />
                 
                 {/* Only show Add Item for sellers */}
                 <Route path="/items/add" element={
@@ -85,24 +86,13 @@ function App() {
                     </Routes>
                   </SellerRoute>
                 } />
-                
-                {/* Advanced Features */}
-                <Route path="/advanced-features" element={<AdvancedFeatures />} />
               </Route>
               
               {/* Admin Routes */}
               <Route element={<AdminRoute><DashboardLayout /></AdminRoute>}>
                 <Route path="/admin" element={<AdminPanel />} />
+                <Route path="/admin/panel" element={<AdminPanel />} />
               </Route>
-              
-              {/* Admin Panel */}
-              <Route path="/admin/panel" element={
-                <AdminRoute>
-                  <DashboardLayout>
-                    <AdminPanel />
-                  </DashboardLayout>
-                </AdminRoute>
-              } />
               
               {/* Catch-all Route */}
               <Route path="*" element={<NotFound />} />
