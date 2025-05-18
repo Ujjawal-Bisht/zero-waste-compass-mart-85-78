@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/auth';
 import { toast } from 'sonner';
@@ -5,9 +6,10 @@ import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar"
 import { Button } from '@/components/ui/button';
 import { Edit, Check, User, Bell, Link2, Save } from 'lucide-react';
 import { motion } from 'framer-motion';
-import PersonalInfoForm from './PersonalInfoForm';
-import NotificationPreferences from './NotificationPreferences';
-import SocialMediaConnections from './SocialMediaConnections';
+// FIXED IMPORTS:
+import PersonalInfoForm from './profile/PersonalInfoForm';
+import NotificationPreferences from './profile/NotificationPreferences';
+import SocialMediaConnections from './profile/SocialMediaConnections';
 
 const Profile: React.FC = () => {
   const { currentUser, updateProfile } = useAuth();
