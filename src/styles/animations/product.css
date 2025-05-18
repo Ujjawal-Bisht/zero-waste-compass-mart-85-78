@@ -1,151 +1,112 @@
 
-/* Add the following new animations to the existing product.css file */
+/* Product-specific animations */
 
-/* New product card animations */
-.product-card-enhanced {
-  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+/* Product card hover effect */
+.product-card {
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.product-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+}
+
+/* Table row animations */
+.table-row-animate {
+  transition: background-color 0.2s, transform 0.2s, box-shadow 0.3s;
+}
+
+/* Badge animations */
+.badge-animate {
+  transition: all 0.3s ease;
+}
+
+.badge-animate:hover {
+  transform: scale(1.05);
+  filter: brightness(1.1);
+}
+
+/* Menu icon animations */
+.menu-icon {
+  transition: transform 0.3s ease;
+}
+
+.menu-icon:hover {
+  transform: rotate(90deg);
+}
+
+/* Product image animations */
+.product-image-hover {
+  transition: transform 0.3s ease;
+}
+
+.product-image-hover:hover {
+  transform: scale(1.05);
+  z-index: 10;
+}
+
+/* Table dropdown content animations */
+.table-dropdown-content {
+  animation: dropdownFadeIn 0.2s ease-out;
+}
+
+@keyframes dropdownFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Button shimmer effect */
+.button-shimmer {
   position: relative;
   overflow: hidden;
 }
 
-.product-card-enhanced::before {
-  content: '';
+.button-shimmer::after {
+  content: "";
   position: absolute;
   top: -50%;
   left: -50%;
   width: 200%;
   height: 200%;
-  background: radial-gradient(circle, rgba(255,255,255,0.8) 0%, rgba(255,255,255,0) 70%);
-  transform: rotate(45deg);
-  opacity: 0;
-  transition: opacity 0.6s ease;
+  background: linear-gradient(
+    to right, 
+    rgba(255, 255, 255, 0) 0%,
+    rgba(255, 255, 255, 0.3) 50%,
+    rgba(255, 255, 255, 0) 100%
+  );
+  transform: rotate(30deg);
+  animation: shimmerEffect 3s infinite;
+  pointer-events: none;
 }
 
-.product-card-enhanced:hover::before {
-  opacity: 0.5;
-  animation: shimmerCard 1.5s ease-in-out;
-}
-
-@keyframes shimmerCard {
-  0% {
-    transform: translate(-100%, -100%) rotate(45deg);
-  }
-  100% {
-    transform: translate(100%, 100%) rotate(45deg);
-  }
-}
-
-/* Dynamic pricing animation */
-.price-dynamic {
-  position: relative;
-}
-
-.price-dynamic::after {
-  content: 'AI Priced';
-  position: absolute;
-  top: -20px;
-  right: 0;
-  font-size: 10px;
-  color: #7c3aed;
-  opacity: 0;
-  transition: opacity 0.3s ease;
-}
-
-.price-dynamic:hover::after {
-  opacity: 1;
-}
-
-/* Dynamic discount badge */
-.discount-badge {
-  animation: pulseBadge 2s infinite;
-  box-shadow: 0 0 0 rgba(239, 68, 68, 0.4);
-}
-
-@keyframes pulseBadge {
-  0% {
-    box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4);
-  }
-  70% {
-    box-shadow: 0 0 0 10px rgba(239, 68, 68, 0);
-  }
-  100% {
-    box-shadow: 0 0 0 0 rgba(239, 68, 68, 0);
-  }
-}
-
-/* Expiry date countdown animation */
-.expiry-countdown {
-  display: inline-flex;
-  align-items: center;
-  padding: 2px 6px;
-  background: linear-gradient(to right, #fcd34d, #f59e0b);
-  border-radius: 4px;
-  color: white;
-  font-size: 10px;
-  font-weight: 600;
-  position: relative;
-  overflow: hidden;
-}
-
-.expiry-countdown::before {
-  content: '';
-  position: absolute;
-  left: 0;
-  top: 0;
-  height: 100%;
-  width: 100%;
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
-  transform: translateX(-100%);
-  animation: shimmerExpiry 2s infinite;
-}
-
-@keyframes shimmerExpiry {
-  100% {
-    transform: translateX(100%);
-  }
-}
-
-/* Rupee symbol animation */
-.rupee-symbol {
-  display: inline-block;
-  margin-right: 2px;
-  animation: scaleRupee 2s infinite alternate;
-}
-
-@keyframes scaleRupee {
+@keyframes shimmerEffect {
   from {
-    transform: scale(1);
+    transform: rotate(30deg) translateX(-100%);
   }
   to {
-    transform: scale(1.1);
+    transform: rotate(30deg) translateX(100%);
   }
 }
 
-/* Improved filter button */
-.filter-button {
-  position: relative;
-  overflow: hidden;
-}
-
-.filter-button::after {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: -100%;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(139, 92, 246, 0.3), transparent);
-  animation: filterButtonShimmer 3s infinite;
-}
-
-@keyframes filterButtonShimmer {
+/* Dynamic pricing indicator pulse */
+@keyframes pricePulse {
   0% {
-    left: -100%;
+    box-shadow: 0 0 0 0 rgba(79, 70, 229, 0.4);
   }
-  50% {
-    left: 100%;
+  70% {
+    box-shadow: 0 0 0 10px rgba(79, 70, 229, 0);
   }
   100% {
-    left: 100%;
+    box-shadow: 0 0 0 0 rgba(79, 70, 229, 0);
   }
+}
+
+.dynamic-pricing-indicator {
+  animation: pricePulse 2s infinite;
 }

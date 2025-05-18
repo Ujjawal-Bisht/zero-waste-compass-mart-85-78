@@ -12,11 +12,13 @@ export interface User {
   verified?: boolean;
 }
 
+export type ItemCategory = 'food' | 'clothing' | 'electronics' | 'household' | 'furniture' | 'other';
+
 export interface Item {
   id: string;
   name: string;
   description: string;
-  category: 'food' | 'clothing' | 'electronics' | 'household' | 'other';
+  category: ItemCategory;
   imageUrl: string;
   expiryDate: string;
   createdAt: string;
@@ -27,13 +29,21 @@ export interface Item {
   userPhoto: string | null;
   quantity: number;
   currentPrice: number;
+  originalPrice?: number;
+  dynamicPricingEnabled?: boolean;
+  dynamicPricingSettings?: {
+    minPrice: number;
+    maxPrice: number;
+    strategy: string;
+    automaticAdjustment: boolean;
+  };
   location: {
     lat: number;
     lng: number;
     address: string;
-    city: string;
-    state: string;
-    zipCode: string;
+    city?: string;
+    state?: string;
+    zipCode?: string;
   };
 }
 
@@ -42,12 +52,14 @@ export type OrderStatus = 'pending' | 'processing' | 'shipped' | 'delivered' | '
 export interface Order {
   id: string;
   userId: string;
+  buyerId?: string;
   status: OrderStatus;
   totalAmount: number;
   items: OrderItem[];
   createdAt: string;
   updatedAt: string;
   buyerName?: string;
+  paymentStatus?: string;
 }
 
 export interface OrderItem {
@@ -78,4 +90,13 @@ export interface Notification {
   createdAt: string;
   link?: string;
   icon?: string;
+}
+
+export interface CartItem {
+  id: string;
+  productId: string;
+  quantity: number;
+  name: string;
+  price: number;
+  image: string;
 }
