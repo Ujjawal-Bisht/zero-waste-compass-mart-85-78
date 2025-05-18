@@ -15,14 +15,14 @@ import {
 } from 'lucide-react';
 
 interface NavigationLinksProps {
-  onNavItemClick?: () => void;
+  isSeller?: boolean;
+  onItemClick?: () => void;
 }
 
-const NavigationLinks: React.FC<NavigationLinksProps> = ({ onNavItemClick }) => {
+const NavigationLinks: React.FC<NavigationLinksProps> = ({ isSeller, onItemClick }) => {
   const location = useLocation();
   const { currentUser } = useAuth();
   const isActive = (path: string) => location.pathname === path;
-  const isSeller = currentUser?.isSeller === true;
   const isAdmin = currentUser?.isAdmin === true;
 
   // Common navigation item styling
@@ -34,7 +34,7 @@ const NavigationLinks: React.FC<NavigationLinksProps> = ({ onNavItemClick }) => 
     <Link
       to={path}
       className={`${baseClass} ${isActive(path) ? activeClass : inactiveClass}`}
-      onClick={onNavItemClick}
+      onClick={onItemClick}
     >
       <span className="mr-3">{icon}</span>
       {label}

@@ -5,7 +5,7 @@ import { cn } from '@/lib/utils';
 import { Sidebar } from '@/components/ui/sidebar';
 import { useAuth } from '@/contexts/auth';
 import { SidebarLogo } from './sidebar/SidebarLogo';
-import { NavigationLinks } from './sidebar/NavigationLinks';
+import NavigationLinks from './sidebar/NavigationLinks';
 import { SellerSection } from './sidebar/SellerSection';
 import { LogoutButton } from './sidebar/LogoutButton';
 
