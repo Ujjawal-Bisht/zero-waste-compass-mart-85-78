@@ -7,7 +7,8 @@ import DeliveryLocation from './DeliveryLocation';
 import OrderActions from './OrderActions';
 import { Order } from '@/types';
 import { Button } from '@/components/ui/button';
-import { FileDown } from 'lucide-react';
+import { FileDown, PhoneCall } from 'lucide-react';
+import { toast } from '@/components/ui/use-toast';
 
 interface TrackingDetailsProps {
   order: Order;
@@ -25,6 +26,13 @@ const TrackingDetails: React.FC<TrackingDetailsProps> = ({
   onDownloadInvoice
 }) => {
   if (!isExpanded) return null;
+
+  const handleCallDeliveryAgent = () => {
+    toast({
+      title: "Calling Delivery Agent",
+      description: "Connecting you with the delivery agent for Order #" + order.id.split('-')[1],
+    });
+  };
 
   return (
     <motion.div 
@@ -52,27 +60,42 @@ const TrackingDetails: React.FC<TrackingDetailsProps> = ({
           onViewMap={onViewMap} 
         />
         
-        <div className="flex justify-end">
-          {(order.status === 'out-for-delivery' || order.status === 'delivered') && (
-            <motion.div className="mr-2" whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+        <div className="flex justify-between items-center">
+          {order.status === 'out-for-delivery' && (
+            <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
               <Button 
-                size="sm"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  onDownloadInvoice(order);
-                }} 
-                variant="outline"
-                className="flex items-center text-indigo-700 border-indigo-200 hover:bg-indigo-50"
+                onClick={handleCallDeliveryAgent}
+                variant="secondary"
+                className="flex items-center bg-green-500 hover:bg-green-600 text-white"
               >
-                <FileDown className="h-4 w-4 mr-1" />
-                Invoice
+                <PhoneCall className="h-4 w-4 mr-1" />
+                Call Delivery Agent
               </Button>
             </motion.div>
           )}
-          <OrderActions 
-            orderId={order.id}
-            onDownloadInvoice={() => onDownloadInvoice(order)}
-          />
+          
+          <div className="flex ml-auto">
+            {(order.status === 'out-for-delivery' || order.status === 'delivered') && (
+              <motion.div className="mr-2" whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+                <Button 
+                  size="sm"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onDownloadInvoice(order);
+                  }} 
+                  variant="outline"
+                  className="flex items-center text-indigo-700 border-indigo-200 hover:bg-indigo-50"
+                >
+                  <FileDown className="h-4 w-4 mr-1" />
+                  Invoice
+                </Button>
+              </motion.div>
+            )}
+            <OrderActions 
+              orderId={order.id}
+              onDownloadInvoice={() => onDownloadInvoice(order)}
+            />
+          </div>
         </div>
       </div>
     </motion.div>

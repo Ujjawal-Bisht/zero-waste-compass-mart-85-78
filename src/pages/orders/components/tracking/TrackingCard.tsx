@@ -1,12 +1,13 @@
 
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Package, MapPin } from 'lucide-react';
+import { Package, MapPin, PhoneCall } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Order } from '@/types';
 import { Progress } from '@/components/ui/progress';
 import TrackingDetails from './TrackingDetails';
+import { toast } from '@/components/ui/use-toast';
 
 interface TrackingCardProps {
   order: Order;
@@ -27,6 +28,15 @@ const TrackingCard: React.FC<TrackingCardProps> = ({
   onViewMap,
   onDownloadInvoice
 }) => {
+  const handleCallDeliveryAgent = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    // In a real app, this would initiate a call
+    toast({
+      title: "Calling Delivery Agent",
+      description: "Connecting you with the delivery agent for Order #" + order.id.split('-')[1],
+    });
+  };
+  
   return (
     <motion.div 
       key={`shipping-${order.id}`} 
@@ -58,6 +68,22 @@ const TrackingCard: React.FC<TrackingCardProps> = ({
               {order.status.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ')}
             </Badge>
             <div className="flex space-x-2">
+              {order.status === 'out-for-delivery' && (
+                <motion.div
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                >
+                  <Button 
+                    size="sm"
+                    onClick={handleCallDeliveryAgent} 
+                    className="transition-all bg-green-500 hover:bg-green-600 text-white"
+                    variant="secondary"
+                  >
+                    <PhoneCall className="h-4 w-4 mr-1" />
+                    Call Agent
+                  </Button>
+                </motion.div>
+              )}
               <motion.div
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}

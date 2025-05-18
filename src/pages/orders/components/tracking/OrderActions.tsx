@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { MoreVertical, FileDown, Phone, MessageSquare } from 'lucide-react';
+import { MoreVertical, FileDown, Phone, MessageSquare, PhoneCall } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
@@ -8,16 +8,26 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import { toast } from '@/components/ui/use-toast';
 
 export interface OrderActionsProps {
   orderId: string;
   onDownloadInvoice?: () => void;
+  showCallOption?: boolean;
 }
 
 const OrderActions: React.FC<OrderActionsProps> = ({ 
   orderId, 
-  onDownloadInvoice 
+  onDownloadInvoice,
+  showCallOption = false
 }) => {
+  const handleCallDeliveryAgent = () => {
+    toast({
+      title: "Calling Delivery Agent",
+      description: `Connecting you with the delivery agent for Order #${orderId.split('-')[1]}`,
+    });
+  };
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -30,6 +40,12 @@ const OrderActions: React.FC<OrderActionsProps> = ({
           <DropdownMenuItem onClick={onDownloadInvoice}>
             <FileDown className="mr-2 h-4 w-4" />
             <span>Download Invoice</span>
+          </DropdownMenuItem>
+        )}
+        {showCallOption && (
+          <DropdownMenuItem onClick={handleCallDeliveryAgent}>
+            <PhoneCall className="mr-2 h-4 w-4" />
+            <span>Call Delivery Agent</span>
           </DropdownMenuItem>
         )}
         <DropdownMenuItem>
