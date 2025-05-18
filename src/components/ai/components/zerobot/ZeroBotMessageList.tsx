@@ -16,6 +16,15 @@ const ZeroBotMessageList: React.FC<ZeroBotMessageListProps> = ({
   isTyping, 
   messagesEndRef 
 }) => {
+  // Generate a safe key for messages by ensuring we never have undefined
+  const getMessageKey = (message: Message, index: number): string => {
+    if (message.id === undefined || message.id === null) {
+      // Fallback to using index if id is not available
+      return `message-${index}`;
+    }
+    return message.id.toString();
+  };
+
   return (
     <motion.div 
       className="space-y-4 px-1"
@@ -32,9 +41,9 @@ const ZeroBotMessageList: React.FC<ZeroBotMessageListProps> = ({
         </div>
       ) : (
         <AnimatePresence>
-          {messages.map((message) => (
+          {messages.map((message, index) => (
             <motion.div
-              key={message.id.toString()} // Ensuring key is always a string
+              key={getMessageKey(message, index)}
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -10 }}
@@ -49,7 +58,7 @@ const ZeroBotMessageList: React.FC<ZeroBotMessageListProps> = ({
       <AnimatePresence>
         {isTyping && (
           <motion.div
-            key="typing-indicator" // Adding unique key
+            key="typing-indicator"
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0 }}
