@@ -1,4 +1,3 @@
-
 import { Item, ItemStatus } from "@/types";
 
 export const formatDate = (dateString: string): string => {
@@ -85,3 +84,5 @@ export const getStatusBadgeColor = (status: string): string => {
 
   return statusBadgeColors[status.toLowerCase()] || 'bg-gray-100 text-gray-800 border-gray-300';
 };
+
+const someObject: { [key: string]: any } = {};

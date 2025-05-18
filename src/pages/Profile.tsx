@@ -1,153 +1,162 @@
-
-import React, { useState } from 'react';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Card, CardContent } from '@/components/ui/card';
-import PersonalInfoForm from '@/pages/profile/PersonalInfoForm';
-import SecurityForm from '@/pages/profile/SecurityForm';
-import NotificationPreferences from '@/pages/profile/NotificationPreferences';
-import SocialMediaConnections from '@/pages/profile/SocialMediaConnections';
-import { motion } from 'framer-motion';
+import React, { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/auth';
-import TwoFactorSetup from '@/components/auth/two-factor/TwoFactorSetup';
+import { toast } from 'sonner';
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar"
+import { Button } from '@/components/ui/button';
+import { Edit, Check, User, Bell, Link2, Save } from 'lucide-react';
+import { motion } from 'framer-motion';
+import PersonalInfoForm from './PersonalInfoForm';
+import NotificationPreferences from './NotificationPreferences';
+import SocialMediaConnections from './SocialMediaConnections';
 
 const Profile: React.FC = () => {
-  const { loading } = useAuth();
-  const [activeTab, setActiveTab] = useState('personal');
+  const { currentUser, updateProfile } = useAuth();
+  const [isEditing, setIsEditing] = useState(false);
+  const [profileImage, setProfileImage] = useState<string | null>(currentUser?.photoURL || null);
+  const [loading, setLoading] = useState(false);
 
-  const tabVariants = {
-    hidden: { opacity: 0, y: 10 },
-    visible: { opacity: 1, y: 0, transition: { duration: 0.5 } }
+  useEffect(() => {
+    if (currentUser) {
+      setProfileImage(currentUser.photoURL || null);
+    }
+  }, [currentUser]);
+
+  const handleProfileImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setProfileImage(reader.result as string);
+      };
+      reader.readAsDataURL(file);
+    }
   };
 
-  if (loading) {
-    return (
-      <div className="flex justify-center items-center min-h-screen">
-        <div className="animate-spin h-12 w-12 border-4 border-zwm-primary border-t-transparent rounded-full"></div>
-      </div>
-    );
+  const toggleEdit = () => {
+    setIsEditing(!isEditing);
+  };
+
+  const handleSave = async () => {
+    setLoading(true);
+    try {
+      if (currentUser && updateProfile) {
+        await updateProfile({
+          ...currentUser,
+          photoURL: profileImage,
+        });
+        toast.success("Profile updated successfully!");
+        setIsEditing(false);
+      }
+    } catch (error: any) {
+      console.error("Profile update error:", error);
+      toast.error(error?.message || "Failed to update profile");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleNotificationSave = async (preferences: any) => {
+    // Placeholder for saving notification preferences
+    toast.success("Notification preferences saved!");
+  };
+
+  const handleSocialSave = async (connections: any) => {
+    // Placeholder for saving social media connections
+    toast.success("Social media connections saved!");
+  };
+
+  if (!currentUser) {
+    return <div>Loading...</div>;
   }
 
   return (
-    <div className="container max-w-6xl py-8 px-4 sm:px-6">
-      <div className="mb-8">
-        <motion.h1 
-          className="text-3xl font-bold" 
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-        >
-          Profile Settings
-        </motion.h1>
-        <motion.p 
-          className="text-muted-foreground mt-2"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.2, duration: 0.5 }}
-        >
-          Manage your account settings and preferences
-        </motion.p>
+    <motion.div
+      className="container mx-auto p-8 flex flex-col md:flex-row gap-8"
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: 20 }}
+      transition={{ duration: 0.5 }}
+    >
+      {/* Profile Summary */}
+      <div className="w-full md:w-1/3 bg-white rounded-lg shadow-md p-6">
+        <div className="flex flex-col items-center">
+          <Avatar className="h-24 w-24 border-4 border-zwm-primary mb-4">
+            <AvatarImage src={profileImage || undefined} alt={currentUser.displayName || "Profile"} />
+            <AvatarFallback>{currentUser.displayName?.[0] || "U"}</AvatarFallback>
+          </Avatar>
+          <h2 className="text-2xl font-semibold text-gray-800">{currentUser.displayName}</h2>
+          <p className="text-gray-600">{currentUser.email}</p>
+          <div className="mt-4 flex space-x-3">
+            <Button variant="outline" size="sm" disabled>
+              <User className="mr-2 h-4 w-4" />
+              {currentUser.isSeller ? 'Seller' : 'Buyer'}
+            </Button>
+            <Button variant="outline" size="sm" disabled>
+              <Bell className="mr-2 h-4 w-4" />
+              {currentUser.isAdmin ? 'Admin' : 'User'}
+            </Button>
+          </div>
+        </div>
+        <div className="mt-6">
+          <h3 className="text-lg font-medium text-gray-700 mb-2">Quick Actions</h3>
+          <div className="flex flex-col space-y-2">
+            <Button variant="ghost" className="justify-start">
+              <Link2 className="mr-2 h-4 w-4" />
+              My Listings
+            </Button>
+            <Button variant="ghost" className="justify-start">
+              <Bell className="mr-2 h-4 w-4" />
+              Notifications
+            </Button>
+          </div>
+        </div>
       </div>
 
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.3, duration: 0.5 }}
-      >
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-          <TabsList className="bg-background/70 backdrop-blur-sm w-full border overflow-x-auto no-scrollbar justify-start rounded-lg p-1">
-            <TabsTrigger value="personal" className="data-[state=active]:bg-blue-50 data-[state=active]:text-blue-700 rounded-md">
-              Personal Info
-            </TabsTrigger>
-            <TabsTrigger value="security" className="data-[state=active]:bg-green-50 data-[state=active]:text-green-700 rounded-md">
-              Security & 2FA
-            </TabsTrigger>
-            <TabsTrigger value="notifications" className="data-[state=active]:bg-purple-50 data-[state=active]:text-purple-700 rounded-md">
-              Notifications
-            </TabsTrigger>
-            <TabsTrigger value="connections" className="data-[state=active]:bg-amber-50 data-[state=active]:text-amber-700 rounded-md">
-              Connections
-            </TabsTrigger>
-          </TabsList>
+      {/* Profile Details */}
+      <div className="w-full md:w-2/3 flex flex-col gap-6">
+        <div className="bg-white rounded-lg shadow-md p-6">
+          <div className="flex justify-between items-center mb-4">
+            <h2 className="text-xl font-semibold text-gray-800">Personal Information</h2>
+            {isEditing ? (
+              <div className="flex space-x-2">
+                <Button variant="secondary" size="sm" onClick={handleSave} disabled={loading}>
+                  {loading ? <span className="animate-spin">Saving...</span> : <><Save className="mr-2 h-4 w-4" /> Save</>}
+                </Button>
+                <Button variant="ghost" size="sm" onClick={toggleEdit} disabled={loading}>
+                  Cancel
+                </Button>
+              </div>
+            ) : (
+              <Button variant="ghost" size="sm" onClick={toggleEdit}>
+                <Edit className="mr-2 h-4 w-4" />
+                Edit Profile
+              </Button>
+            )}
+          </div>
 
-          <TabsContent 
-            value="personal" 
-            className="space-y-6"
-          >
-            <motion.div
-              variants={tabVariants}
-              initial="hidden"
-              animate="visible"
-            >
-              <Card>
-                <CardContent className="pt-6">
-                  <PersonalInfoForm />
-                </CardContent>
-              </Card>
-            </motion.div>
-          </TabsContent>
+          <PersonalInfoForm
+            currentUser={currentUser}
+            updateProfile={updateProfile}
+            profileImage={profileImage}
+            handleProfileImageChange={handleProfileImageChange}
+          />
+        </div>
 
-          <TabsContent 
-            value="security" 
-            className="space-y-6"
-          >
-            <motion.div
-              variants={tabVariants}
-              initial="hidden"
-              animate="visible"
-            >
-              <Card>
-                <CardContent className="pt-6">
-                  <SecurityForm />
-                </CardContent>
-              </Card>
-            </motion.div>
-            
-            <motion.div
-              variants={tabVariants}
-              initial="hidden"
-              animate="visible"
-              transition={{ delay: 0.2 }}
-            >
-              <TwoFactorSetup />
-            </motion.div>
-          </TabsContent>
+        <div className="bg-white rounded-lg shadow-md p-6">
+          <h2 className="text-xl font-semibold text-gray-800 mb-4">Notification Preferences</h2>
+          <NotificationPreferences
+            onSave={handleNotificationSave}
+          />
+        </div>
 
-          <TabsContent 
-            value="notifications" 
-            className="space-y-6"
-          >
-            <motion.div
-              variants={tabVariants}
-              initial="hidden"
-              animate="visible"
-            >
-              <Card>
-                <CardContent className="pt-6">
-                  <NotificationPreferences />
-                </CardContent>
-              </Card>
-            </motion.div>
-          </TabsContent>
-
-          <TabsContent 
-            value="connections" 
-            className="space-y-6"
-          >
-            <motion.div
-              variants={tabVariants}
-              initial="hidden"
-              animate="visible"
-            >
-              <Card>
-                <CardContent className="pt-6">
-                  <SocialMediaConnections />
-                </CardContent>
-              </Card>
-            </motion.div>
-          </TabsContent>
-        </Tabs>
-      </motion.div>
-    </div>
+        <div className="bg-white rounded-lg shadow-md p-6">
+          <h2 className="text-xl font-semibold text-gray-800 mb-4">Social Media Connections</h2>
+          <SocialMediaConnections
+            onSave={handleSocialSave}
+          />
+        </div>
+      </div>
+    </motion.div>
   );
 };
 

@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { barcodeDatabase } from '../../data/barcodeDatabase';
 import { toast } from 'sonner';
@@ -67,7 +66,7 @@ export const useProductDetails = () => {
           name: data.name,
           description: data.description || '',
           category: data.category as any,
-          imageUrl: data.image_url || 'https://via.placeholder.com/150',
+          imageUrl: (data as any).image_url || 'https://via.placeholder.com/150',
           expiryDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0], // Default 7 days
           createdAt: data.created_at,
           updatedAt: data.updated_at,
@@ -85,7 +84,6 @@ export const useProductDetails = () => {
           currentPrice: data.price,
           dynamicPricingEnabled: false,
         };
-        
         setProductDetails(item);
         toast.success(`Found product: ${data.name}`);
         return item;
