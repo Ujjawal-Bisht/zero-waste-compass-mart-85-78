@@ -1,12 +1,13 @@
 
 import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
 
 const AuthCallback = () => {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -16,7 +17,6 @@ const AuthCallback = () => {
         console.log("Processing auth callback");
         
         // Get the URL parameters
-        const { searchParams } = new URL(window.location.href);
         const code = searchParams.get('code');
         
         if (!code) {
@@ -44,7 +44,7 @@ const AuthCallback = () => {
           return;
         }
         
-        console.log("Successfully exchanged code for session");
+        console.log("Successfully exchanged code for session", data.session);
         // Check user metadata for roles
         const isSeller = data.session.user?.user_metadata?.is_seller === true || 
                         searchParams.get('is_seller') === 'true';
@@ -65,7 +65,7 @@ const AuthCallback = () => {
     };
     
     handleAuthCallback();
-  }, [navigate]);
+  }, [navigate, searchParams]);
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-b from-gray-50 to-gray-100 p-4">

@@ -26,6 +26,7 @@ const GoogleLoginSection: React.FC<GoogleLoginSectionProps> = ({
   const handleClick = async () => {
     try {
       setError(null);
+      toast.info("Redirecting to Google login...");
       await handleGoogleLogin();
     } catch (err: any) {
       console.error("Google login error:", err);
@@ -75,6 +76,7 @@ const GoogleLoginSection: React.FC<GoogleLoginSectionProps> = ({
         onClick={handleClick}
         disabled={isLoading || (showCaptcha && !captchaValue)}
         className="flex items-center justify-center gap-3 w-full bg-white border border-gray-300 rounded-lg py-3 px-4 font-medium text-gray-700 hover:bg-gray-50 transition-all shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
+        aria-label={`Sign in with Google as ${accountType}`}
       >
         <svg className="w-5 h-5" viewBox="0 0 24 24">
           <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />

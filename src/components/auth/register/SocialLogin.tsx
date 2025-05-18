@@ -7,12 +7,14 @@ interface SocialLoginProps {
   onGoogleLogin: () => void;
   isLoading: boolean;
   captchaValue: string | null;
+  accountType?: 'buyer' | 'seller';
 }
 
 const SocialLogin: React.FC<SocialLoginProps> = ({ 
   onGoogleLogin, 
   isLoading, 
-  captchaValue 
+  captchaValue,
+  accountType = 'buyer'
 }) => {
   return (
     <div className="mt-6">
@@ -39,6 +41,7 @@ const SocialLogin: React.FC<SocialLoginProps> = ({
           className="w-full button-hover"
           onClick={onGoogleLogin}
           disabled={isLoading || !captchaValue}
+          aria-label={`Continue with Google as ${accountType}`}
         >
           <motion.svg 
             className="h-5 w-5 mr-2"
