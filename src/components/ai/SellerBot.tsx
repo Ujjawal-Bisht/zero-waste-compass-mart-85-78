@@ -1,18 +1,13 @@
 
 import React from 'react';
-import ZeroBot4 from './ai/ZeroBot4';
+import ZeroBot4 from './ZeroBot4';
 
-interface ChatBotProps {
+interface SellerBotProps {
   initialPrompt?: string;
   showInitially?: boolean;
-  sellerMode?: boolean;
 }
 
-const ChatBot: React.FC<ChatBotProps> = ({ 
-  initialPrompt, 
-  showInitially = false,
-  sellerMode = false 
-}) => {
+const SellerBot: React.FC<SellerBotProps> = ({ initialPrompt, showInitially = false }) => {
   return (
     <ZeroBot4
       initialPrompt={initialPrompt}
@@ -20,9 +15,9 @@ const ChatBot: React.FC<ChatBotProps> = ({
       enableVoice={true}
       enableRealtime={true}
       showAnalytics={true}
-      sellerMode={sellerMode}
+      sellerMode={true}
     />
   );
 };
 
-export default ChatBot;
+export default SellerBot;
