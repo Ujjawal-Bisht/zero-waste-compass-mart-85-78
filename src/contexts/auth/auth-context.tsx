@@ -28,21 +28,21 @@ export const AuthContextProvider: React.FC<AuthProviderProps> = ({ children }) =
         const user: User = {
           id: currentSession.user.id,
           email: currentSession.user.email || '',
-          displayName: currentSession.user.user_metadata.full_name || '',
-          photoURL: currentSession.user.user_metadata.avatar_url || null,
+          displayName: currentSession.user.user_metadata?.full_name || '',
+          photoURL: currentSession.user.user_metadata?.avatar_url || null,
           isAdmin: false, // Default, will be updated from profile
           isSeller: false, // Default, will be updated from profile
-          businessName: currentSession.user.user_metadata.business_name,
-          businessType: currentSession.user.user_metadata.business_type,
-          trustScore: currentSession.user.user_metadata.trust_score,
-          verified: currentSession.user.user_metadata.verified,
+          businessName: currentSession.user.user_metadata?.business_name,
+          businessType: currentSession.user.user_metadata?.business_type,
+          trustScore: currentSession.user.user_metadata?.trust_score,
+          verified: currentSession.user.user_metadata?.verified,
         };
         setCurrentUser(user);
         
         // Fetch additional profile data without blocking
         setTimeout(() => {
           fetchUserProfile(currentSession.user.id);
-          checkTwoFactorStatus(currentSession.user.id);
+          // Don't check 2FA status here as table doesn't exist yet
         }, 0);
       } else {
         setCurrentUser(null);
@@ -58,20 +58,19 @@ export const AuthContextProvider: React.FC<AuthProviderProps> = ({ children }) =
         const user: User = {
           id: currentSession.user.id,
           email: currentSession.user.email || '',
-          displayName: currentSession.user.user_metadata.full_name || '',
-          photoURL: currentSession.user.user_metadata.avatar_url || null,
+          displayName: currentSession.user.user_metadata?.full_name || '',
+          photoURL: currentSession.user.user_metadata?.avatar_url || null,
           isAdmin: false, // Default, will be updated from profile
           isSeller: false, // Default, will be updated from profile
-          businessName: currentSession.user.user_metadata.business_name,
-          businessType: currentSession.user.user_metadata.business_type,
-          trustScore: currentSession.user.user_metadata.trust_score,
-          verified: currentSession.user.user_metadata.verified,
+          businessName: currentSession.user.user_metadata?.business_name,
+          businessType: currentSession.user.user_metadata?.business_type,
+          trustScore: currentSession.user.user_metadata?.trust_score,
+          verified: currentSession.user.user_metadata?.verified,
         };
         setCurrentUser(user);
         
         // Fetch additional profile data
         fetchUserProfile(currentSession.user.id);
-        checkTwoFactorStatus(currentSession.user.id);
       }
       
       setLoading(false);
@@ -98,7 +97,7 @@ export const AuthContextProvider: React.FC<AuthProviderProps> = ({ children }) =
       if (data && currentUser) {
         const updatedUser: User = {
           ...currentUser,
-          displayName: data.full_name || currentUser.displayName,
+          displayName: data.display_name || currentUser.displayName,
           photoURL: data.avatar_url || currentUser.photoURL,
           isSeller: data.is_seller || false,
         };
@@ -106,26 +105,6 @@ export const AuthContextProvider: React.FC<AuthProviderProps> = ({ children }) =
       }
     } catch (error) {
       console.error("Failed to fetch user profile:", error);
-    }
-  };
-
-  // Check if 2FA is enabled for the user
-  const checkTwoFactorStatus = async (userId: string) => {
-    try {
-      const { data, error } = await supabase
-        .from('two_factor_auth')
-        .select('is_enabled')
-        .eq('user_id', userId)
-        .single();
-      
-      if (error && error.code !== 'PGRST116') { // PGRST116 is "No rows returned" error
-        console.error('Error checking 2FA status:', error);
-        return;
-      }
-
-      setIsTwoFactorEnabled(data?.is_enabled || false);
-    } catch (error) {
-      console.error("Failed to check 2FA status:", error);
     }
   };
 
@@ -151,7 +130,7 @@ export const AuthContextProvider: React.FC<AuthProviderProps> = ({ children }) =
       setLoading(true);
       console.log(`Starting Google authentication flow as ${accountType}...`);
       
-      const { error } = await supabase.auth.signInWithOAuth({ 
+      const { data, error } = await supabase.auth.signInWithOAuth({ 
         provider: 'google',
         options: {
           redirectTo: `${window.location.origin}/auth/callback`,
@@ -317,7 +296,7 @@ export const AuthContextProvider: React.FC<AuthProviderProps> = ({ children }) =
       const { error: profileError } = await supabase
         .from('profiles')
         .update({
-          full_name: data.displayName,
+          display_name: data.displayName,
           avatar_url: data.photoURL,
           is_seller: data.isSeller,
         })
@@ -371,98 +350,8 @@ export const AuthContextProvider: React.FC<AuthProviderProps> = ({ children }) =
     }
   };
 
-  // New 2FA Methods
-  const setupTwoFactor = async (): Promise<{ qrCode: string }> => {
-    try {
-      setLoading(true);
-      
-      if (!currentUser) throw new Error("No authenticated user");
-      
-      // In a real implementation, this would call a Supabase edge function to generate a TOTP secret
-      // For this example, we'll simulate the API response
-      const qrCodeUrl = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=otpauth://totp/ZeroWasteMart:${currentUser.email}?secret=JBSWY3DPEHPK3PXP&issuer=ZeroWasteMart`;
-      
-      // Store 2FA setup in database
-      const { error } = await supabase
-        .from('two_factor_auth')
-        .upsert({
-          user_id: currentUser.id,
-          secret: 'JBSWY3DPEHPK3PXP', // In a real app, this would be securely stored
-          is_enabled: false, // Not enabled until verified
-          created_at: new Date().toISOString()
-        });
-        
-      if (error) throw error;
-      
-      return { qrCode: qrCodeUrl };
-    } catch (error: any) {
-      console.error("2FA setup error:", error);
-      toast.error(error.message || "Failed to set up two-factor authentication");
-      throw error;
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const verifyTwoFactor = async (token: string): Promise<boolean> => {
-    try {
-      setLoading(true);
-      
-      if (!currentUser) throw new Error("No authenticated user");
-      
-      // In a real implementation, this would verify the token against the user's secret
-      // For this example, we'll simulate verification (allow any 6-digit code)
-      const isValid = /^\d{6}$/.test(token);
-      
-      if (isValid) {
-        // Update 2FA status in database
-        const { error } = await supabase
-          .from('two_factor_auth')
-          .update({ is_enabled: true })
-          .eq('user_id', currentUser.id);
-          
-        if (error) throw error;
-        
-        setIsTwoFactorEnabled(true);
-        toast.success("Two-factor authentication enabled successfully!");
-      } else {
-        toast.error("Invalid verification code. Please try again.");
-      }
-      
-      return isValid;
-    } catch (error: any) {
-      console.error("2FA verification error:", error);
-      toast.error(error.message || "Failed to verify two-factor authentication");
-      throw error;
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const disableTwoFactor = async (): Promise<void> => {
-    try {
-      setLoading(true);
-      
-      if (!currentUser) throw new Error("No authenticated user");
-      
-      // Update 2FA status in database
-      const { error } = await supabase
-        .from('two_factor_auth')
-        .update({ is_enabled: false })
-        .eq('user_id', currentUser.id);
-        
-      if (error) throw error;
-      
-      setIsTwoFactorEnabled(false);
-      toast.success("Two-factor authentication disabled successfully!");
-    } catch (error: any) {
-      console.error("Disable 2FA error:", error);
-      toast.error(error.message || "Failed to disable two-factor authentication");
-      throw error;
-    } finally {
-      setLoading(false);
-    }
-  };
+  // Two-factor authentication is removed for now since the table doesn't exist
+  // These methods will be reintroduced when you create the two_factor_auth table
 
   const contextValue: AuthContextType = {
     currentUser,
@@ -476,10 +365,10 @@ export const AuthContextProvider: React.FC<AuthProviderProps> = ({ children }) =
     resetPassword,
     updateProfile,
     verifySellerAccount,
-    setupTwoFactor,
-    verifyTwoFactor,
-    disableTwoFactor,
-    isTwoFactorEnabled,
+    isTwoFactorEnabled: false, // Default to false
+    setupTwoFactor: async () => ({ qrCode: '' }), // Placeholder
+    verifyTwoFactor: async () => false, // Placeholder
+    disableTwoFactor: async () => {}, // Placeholder
   };
 
   return (

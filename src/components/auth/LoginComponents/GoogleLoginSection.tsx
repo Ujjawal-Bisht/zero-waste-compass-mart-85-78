@@ -1,7 +1,8 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import ReCAPTCHA from 'react-google-recaptcha';
+import { toast } from 'sonner';
 
 interface GoogleLoginSectionProps {
   handleGoogleLogin: () => Promise<void>;
@@ -20,6 +21,19 @@ const GoogleLoginSection: React.FC<GoogleLoginSectionProps> = ({
   captchaValue,
   showCaptcha = false
 }) => {
+  const [error, setError] = useState<string | null>(null);
+
+  const handleClick = async () => {
+    try {
+      setError(null);
+      await handleGoogleLogin();
+    } catch (err: any) {
+      console.error("Google login error:", err);
+      setError(err?.message || "Failed to sign in with Google");
+      toast.error(err?.message || "Failed to sign in with Google");
+    }
+  };
+
   return (
     <div className="flex flex-col items-center justify-center p-6 border rounded-lg">
       <div className="mb-4 text-center">
@@ -49,10 +63,16 @@ const GoogleLoginSection: React.FC<GoogleLoginSectionProps> = ({
         </div>
       )}
       
+      {error && (
+        <div className="mb-4 text-sm text-red-600 text-center">
+          {error}
+        </div>
+      )}
+      
       <motion.button
         whileHover={{ scale: 1.02 }}
         whileTap={{ scale: 0.98 }}
-        onClick={handleGoogleLogin}
+        onClick={handleClick}
         disabled={isLoading || (showCaptcha && !captchaValue)}
         className="flex items-center justify-center gap-3 w-full bg-white border border-gray-300 rounded-lg py-3 px-4 font-medium text-gray-700 hover:bg-gray-50 transition-all shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
       >
