@@ -12,50 +12,71 @@ const AuthCallback = () => {
 
   useEffect(() => {
     const handleAuthCallback = async () => {
-      const { searchParams } = new URL(window.location.href);
-      const code = searchParams.get('code');
-      
-      if (code) {
-        try {
-          console.log("Processing auth callback with code");
+      try {
+        console.log("Processing auth callback");
+        
+        // Let Supabase handle the exchange of the code for a session
+        const { data, error } = await supabase.auth.getSession();
+        
+        if (error || !data.session) {
+          console.error("Session error:", error);
           
-          // Let Supabase handle the exchange of the code for a session
-          const { data, error } = await supabase.auth.exchangeCodeForSession(code);
+          // Try to exchange code if present in URL
+          const { searchParams } = new URL(window.location.href);
+          const code = searchParams.get('code');
           
-          if (error) {
-            console.error("Exchange code error:", error);
-            setError(error.message);
-            toast.error(error.message || "Authentication failed");
+          if (code) {
+            console.log("Found code in URL, exchanging for session");
+            const { data: exchangeData, error: exchangeError } = await supabase.auth.exchangeCodeForSession(code);
+            
+            if (exchangeError) {
+              console.error("Exchange code error:", exchangeError);
+              setError(exchangeError.message || "Authentication failed");
+              toast.error(exchangeError.message || "Authentication failed");
+              setTimeout(() => navigate('/login'), 3000);
+              return;
+            }
+            
+            if (exchangeData.session) {
+              console.log("Successfully exchanged code for session");
+              // Check user metadata for roles
+              const isSeller = exchangeData.session.user?.user_metadata?.is_seller === true || 
+                              searchParams.get('is_seller') === 'true';
+              
+              // Redirect based on user role
+              if (isSeller) {
+                navigate('/seller/dashboard');
+              } else {
+                navigate('/dashboard');
+              }
+              return;
+            }
+          } else {
+            console.error("No code found in URL");
+            setError("No authentication code found. Please try logging in again.");
             setTimeout(() => navigate('/login'), 3000);
             return;
           }
+        } else {
+          console.log("Found existing session");
+          // Check user metadata for roles
+          const isSeller = data.session.user?.user_metadata?.is_seller === true;
           
-          // Check if user is authenticated
-          if (data?.session?.user) {
-            console.log("Authentication successful, redirecting...");
-            
-            // Redirect based on user role
-            if (data.session.user.user_metadata?.is_seller) {
-              navigate('/seller/dashboard');
-            } else {
-              navigate('/dashboard');
-            }
+          // Redirect based on user role
+          if (isSeller) {
+            navigate('/seller/dashboard');
           } else {
-            console.log("No session found after code exchange");
-            setError("Authentication failed. Please try again.");
-            setTimeout(() => navigate('/login'), 3000);
+            navigate('/dashboard');
           }
-        } catch (error: any) {
-          console.error('Error handling auth callback:', error);
-          setError(error?.message || "An error occurred during authentication");
-          setTimeout(() => navigate('/login'), 3000);
+          return;
         }
-      } else {
-        setError("No authentication code found. Please try logging in again.");
+      } catch (error: any) {
+        console.error('Error handling auth callback:', error);
+        setError(error?.message || "An error occurred during authentication");
         setTimeout(() => navigate('/login'), 3000);
+      } finally {
+        setLoading(false);
       }
-      
-      setLoading(false);
     };
     
     handleAuthCallback();

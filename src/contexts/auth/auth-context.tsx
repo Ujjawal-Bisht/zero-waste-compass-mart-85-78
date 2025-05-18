@@ -1,4 +1,3 @@
-
 import React, { createContext, useState, useEffect } from 'react';
 import { toast } from 'sonner';
 import { User } from '@/types';
@@ -137,9 +136,8 @@ export const AuthContextProvider: React.FC<AuthProviderProps> = ({ children }) =
           queryParams: {
             access_type: 'offline',
             prompt: 'consent',
-          },
-          // Store account type in user metadata
-          data: { is_seller: accountType === 'seller' }
+            is_seller: accountType === 'seller' ? 'true' : 'false'
+          }
         },
       });
       

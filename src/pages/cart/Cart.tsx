@@ -9,7 +9,6 @@ import CartItems from './components/CartItems';
 import OrderSummary from './components/OrderSummary';
 import PaymentModal from '@/components/PaymentModal';
 import { v4 as uuidv4 } from 'uuid';
-import { PaymentDetails, PaymentMethod } from '@/hooks/usePayment';
 
 const Cart: React.FC = () => {
   const { toast } = useToast();
@@ -21,7 +20,7 @@ const Cart: React.FC = () => {
     getCartTotal, 
     getCartCount,
     clearCart,
-    isLoading
+    loading: isLoading
   } = useCart();
   
   const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);

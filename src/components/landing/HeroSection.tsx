@@ -41,7 +41,7 @@ const HeroSection: React.FC = () => {
               transition={{ duration: 0.6, delay: 0.2 }}
             >
               Reduce Waste, <br/>
-              <span className="bg-clip-text text-transparent bg-gradient-to-r from-white to-white/80 neon-glow">Share Value</span>
+              <span className="bg-clip-text text-transparent bg-gradient-to-r from-white to-white/80 animate-pulse">Share Value</span>
             </motion.h1>
             <motion.p 
               className="mt-6 text-lg md:text-xl text-white opacity-90 max-w-2xl text-center md:text-left"

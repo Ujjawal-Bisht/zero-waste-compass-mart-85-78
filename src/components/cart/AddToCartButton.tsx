@@ -2,7 +2,7 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { ShoppingCart, Check } from 'lucide-react';
-import { useCart, CartItem } from '@/hooks/useCart';
+import { useCart } from '@/hooks/useCart';
 import { Item } from '@/types';
 import { motion } from 'framer-motion';
 
@@ -26,16 +26,15 @@ const AddToCartButton: React.FC<AddToCartButtonProps> = ({
     e.stopPropagation();
     e.preventDefault();
     
-    const cartItem: Omit<CartItem, 'quantity'> = {
+    addToCart({
       id: item.id,
       name: item.name,
       price: item.currentPrice,
       image: item.imageUrl || 'https://via.placeholder.com/150',
       expiryDate: item.expiryDate,
-      sellerId: item.userId
-    };
-    
-    addToCart(cartItem);
+      sellerId: item.userId,
+      quantity: 1
+    });
   };
   
   return (

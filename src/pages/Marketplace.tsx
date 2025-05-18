@@ -8,7 +8,7 @@ import { Button } from '@/components/ui/button';
 import { ShoppingCart, Filter, PackageOpen, Clock } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useCart } from '@/hooks/useCart';
-import { v4 as uuidv4 } from 'uuid';
+import { supabase } from '@/integrations/supabase/client';
 
 type Product = {
   id: string;
@@ -23,6 +23,7 @@ type Product = {
   discountPercentage?: number;
 };
 
+// This will be replaced with real data from Supabase when available
 const mockProducts: Product[] = [
   {
     id: uuidv4(),
@@ -118,40 +119,64 @@ const Marketplace: React.FC = () => {
   const { toast } = useToast();
   const [activeCategory, setActiveCategory] = useState('all');
   const [products, setProducts] = useState<Product[]>([]);
+  const [loading, setLoading] = useState(true);
   const { addToCart } = useCart();
 
-  // Calculate dynamic pricing based on expiry dates
+  // Fetch products from Supabase (simulated for now)
   useEffect(() => {
-    // Apply AI dynamic pricing model based on expiry date
-    const calculateDiscount = (expiryDate: string): number => {
-      const today = new Date();
-      const expiry = new Date(expiryDate);
-      const daysUntilExpiry = Math.floor((expiry.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
-      
-      // Dynamic pricing algorithm
-      if (daysUntilExpiry <= 3) {
-        return 70; // 70% discount if about to expire in 3 days
-      } else if (daysUntilExpiry <= 7) {
-        return 50; // 50% discount if expiring within a week
-      } else if (daysUntilExpiry <= 14) {
-        return 30; // 30% discount if expiring within two weeks
-      } else if (daysUntilExpiry <= 30) {
-        return 15; // 15% discount if expiring within a month
+    const fetchProducts = async () => {
+      setLoading(true);
+      try {
+        // This would be a real Supabase query in production
+        // const { data, error } = await supabase
+        //   .from('products')
+        //   .select('*')
+        
+        // For now, we'll use our mock data
+        const data = mockProducts;
+        
+        // Apply dynamic pricing algorithm
+        const updatedProducts = data.map(product => {
+          const discountPercentage = calculateDiscount(product.expiryDate);
+          return {
+            ...product,
+            discountPercentage
+          };
+        });
+        
+        setProducts(updatedProducts);
+      } catch (error) {
+        console.error("Error fetching products:", error);
+        toast({ 
+          title: "Error", 
+          description: "Failed to load products. Please try again later." 
+        });
+      } finally {
+        setLoading(false);
       }
-      return 0; // No discount for items with expiry date far away
     };
+    
+    fetchProducts();
+  }, [toast]);
 
-    // Update products with discount
-    const updatedProducts = mockProducts.map(product => {
-      const discountPercentage = calculateDiscount(product.expiryDate);
-      return {
-        ...product,
-        discountPercentage
-      };
-    });
-
-    setProducts(updatedProducts);
-  }, []);
+  // Calculate dynamic pricing based on expiry dates
+  const calculateDiscount = (expiryDate: string): number => {
+    const today = new Date();
+    const expiry = new Date(expiryDate);
+    const daysUntilExpiry = Math.floor((expiry.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
+    
+    // Dynamic pricing algorithm
+    if (daysUntilExpiry <= 3) {
+      return 70; // 70% discount if about to expire in 3 days
+    } else if (daysUntilExpiry <= 7) {
+      return 50; // 50% discount if expiring within a week
+    } else if (daysUntilExpiry <= 14) {
+      return 30; // 30% discount if expiring within two weeks
+    } else if (daysUntilExpiry <= 30) {
+      return 15; // 15% discount if expiring within a month
+    }
+    return 0; // No discount for items with expiry date far away
+  };
 
   const handleAddToCart = (product: Product) => {
     const discountedPrice = product.discountPercentage 
@@ -164,7 +189,13 @@ const Marketplace: React.FC = () => {
       price: discountedPrice,
       image: product.image,
       expiryDate: product.expiryDate,
-      sellerId: product.sellerId
+      sellerId: product.sellerId,
+      quantity: 1
+    });
+    
+    toast({
+      title: "Added to cart",
+      description: `${product.name} has been added to your cart.`
     });
   };
 
@@ -187,6 +218,31 @@ const Marketplace: React.FC = () => {
       transition: { type: 'spring', stiffness: 100 }
     }
   };
+
+  // Show loading state
+  if (loading) {
+    return (
+      <div className="container mx-auto px-4 py-8">
+        <h1 className="text-3xl font-bold bg-gradient-to-r from-purple-600 to-indigo-600 bg-clip-text text-transparent mb-8">Marketplace</h1>
+        
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+          {[...Array(8)].map((_, i) => (
+            <Card key={i} className="overflow-hidden h-full">
+              <div className="h-40 bg-gray-100 animate-pulse"></div>
+              <CardContent className="pt-4">
+                <div className="h-5 bg-gray-200 rounded animate-pulse mb-2"></div>
+                <div className="h-4 bg-gray-200 rounded w-2/3 animate-pulse mb-4"></div>
+                <div className="flex justify-between items-center">
+                  <div className="h-6 bg-gray-200 rounded w-1/4 animate-pulse"></div>
+                  <div className="h-8 bg-gray-200 rounded w-1/3 animate-pulse"></div>
+                </div>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="container mx-auto px-4 py-8">
