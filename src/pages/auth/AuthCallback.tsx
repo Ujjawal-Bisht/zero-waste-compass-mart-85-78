@@ -15,60 +15,45 @@ const AuthCallback = () => {
       try {
         console.log("Processing auth callback");
         
-        // Let Supabase handle the exchange of the code for a session
-        const { data, error } = await supabase.auth.getSession();
+        // Get the URL parameters
+        const { searchParams } = new URL(window.location.href);
+        const code = searchParams.get('code');
         
-        if (error || !data.session) {
-          console.error("Session error:", error);
-          
-          // Try to exchange code if present in URL
-          const { searchParams } = new URL(window.location.href);
-          const code = searchParams.get('code');
-          
-          if (code) {
-            console.log("Found code in URL, exchanging for session");
-            const { data: exchangeData, error: exchangeError } = await supabase.auth.exchangeCodeForSession(code);
-            
-            if (exchangeError) {
-              console.error("Exchange code error:", exchangeError);
-              setError(exchangeError.message || "Authentication failed");
-              toast.error(exchangeError.message || "Authentication failed");
-              setTimeout(() => navigate('/login'), 3000);
-              return;
-            }
-            
-            if (exchangeData.session) {
-              console.log("Successfully exchanged code for session");
-              // Check user metadata for roles
-              const isSeller = exchangeData.session.user?.user_metadata?.is_seller === true || 
-                              searchParams.get('is_seller') === 'true';
-              
-              // Redirect based on user role
-              if (isSeller) {
-                navigate('/seller/dashboard');
-              } else {
-                navigate('/dashboard');
-              }
-              return;
-            }
-          } else {
-            console.error("No code found in URL");
-            setError("No authentication code found. Please try logging in again.");
-            setTimeout(() => navigate('/login'), 3000);
-            return;
-          }
-        } else {
-          console.log("Found existing session");
-          // Check user metadata for roles
-          const isSeller = data.session.user?.user_metadata?.is_seller === true;
-          
-          // Redirect based on user role
-          if (isSeller) {
-            navigate('/seller/dashboard');
-          } else {
-            navigate('/dashboard');
-          }
+        if (!code) {
+          console.error("No code found in URL");
+          setError("Authentication failed. No code parameter found in URL.");
+          setTimeout(() => navigate('/login'), 3000);
           return;
+        }
+
+        console.log("Found code in URL, exchanging for session");
+        const { data, error: exchangeError } = await supabase.auth.exchangeCodeForSession(code);
+        
+        if (exchangeError) {
+          console.error("Exchange code error:", exchangeError);
+          setError(exchangeError.message || "Authentication failed");
+          toast.error(exchangeError.message || "Authentication failed");
+          setTimeout(() => navigate('/login'), 3000);
+          return;
+        }
+        
+        if (!data.session) {
+          console.error("No session returned");
+          setError("No session returned from authentication provider");
+          setTimeout(() => navigate('/login'), 3000);
+          return;
+        }
+        
+        console.log("Successfully exchanged code for session");
+        // Check user metadata for roles
+        const isSeller = data.session.user?.user_metadata?.is_seller === true || 
+                        searchParams.get('is_seller') === 'true';
+        
+        // Redirect based on user role
+        if (isSeller) {
+          navigate('/seller/dashboard');
+        } else {
+          navigate('/dashboard');
         }
       } catch (error: any) {
         console.error('Error handling auth callback:', error);
