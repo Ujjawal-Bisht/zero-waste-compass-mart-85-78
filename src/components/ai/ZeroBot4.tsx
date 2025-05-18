@@ -97,7 +97,8 @@ const ZeroBot4: React.FC<ZeroBot4Props> = ({
             
             {/* Content */}
             <div className="flex-1 flex flex-col overflow-hidden">
-              <Tabs value={bot.activeTab}>
+              {/* Fixing the Tabs issue by properly implementing the Tabs component structure */}
+              <Tabs value={bot.activeTab} className="flex-1 flex flex-col overflow-hidden">
                 <TabsContent value="chat" className="flex-1 overflow-hidden flex flex-col mt-0 p-0">
                   <ZeroBotChatContent
                     messages={bot.messages}

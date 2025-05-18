@@ -34,7 +34,7 @@ const ZeroBotMessageList: React.FC<ZeroBotMessageListProps> = ({
         <AnimatePresence>
           {messages.map((message) => (
             <motion.div
-              key={message.id}
+              key={message.id.toString()} // Ensuring key is always a string
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -10 }}
@@ -49,6 +49,7 @@ const ZeroBotMessageList: React.FC<ZeroBotMessageListProps> = ({
       <AnimatePresence>
         {isTyping && (
           <motion.div
+            key="typing-indicator" // Adding unique key
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0 }}
