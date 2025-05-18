@@ -46,7 +46,13 @@ const ChatBot: React.FC<ChatBotProps> = ({
   // Default to ZeroBot3
   return (
     <ZeroBot3
+      initialPrompt={initialPrompt}
       showInitially={showInitially}
+      sellerMode={sellerMode}
+      theme={theme}
+      enableVoice={enableVoice}
+      enableRealtime={enableRealtime}
+      showAnalytics={showAnalytics}
     />
   );
 };

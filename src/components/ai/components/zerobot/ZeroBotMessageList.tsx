@@ -22,7 +22,7 @@ const ZeroBotMessageList: React.FC<ZeroBotMessageListProps> = ({
       // Fallback to using index if id is not available
       return `message-${index}`;
     }
-    return message.id.toString();
+    return String(message.id); // Convert to string to avoid toString() on undefined
   };
 
   return (

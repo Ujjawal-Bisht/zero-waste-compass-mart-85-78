@@ -7,7 +7,7 @@ import { OrderTrackingInfo } from './components/OrderTrackingInfo';
 import { useOrderManagement } from './hooks/useOrderManagement';
 import { ChatDrawer } from '../chat/ChatDrawer';
 import TopNavbar from '@/components/layouts/TopNavbar';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Package, TrendingDown, TrendingUp } from 'lucide-react';
 
@@ -65,14 +65,12 @@ const MyOrders: React.FC = () => {
               className="transition-all"
             >
               <Card className="bg-gradient-to-br from-blue-50 to-indigo-50 border-blue-100">
-                <CardHeader className="pb-2">
-                  <CardTitle className="text-sm font-medium text-blue-600">Total Orders</CardTitle>
-                </CardHeader>
-                <CardContent>
+                <CardContent className="pt-6">
                   <div className="flex justify-between items-center">
-                    <span className="text-2xl font-bold">{totalOrders}</span>
+                    <span className="text-sm font-medium text-blue-600">Total Orders</span>
                     <Package className="h-8 w-8 text-blue-500 opacity-70" />
                   </div>
+                  <div className="text-2xl font-bold mt-2">{totalOrders}</div>
                   <p className="text-xs text-blue-600 mt-2">
                     {pendingOrders > 0 && `${pendingOrders} orders in progress`}
                   </p>
@@ -86,16 +84,14 @@ const MyOrders: React.FC = () => {
               className="transition-all"
             >
               <Card className="bg-gradient-to-br from-green-50 to-emerald-50 border-green-100">
-                <CardHeader className="pb-2">
-                  <CardTitle className="text-sm font-medium text-green-600">Delivered Orders</CardTitle>
-                </CardHeader>
-                <CardContent>
+                <CardContent className="pt-6">
                   <div className="flex justify-between items-center">
-                    <span className="text-2xl font-bold">{deliveredOrders}</span>
+                    <span className="text-sm font-medium text-green-600">Delivered Orders</span>
                     <Badge className="bg-green-100 text-green-800 border border-green-200">
                       {deliveredOrders > 0 ? <TrendingUp className="h-4 w-4" /> : <TrendingDown className="h-4 w-4" />}
                     </Badge>
                   </div>
+                  <div className="text-2xl font-bold mt-2">{deliveredOrders}</div>
                   <p className="text-xs text-green-600 mt-2">
                     {(deliveredOrders / totalOrders * 100).toFixed(0)}% of total orders
                   </p>
@@ -109,16 +105,14 @@ const MyOrders: React.FC = () => {
               className="transition-all"
             >
               <Card className="bg-gradient-to-br from-purple-50 to-violet-50 border-purple-100">
-                <CardHeader className="pb-2">
-                  <CardTitle className="text-sm font-medium text-purple-600">Total Spent</CardTitle>
-                </CardHeader>
-                <CardContent>
+                <CardContent className="pt-6">
                   <div className="flex justify-between items-center">
-                    <span className="text-2xl font-bold">₹{totalSpent.toFixed(2)}</span>
+                    <span className="text-sm font-medium text-purple-600">Total Spent</span>
                     <Badge className="bg-purple-100 text-purple-800 border border-purple-200">
                       {totalOrders} orders
                     </Badge>
                   </div>
+                  <div className="text-2xl font-bold mt-2">₹{totalSpent.toFixed(2)}</div>
                   <p className="text-xs text-purple-600 mt-2">
                     Avg ₹{(totalSpent / totalOrders || 0).toFixed(2)} per order
                   </p>

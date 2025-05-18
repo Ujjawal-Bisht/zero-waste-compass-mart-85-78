@@ -12,8 +12,8 @@ const mockOrders: Order[] = [
     sellerId: "seller-001",
     sellerName: "Fresh Farms",
     items: [
-      { itemId: "item-001", quantity: 2, price: 1299, name: "Organic Apples" },
-      { itemId: "item-002", quantity: 1, price: 799, name: "Fresh Bread" }
+      { id: "item-001", quantity: 2, price: 1299, name: "Organic Apples" },
+      { id: "item-002", quantity: 1, price: 799, name: "Fresh Bread" }
     ],
     status: "processing",
     paymentStatus: "paid",
@@ -28,7 +28,7 @@ const mockOrders: Order[] = [
     sellerId: "seller-002",
     sellerName: "Tech World",
     items: [
-      { itemId: "item-003", quantity: 1, price: 6999, name: "Wireless Headphones" }
+      { id: "item-003", quantity: 1, price: 6999, name: "Wireless Headphones" }
     ],
     status: "shipped",
     paymentStatus: "paid",
@@ -43,8 +43,8 @@ const mockOrders: Order[] = [
     sellerId: "seller-003",
     sellerName: "Dairy Delight",
     items: [
-      { itemId: "item-004", quantity: 3, price: 499, name: "Organic Bananas" },
-      { itemId: "item-005", quantity: 2, price: 299, name: "Fresh Milk" }
+      { id: "item-004", quantity: 3, price: 499, name: "Organic Bananas" },
+      { id: "item-005", quantity: 2, price: 299, name: "Fresh Milk" }
     ],
     status: "out-for-delivery",
     paymentStatus: "paid",
@@ -59,7 +59,7 @@ const mockOrders: Order[] = [
     sellerId: "seller-004",
     sellerName: "Fashion Styles",
     items: [
-      { itemId: "item-006", quantity: 1, price: 2499, name: "Cotton T-Shirt" }
+      { id: "item-006", quantity: 1, price: 2499, name: "Cotton T-Shirt" }
     ],
     status: "pending",
     paymentStatus: "pending",

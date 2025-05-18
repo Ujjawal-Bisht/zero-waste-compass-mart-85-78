@@ -16,7 +16,7 @@ const SellerOrders: React.FC = () => {
       buyerName: 'John Doe',
       sellerId: 'seller123',
       items: [
-        { itemId: '1', name: 'Organic Bananas', quantity: 2, price: 299.99 },
+        { id: '1', name: 'Organic Bananas', quantity: 2, price: 299.99 },
       ],
       status: 'pending',
       paymentStatus: 'paid',
@@ -30,7 +30,7 @@ const SellerOrders: React.FC = () => {
       buyerName: 'Jane Smith',
       sellerId: 'seller123',
       items: [
-        { itemId: '2', name: 'T-shirts Pack', quantity: 1, price: 2499.00 },
+        { id: '2', name: 'T-shirts Pack', quantity: 1, price: 2499.00 },
       ],
       status: 'shipped',
       paymentStatus: 'paid',
@@ -44,7 +44,7 @@ const SellerOrders: React.FC = () => {
       buyerName: 'Alex Johnson',
       sellerId: 'seller123',
       items: [
-        { itemId: '3', name: 'Wireless Earbuds', quantity: 1, price: 1999.00 },
+        { id: '3', name: 'Wireless Earbuds', quantity: 1, price: 1999.00 },
       ],
       status: 'out-for-delivery',
       paymentStatus: 'paid',
