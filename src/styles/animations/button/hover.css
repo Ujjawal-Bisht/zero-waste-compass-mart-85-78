@@ -25,6 +25,11 @@
   transition: all 0.3s ease;
 }
 
+.home-button:hover {
+  background-color: #9b87f5 !important;
+  color: white !important;
+}
+
 .home-button::before {
   content: '';
   position: absolute;

@@ -1,106 +1,72 @@
 
-import { Toaster } from "@/components/ui/toaster";
-import { Toaster as Sonner } from "@/components/ui/sonner";
-import { TooltipProvider } from "@/components/ui/tooltip";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
-
-// Authentication Context
-import { AuthProvider } from "./contexts/auth";
-
-// Pages
-import LandingPage from "./pages/LandingPage";
-import Dashboard from "./pages/Dashboard";
-import Marketplace from "./pages/Marketplace";
-import AdminPanel from "./pages/AdminPanel";
-import NotFound from "./pages/NotFound";
-import Profile from "./pages/Profile";
-import Login from "./pages/auth/Login";
-import Register from "./pages/auth/Register";
-import AuthCallback from "./pages/auth/AuthCallback";
-import AddItem from "./pages/items/AddItem";
-import MyOrders from "./pages/orders/MyOrders";
-import Cart from "./pages/cart/Cart";
-import AdvancedFeatures from "./pages/services/AdvancedFeatures";
-
-// Seller Pages
-import SellerDashboard from "./pages/seller/Dashboard";
-import SellerProducts from "./pages/seller/Products";
-import SellerOrders from "./pages/seller/Orders";
-import SellerProfile from "./pages/seller/Profile";
-
-// Layout
-import DashboardLayout from "./components/layouts/DashboardLayout";
-import AuthLayout from "./components/layouts/AuthLayout";
-
-// Utility Components
-import PrivateRoute from "./components/auth/PrivateRoute";
-import AdminRoute from "./components/auth/AdminRoute";
-import SellerRoute from "./components/auth/SellerRoute";
-
-const queryClient = new QueryClient();
+import React from 'react';
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import './App.css';
+import Login from './pages/auth/Login';
+import Register from './pages/auth/Register';
+import Index from './pages/Index';
+import AuthCallback from './pages/auth/AuthCallback';
+import Dashboard from './pages/Dashboard';
+import NotFound from './pages/NotFound';
+import Profile from './pages/Profile';
+import AdminPanel from './pages/AdminPanel';
+import AuthLayout from './components/layouts/AuthLayout';
+import DashboardLayout from './components/layouts/DashboardLayout';
+import Marketplace from './pages/Marketplace';
+import PrivateRoute from './components/auth/PrivateRoute';
+import SellerRoute from './components/auth/SellerRoute';
+import AdminRoute from './components/auth/AdminRoute';
+import SellerDashboard from './pages/seller/Dashboard';
+import SellerProfile from './pages/seller/Profile';
+import SellerProducts from './pages/seller/Products';
+import SellerOrders from './pages/seller/Orders';
+import AddItem from './pages/items/AddItem';
+import Cart from './pages/cart/Cart';
+import MyOrders from './pages/orders/MyOrders';
+import AdvancedFeatures from './pages/services/AdvancedFeatures';
+import { Toaster } from '@/components/ui/sonner';
+import ZeroBot from '@/components/ai/ZeroBot'; // Import ZeroBot component
 
 function App() {
   return (
-    <QueryClientProvider client={queryClient}>
-      <TooltipProvider>
-        <AuthProvider>
-          <Toaster />
-          <Sonner />
-          <Router>
-            <Routes>
-              {/* Public Routes */}
-              <Route path="/" element={<LandingPage />} />
-              
-              {/* Auth Routes */}
-              <Route element={<AuthLayout />}>
-                <Route path="/login" element={<Login />} />
-                <Route path="/register" element={<Register />} />
-              </Route>
-              <Route path="/auth/callback" element={<AuthCallback />} />
-              
-              {/* Protected Dashboard Routes */}
-              <Route element={<PrivateRoute><DashboardLayout /></PrivateRoute>}>
-                <Route path="/dashboard" element={<Dashboard />} />
-                <Route path="/marketplace" element={<Marketplace />} />
-                <Route path="/profile" element={<Profile />} />
-                <Route path="/orders" element={<MyOrders />} />
-                <Route path="/cart" element={<Cart />} />
-                <Route path="/advanced-features" element={<AdvancedFeatures />} />
-                
-                {/* Only show Add Item for sellers */}
-                <Route path="/items/add" element={
-                  <SellerRoute>
-                    <AddItem />
-                  </SellerRoute>
-                } />
-                
-                {/* Seller Routes */}
-                <Route path="/seller/*" element={
-                  <SellerRoute>
-                    <Routes>
-                      <Route path="dashboard" element={<SellerDashboard />} />
-                      <Route path="products" element={<SellerProducts />} />
-                      <Route path="orders" element={<SellerOrders />} />
-                      <Route path="profile" element={<SellerProfile />} />
-                    </Routes>
-                  </SellerRoute>
-                } />
-              </Route>
-              
-              {/* Admin Routes */}
-              <Route element={<AdminRoute><DashboardLayout /></AdminRoute>}>
-                <Route path="/admin" element={<AdminPanel />} />
-                <Route path="/admin/panel" element={<AdminPanel />} />
-              </Route>
-              
-              {/* Catch-all Route */}
-              <Route path="*" element={<NotFound />} />
-            </Routes>
-          </Router>
-        </AuthProvider>
-      </TooltipProvider>
-    </QueryClientProvider>
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<Index />} />
+        <Route element={<AuthLayout />}>
+          <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<Register />} />
+        </Route>
+        <Route path="/auth/callback" element={<AuthCallback />} />
+
+        <Route element={<PrivateRoute />}>
+          <Route element={<DashboardLayout />}>
+            <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/profile" element={<Profile />} />
+            <Route path="/marketplace" element={<Marketplace />} />
+            <Route path="/cart" element={<Cart />} />
+            <Route path="/orders" element={<MyOrders />} />
+            <Route path="/advanced-features" element={<AdvancedFeatures />} />
+
+            <Route element={<SellerRoute />}>
+              <Route path="/seller/dashboard" element={<SellerDashboard />} />
+              <Route path="/seller/profile" element={<SellerProfile />} />
+              <Route path="/seller/products" element={<SellerProducts />} />
+              <Route path="/seller/orders" element={<SellerOrders />} />
+              <Route path="/items/add" element={<AddItem />} />
+            </Route>
+
+            <Route element={<AdminRoute />}>
+              <Route path="/admin/panel" element={<AdminPanel />} />
+            </Route>
+          </Route>
+        </Route>
+
+        <Route path="*" element={<NotFound />} />
+      </Routes>
+      
+      <Toaster richColors />
+      <ZeroBot /> {/* Add ZeroBot to be accessible across the entire app */}
+    </BrowserRouter>
   );
 }
 

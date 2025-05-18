@@ -5,6 +5,7 @@ import { ShoppingCart, Check } from 'lucide-react';
 import { useCart } from '@/hooks/useCart';
 import { Item } from '@/types';
 import { motion } from 'framer-motion';
+import { toast } from 'sonner';
 
 interface AddToCartButtonProps {
   item: Item;
@@ -20,14 +21,15 @@ const AddToCartButton: React.FC<AddToCartButtonProps> = ({
   className = ''
 }) => {
   const { addToCart, cartItems } = useCart();
-  const isInCart = cartItems.some(cartItem => cartItem.id === item.id);
+  const isInCart = cartItems.some(cartItem => cartItem.productId === item.id);
   
   const handleAddToCart = (e: React.MouseEvent) => {
     e.stopPropagation();
     e.preventDefault();
     
     addToCart({
-      id: item.id,
+      id: crypto.randomUUID(), // Generate a unique ID for the cart item
+      productId: item.id,
       name: item.name,
       price: item.currentPrice,
       image: item.imageUrl || 'https://via.placeholder.com/150',
@@ -35,6 +37,8 @@ const AddToCartButton: React.FC<AddToCartButtonProps> = ({
       sellerId: item.userId,
       quantity: 1
     });
+    
+    toast.success(`Added ${item.name} to cart`);
   };
   
   return (
@@ -44,6 +48,7 @@ const AddToCartButton: React.FC<AddToCartButtonProps> = ({
         variant={isInCart ? 'outline' : variant}
         size={size}
         className={`${className} ${isInCart ? 'border-green-500 text-green-500' : ''}`}
+        disabled={isInCart}
       >
         {isInCart ? (
           <>

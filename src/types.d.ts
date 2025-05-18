@@ -10,6 +10,17 @@ export interface User {
   businessType?: 'retailer' | 'distributor' | 'manufacturer' | 'individual';
   trustScore?: number;
   verified?: boolean;
+  notificationPreferences?: {
+    email: boolean;
+    push: boolean;
+    sms: boolean;
+  };
+  socialMedia?: {
+    twitter?: string;
+    facebook?: string;
+    instagram?: string;
+    linkedin?: string;
+  };
 }
 
 export type ItemCategory = 
@@ -21,7 +32,13 @@ export type ItemCategory =
   | 'other'
   | 'books'
   | 'toys'
-  | 'medicine';
+  | 'medicine'
+  | 'beauty'
+  | 'sports'
+  | 'automotive'
+  | 'garden'
+  | 'pet_supplies'
+  | 'office';
 
 export interface Item {
   id: string;
@@ -32,7 +49,7 @@ export interface Item {
   expiryDate: string;
   createdAt: string;
   updatedAt: string;
-  status: 'available' | 'sold' | 'expired' | 'donated' | 'flagged' | 'reserved';
+  status: ItemStatus;
   userId: string;
   userName: string;
   userPhoto: string | null;
@@ -56,20 +73,31 @@ export interface Item {
   };
 }
 
+export type ItemStatus = 'available' | 'sold' | 'expired' | 'donated' | 'flagged' | 'reserved';
+
+export interface ItemStatusInterface {
+  available: string;
+  sold: string;
+  expired: string;
+  donated: string;
+  flagged: string;
+  reserved: string;
+}
+
 export type OrderStatus = 'pending' | 'processing' | 'shipped' | 'delivered' | 'cancelled' | 'out-for-delivery';
 
 export interface Order {
   id: string;
   userId: string;
   buyerId?: string;
-  sellerId?: string;  // Added for order tracking
+  sellerId?: string;
   status: OrderStatus;
   totalAmount: number;
   items: OrderItem[];
   createdAt: string;
   updatedAt: string;
   buyerName?: string;
-  sellerName?: string; // Added for order display
+  sellerName?: string;
   paymentStatus?: string;
   paymentMethod?: string;
   shippingAddress: string;
@@ -88,19 +116,10 @@ export interface OrderItem {
   productId: string;
   quantity: number;
   price: number;
-  name: string;  // Changed from productName
-  productName?: string; // For backward compatibility
+  name: string;
+  productName?: string;
   productImage?: string;
-  imageUrl?: string; // For consistency
-}
-
-export interface ItemStatus {
-  available: string;
-  sold: string;
-  expired: string;
-  donated: string;
-  flagged: string;
-  reserved: string;
+  imageUrl?: string;
 }
 
 export interface Notification {
@@ -116,11 +135,14 @@ export interface Notification {
 
 export interface CartItem {
   id: string;
-  productId: string;
+  productId?: string;
+  user_id?: string;
   quantity: number;
   name: string;
   price: number;
   image: string;
+  expiryDate?: string;
+  sellerId?: string;
 }
 
 // For Task Scheduler

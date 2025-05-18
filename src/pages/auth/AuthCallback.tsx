@@ -54,7 +54,7 @@ const AuthCallback = () => {
         let userIsSeller = false;
         
         // First check URL parameter (this takes precedence)
-        if (isSeller) {
+        if (isSeller === true) {
           userIsSeller = true;
           console.log("User is seller based on URL parameter");
         } 

@@ -21,11 +21,12 @@ const ProductRow: React.FC<ProductRowProps> = ({
 }) => {
   const getStatusIcon = (status: string) => {
     switch(status.toLowerCase()) {
-      case 'active':
+      case 'available':
         return <CheckCircle className="h-4 w-4 text-green-500" />;
-      case 'out of stock':
+      case 'sold':
+      case 'expired':
         return <AlertCircle className="h-4 w-4 text-red-500" />;
-      case 'pending':
+      case 'reserved':
         return <Clock className="h-4 w-4 text-yellow-500" />;
       default:
         return null;
@@ -57,7 +58,10 @@ const ProductRow: React.FC<ProductRowProps> = ({
         <div className="text-sm font-medium text-gray-900">{product.name}</div>
       </motion.td>
       <motion.td className="px-6 py-4 whitespace-nowrap animate-cell" style={{ animationDelay: '0.1s' }}>
-        <div className="text-sm text-gray-900">${product.price.toFixed(2)}</div>
+        <div className="text-sm text-gray-900">₹{product.currentPrice.toFixed(2)}</div>
+        {product.originalPrice && product.originalPrice > product.currentPrice && (
+          <div className="text-xs text-gray-500 line-through">₹{product.originalPrice.toFixed(2)}</div>
+        )}
       </motion.td>
       <motion.td className="px-6 py-4 whitespace-nowrap animate-cell" style={{ animationDelay: '0.15s' }}>
         <Badge className={`${getCategoryBadgeColor(product.category)}`}>

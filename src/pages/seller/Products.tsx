@@ -1,43 +1,180 @@
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { useProductManagement } from '@/hooks/products/useProductManagement';
+import { Item } from '@/types';
+import TopNavbar from '@/components/layouts/TopNavbar';
 import ProductsHeader from '@/components/products/headers/ProductsHeader';
 import CategoryFilters from '@/components/products/filters/CategoryFilters';
-import ProductsCard from '@/components/products/containers/ProductsCard';
+import ProductTable from '@/components/products/ProductTable';
+import { useToast } from '@/components/ui/use-toast';
 
 const SellerProducts: React.FC = () => {
   const navigate = useNavigate();
-  const { filteredProducts, activeFilter, handleFilterByCategory } = useProductManagement();
+  const { toast } = useToast();
+  const [products, setProducts] = useState<Item[]>([]);
+  const [activeFilter, setActiveFilter] = useState<string>('all');
+  const [loading, setLoading] = useState<boolean>(true);
+  
+  // Mock products for demonstration
+  useEffect(() => {
+    // Simulate API call
+    setTimeout(() => {
+      const mockProducts: Item[] = [
+        {
+          id: 'prod-1',
+          name: 'Organic Tomatoes',
+          description: 'Fresh organic tomatoes from local farms.',
+          category: 'food',
+          status: 'available',
+          imageUrl: 'https://images.unsplash.com/photo-1582284540020-8acbe03f4924?q=80&w=300',
+          quantity: 50,
+          currentPrice: 5.99,
+          originalPrice: 7.99,
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
+          expiryDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
+          userId: 'seller-123',
+          userName: 'John Seller',
+          userPhoto: null,
+          location: {
+            lat: 28.6139,
+            lng: 77.2090,
+            address: '123 Market St, Delhi, India',
+          }
+        },
+        {
+          id: 'prod-2',
+          name: 'Cotton T-shirts (5-pack)',
+          description: 'Pack of 5 cotton t-shirts, assorted colors.',
+          category: 'clothing',
+          status: 'available',
+          imageUrl: 'https://images.unsplash.com/photo-1576566588028-4147f3842f27?q=80&w=300',
+          quantity: 25,
+          currentPrice: 1299.00,
+          originalPrice: 1599.00,
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
+          expiryDate: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString(),
+          userId: 'seller-123',
+          userName: 'John Seller',
+          userPhoto: null,
+          location: {
+            lat: 28.6139,
+            lng: 77.2090,
+            address: '123 Market St, Delhi, India',
+          }
+        },
+        {
+          id: 'prod-3',
+          name: 'Bluetooth Headphones',
+          description: 'Wireless Bluetooth headphones with noise cancellation.',
+          category: 'electronics',
+          status: 'available',
+          imageUrl: 'https://images.unsplash.com/photo-1578319439584-104c94d37305?q=80&w=300',
+          quantity: 10,
+          currentPrice: 2499.00,
+          originalPrice: 2999.00,
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
+          expiryDate: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString(),
+          userId: 'seller-123',
+          userName: 'John Seller',
+          userPhoto: null,
+          location: {
+            lat: 28.6139,
+            lng: 77.2090,
+            address: '123 Market St, Delhi, India',
+          }
+        }
+      ];
+      
+      setProducts(mockProducts);
+      setLoading(false);
+    }, 800);
+  }, []);
+  
+  const handleFilterByCategory = (category: string) => {
+    setActiveFilter(category);
+  };
+  
+  // Filter products based on active category filter
+  const filteredProducts = activeFilter === 'all' 
+    ? products 
+    : products.filter(product => product.category === activeFilter);
   
   const handleAddProduct = () => {
     navigate('/items/add');
   };
+  
+  // Utility functions for product table
+  const getCategoryBadgeColor = (category: string) => {
+    const colorMap: Record<string, string> = {
+      food: 'bg-green-100 text-green-800 border-green-200',
+      clothing: 'bg-blue-100 text-blue-800 border-blue-200',
+      electronics: 'bg-purple-100 text-purple-800 border-purple-200',
+      household: 'bg-amber-100 text-amber-800 border-amber-200',
+      furniture: 'bg-indigo-100 text-indigo-800 border-indigo-200',
+      books: 'bg-cyan-100 text-cyan-800 border-cyan-200',
+      toys: 'bg-pink-100 text-pink-800 border-pink-200',
+      medicine: 'bg-red-100 text-red-800 border-red-200',
+      other: 'bg-gray-100 text-gray-800 border-gray-200',
+    };
+    return colorMap[category] || 'bg-gray-100 text-gray-800 border-gray-200';
+  };
+  
+  const getStatusBadgeColor = (status: string) => {
+    const colorMap: Record<string, string> = {
+      available: 'bg-green-100 text-green-800 border-green-200',
+      sold: 'bg-blue-100 text-blue-800 border-blue-200',
+      expired: 'bg-red-100 text-red-800 border-red-200',
+      donated: 'bg-purple-100 text-purple-800 border-purple-200',
+      flagged: 'bg-amber-100 text-amber-800 border-amber-200',
+      reserved: 'bg-indigo-100 text-indigo-800 border-indigo-200',
+    };
+    return colorMap[status] || 'bg-gray-100 text-gray-800 border-gray-200';
+  };
+  
+  const formatDate = (dateString: string) => {
+    return new Date(dateString).toLocaleDateString();
+  };
 
   return (
-    <motion.div 
-      className="space-y-6"
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      transition={{ duration: 0.5 }}
-    >
-      <ProductsHeader 
-        products={filteredProducts} 
-        onAddProduct={handleAddProduct} 
-      />
-      
-      <CategoryFilters 
-        activeFilter={activeFilter} 
-        onFilterChange={handleFilterByCategory} 
-      />
-      
-      <ProductsCard 
-        products={filteredProducts} 
-        activeFilter={activeFilter}
-        handleAddProduct={handleAddProduct}
-      />
-    </motion.div>
+    <>
+      <TopNavbar />
+      <div className="container mx-auto py-6 px-4">
+        <motion.div 
+          className="space-y-6"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.5 }}
+        >
+          <ProductsHeader 
+            products={filteredProducts} 
+            onAddProduct={handleAddProduct} 
+          />
+          
+          <CategoryFilters 
+            activeFilter={activeFilter} 
+            onFilterChange={handleFilterByCategory} 
+          />
+          
+          {loading ? (
+            <div className="flex justify-center py-12">
+              <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
+            </div>
+          ) : (
+            <ProductTable 
+              products={filteredProducts} 
+              getCategoryBadgeColor={getCategoryBadgeColor}
+              getStatusBadgeColor={getStatusBadgeColor}
+              formatDate={formatDate}
+              handleAddProduct={handleAddProduct}
+            />
+          )}
+        </motion.div>
+      </div>
+    </>
   );
 };
 
