@@ -1,6 +1,7 @@
 
 import { useState, useRef, useEffect } from 'react';
 import { Message, MessageCategory } from '@/types/chat';
+import { toast } from 'sonner';
 
 export function useChatMessages(sellerMode: boolean, initialPrompt?: string) {
   // State for messages
@@ -18,17 +19,31 @@ export function useChatMessages(sellerMode: boolean, initialPrompt?: string) {
     if (messages.length === 0) {
       addBotMessage(
         sellerMode
-          ? "Welcome to ZeroBot AI v4.0! I'm here to help you manage your seller account, add new products, analyze sales data, and optimize your store performance. What would you like assistance with today?"
-          : "Hello! I'm ZeroBot AI v4.0, your shopping and sustainability assistant. I can help you find products, track orders, learn about sustainability features, and more. How can I assist you today?",
+          ? "Welcome to ZeroBot AI v5.0! I'm here to help you manage your seller account, add new products, analyze sales data, and optimize your store performance. What would you like assistance with today?"
+          : "Hello! I'm ZeroBot AI v5.0, your enhanced shopping and sustainability assistant. I can help you find products, track orders, learn about sustainability features, and more. How can I assist you today?",
         'general'
       );
     }
     
     // Handle initial prompt if provided
     if (initialPrompt && messages.length === 1) {
-      handleInitialPrompt(initialPrompt);
+      setTimeout(() => {
+        handleInitialPrompt(initialPrompt);
+      }, 1000);
     }
-  }, [initialPrompt, sellerMode]);
+  }, []);
+  
+  // Ensure initialPrompt is only processed once
+  const initialPromptProcessed = useRef(false);
+  
+  useEffect(() => {
+    if (initialPrompt && messages.length === 1 && !initialPromptProcessed.current) {
+      initialPromptProcessed.current = true;
+      setTimeout(() => {
+        handleInitialPrompt(initialPrompt);
+      }, 1000);
+    }
+  }, [initialPrompt, messages]);
   
   // Scroll to bottom when messages change
   useEffect(() => {
@@ -41,6 +56,8 @@ export function useChatMessages(sellerMode: boolean, initialPrompt?: string) {
   };
   
   const addUserMessage = (content: string) => {
+    if (!content.trim()) return;
+    
     const userMessage: Message = {
       id: Date.now(),
       content,
@@ -63,8 +80,14 @@ export function useChatMessages(sellerMode: boolean, initialPrompt?: string) {
   };
   
   const handleInitialPrompt = (prompt: string) => {
-    // This will be handled by the message handling hook
-    // Just adding a placeholder function here for the effect dependency
+    try {
+      addUserMessage(prompt);
+      // Additional logic for processing the initial prompt will be handled by
+      // the message handling hook that consumes this hook
+    } catch (error) {
+      console.error("Error processing initial prompt:", error);
+      toast.error("Failed to process initial prompt");
+    }
   };
 
   return {

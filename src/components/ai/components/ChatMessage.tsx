@@ -1,11 +1,12 @@
 
-import React from 'react';
-import { Bot, ThumbsDown, ThumbsUp } from 'lucide-react';
+import React, { useState } from 'react';
+import { Bot, ThumbsDown, ThumbsUp, Copy, CheckCheck } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Message } from '@/types/chat';
 import { motion } from 'framer-motion';
+import { toast } from 'sonner';
 
 interface ChatMessageProps {
   message: Message;
@@ -22,6 +23,7 @@ const ChatMessage: React.FC<ChatMessageProps> = ({
   currentUser,
   handleMessageReaction
 }) => {
+  const [copied, setCopied] = useState(false);
   const isBot = message.sender === 'bot';
   const isHighlighted = searchQuery && message.content.toLowerCase().includes(searchQuery.toLowerCase());
   
@@ -39,6 +41,16 @@ const ChatMessage: React.FC<ChatMessageProps> = ({
         )}
       </>
     );
+  };
+  
+  const copyToClipboard = () => {
+    navigator.clipboard.writeText(message.content);
+    setCopied(true);
+    toast.success("Message copied to clipboard");
+    
+    setTimeout(() => {
+      setCopied(false);
+    }, 2000);
   };
   
   return (
@@ -67,15 +79,32 @@ const ChatMessage: React.FC<ChatMessageProps> = ({
           {highlightText(message.content)}
         </p>
         
-        {/* Category badge for bot messages */}
-        {isBot && message.category && (
-          <div className="mt-1 flex items-center justify-between">
-            <Badge variant="outline" className="text-xs bg-gray-50">
-              {message.category}
-            </Badge>
+        {/* Category badge and controls for bot messages */}
+        {isBot && (
+          <div className="mt-2 flex items-center justify-between">
+            <div className="flex items-center">
+              {message.category && (
+                <Badge variant="outline" className="text-xs bg-gray-50 mr-2">
+                  {message.category}
+                </Badge>
+              )}
+              
+              {/* Copy button */}
+              <Button 
+                variant="ghost" 
+                size="icon" 
+                className="h-5 w-5 rounded-full hover:bg-gray-100"
+                onClick={copyToClipboard}
+              >
+                {copied ? 
+                  <CheckCheck size={12} className="text-green-500" /> : 
+                  <Copy size={12} className="text-gray-400" />
+                }
+              </Button>
+            </div>
             
             {/* Feedback buttons */}
-            <div className="flex space-x-1 ml-2">
+            <div className="flex space-x-1">
               <Button 
                 variant="ghost" 
                 size="icon" 

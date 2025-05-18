@@ -17,11 +17,6 @@ interface ZeroBotDialogProps {
   messagesEndRef: React.RefObject<HTMLDivElement>;
   trainingMode: boolean;
   setTrainingMode: (mode: boolean) => void;
-  trainingQuestion: string;
-  setTrainingQuestion: (value: string) => void;
-  trainingAnswer: string;
-  setTrainingAnswer: (value: string) => void;
-  addTrainingPair: () => void;
   handleSendMessage: () => void;
   handleKeyPress: (e: React.KeyboardEvent) => void;
 }
@@ -36,11 +31,6 @@ const ZeroBotDialog: React.FC<ZeroBotDialogProps> = ({
   messagesEndRef,
   trainingMode,
   setTrainingMode,
-  trainingQuestion,
-  setTrainingQuestion,
-  trainingAnswer,
-  setTrainingAnswer,
-  addTrainingPair,
   handleSendMessage,
   handleKeyPress
 }) => {
@@ -68,11 +58,6 @@ const ZeroBotDialog: React.FC<ZeroBotDialogProps> = ({
         <AnimatePresence>
           {trainingMode && (
             <ZeroBotTrainingPanel
-              trainingQuestion={trainingQuestion}
-              trainingAnswer={trainingAnswer}
-              setTrainingQuestion={setTrainingQuestion}
-              setTrainingAnswer={setTrainingAnswer}
-              addTrainingPair={addTrainingPair}
               setTrainingMode={setTrainingMode}
             />
           )}
@@ -84,7 +69,6 @@ const ZeroBotDialog: React.FC<ZeroBotDialogProps> = ({
             setInputValue={setInputValue}
             handleSendMessage={handleSendMessage}
             handleKeyPress={handleKeyPress}
-            setTrainingMode={setTrainingMode}
             trainingMode={trainingMode}
           />
         </CardFooter>

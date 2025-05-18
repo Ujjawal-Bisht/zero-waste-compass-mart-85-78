@@ -38,25 +38,42 @@ class StreamHandlerService {
       // Start with thinking indicators
       onChunk("Analyzing your question");
       await new Promise(resolve => setTimeout(resolve, 500));
-      onChunk("...");
+      onChunk("...\n\n");
       await new Promise(resolve => setTimeout(resolve, 400));
       
       // Generate a realistic response based on context
       const fullResponse = contentGenerator.generateContextualResponse(message, detectedContext);
-      const tokens = fullResponse.split(' ');
       
-      // Stream tokens with natural timing
-      for (let i = 0; i < tokens.length; i++) {
+      // Split into sentences for more realistic streaming
+      const sentences = fullResponse.match(/[^.!?]+[.!?]+/g) || [fullResponse];
+      
+      for (const sentence of sentences) {
         if (signal.aborted) {
           throw new Error('Stream was cancelled');
         }
         
-        const token = tokens[i] + (i < tokens.length - 1 ? ' ' : '');
-        onChunk(token);
+        // Stream each word with natural timing
+        const words = sentence.split(' ');
         
-        // Randomize streaming speed to feel more natural
-        const delay = Math.floor(Math.random() * 40) + 20;  
-        await new Promise(resolve => setTimeout(resolve, delay));
+        for (let i = 0; i < words.length; i++) {
+          if (signal.aborted) {
+            throw new Error('Stream was cancelled');
+          }
+          
+          const word = words[i] + (i < words.length - 1 ? ' ' : '');
+          onChunk(word);
+          
+          // Randomize streaming speed to feel more natural
+          const delay = Math.floor(Math.random() * 30) + 15;
+          await new Promise(resolve => setTimeout(resolve, delay));
+        }
+        
+        // Add a short pause between sentences
+        if (signal.aborted) {
+          throw new Error('Stream was cancelled');
+        }
+        
+        await new Promise(resolve => setTimeout(resolve, 150));
       }
       
       // Prepare the complete response object

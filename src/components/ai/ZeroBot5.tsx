@@ -117,7 +117,7 @@ const ZeroBot5: React.FC<ZeroBot5Props> = ({
                 className="absolute -top-1 -right-1 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs font-bold"
                 initial={{ scale: 0 }}
                 animate={{ scale: 1 }}
-                transition={{ type: 'spring', stiffness: 300, damping: 20 }}
+                transition={{ type: "spring", stiffness: 300, damping: 20 }}
               >
                 1
               </motion.div>
@@ -128,7 +128,7 @@ const ZeroBot5: React.FC<ZeroBot5Props> = ({
               className="absolute -bottom-1 -right-1 bg-white shadow-md text-xs rounded-full w-6 h-6 flex items-center justify-center font-bold"
               initial={{ scale: 0 }}
               animate={{ scale: 1 }}
-              transition={{ type: 'spring', delay: 0.1 }}
+              transition={{ type: "spring", delay: 0.1 }}
             >
               {sellerMode ? (
                 <span className="text-amber-500 font-bold">S</span>
@@ -249,10 +249,6 @@ const ZeroBot5: React.FC<ZeroBot5Props> = ({
                   sellerMode={sellerMode}
                   onClose={() => bot.setShowSettings(false)}
                   clearChat={bot.clearChat}
-                  theme={theme}
-                  enableAI={enableAI}
-                  enableVoice={enableVoice}
-                  enableRealtime={enableRealtime}
                 />
               )}
             </AnimatePresence>

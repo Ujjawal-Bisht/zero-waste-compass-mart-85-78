@@ -22,7 +22,6 @@ const SellerBot: React.FC<SellerBotProps> = ({
       showAnalytics={true}
       sellerMode={true}
       theme={theme}
-      enableAI={true}
     />
   );
 };

@@ -28,7 +28,7 @@ export function useMessageHandling({
   setSuggestions,
 }: MessageHandlingProps) {
   const handleSendMessage = async (content: string = '') => {
-    if (!content) return;
+    if (!content.trim()) return;
     
     // Add user message to chat
     addUserMessage(content);
@@ -115,7 +115,9 @@ export function useMessageHandling({
   const handleKeyPress = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
-      handleSendMessage();
+      const target = e.target as HTMLTextAreaElement;
+      handleSendMessage(target.value);
+      target.value = '';
     }
   };
   
