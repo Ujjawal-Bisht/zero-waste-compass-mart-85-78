@@ -1,3 +1,4 @@
+
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -20,6 +21,7 @@ import AuthCallback from "./pages/auth/AuthCallback";
 import AddItem from "./pages/items/AddItem";
 import MyOrders from "./pages/orders/MyOrders";
 import Cart from "./pages/cart/Cart";
+import AdvancedFeatures from "./pages/services/AdvancedFeatures";
 
 // Seller Pages
 import SellerDashboard from "./pages/seller/Dashboard";
@@ -83,6 +85,9 @@ function App() {
                     </Routes>
                   </SellerRoute>
                 } />
+                
+                {/* Advanced Features */}
+                <Route path="/advanced-features" element={<AdvancedFeatures />} />
               </Route>
               
               {/* Admin Routes */}
@@ -90,14 +95,7 @@ function App() {
                 <Route path="/admin" element={<AdminPanel />} />
               </Route>
               
-              {/* Add new routes for advanced features */}
-              <Route path="/advanced-features" element={
-                <PrivateRoute>
-                  <DashboardLayout>
-                    <AdvancedFeatures />
-                  </DashboardLayout>
-                </PrivateRoute>
-              } />
+              {/* Admin Panel */}
               <Route path="/admin/panel" element={
                 <AdminRoute>
                   <DashboardLayout>
