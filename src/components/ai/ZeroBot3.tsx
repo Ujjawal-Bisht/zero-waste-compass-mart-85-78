@@ -1,6 +1,5 @@
 
-import React from 'react';
-import { useChatMessages } from './hooks/zerobot/useChatMessages';
+import React, { useState, useEffect, useRef } from 'react';
 import ZeroBotDialog from './components/zerobot/ZeroBotDialog';
 
 export interface ZeroBot3Props {
@@ -22,19 +21,21 @@ const ZeroBot3: React.FC<ZeroBot3Props> = ({
   enableRealtime = true,
   showAnalytics = true
 }) => {
-  // Use our hook to manage state and behavior
-  const {
-    messages,
-    isTyping,
-    sendMessage,
-    messagesEndRef,
-    inputValue,
-    setInputValue,
-    isOpen,
-    setIsOpen,
-    trainingMode, 
-    setTrainingMode,
-  } = useChatMessages();
+  // States
+  const [messages, setMessages] = useState<any[]>([
+    {
+      id: 1,
+      content: "👋 Hi there! I'm your ZeroBot AI assistant v3.0. How can I help you today?",
+      sender: 'bot',
+      timestamp: new Date(),
+      category: 'general',
+    },
+  ]);
+  const [isTyping, setIsTyping] = useState(false);
+  const [inputValue, setInputValue] = useState('');
+  const [isOpen, setIsOpen] = useState(false);
+  const [trainingMode, setTrainingMode] = useState(false);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
 
   // Handle input submission
   const handleSendMessage = () => {
@@ -42,6 +43,37 @@ const ZeroBot3: React.FC<ZeroBot3Props> = ({
       sendMessage(inputValue);
       setInputValue('');
     }
+  };
+
+  // Send message function
+  const sendMessage = (content: string) => {
+    if (!content.trim()) return;
+
+    // Add user message
+    const userMessage = {
+      id: Date.now(),
+      content,
+      sender: 'user',
+      timestamp: new Date(),
+      category: 'general',
+    };
+
+    setMessages((prev) => [...prev, userMessage]);
+    setIsTyping(true);
+
+    // Simulate AI response
+    setTimeout(() => {
+      const aiResponse = {
+        id: Date.now() + 1,
+        content: `I received your message: "${content}". This is a simulated response.`,
+        sender: 'bot',
+        timestamp: new Date(),
+        category: 'general',
+      };
+
+      setMessages((prev) => [...prev, aiResponse]);
+      setIsTyping(false);
+    }, 1000);
   };
 
   // Handle pressing Enter to send
@@ -53,7 +85,7 @@ const ZeroBot3: React.FC<ZeroBot3Props> = ({
   };
 
   // Open the chat on initial render if showInitially is true
-  React.useEffect(() => {
+  useEffect(() => {
     if (showInitially) {
       setIsOpen(true);
     }
@@ -85,7 +117,7 @@ const ZeroBot3: React.FC<ZeroBot3Props> = ({
       ) : (
         <button
           onClick={() => setIsOpen(true)}
-          className="fixed bottom-6 right-6 bg-gradient-to-r from-indigo-500 to-purple-600 text-white rounded-full w-14 h-14 flex items-center justify-center shadow-lg hover:shadow-xl transition-all"
+          className="fixed bottom-6 right-6 bg-indigo-600 text-white rounded-full w-14 h-14 flex items-center justify-center shadow-lg hover:shadow-xl transition-all"
           aria-label="Open ZeroBot AI"
         >
           <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">

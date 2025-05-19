@@ -1,6 +1,7 @@
 
 import React from 'react';
 import ZeroBot3 from './ai/ZeroBot3';
+import ZeroBotAssistant from './ai/ZeroBotAssistant';
 import { useDeviceType } from '@/hooks/use-mobile';
 
 interface ChatBotProps {
@@ -22,33 +23,22 @@ const ChatBot: React.FC<ChatBotProps> = ({
   enableVoice = true,
   enableRealtime = true,
   showAnalytics = true,
-  version = 3 // Default to version 3
+  version = 5 // Default to version 5 now
 }) => {
   const deviceType = useDeviceType();
   const isMobile = deviceType === 'mobile';
   
-  // Use version 3 as default, and only render v5 if specifically requested
+  // Use ZeroBotAssistant as default for the new version 5
   if (version === 5) {
-    // Import is done dynamically to avoid loading v5 when not needed
-    const ZeroBot5 = React.lazy(() => import('./ai/ZeroBot5'));
-    
     return (
-      <React.Suspense fallback={<div className="fixed bottom-4 right-4 bg-gray-100 p-2 rounded-md shadow-md">Loading...</div>}>
-        <ZeroBot5
-          initialPrompt={initialPrompt}
-          showInitially={showInitially}
-          enableVoice={enableVoice}
-          enableRealtime={enableRealtime}
-          showAnalytics={showAnalytics}
-          sellerMode={sellerMode}
-          theme={theme}
-          isMobile={isMobile}
-        />
-      </React.Suspense>
+      <ZeroBotAssistant
+        initialPrompt={initialPrompt}
+        showInitially={showInitially}
+      />
     );
   }
   
-  // Default to ZeroBot3
+  // Fallback to ZeroBot3
   return (
     <ZeroBot3
       initialPrompt={initialPrompt}

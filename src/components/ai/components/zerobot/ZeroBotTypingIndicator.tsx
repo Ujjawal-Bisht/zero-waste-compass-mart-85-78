@@ -2,34 +2,37 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 
-const ZeroBotTypingIndicator: React.FC = () => {
+interface ZeroBotTypingIndicatorProps {
+  isMobile?: boolean;
+}
+
+const ZeroBotTypingIndicator: React.FC<ZeroBotTypingIndicatorProps> = ({ isMobile = false }) => {
   return (
-    <motion.div 
-      className="flex justify-start"
-      initial={{ opacity: 0, y: 10 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.2 }}
-    >
-      <div className="bg-white rounded-lg p-3 shadow-sm border border-gray-100 rounded-bl-none">
-        <div className="flex space-x-2 items-center h-5">
-          <motion.div 
-            className="w-2 h-2 bg-emerald-500 rounded-full"
-            animate={{ scale: [0.5, 1, 0.5] }}
-            transition={{ repeat: Infinity, duration: 1.5, ease: "easeInOut" }}
-          />
-          <motion.div 
-            className="w-2 h-2 bg-emerald-500 rounded-full"
-            animate={{ scale: [0.5, 1, 0.5] }}
-            transition={{ repeat: Infinity, duration: 1.5, ease: "easeInOut", delay: 0.2 }}
-          />
-          <motion.div 
-            className="w-2 h-2 bg-emerald-500 rounded-full"
-            animate={{ scale: [0.5, 1, 0.5] }}
-            transition={{ repeat: Infinity, duration: 1.5, ease: "easeInOut", delay: 0.4 }}
-          />
+    <div className="flex items-center justify-start">
+      <motion.div 
+        className={`bg-white p-3 rounded-lg shadow-sm ${isMobile ? 'p-2 max-w-[70%]' : ''}`}
+      >
+        <div className="flex items-center space-x-2">
+          <div className="text-sm text-gray-500">ZeroBot is typing</div>
+          <div className="flex space-x-1">
+            {[0, 1, 2].map((i) => (
+              <motion.div
+                key={i}
+                className="w-2 h-2 bg-gray-400 rounded-full"
+                initial={{ opacity: 0.3 }}
+                animate={{ opacity: [0.3, 1, 0.3] }}
+                transition={{
+                  duration: 1.2,
+                  repeat: Infinity,
+                  delay: i * 0.15,
+                  ease: "easeInOut"
+                }}
+              />
+            ))}
+          </div>
         </div>
-      </div>
-    </motion.div>
+      </motion.div>
+    </div>
   );
 };
 

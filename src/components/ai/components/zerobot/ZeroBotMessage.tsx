@@ -5,9 +5,10 @@ import { Message } from '@/types/chat';
 
 interface ZeroBotMessageProps {
   message: Message;
+  isMobile?: boolean;
 }
 
-const ZeroBotMessage: React.FC<ZeroBotMessageProps> = ({ message }) => {
+const ZeroBotMessage: React.FC<ZeroBotMessageProps> = ({ message, isMobile = false }) => {
   return (
     <motion.div
       initial={{ opacity: 0, y: 10 }}
@@ -20,9 +21,9 @@ const ZeroBotMessage: React.FC<ZeroBotMessageProps> = ({ message }) => {
           message.sender === 'user' 
             ? 'bg-indigo-600 text-white rounded-br-none' 
             : 'bg-white rounded-bl-none border border-gray-100'
-        }`}
+        } ${isMobile ? 'text-sm' : ''}`}
       >
-        <p className="text-sm">{message.content}</p>
+        <p className={`${isMobile ? 'text-sm' : 'text-sm'}`}>{message.content}</p>
         <div className="mt-1 text-xs opacity-70">
           {new Date(message.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
         </div>
