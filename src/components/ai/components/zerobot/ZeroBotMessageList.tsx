@@ -9,12 +9,14 @@ interface ZeroBotMessageListProps {
   messages: Message[];
   isTyping: boolean;
   messagesEndRef: React.RefObject<HTMLDivElement>;
+  isMobile?: boolean;
 }
 
 const ZeroBotMessageList: React.FC<ZeroBotMessageListProps> = ({ 
   messages, 
   isTyping, 
-  messagesEndRef 
+  messagesEndRef,
+  isMobile = false
 }) => {
   // Generate a safe key for messages by ensuring we never have undefined
   const getMessageKey = (message: Message, index: number): string => {
@@ -27,7 +29,7 @@ const ZeroBotMessageList: React.FC<ZeroBotMessageListProps> = ({
 
   return (
     <motion.div 
-      className="space-y-4 px-1"
+      className={`space-y-4 ${isMobile ? 'px-2' : 'px-1'}`}
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.3 }}
@@ -48,8 +50,9 @@ const ZeroBotMessageList: React.FC<ZeroBotMessageListProps> = ({
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -10 }}
               transition={{ duration: 0.3 }}
+              className={isMobile ? 'mobile-touch-feedback' : ''}
             >
-              <ZeroBotMessage message={message} />
+              <ZeroBotMessage message={message} isMobile={isMobile} />
             </motion.div>
           ))}
         </AnimatePresence>
@@ -64,7 +67,7 @@ const ZeroBotMessageList: React.FC<ZeroBotMessageListProps> = ({
             exit={{ opacity: 0 }}
             transition={{ duration: 0.2 }}
           >
-            <ZeroBotTypingIndicator />
+            <ZeroBotTypingIndicator isMobile={isMobile} />
           </motion.div>
         )}
       </AnimatePresence>

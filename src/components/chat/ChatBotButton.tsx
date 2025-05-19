@@ -8,22 +8,37 @@ interface ChatBotButtonProps {
   onClick: () => void;
   isOpen: boolean;
   hasUnread?: boolean;
+  isMobile?: boolean;
 }
 
-const ChatBotButton: React.FC<ChatBotButtonProps> = ({ onClick, isOpen, hasUnread = false }) => {
+const ChatBotButton: React.FC<ChatBotButtonProps> = ({ 
+  onClick, 
+  isOpen, 
+  hasUnread = false,
+  isMobile = false
+}) => {
+  // Mobile-optimized styles
+  const buttonClasses = isMobile
+    ? 'rounded-full h-12 w-12 p-0 bg-gradient-to-r from-purple-500 to-indigo-600 text-white shadow-lg hover:shadow-xl touch-optimized'
+    : 'rounded-full h-14 w-14 p-0 bg-gradient-to-r from-purple-500 to-indigo-600 text-white shadow-lg hover:shadow-xl';
+    
+  const positionClasses = isMobile
+    ? 'fixed bottom-4 right-4 z-40'
+    : 'fixed bottom-6 right-6 z-40';
+
   return (
     <motion.div
-      className="fixed bottom-6 right-6 z-40"
+      className={positionClasses}
       initial={{ scale: 0 }}
       animate={{ scale: 1 }}
       transition={{ type: "spring", stiffness: 260, damping: 20 }}
     >
       <Button
         onClick={onClick}
-        className={`rounded-full h-14 w-14 p-0 bg-gradient-to-r from-purple-500 to-indigo-600 text-white shadow-lg hover:shadow-xl ${isOpen ? 'hidden' : ''}`}
+        className={`${buttonClasses} ${isOpen ? 'hidden' : ''}`}
         aria-label="Open chat"
       >
-        <MessageCircle size={24} />
+        <MessageCircle size={isMobile ? 20 : 24} />
         
         {/* Unread message indicator */}
         {hasUnread && (

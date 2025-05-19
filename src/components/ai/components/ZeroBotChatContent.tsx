@@ -31,6 +31,7 @@ interface ZeroBotChatContentProps {
   stopRecording: () => void;
   isRecording: boolean;
   handleSuggestionClick: (suggestion: string) => void;
+  isMobile?: boolean;
 }
 
 const ZeroBotChatContent: React.FC<ZeroBotChatContentProps> = ({
@@ -56,7 +57,8 @@ const ZeroBotChatContent: React.FC<ZeroBotChatContentProps> = ({
   startRecording,
   stopRecording,
   isRecording,
-  handleSuggestionClick
+  handleSuggestionClick,
+  isMobile = false
 }) => {
   const displayMessages = searchQuery ? filteredMessages : messages;
   
@@ -68,6 +70,7 @@ const ZeroBotChatContent: React.FC<ZeroBotChatContentProps> = ({
           setSearchQuery={setSearchQuery}
           filteredMessages={filteredMessages}
           isSearching={isSearching}
+          isMobile={isMobile}
         />
       </AnimatePresence>
       
@@ -82,6 +85,7 @@ const ZeroBotChatContent: React.FC<ZeroBotChatContentProps> = ({
         handleMessageReaction={handleMessageReaction}
         cancelCurrentStream={cancelCurrentStream}
         currentUser={currentUser}
+        isMobile={isMobile}
       />
       
       {/* Suggestions */}
@@ -89,6 +93,7 @@ const ZeroBotChatContent: React.FC<ZeroBotChatContentProps> = ({
         suggestions={suggestions}
         isSearching={isSearching}
         handleSuggestionClick={handleSuggestionClick}
+        isMobile={isMobile}
       />
       
       {/* Input area */}
@@ -103,6 +108,7 @@ const ZeroBotChatContent: React.FC<ZeroBotChatContentProps> = ({
         startRecording={startRecording}
         isRecording={isRecording}
         stopRecording={stopRecording}
+        isMobile={isMobile}
       />
     </>
   );

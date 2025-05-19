@@ -1,18 +1,20 @@
 
-import React from 'react';
+import React, { Suspense, lazy } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { Tabs, TabsContent } from '@/components/ui/tabs';
 import { useZeroBot } from './hooks/useZeroBot';
 import ZeroBotV5Header from './components/zerobot/ZeroBotV5Header';
 import ZeroBotTabs from './components/ZeroBotTabs';
-import ZeroBotChatContent from './components/ZeroBotChatContent';
 import HelpTab from './components/HelpTab';
 import AnalyticsTab from './components/AnalyticsTab';
 import SettingsPanel from './components/SettingsPanel';
 import ZeroBotTypingIndicatorV5 from './components/zerobot/ZeroBotTypingIndicatorV5';
-import ZeroBotSuggestionsBar from './components/zerobot/ZeroBotSuggestionsBar';
 import { Bot } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+
+// Lazy loaded components to improve performance
+const ZeroBotChatContent = lazy(() => import('./components/ZeroBotChatContent'));
+const ZeroBotSuggestionsBar = lazy(() => import('./components/zerobot/ZeroBotSuggestionsBar'));
 
 interface ZeroBot5Props {
   initialPrompt?: string;
@@ -23,6 +25,7 @@ interface ZeroBot5Props {
   sellerMode?: boolean;
   theme?: 'light' | 'dark' | 'auto';
   enableAI?: boolean;
+  isMobile?: boolean;
 }
 
 const ZeroBot5: React.FC<ZeroBot5Props> = ({
@@ -34,6 +37,7 @@ const ZeroBot5: React.FC<ZeroBot5Props> = ({
   sellerMode = false,
   theme = 'auto',
   enableAI = true,
+  isMobile = false,
 }) => {
   // Pull out our state/logic hook
   const bot = useZeroBot(initialPrompt, sellerMode);
@@ -79,6 +83,15 @@ const ZeroBot5: React.FC<ZeroBot5Props> = ({
     },
   };
 
+  // Mobile optimized styles
+  const botButtonClasses = `rounded-full h-12 w-12 sm:h-14 sm:w-14 relative flex items-center justify-center shadow-lg 
+  ${sellerMode
+    ? 'bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700'
+    : 'bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700'
+  }`;
+  
+  const botWindowClasses = `fixed ${isMobile ? 'bottom-0 right-0 left-0 rounded-t-2xl h-[85vh]' : 'bottom-6 right-6 w-full sm:w-96 h-[580px] rounded-2xl'} z-50 flex flex-col shadow-xl border border-gray-200 glass-morphism`;
+
   return (
     <>
       {/* Floating bot button */}
@@ -94,15 +107,11 @@ const ZeroBot5: React.FC<ZeroBot5Props> = ({
               bot.setIsOpen(true);
               bot.setHasUnreadMessages(false);
             }}
-            className={`rounded-full h-14 w-14 relative flex items-center justify-center shadow-lg 
-            ${sellerMode
-              ? 'bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700'
-              : 'bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700'
-            }`}
+            className={botButtonClasses}
             size="icon"
             aria-label="Open ZeroBot AI"
           >
-            <Bot className="h-7 w-7 text-white" />
+            <Bot className="h-5 w-5 sm:h-7 sm:w-7 text-white" />
             {bot.hasUnreadMessages && (
               <motion.div
                 className="absolute -top-1 -right-1 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs font-bold ring-2 ring-white"
@@ -121,10 +130,10 @@ const ZeroBot5: React.FC<ZeroBot5Props> = ({
       <AnimatePresence>
         {bot.isOpen && (
           <motion.div
-            className="fixed bottom-6 right-6 z-50 w-full sm:w-96 h-[580px] flex flex-col rounded-2xl shadow-xl border border-gray-200 glass-morphism"
-            initial={{ opacity: 0, scale: 0.94, y: 28 }}
-            animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.97, y: 28 }}
+            className={botWindowClasses}
+            initial={isMobile ? { opacity: 0, y: 100 } : { opacity: 0, scale: 0.94, y: 28 }}
+            animate={isMobile ? { opacity: 1, y: 0 } : { opacity: 1, scale: 1, y: 0 }}
+            exit={isMobile ? { opacity: 0, y: 100 } : { opacity: 0, scale: 0.97, y: 28 }}
             transition={{ type: 'spring', damping: 25, stiffness: 220 }}
           >
             {/* V5 Header with AI Bot icon and theme */}
@@ -134,6 +143,7 @@ const ZeroBot5: React.FC<ZeroBot5Props> = ({
               onClose={() => bot.setIsOpen(false)}
               onSettings={() => bot.setShowSettings(true)}
               badgeVersion="v5"
+              isMobile={isMobile}
             />
 
             {/* Tabs */}
@@ -141,46 +151,52 @@ const ZeroBot5: React.FC<ZeroBot5Props> = ({
               activeTab={bot.activeTab}
               setActiveTab={bot.setActiveTab}
               showAnalytics={showAnalytics}
+              isMobile={isMobile}
             />
 
             {/* Main Content */}
             <div className="flex-1 flex flex-col overflow-hidden bg-gradient-to-br from-gray-50/90 to-white/80 dark:from-gray-900/70 dark:to-gray-800/90">
-              {/* Wrap TabsContent components within a Tabs component - this is what fixes the error */}
               <Tabs value={bot.activeTab} className="flex-1 flex flex-col overflow-hidden">
                 <TabsContent value="chat" className="flex-1 overflow-hidden flex flex-col p-0">
-                  {/* Modern suggestions bar */}
-                  <ZeroBotSuggestionsBar
-                    suggestions={bot.suggestions}
-                    isProcessing={bot.isProcessing}
-                    onSuggestionClick={bot.handleSuggestionClick}
-                  />
+                  {/* Modern suggestions bar - lazy loaded */}
+                  <Suspense fallback={<div className="h-12 bg-gray-100/50 animate-pulse"></div>}>
+                    <ZeroBotSuggestionsBar
+                      suggestions={bot.suggestions}
+                      isProcessing={bot.isProcessing}
+                      onSuggestionClick={bot.handleSuggestionClick}
+                      isMobile={isMobile}
+                    />
+                  </Suspense>
 
-                  {/* Chat content */}
-                  <ZeroBotChatContent
-                    messages={bot.messages}
-                    filteredMessages={bot.filteredMessages}
-                    searchQuery={bot.searchQuery}
-                    setSearchQuery={bot.setSearchQuery}
-                    isSearching={bot.isSearching}
-                    toggleSearch={bot.toggleSearch}
-                    isProcessing={bot.isProcessing}
-                    streamedResponse={bot.streamedResponse}
-                    currentContext={bot.currentContext}
-                    sellerMode={sellerMode}
-                    inputValue={bot.inputValue}
-                    setInputValue={bot.setInputValue}
-                    suggestions={bot.suggestions}
-                    messagesEndRef={bot.messagesEndRef}
-                    currentUser={bot.currentUser}
-                    handleSendMessage={bot.handleSendMessage}
-                    handleKeyPress={bot.handleKeyPress}
-                    handleMessageReaction={bot.handleMessageReaction}
-                    cancelCurrentStream={bot.cancelCurrentStream}
-                    startRecording={enableVoice ? bot.startRecording : () => {}}
-                    stopRecording={bot.stopRecording}
-                    isRecording={bot.isRecording}
-                    handleSuggestionClick={bot.handleSuggestionClick}
-                  />
+                  {/* Chat content - lazy loaded */}
+                  <Suspense fallback={<div className="flex-1 flex items-center justify-center">Loading chat...</div>}>
+                    <ZeroBotChatContent
+                      messages={bot.messages}
+                      filteredMessages={bot.filteredMessages}
+                      searchQuery={bot.searchQuery}
+                      setSearchQuery={bot.setSearchQuery}
+                      isSearching={bot.isSearching}
+                      toggleSearch={bot.toggleSearch}
+                      isProcessing={bot.isProcessing}
+                      streamedResponse={bot.streamedResponse}
+                      currentContext={bot.currentContext}
+                      sellerMode={sellerMode}
+                      inputValue={bot.inputValue}
+                      setInputValue={bot.setInputValue}
+                      suggestions={bot.suggestions}
+                      messagesEndRef={bot.messagesEndRef}
+                      currentUser={bot.currentUser}
+                      handleSendMessage={bot.handleSendMessage}
+                      handleKeyPress={bot.handleKeyPress}
+                      handleMessageReaction={bot.handleMessageReaction}
+                      cancelCurrentStream={bot.cancelCurrentStream}
+                      startRecording={enableVoice ? bot.startRecording : () => {}}
+                      stopRecording={bot.stopRecording}
+                      isRecording={bot.isRecording}
+                      handleSuggestionClick={bot.handleSuggestionClick}
+                      isMobile={isMobile}
+                    />
+                  </Suspense>
                   <ZeroBotTypingIndicatorV5 isTyping={bot.isProcessing} sellerMode={sellerMode} />
                 </TabsContent>
 
@@ -191,6 +207,7 @@ const ZeroBot5: React.FC<ZeroBot5Props> = ({
                     sellerMode={sellerMode}
                     onGetStartedClick={bot.handleGetStartedClick}
                     onTopicClick={bot.handleTopicClick}
+                    isMobile={isMobile}
                   />
                 </TabsContent>
 
@@ -200,6 +217,7 @@ const ZeroBot5: React.FC<ZeroBot5Props> = ({
                     mockAnalytics={mockAnalytics}
                     sellerMode={sellerMode}
                     onReturn={() => bot.setActiveTab('chat')}
+                    isMobile={isMobile}
                   />
                 </TabsContent>
               </Tabs>
@@ -213,6 +231,7 @@ const ZeroBot5: React.FC<ZeroBot5Props> = ({
                   sellerMode={sellerMode}
                   onClose={() => bot.setShowSettings(false)}
                   clearChat={bot.clearChat}
+                  isMobile={isMobile}
                 />
               )}
             </AnimatePresence>

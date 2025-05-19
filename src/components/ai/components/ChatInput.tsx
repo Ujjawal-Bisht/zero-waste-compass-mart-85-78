@@ -15,6 +15,7 @@ interface ChatInputProps {
   startRecording: () => void;
   isRecording: boolean;
   stopRecording: () => void;
+  isMobile?: boolean;
 }
 
 const ChatInput: React.FC<ChatInputProps> = ({
@@ -27,16 +28,25 @@ const ChatInput: React.FC<ChatInputProps> = ({
   toggleSearch,
   startRecording,
   isRecording,
-  stopRecording
+  stopRecording,
+  isMobile = false
 }) => {
+  const containerClasses = isMobile 
+    ? 'p-2 border-t flex items-end gap-2 bg-white safe-area-bottom mobile-chat-input'
+    : 'p-3 border-t flex items-end gap-2 bg-white';
+    
+  // Optimize button sizes for mobile
+  const buttonSize = isMobile ? 'h-10 w-10' : 'h-9 w-9';
+  const inputHeight = isMobile ? 'h-10' : '';
+
   return (
-    <div className="p-3 border-t flex items-end gap-2 bg-white">
+    <div className={containerClasses}>
       <Input
         value={inputValue}
         onChange={(e) => setInputValue(e.target.value)}
         onKeyDown={handleKeyPress}
-        placeholder="Message ZeroBot AI..."
-        className="flex-1 border-gray-200 focus-visible:ring-purple-500"
+        placeholder={isMobile ? "Message..." : "Message ZeroBot AI..."}
+        className={`flex-1 border-gray-200 focus-visible:ring-purple-500 ${inputHeight}`}
         disabled={isSearching || isProcessing}
       />
       
@@ -44,30 +54,32 @@ const ChatInput: React.FC<ChatInputProps> = ({
         <Button
           variant="outline"
           size="icon"
-          className={`h-9 w-9 ${isSearching ? 'bg-gray-100' : ''}`}
+          className={`${buttonSize} ${isSearching ? 'bg-gray-100' : ''} touch-optimized`}
           onClick={toggleSearch}
           title={isSearching ? "Close search" : "Search conversation"}
         >
-          <Search size={16} className={isSearching ? 'text-gray-600' : 'text-gray-400'} />
+          <Search size={isMobile ? 18 : 16} className={isSearching ? 'text-gray-600' : 'text-gray-400'} />
         </Button>
         
-        <Button
-          variant="outline"
-          size="icon"
-          className={`h-9 w-9 ${isRecording ? 'bg-red-50 border-red-200' : ''}`}
-          onClick={isRecording ? stopRecording : startRecording}
-          disabled={isProcessing || isSearching}
-        >
-          <Mic size={16} className={isRecording ? 'text-red-500' : 'text-gray-400'} />
-        </Button>
+        {!isMobile && (
+          <Button
+            variant="outline"
+            size="icon"
+            className={`${buttonSize} ${isRecording ? 'bg-red-50 border-red-200' : ''}`}
+            onClick={isRecording ? stopRecording : startRecording}
+            disabled={isProcessing || isSearching}
+          >
+            <Mic size={16} className={isRecording ? 'text-red-500' : 'text-gray-400'} />
+          </Button>
+        )}
         
         <Button
-          className="h-9 w-9 bg-purple-500 hover:bg-purple-600"
+          className={`${buttonSize} bg-purple-500 hover:bg-purple-600 touch-optimized`}
           size="icon"
           onClick={handleSendMessage}
           disabled={!inputValue.trim() || isProcessing || isSearching}
         >
-          <Send size={16} className="text-white" />
+          <Send size={isMobile ? 18 : 16} className="text-white" />
         </Button>
       </div>
     </div>

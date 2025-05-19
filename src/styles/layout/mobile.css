@@ -50,6 +50,39 @@
   .safe-area-bottom {
     padding-bottom: env(safe-area-inset-bottom, 1rem);
   }
+  
+  /* Optimize chat UI for mobile */
+  .chat-container {
+    border-radius: 0;
+    height: 100vh;
+    width: 100%;
+    max-height: none;
+    max-width: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+  }
+  
+  /* Improve scrolling performance */
+  .scroll-container {
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior-y: contain;
+  }
+  
+  /* Fix for position fixed elements */
+  .fixed-element {
+    position: sticky;
+  }
+  
+  /* Adjust modal positioning for mobile */
+  .modal-mobile {
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    border-radius: 0;
+  }
 }
 
 /* Improved mobile buttons */
@@ -67,4 +100,48 @@
 .mobile-touch-feedback:active {
   @apply bg-opacity-80;
   transform: scale(0.98);
+}
+
+/* Prevent text selection on interactive elements */
+.no-text-select {
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+/* Better fixed elements on iOS */
+.ios-fixed {
+  position: sticky;
+  position: -webkit-sticky;
+}
+
+/* Fix 100vh issues on mobile browsers */
+.mobile-full-height {
+  height: 100vh;
+  height: -webkit-fill-available;
+  height: fill-available;
+}
+
+/* Prevent content shift when keyboard opens */
+.content-no-shift {
+  height: 100%;
+  position: fixed;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Optimize buttons for touch */
+.touch-optimized {
+  min-height: 44px;
+  min-width: 44px;
+}
+
+/* Responsive grid for mobile */
+.mobile-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 1rem;
 }
