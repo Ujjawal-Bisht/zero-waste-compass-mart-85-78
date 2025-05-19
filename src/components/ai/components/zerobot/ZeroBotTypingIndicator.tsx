@@ -8,31 +8,31 @@ interface ZeroBotTypingIndicatorProps {
 
 const ZeroBotTypingIndicator: React.FC<ZeroBotTypingIndicatorProps> = ({ isMobile = false }) => {
   return (
-    <div className="flex items-center justify-start">
-      <motion.div 
-        className={`bg-white p-3 rounded-lg shadow-sm ${isMobile ? 'p-2 max-w-[70%]' : ''}`}
-      >
-        <div className="flex items-center space-x-2">
-          <div className="text-sm text-gray-500">ZeroBot is typing</div>
-          <div className="flex space-x-1">
-            {[0, 1, 2].map((i) => (
-              <motion.div
-                key={i}
-                className="w-2 h-2 bg-gray-400 rounded-full"
-                initial={{ opacity: 0.3 }}
-                animate={{ opacity: [0.3, 1, 0.3] }}
-                transition={{
-                  duration: 1.2,
-                  repeat: Infinity,
-                  delay: i * 0.15,
-                  ease: "easeInOut"
-                }}
-              />
-            ))}
-          </div>
+    <motion.div
+      initial={{ opacity: 0, y: 10 }}
+      animate={{ opacity: 1, y: 0 }}
+      className="flex justify-start"
+    >
+      <div className={`bg-white p-3 rounded-lg shadow-sm border border-gray-100 rounded-bl-none ${isMobile ? 'p-2' : ''}`}>
+        <div className="flex space-x-1">
+          <motion.div
+            animate={{ y: [0, -5, 0] }}
+            transition={{ repeat: Infinity, duration: 1, repeatType: 'loop', delay: 0 }}
+            className={`bg-gray-300 rounded-full ${isMobile ? 'h-1.5 w-1.5' : 'h-2 w-2'}`}
+          />
+          <motion.div
+            animate={{ y: [0, -5, 0] }}
+            transition={{ repeat: Infinity, duration: 1, repeatType: 'loop', delay: 0.2 }}
+            className={`bg-gray-300 rounded-full ${isMobile ? 'h-1.5 w-1.5' : 'h-2 w-2'}`}
+          />
+          <motion.div
+            animate={{ y: [0, -5, 0] }}
+            transition={{ repeat: Infinity, duration: 1, repeatType: 'loop', delay: 0.4 }}
+            className={`bg-gray-300 rounded-full ${isMobile ? 'h-1.5 w-1.5' : 'h-2 w-2'}`}
+          />
         </div>
-      </motion.div>
-    </div>
+      </div>
+    </motion.div>
   );
 };
 

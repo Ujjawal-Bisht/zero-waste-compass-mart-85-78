@@ -19,7 +19,7 @@ const ZeroBotMessage: React.FC<ZeroBotMessageProps> = ({ message, isMobile = fal
       <div 
         className={`max-w-3/4 rounded-lg p-3 shadow-sm ${
           message.sender === 'user' 
-            ? 'bg-indigo-600 text-white rounded-br-none' 
+            ? 'bg-purple-600 text-white rounded-br-none' 
             : 'bg-white rounded-bl-none border border-gray-100'
         } ${isMobile ? 'text-sm' : ''}`}
       >

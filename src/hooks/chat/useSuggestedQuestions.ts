@@ -1,4 +1,3 @@
-
 import { MessageCategory } from '@/types/chat';
 
 export function useSuggestedQuestions() {

@@ -27,26 +27,11 @@ const ChatBot: React.FC<ChatBotProps> = ({
   const deviceType = useDeviceType();
   const isMobile = deviceType === 'mobile';
   
-  // Use ZeroBotAssistant as default for the new version 5
-  if (version === 5) {
-    return (
-      <ZeroBotAssistant
-        initialPrompt={initialPrompt}
-        showInitially={showInitially}
-      />
-    );
-  }
-  
-  // Fallback to ZeroBot3
   return (
-    <ZeroBot3
+    <ZeroBotAssistant
       initialPrompt={initialPrompt}
       showInitially={showInitially}
       sellerMode={sellerMode}
-      theme={theme}
-      enableVoice={enableVoice}
-      enableRealtime={enableRealtime}
-      showAnalytics={showAnalytics}
     />
   );
 };
