@@ -1,6 +1,5 @@
 
 import React from 'react';
-import ZeroBot3 from './ai/ZeroBot3';
 import ZeroBotAssistant from './ai/ZeroBotAssistant';
 import { useDeviceType } from '@/hooks/use-mobile';
 

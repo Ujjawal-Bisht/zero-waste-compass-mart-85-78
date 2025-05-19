@@ -3,6 +3,9 @@ import React, { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Send, Bot } from 'lucide-react';
 import { useDeviceType } from '@/hooks/use-mobile';
+import { toast } from 'sonner';
+import ZeroBotMessage from './components/zerobot/ZeroBotMessage';
+import ZeroBotTypingIndicator from './components/zerobot/ZeroBotTypingIndicator';
 
 interface ZeroBotAssistantProps {
   initialPrompt?: string;
@@ -53,6 +56,29 @@ const ZeroBotAssistant: React.FC<ZeroBotAssistantProps> = ({
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages, isTyping]);
 
+  // Method to handle different types of queries with appropriate responses
+  const getResponseForQuery = (query: string) => {
+    const lowerQuery = query.toLowerCase();
+    
+    // Check for order-related queries
+    if (lowerQuery.includes('order') || lowerQuery.includes('delivery') || lowerQuery.includes('shipping')) {
+      return "I can help you with your order! To check your order status, please go to 'My Orders' section. For specific order inquiries, please provide your order number.";
+    }
+    
+    // Check for product-related queries
+    if (lowerQuery.includes('product') || lowerQuery.includes('item') || lowerQuery.includes('buy')) {
+      return "We have a wide range of sustainable products. Would you like to browse by category, or are you looking for something specific?";
+    }
+    
+    // Check for sustainability queries
+    if (lowerQuery.includes('sustain') || lowerQuery.includes('eco') || lowerQuery.includes('environment')) {
+      return "Sustainability is at the core of our mission! All our products are eco-friendly and ethically sourced. Would you like to learn more about our environmental initiatives?";
+    }
+    
+    // Default response for other queries
+    return `Thank you for your question about "${query}". I'm here to help you with any information about our products, orders, or sustainability practices. How else can I assist you?`;
+  };
+
   const handleSendMessage = (content: string = inputValue) => {
     if (!content.trim()) return;
     
@@ -68,16 +94,23 @@ const ZeroBotAssistant: React.FC<ZeroBotAssistantProps> = ({
     setInputValue('');
     setIsTyping(true);
     
-    // Simulate bot response
+    // Generate contextual response based on query type
     setTimeout(() => {
       setIsTyping(false);
+      const response = getResponseForQuery(content.trim());
+      
       setMessages(prev => [...prev, {
         id: Date.now(),
-        content: `This is a simulated response to "${content.trim()}"`,
+        content: response,
         sender: 'bot',
         timestamp: new Date(),
       }]);
-    }, 1500);
+      
+      // Show toast notification for certain types of queries
+      if (content.toLowerCase().includes('help') || content.toLowerCase().includes('support')) {
+        toast.info("Support resources are available in the Help section!");
+      }
+    }, 1000 + Math.random() * 1000); // Randomize response time for more natural feel
   };
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
@@ -140,48 +173,16 @@ const ZeroBotAssistant: React.FC<ZeroBotAssistantProps> = ({
             {/* Messages */}
             <div className="flex-1 bg-gray-50 overflow-y-auto p-4 space-y-4">
               {messages.map((message) => (
-                <div 
+                <ZeroBotMessage 
                   key={message.id} 
-                  className={`flex ${message.sender === 'user' ? 'justify-end' : 'justify-start'}`}
-                >
-                  <div 
-                    className={`p-3 rounded-lg ${
-                      message.sender === 'user' 
-                        ? 'bg-indigo-600 text-white rounded-br-none' 
-                        : 'bg-white text-gray-800 rounded-bl-none shadow-sm'
-                    } max-w-[80%]`}
-                  >
-                    <p className="text-sm">{message.content}</p>
-                    <p className="text-xs opacity-70 mt-1">
-                      {message.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                    </p>
-                  </div>
-                </div>
+                  message={message}
+                  isMobile={isMobile}
+                />
               ))}
               
               {/* Typing indicator */}
               {isTyping && (
-                <div className="flex justify-start">
-                  <div className="bg-white p-3 rounded-lg shadow-sm rounded-tl-none max-w-[80%]">
-                    <div className="flex items-center space-x-2">
-                      <div className="text-sm text-gray-500">Typing</div>
-                      <div className="flex space-x-1">
-                        {[0, 1, 2].map((i) => (
-                          <motion.div
-                            key={i}
-                            className="w-1.5 h-1.5 bg-gray-400 rounded-full"
-                            animate={{ y: [0, -4, 0] }}
-                            transition={{
-                              duration: 0.6,
-                              repeat: Infinity,
-                              delay: i * 0.1,
-                            }}
-                          />
-                        ))}
-                      </div>
-                    </div>
-                  </div>
-                </div>
+                <ZeroBotTypingIndicator isMobile={isMobile} />
               )}
               
               <div ref={messagesEndRef} />
