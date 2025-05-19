@@ -3,17 +3,17 @@ import React, { Suspense, lazy } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { Tabs, TabsContent } from '@/components/ui/tabs';
 import { useZeroBot } from './hooks/useZeroBot';
-import ZeroBotV5Header from './components/zerobot/ZeroBotV5Header';
-import ZeroBotTabs from './components/ZeroBotTabs';
-import HelpTab from './components/HelpTab';
-import AnalyticsTab from './components/AnalyticsTab';
-import SettingsPanel from './components/SettingsPanel';
+import ChatBotButton from '../chat/ChatBotButton';
 import ZeroBotTypingIndicatorV5 from './components/zerobot/ZeroBotTypingIndicatorV5';
 import { Bot } from 'lucide-react';
-import { Button } from '@/components/ui/button';
 
 // Lazy loaded components to improve performance
 const ZeroBotChatContent = lazy(() => import('./components/ZeroBotChatContent'));
+const ZeroBotHeader = lazy(() => import('./components/zerobot/ZeroBotV5Header'));
+const ZeroBotTabs = lazy(() => import('./components/ZeroBotTabs'));
+const HelpTab = lazy(() => import('./components/HelpTab'));
+const AnalyticsTab = lazy(() => import('./components/AnalyticsTab'));
+const SettingsPanel = lazy(() => import('./components/SettingsPanel'));
 const ZeroBotSuggestionsBar = lazy(() => import('./components/zerobot/ZeroBotSuggestionsBar'));
 
 interface ZeroBot5Props {
@@ -83,47 +83,24 @@ const ZeroBot5: React.FC<ZeroBot5Props> = ({
     },
   };
 
-  // Mobile optimized styles
-  const botButtonClasses = `rounded-full h-12 w-12 sm:h-14 sm:w-14 relative flex items-center justify-center shadow-lg 
-  ${sellerMode
-    ? 'bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700'
-    : 'bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700'
-  }`;
-  
-  const botWindowClasses = `fixed ${isMobile ? 'bottom-0 right-0 left-0 rounded-t-2xl h-[85vh]' : 'bottom-6 right-6 w-full sm:w-96 h-[580px] rounded-2xl'} z-50 flex flex-col shadow-xl border border-gray-200 glass-morphism`;
+  // Responsive container classes based on device type
+  const botWindowClasses = isMobile
+    ? "fixed bottom-0 left-0 right-0 z-50 flex flex-col shadow-xl border border-gray-200 glass-morphism rounded-t-2xl h-[85vh]"
+    : "fixed bottom-6 right-6 w-full sm:w-96 h-[580px] z-50 flex flex-col shadow-xl border border-gray-200 glass-morphism rounded-2xl";
 
   return (
     <>
-      {/* Floating bot button */}
+      {/* Floating bot button - improved for mobile */}
       {!bot.isOpen && (
-        <motion.div
-          className="fixed bottom-6 right-6 z-50"
-          initial={{ scale: 0 }}
-          animate={{ scale: 1 }}
-          transition={{ type: 'spring', stiffness: 260, damping: 20 }}
-        >
-          <Button
-            onClick={() => {
-              bot.setIsOpen(true);
-              bot.setHasUnreadMessages(false);
-            }}
-            className={botButtonClasses}
-            size="icon"
-            aria-label="Open ZeroBot AI"
-          >
-            <Bot className="h-5 w-5 sm:h-7 sm:w-7 text-white" />
-            {bot.hasUnreadMessages && (
-              <motion.div
-                className="absolute -top-1 -right-1 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs font-bold ring-2 ring-white"
-                initial={{ scale: 0 }}
-                animate={{ scale: 1 }}
-                transition={{ type: "spring", stiffness: 300, damping: 20 }}
-              >
-                1
-              </motion.div>
-            )}
-          </Button>
-        </motion.div>
+        <ChatBotButton
+          onClick={() => {
+            bot.setIsOpen(true);
+            bot.setHasUnreadMessages(false);
+          }}
+          isOpen={bot.isOpen}
+          hasUnread={bot.hasUnreadMessages}
+          isMobile={isMobile}
+        />
       )}
 
       {/* Chat window */}
@@ -137,34 +114,35 @@ const ZeroBot5: React.FC<ZeroBot5Props> = ({
             transition={{ type: 'spring', damping: 25, stiffness: 220 }}
           >
             {/* V5 Header with AI Bot icon and theme */}
-            <ZeroBotV5Header
-              sellerMode={sellerMode}
-              showSettings={bot.showSettings}
-              onClose={() => bot.setIsOpen(false)}
-              onSettings={() => bot.setShowSettings(true)}
-              badgeVersion="v5"
-              isMobile={isMobile}
-            />
+            <Suspense fallback={<div className="h-14 bg-gradient-to-r from-purple-500 to-indigo-600 animate-pulse"></div>}>
+              <ZeroBotHeader
+                sellerMode={sellerMode}
+                showSettings={bot.showSettings}
+                onClose={() => bot.setIsOpen(false)}
+                onSettings={() => bot.setShowSettings(true)}
+                badgeVersion="v5"
+              />
+            </Suspense>
 
             {/* Tabs */}
-            <ZeroBotTabs
-              activeTab={bot.activeTab}
-              setActiveTab={bot.setActiveTab}
-              showAnalytics={showAnalytics}
-              isMobile={isMobile}
-            />
+            <Suspense fallback={<div className="h-10 bg-white border-b animate-pulse"></div>}>
+              <ZeroBotTabs
+                activeTab={bot.activeTab}
+                setActiveTab={bot.setActiveTab}
+                showAnalytics={showAnalytics}
+              />
+            </Suspense>
 
             {/* Main Content */}
             <div className="flex-1 flex flex-col overflow-hidden bg-gradient-to-br from-gray-50/90 to-white/80 dark:from-gray-900/70 dark:to-gray-800/90">
               <Tabs value={bot.activeTab} className="flex-1 flex flex-col overflow-hidden">
-                <TabsContent value="chat" className="flex-1 overflow-hidden flex flex-col p-0">
+                <TabsContent value="chat" className="flex-1 overflow-hidden flex flex-col p-0 m-0">
                   {/* Modern suggestions bar - lazy loaded */}
                   <Suspense fallback={<div className="h-12 bg-gray-100/50 animate-pulse"></div>}>
                     <ZeroBotSuggestionsBar
                       suggestions={bot.suggestions}
                       isProcessing={bot.isProcessing}
                       onSuggestionClick={bot.handleSuggestionClick}
-                      isMobile={isMobile}
                     />
                   </Suspense>
 
@@ -202,23 +180,25 @@ const ZeroBot5: React.FC<ZeroBot5Props> = ({
 
                 {/* Help Tab */}
                 <TabsContent value="help" className="flex-1 overflow-auto mt-0 p-0">
-                  <HelpTab
-                    helpTopics={helpTopics}
-                    sellerMode={sellerMode}
-                    onGetStartedClick={bot.handleGetStartedClick}
-                    onTopicClick={bot.handleTopicClick}
-                    isMobile={isMobile}
-                  />
+                  <Suspense fallback={<div className="p-4">Loading help content...</div>}>
+                    <HelpTab
+                      helpTopics={helpTopics}
+                      sellerMode={sellerMode}
+                      onGetStartedClick={bot.handleGetStartedClick}
+                      onTopicClick={bot.handleTopicClick}
+                    />
+                  </Suspense>
                 </TabsContent>
 
                 {/* Analytics Tab */}
                 <TabsContent value="analytics" className="flex-1 overflow-auto mt-0 p-0">
-                  <AnalyticsTab
-                    mockAnalytics={mockAnalytics}
-                    sellerMode={sellerMode}
-                    onReturn={() => bot.setActiveTab('chat')}
-                    isMobile={isMobile}
-                  />
+                  <Suspense fallback={<div className="p-4">Loading analytics...</div>}>
+                    <AnalyticsTab
+                      mockAnalytics={mockAnalytics}
+                      sellerMode={sellerMode}
+                      onReturn={() => bot.setActiveTab('chat')}
+                    />
+                  </Suspense>
                 </TabsContent>
               </Tabs>
             </div>
@@ -226,13 +206,14 @@ const ZeroBot5: React.FC<ZeroBot5Props> = ({
             {/* Settings panel */}
             <AnimatePresence>
               {bot.showSettings && (
-                <SettingsPanel
-                  showSettings={bot.showSettings}
-                  sellerMode={sellerMode}
-                  onClose={() => bot.setShowSettings(false)}
-                  clearChat={bot.clearChat}
-                  isMobile={isMobile}
-                />
+                <Suspense fallback={<div className="absolute inset-0 bg-black/20"></div>}>
+                  <SettingsPanel
+                    showSettings={bot.showSettings}
+                    sellerMode={sellerMode}
+                    onClose={() => bot.setShowSettings(false)}
+                    clearChat={bot.clearChat}
+                  />
+                </Suspense>
               )}
             </AnimatePresence>
           </motion.div>

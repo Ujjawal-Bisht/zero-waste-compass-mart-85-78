@@ -22,13 +22,13 @@ const SuggestionsList: React.FC<SuggestionsListProps> = ({
       animate={{ height: 'auto' }}
       className="overflow-hidden bg-gray-50 border-t border-gray-100"
     >
-      <div className="p-2 overflow-x-auto whitespace-nowrap flex gap-2">
+      <div className="p-2 overflow-x-auto whitespace-nowrap flex gap-2 no-scrollbar">
         {suggestions.map((suggestion, i) => (
           <Button
             key={i}
             variant="outline"
             size="sm"
-            className="h-7 text-xs bg-white whitespace-nowrap"
+            className="h-7 text-xs bg-white whitespace-nowrap flex-shrink-0 touch-optimized"
             onClick={() => handleSuggestionClick(suggestion)}
           >
             {suggestion}

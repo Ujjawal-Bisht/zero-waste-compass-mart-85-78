@@ -40,16 +40,30 @@ const ChatBotButton: React.FC<ChatBotButtonProps> = ({
       >
         <MessageCircle size={isMobile ? 20 : 24} />
         
-        {/* Unread message indicator */}
+        {/* Unread message indicator with ripple effect */}
         {hasUnread && (
-          <motion.div 
-            className="absolute -top-1 -right-1 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs font-bold"
-            initial={{ scale: 0 }}
-            animate={{ scale: 1 }}
-            transition={{ type: "spring", stiffness: 300, damping: 20 }}
-          >
-            1
-          </motion.div>
+          <>
+            <motion.div 
+              className="absolute -top-1 -right-1 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs font-bold ring-2 ring-white"
+              initial={{ scale: 0 }}
+              animate={{ scale: 1 }}
+              transition={{ type: "spring", stiffness: 300, damping: 20 }}
+            >
+              1
+            </motion.div>
+            <motion.div 
+              className="absolute inset-0 rounded-full border-2 border-white"
+              animate={{ 
+                scale: [1, 1.15, 1], 
+                opacity: [1, 0, 1]
+              }}
+              transition={{ 
+                duration: 2,
+                repeat: Infinity,
+                ease: "easeInOut" 
+              }}
+            />
+          </>
         )}
       </Button>
     </motion.div>

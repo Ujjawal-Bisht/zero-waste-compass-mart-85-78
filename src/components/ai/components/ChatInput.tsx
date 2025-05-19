@@ -3,6 +3,7 @@ import React from 'react';
 import { Search, Send, Mic } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
+import { motion } from 'framer-motion';
 
 interface ChatInputProps {
   inputValue: string;
@@ -31,22 +32,32 @@ const ChatInput: React.FC<ChatInputProps> = ({
   stopRecording,
   isMobile = false
 }) => {
+  // Optimize container classes for mobile
   const containerClasses = isMobile 
-    ? 'p-2 border-t flex items-end gap-2 bg-white safe-area-bottom mobile-chat-input'
-    : 'p-3 border-t flex items-end gap-2 bg-white';
-    
+    ? 'p-2 border-t flex items-center gap-2 bg-white safe-area-bottom pb-[env(safe-area-inset-bottom,0.5rem)]'
+    : 'p-3 border-t flex items-center gap-2 bg-white';
+  
   // Optimize button sizes for mobile
   const buttonSize = isMobile ? 'h-10 w-10' : 'h-9 w-9';
-  const inputHeight = isMobile ? 'h-10' : '';
-
+  
+  // Responsive input styles
+  const inputClasses = isMobile 
+    ? 'flex-1 h-10 border-gray-200 focus-visible:ring-purple-500 text-base' 
+    : 'flex-1 border-gray-200 focus-visible:ring-purple-500';
+  
   return (
-    <div className={containerClasses}>
+    <motion.div 
+      className={containerClasses}
+      initial={{ y: 20, opacity: 0 }}
+      animate={{ y: 0, opacity: 1 }}
+      transition={{ delay: 0.2 }}
+    >
       <Input
         value={inputValue}
         onChange={(e) => setInputValue(e.target.value)}
         onKeyDown={handleKeyPress}
         placeholder={isMobile ? "Message..." : "Message ZeroBot AI..."}
-        className={`flex-1 border-gray-200 focus-visible:ring-purple-500 ${inputHeight}`}
+        className={inputClasses}
         disabled={isSearching || isProcessing}
       />
       
@@ -82,7 +93,7 @@ const ChatInput: React.FC<ChatInputProps> = ({
           <Send size={isMobile ? 18 : 16} className="text-white" />
         </Button>
       </div>
-    </div>
+    </motion.div>
   );
 };
 

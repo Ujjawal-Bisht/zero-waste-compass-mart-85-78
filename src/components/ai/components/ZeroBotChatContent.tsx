@@ -70,7 +70,6 @@ const ZeroBotChatContent: React.FC<ZeroBotChatContentProps> = ({
           setSearchQuery={setSearchQuery}
           filteredMessages={filteredMessages}
           isSearching={isSearching}
-          isMobile={isMobile}
         />
       </AnimatePresence>
       
@@ -85,7 +84,6 @@ const ZeroBotChatContent: React.FC<ZeroBotChatContentProps> = ({
         handleMessageReaction={handleMessageReaction}
         cancelCurrentStream={cancelCurrentStream}
         currentUser={currentUser}
-        isMobile={isMobile}
       />
       
       {/* Suggestions */}
@@ -93,7 +91,6 @@ const ZeroBotChatContent: React.FC<ZeroBotChatContentProps> = ({
         suggestions={suggestions}
         isSearching={isSearching}
         handleSuggestionClick={handleSuggestionClick}
-        isMobile={isMobile}
       />
       
       {/* Input area */}
