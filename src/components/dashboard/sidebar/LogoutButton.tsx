@@ -37,14 +37,14 @@ const LogoutButton: React.FC<LogoutButtonProps> = ({ className, onLogout }) => {
       animate={{ opacity: 1 }}
       whileHover={{ 
         scale: 1.04,
-        rotate: -2,
+        rotate: -5, // Changed from -2 to -5 degrees for a more noticeable rotation
         boxShadow: "0 0 18px 2px rgba(239,68,68,0.25)",
         transition: { duration: 0.2 }
       }}
       whileTap={{ scale: 0.97, rotate: 0 }}
     >
       <Button 
-        className="w-full justify-start text-white group hover:bg-transparent transition-all duration-300"
+        className="w-full justify-start text-white group hover:bg-transparent transition-all duration-300 logout-button"
         variant="ghost"
         onClick={handleLogout}
       >
