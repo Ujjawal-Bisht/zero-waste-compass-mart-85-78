@@ -17,7 +17,10 @@ import {
   BookOpen,
   Heart,
   Tag,
-  Coffee
+  Coffee,
+  MoreHorizontal,
+  Star,
+  Users
 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
@@ -69,12 +72,18 @@ const NavigationLinks: React.FC<NavigationLinksProps> = ({ isSeller, onItemClick
       ]
     },
     {
-      title: "Features",
+      title: "User",
       items: [
         { path: "/profile", icon: <User size={18} />, label: "My Profile" },
+        { path: "/settings", icon: <Settings size={18} />, label: "Settings" },
+      ]
+    },
+    {
+      title: "More Options",
+      items: [
         { path: "/chat", icon: <MessageSquare size={18} />, label: "Support Chat" },
-        { path: "/advanced-features", icon: <Sparkles size={18} />, label: "Premium Features", highlight: true },
-        { path: "/community", icon: <Coffee size={18} />, label: "Community" },
+        { path: "/community", icon: <Users size={18} />, label: "Community" },
+        { path: "/advanced-features", icon: <Star size={18} />, label: "Premium Features", highlight: true },
       ]
     },
   ];
