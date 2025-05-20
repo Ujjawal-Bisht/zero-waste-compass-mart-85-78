@@ -11,15 +11,15 @@ interface NavButtonsProps {
 
 const NavButtons: React.FC<NavButtonsProps> = ({ isSellerPortal }) => {
   const navigate = useNavigate();
-  
+
   const goToHome = () => {
     navigate('/');
   };
-  
+
   const goToCart = () => {
     navigate('/cart');
   };
-  
+
   return (
     <div className="flex gap-2">
       <Button
@@ -28,18 +28,23 @@ const NavButtons: React.FC<NavButtonsProps> = ({ isSellerPortal }) => {
         onClick={goToHome}
         className={`hidden md:flex items-center gap-2 hover:bg-gray-100 transition-colors home-button home-button-3d ${isSellerPortal ? 'seller-home-button seller-button-3d' : 'buyer-home-button buyer-button-3d'} button-bounce button-shimmer`}
       >
-        <Home className="h-4 w-4 home-button-icon" /> 
+        <Home className="h-4 w-4 home-button-icon" />
         <span className="relative">Home</span>
       </Button>
-      
+
       {!isSellerPortal && (
         <Button
           variant="outline"
           size="sm"
           onClick={goToCart}
-          className="hidden md:flex items-center gap-2 hover:bg-gray-100 transition-colors cart-button cart-button-3d buyer-button-3d button-bounce button-shimmer"
+          className="hidden md:flex items-center gap-2 transition-colors cart-button cart-button-3d buyer-button-3d button-bounce button-shimmer
+            hover:bg-[#9b87f5] hover:text-white"
+          style={{
+            borderColor: '#9b87f5',
+            color: '#6E59A5'
+          }}
         >
-          <ShoppingCart className="h-4 w-4" /> 
+          <ShoppingCart className="h-4 w-4" />
           <span className="relative">Cart</span>
         </Button>
       )}

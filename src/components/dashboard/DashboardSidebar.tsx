@@ -29,24 +29,25 @@ export const DashboardSidebar = ({ className, onClose, ...props }: SidebarNavPro
   };
 
   return (
-    <Sidebar 
-      className={cn("pb-12 bg-navy-blue w-64", className)} 
+    <Sidebar
+      className={cn("pb-4 pt-16 bg-navy-blue w-64 flex flex-col", className)} // More flexible vertical layout and reduced padding-bottom
       {...props}
     >
-      {/* Add padding-top so the fixed cross/menu button never covers the logo or content */}
-      <div className="px-3 py-2 flex flex-col h-full pt-16">
+      <div className="px-3 flex flex-col h-full">
         <SidebarLogo onClose={onClose} />
-        
-        <h2 className="mb-4 px-4 text-lg font-semibold tracking-tight text-white">
+
+        <h2 className="mb-3 px-4 text-lg font-semibold tracking-tight text-white">
           Navigation
         </h2>
-        
-        <NavigationLinks 
-          isSeller={Boolean(isSeller)} 
-          onItemClick={onClose} 
-        />
-        
-        <div className="mt-auto px-3 py-2">
+
+        <div className="flex-1 min-h-0 overflow-auto">
+          <NavigationLinks
+            isSeller={Boolean(isSeller)}
+            onItemClick={onClose}
+          />
+        </div>
+
+        <div className="shrink-0 pt-3 pb-2 px-3">
           <LogoutButton onLogout={handleLogout} />
         </div>
       </div>
