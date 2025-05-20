@@ -28,6 +28,12 @@ interface ZeroBot5Props {
   isMobile?: boolean;
 }
 
+const gradientBackground =
+  "bg-gradient-to-br from-purple-50/90 via-white/90 to-emerald-50/80 dark:from-purple-900/70 dark:via-gray-900/80 dark:to-emerald-900/70";
+
+const animatedPanelClass =
+  "shadow-xl border border-gray-200 rounded-2xl ";
+
 const ZeroBot5: React.FC<ZeroBot5Props> = ({
   initialPrompt,
   showInitially = false,
@@ -85,12 +91,29 @@ const ZeroBot5: React.FC<ZeroBot5Props> = ({
 
   // Responsive container classes based on device type
   const botWindowClasses = isMobile
-    ? "fixed bottom-0 left-0 right-0 z-50 flex flex-col shadow-xl border border-gray-200 glass-morphism rounded-t-2xl h-[85vh]"
-    : "fixed bottom-6 right-6 w-full sm:w-96 h-[580px] z-50 flex flex-col shadow-xl border border-gray-200 glass-morphism rounded-2xl";
+    ? "fixed bottom-0 left-0 right-0 z-50 flex flex-col " +
+      `${animatedPanelClass} glass-morphism rounded-t-2xl h-[85vh] ` +
+      gradientBackground
+    : "fixed bottom-6 right-6 w-full sm:w-96 h-[600px] z-50 flex flex-col " +
+      `${animatedPanelClass} glass-morphism rounded-2xl overflow-hidden ` +
+      gradientBackground;
+
+  // Animation variant for chat bubbles
+  const bubbleVariants = {
+    initial: { opacity: 0, y: 14, scale: 0.95 },
+    animate: { opacity: 1, y: 0, scale: 1, transition: { type: "spring", stiffness: 260, damping: 20, mass: 0.6 } },
+    exit: { opacity: 0, y: 12, scale: 0.88, transition: { duration: 0.22 } },
+  };
+
+  // Animation variant for suggestion pill interaction
+  const suggestionVariants = {
+    hover: { scale: 1.07, backgroundColor: "#f6e1ff" },
+    tap: { scale: 0.96 },
+  };
 
   return (
     <>
-      {/* Floating bot button - improved for mobile */}
+      {/* Floating bot button - modernized */}
       {!bot.isOpen && (
         <ChatBotButton
           onClick={() => {
@@ -108,13 +131,17 @@ const ZeroBot5: React.FC<ZeroBot5Props> = ({
         {bot.isOpen && (
           <motion.div
             className={botWindowClasses}
-            initial={isMobile ? { opacity: 0, y: 100 } : { opacity: 0, scale: 0.94, y: 28 }}
-            animate={isMobile ? { opacity: 1, y: 0 } : { opacity: 1, scale: 1, y: 0 }}
-            exit={isMobile ? { opacity: 0, y: 100 } : { opacity: 0, scale: 0.97, y: 28 }}
-            transition={{ type: 'spring', damping: 25, stiffness: 220 }}
+            initial={isMobile ? { opacity: 0, y: 70, scale: 0.96 }
+                              : { opacity: 0, scale: 0.95, y: 28 }}
+            animate={isMobile ? { opacity: 1, y: 0, scale: 1 }
+                              : { opacity: 1, scale: 1, y: 0 }}
+            exit={isMobile ? { opacity: 0, y: 80, scale: 0.96 }
+                            : { opacity: 0, scale: 0.9, y: 28 }}
+            transition={{ type: 'spring', damping: 26, stiffness: 240, mass: 0.8 }}
+            style={{ boxShadow: "0 8px 48px 0 rgba(156, 130, 255, 0.17)" }}
           >
-            {/* V5 Header with AI Bot icon and theme */}
-            <Suspense fallback={<div className="h-14 bg-gradient-to-r from-purple-500 to-indigo-600 animate-pulse"></div>}>
+            {/* V5 Header with animated gradient */}
+            <Suspense fallback={<div className="h-14 bg-gradient-to-r from-purple-400 to-indigo-500 animate-pulse"></div>}>
               <ZeroBotHeader
                 sellerMode={sellerMode}
                 showSettings={bot.showSettings}
@@ -124,58 +151,94 @@ const ZeroBot5: React.FC<ZeroBot5Props> = ({
               />
             </Suspense>
 
-            {/* Tabs */}
-            <Suspense fallback={<div className="h-10 bg-white border-b animate-pulse"></div>}>
-              <ZeroBotTabs
-                activeTab={bot.activeTab}
-                setActiveTab={bot.setActiveTab}
-                showAnalytics={showAnalytics}
-              />
-            </Suspense>
+            {/* Animated Tabs */}
+            <motion.div
+              className="w-full"
+              initial={{ opacity: 0, y: -8 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.42 }}
+            >
+              <Suspense fallback={<div className="h-10 bg-white border-b animate-pulse"></div>}>
+                <ZeroBotTabs
+                  activeTab={bot.activeTab}
+                  setActiveTab={bot.setActiveTab}
+                  showAnalytics={showAnalytics}
+                />
+              </Suspense>
+            </motion.div>
 
-            {/* Main Content */}
-            <div className="flex-1 flex flex-col overflow-hidden bg-gradient-to-br from-gray-50/90 to-white/80 dark:from-gray-900/70 dark:to-gray-800/90">
+            {/* Main Content with enhanced background */}
+            <div className="flex-1 flex flex-col overflow-hidden bg-gradient-to-br from-gray-50/90 via-white/90 to-emerald-50/70 dark:from-gray-900/65 dark:via-gray-800/85 dark:to-purple-900/70 relative">
               <Tabs value={bot.activeTab} className="flex-1 flex flex-col overflow-hidden">
                 <TabsContent value="chat" className="flex-1 overflow-hidden flex flex-col p-0 m-0">
-                  {/* Modern suggestions bar - lazy loaded */}
+                  {/* Suggestions Bar - with motion */}
                   <Suspense fallback={<div className="h-12 bg-gray-100/50 animate-pulse"></div>}>
                     <ZeroBotSuggestionsBar
                       suggestions={bot.suggestions}
                       isProcessing={bot.isProcessing}
                       onSuggestionClick={bot.handleSuggestionClick}
+                      animateSuggestion={(element, i) => (
+                        <motion.div
+                          key={i}
+                          variants={suggestionVariants}
+                          whileHover="hover"
+                          whileTap="tap"
+                          className="cursor-pointer"
+                        >
+                          {element}
+                        </motion.div>
+                      )}
+                      animationEnabled={true}
                     />
                   </Suspense>
 
-                  {/* Chat content - lazy loaded */}
+                  {/* Chat content - chat bubble animation */}
                   <Suspense fallback={<div className="flex-1 flex items-center justify-center">Loading chat...</div>}>
-                    <ZeroBotChatContent
-                      messages={bot.messages}
-                      filteredMessages={bot.filteredMessages}
-                      searchQuery={bot.searchQuery}
-                      setSearchQuery={bot.setSearchQuery}
-                      isSearching={bot.isSearching}
-                      toggleSearch={bot.toggleSearch}
-                      isProcessing={bot.isProcessing}
-                      streamedResponse={bot.streamedResponse}
-                      currentContext={bot.currentContext}
-                      sellerMode={sellerMode}
-                      inputValue={bot.inputValue}
-                      setInputValue={bot.setInputValue}
-                      suggestions={bot.suggestions}
-                      messagesEndRef={bot.messagesEndRef}
-                      currentUser={bot.currentUser}
-                      handleSendMessage={bot.handleSendMessage}
-                      handleKeyPress={bot.handleKeyPress}
-                      handleMessageReaction={bot.handleMessageReaction}
-                      cancelCurrentStream={bot.cancelCurrentStream}
-                      startRecording={enableVoice ? bot.startRecording : () => {}}
-                      stopRecording={bot.stopRecording}
-                      isRecording={bot.isRecording}
-                      handleSuggestionClick={bot.handleSuggestionClick}
-                      isMobile={isMobile}
-                    />
+                    <motion.div
+                      className="flex-1 flex flex-col"
+                      initial="initial"
+                      animate="animate"
+                      exit="exit"
+                      variants={bubbleVariants}
+                    >
+                      <ZeroBotChatContent
+                        messages={bot.messages}
+                        filteredMessages={bot.filteredMessages}
+                        searchQuery={bot.searchQuery}
+                        setSearchQuery={bot.setSearchQuery}
+                        isSearching={bot.isSearching}
+                        toggleSearch={bot.toggleSearch}
+                        isProcessing={bot.isProcessing}
+                        streamedResponse={bot.streamedResponse}
+                        currentContext={bot.currentContext}
+                        sellerMode={sellerMode}
+                        inputValue={bot.inputValue}
+                        setInputValue={bot.setInputValue}
+                        suggestions={bot.suggestions}
+                        messagesEndRef={bot.messagesEndRef}
+                        currentUser={bot.currentUser}
+                        handleSendMessage={bot.handleSendMessage}
+                        handleKeyPress={bot.handleKeyPress}
+                        handleMessageReaction={bot.handleMessageReaction}
+                        cancelCurrentStream={bot.cancelCurrentStream}
+                        startRecording={enableVoice ? bot.startRecording : () => {}}
+                        stopRecording={bot.stopRecording}
+                        isRecording={bot.isRecording}
+                        handleSuggestionClick={bot.handleSuggestionClick}
+                        isMobile={isMobile}
+                      />
+                    </motion.div>
                   </Suspense>
-                  <ZeroBotTypingIndicatorV5 isTyping={bot.isProcessing} sellerMode={sellerMode} />
+                  {/* Animated typing indicator */}
+                  <motion.div
+                    key={bot.isProcessing ? "typing-on" : "typing-off"}
+                    initial={{ opacity: 0, y: 8 }}
+                    animate={{ opacity: bot.isProcessing ? 1 : 0, y: bot.isProcessing ? 0 : 12 }}
+                    exit={{ opacity: 0, y: 16 }}
+                    transition={{ type: 'spring', stiffness: 100, damping: 18 }}
+                  >
+                    <ZeroBotTypingIndicatorV5 isTyping={bot.isProcessing} sellerMode={sellerMode} />
+                  </motion.div>
                 </TabsContent>
 
                 {/* Help Tab */}
@@ -201,6 +264,13 @@ const ZeroBot5: React.FC<ZeroBot5Props> = ({
                   </Suspense>
                 </TabsContent>
               </Tabs>
+              {/* Floating animated effect as background */}
+              <motion.div
+                className="absolute pointer-events-none right-5 bottom-12 w-20 h-20 opacity-40 blur-2xl rounded-full bg-gradient-to-br from-indigo-300 via-purple-400 to-emerald-200 z-0"
+                animate={{ scale: [1, 1.18, 1], rotate: [0, 8, 0] }}
+                transition={{ repeat: Infinity, duration: 10, ease: "easeInOut" }}
+                style={{filter: "blur(16px)"}}
+              />
             </div>
 
             {/* Settings panel */}
