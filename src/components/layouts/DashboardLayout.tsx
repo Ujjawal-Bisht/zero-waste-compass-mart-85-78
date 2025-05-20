@@ -3,7 +3,6 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Menu, X } from 'lucide-react';
-import ChatBot from '@/components/ChatBot';
 import { DashboardSidebar } from '@/components/dashboard/DashboardSidebar';
 import DashboardHeader from '@/components/dashboard/DashboardHeader';
 import PageContainer from '@/components/dashboard/PageContainer';
@@ -56,9 +55,6 @@ const DashboardLayout: React.FC = () => {
               <PageContainer />
             </div>
           </div>
-          
-          {/* Chat Bot */}
-          <ChatBot />
         </div>
       </div>
     </SidebarProvider>
