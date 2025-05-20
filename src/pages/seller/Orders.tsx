@@ -16,13 +16,14 @@ const SellerOrders: React.FC = () => {
       buyerName: 'John Doe',
       sellerId: 'seller123',
       items: [
-        { id: '1', name: 'Organic Bananas', quantity: 2, price: 299.99 },
+        { id: '1', name: 'Organic Bananas', quantity: 2, price: 299.99, productId: 'product1', orderId: 'ORD001' },
       ],
       status: 'pending',
       paymentStatus: 'paid',
       totalAmount: 599.98,
       createdAt: '2023-05-20T10:30:00',
       updatedAt: '2023-05-20T10:30:00',
+      shippingAddress: '123 Main St, City, Country',
     },
     {
       id: 'ORD002',
@@ -30,13 +31,14 @@ const SellerOrders: React.FC = () => {
       buyerName: 'Jane Smith',
       sellerId: 'seller123',
       items: [
-        { id: '2', name: 'T-shirts Pack', quantity: 1, price: 2499.00 },
+        { id: '2', name: 'T-shirts Pack', quantity: 1, price: 2499.00, productId: 'product2', orderId: 'ORD002' },
       ],
       status: 'shipped',
       paymentStatus: 'paid',
       totalAmount: 2499.00,
       createdAt: '2023-05-19T14:15:00',
       updatedAt: '2023-05-19T14:15:00',
+      shippingAddress: '456 Oak St, City, Country',
     },
     {
       id: 'ORD003',
@@ -44,13 +46,14 @@ const SellerOrders: React.FC = () => {
       buyerName: 'Alex Johnson',
       sellerId: 'seller123',
       items: [
-        { id: '3', name: 'Wireless Earbuds', quantity: 1, price: 1999.00 },
+        { id: '3', name: 'Wireless Earbuds', quantity: 1, price: 1999.00, productId: 'product3', orderId: 'ORD003' },
       ],
       status: 'out-for-delivery',
       paymentStatus: 'paid',
       totalAmount: 1999.00,
       createdAt: '2023-05-18T09:30:00',
       updatedAt: '2023-05-18T09:30:00',
+      shippingAddress: '789 Pine St, City, Country',
     },
   ]);
 

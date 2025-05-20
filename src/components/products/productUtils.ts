@@ -1,3 +1,4 @@
+
 import { Item, ItemStatus } from "@/types";
 
 export const formatDate = (dateString: string): string => {
@@ -22,8 +23,8 @@ export const getStatusColor = (status: string): string => {
   return statusColors[status.toLowerCase()] || 'bg-gray-500';
 };
 
-export const getStatusText = (status: keyof ItemStatus): string => {
-  const statusText: Record<ItemStatus[keyof ItemStatus], string> = {
+export const getStatusText = (status: ItemStatus): string => {
+  const statusText: Record<string, string> = {
     available: 'Available',
     sold: 'Sold',
     expired: 'Expired',
@@ -84,5 +85,3 @@ export const getStatusBadgeColor = (status: string): string => {
 
   return statusBadgeColors[status.toLowerCase()] || 'bg-gray-100 text-gray-800 border-gray-300';
 };
-
-const someObject: { [key: string]: any } = {};

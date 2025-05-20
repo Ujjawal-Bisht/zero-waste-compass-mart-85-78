@@ -1,3 +1,4 @@
+
 export type ItemCategory = 
   | 'food'
   | 'clothing'
@@ -56,18 +57,32 @@ export interface User {
   isAdmin?: boolean;
 }
 
+export interface OrderItem {
+  id: string;
+  orderId: string;
+  productId: string;
+  name: string;
+  price: number;
+  quantity: number;
+  imageUrl?: string;
+  productName?: string;
+  productImage?: string;
+}
+
 export interface Order {
   id: string;
   buyerId: string;
   sellerId?: string;
   items: OrderItem[];
   totalAmount: number;
-  status: 'pending' | 'processing' | 'shipped' | 'delivered' | 'cancelled';
+  status: 'pending' | 'processing' | 'shipped' | 'delivered' | 'cancelled' | 'out-for-delivery';
   createdAt: string;
   updatedAt: string;
   paymentMethod?: string;
   paymentStatus?: 'pending' | 'paid' | 'failed';
   shippingAddress: string;
+  buyerName?: string;
+  sellerName?: string;
   trackingInfo?: {
     trackingId?: string;
     carrier?: string;
@@ -75,13 +90,4 @@ export interface Order {
     currentLocation?: string;
     status?: string;
   };
-}
-
-export interface OrderItem {
-  id: string;
-  productId: string;
-  name: string;
-  price: number;
-  quantity: number;
-  imageUrl?: string;
 }

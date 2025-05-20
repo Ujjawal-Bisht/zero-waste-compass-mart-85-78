@@ -1,6 +1,7 @@
+
 import React from 'react';
 import { Button } from '@/components/ui/button';
-import { useCart } from '@/contexts/cart';
+import { useCart } from '@/contexts/cart/useCart';
 import { toast } from 'sonner';
 
 const AddToCartButton = ({ product_id }: { product_id: string }) => {

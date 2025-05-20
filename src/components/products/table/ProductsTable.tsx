@@ -49,8 +49,8 @@ const ProductsTable: React.FC<ProductsTableProps> = ({
           : b.name.localeCompare(a.name);
       } else if (field === 'price') {
         return direction === 'asc' 
-          ? a.price - b.price 
-          : b.price - a.price;
+          ? a.currentPrice - b.currentPrice 
+          : b.currentPrice - a.currentPrice;
       } else if (field === 'category') {
         return direction === 'asc' 
           ? a.category.localeCompare(b.category) 
