@@ -15,6 +15,7 @@ const SellerOrders: React.FC = () => {
       buyerId: 'buyer123',
       buyerName: 'John Doe',
       sellerId: 'seller123',
+      userId: 'seller123', // Added to fix the type error
       items: [
         { 
           id: '1', 
@@ -22,7 +23,8 @@ const SellerOrders: React.FC = () => {
           quantity: 2, 
           price: 299.99, 
           productId: 'product1', 
-          orderId: 'ORD001' 
+          orderId: 'ORD001',
+          imageUrl: undefined
         },
       ],
       status: 'pending',
@@ -37,6 +39,7 @@ const SellerOrders: React.FC = () => {
       buyerId: 'buyer456',
       buyerName: 'Jane Smith',
       sellerId: 'seller123',
+      userId: 'seller123', // Added to fix the type error
       items: [
         { 
           id: '2', 
@@ -44,7 +47,8 @@ const SellerOrders: React.FC = () => {
           quantity: 1, 
           price: 2499.00, 
           productId: 'product2', 
-          orderId: 'ORD002' 
+          orderId: 'ORD002',
+          imageUrl: undefined
         },
       ],
       status: 'shipped',
@@ -59,6 +63,7 @@ const SellerOrders: React.FC = () => {
       buyerId: 'buyer789',
       buyerName: 'Alex Johnson',
       sellerId: 'seller123',
+      userId: 'seller123', // Added to fix the type error
       items: [
         { 
           id: '3', 
@@ -66,7 +71,8 @@ const SellerOrders: React.FC = () => {
           quantity: 1, 
           price: 1999.00, 
           productId: 'product3', 
-          orderId: 'ORD003' 
+          orderId: 'ORD003',
+          imageUrl: undefined
         },
       ],
       status: 'out-for-delivery',

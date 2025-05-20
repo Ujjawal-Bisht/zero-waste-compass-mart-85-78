@@ -1,4 +1,3 @@
-
 import React, { createContext, useState, useEffect } from 'react';
 import { toast } from 'sonner';
 import { User } from '@/types';
@@ -13,7 +12,8 @@ interface AuthProviderProps {
   children: React.ReactNode;
 }
 
-export const AuthContextProvider: React.FC<AuthProviderProps> = ({ children }) => {
+// Renamed from AuthContextProvider to AuthProvider for consistency with imports
+export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [currentUser, setCurrentUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
