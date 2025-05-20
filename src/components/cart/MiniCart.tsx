@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ShoppingCart, ChevronRight, X, ShoppingBag, AlertTriangle } from 'lucide-react';
@@ -7,7 +6,7 @@ import { useToast } from '@/components/ui/use-toast';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { useNavigate } from 'react-router-dom';
-import { useCart } from '@/hooks/useCart';
+import { useCart } from '@/hooks/cart';
 import {
   Sheet,
   SheetContent,

@@ -1,8 +1,7 @@
-
 import React, { useState } from 'react';
 import { useToast } from '@/components/ui/use-toast';
 import { useNavigate } from 'react-router-dom';
-import { useCart } from '@/hooks/useCart';
+import { useCart } from '@/hooks/cart';
 import TopNavbar from '@/components/layouts/TopNavbar';
 import CartHeader from './components/CartHeader';
 import CartItems from './components/CartItems';

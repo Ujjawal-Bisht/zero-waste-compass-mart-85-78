@@ -1,17 +1,14 @@
 
 import React from 'react';
 import { Button } from '@/components/ui/button';
-import { useCart } from '@/contexts/cart/useCart';
+import { useCart } from '@/hooks/cart';
 import { toast } from 'sonner';
 
 const AddToCartButton = ({ product_id }: { product_id: string }) => {
-  const { addItemToCart } = useCart();
+  const { addToCart } = useCart();
 
   const handleAddToCart = () => {
-    addItemToCart({
-      product_id: product_id,
-      quantity: 1,
-    });
+    addToCart(product_id, 1);
     toast.success('Item added to cart!');
   };
 
