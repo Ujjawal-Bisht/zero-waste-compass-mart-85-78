@@ -24,7 +24,7 @@ export const getStatusColor = (status: string): string => {
 };
 
 export const getStatusText = (status: ItemStatus): string => {
-  const statusText: Record<string, string> = {
+  const statusText: Record<ItemStatus, string> = {
     available: 'Available',
     sold: 'Sold',
     expired: 'Expired',
@@ -66,6 +66,9 @@ export const getCategoryBadgeColor = (category: string): string => {
     electronics: 'bg-yellow-100 text-yellow-800 border-yellow-300',
     furniture: 'bg-purple-100 text-purple-800 border-purple-300',
     household: 'bg-cyan-100 text-cyan-800 border-cyan-300',
+    books: 'bg-amber-100 text-amber-800 border-amber-300',
+    toys: 'bg-pink-100 text-pink-800 border-pink-300',
+    medicine: 'bg-indigo-100 text-indigo-800 border-indigo-300',
     other: 'bg-gray-100 text-gray-800 border-gray-300'
   };
 
