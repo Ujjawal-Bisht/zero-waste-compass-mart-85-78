@@ -26,8 +26,14 @@ const TopNavbar: React.FC<TopNavbarProps> = ({ onMenuClick }) => {
         <div className="flex items-center justify-between h-16">
           <div className="flex items-center">
             {onMenuClick && (
-              <Button variant="ghost" size="icon" onClick={onMenuClick} className="mr-2 lg:hidden">
-                <Menu className="h-5 w-5" />
+              <Button 
+                variant="outline" 
+                size="icon" 
+                onClick={onMenuClick} 
+                className="mr-2 lg:hidden bg-white hover:bg-gray-50"
+                style={{ color: '#000000' }}
+              >
+                <Menu className="h-5 w-5" strokeWidth={2.5} />
               </Button>
             )}
             <div 

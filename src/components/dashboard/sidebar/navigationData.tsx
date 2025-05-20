@@ -1,70 +1,139 @@
-
-import React from 'react';
 import {
+  BarChart3,
   Home,
-  Store,
-  ShoppingCart,
-  Box,
-  MessageSquare,
+  Package,
   Settings,
-  LineChart,
-  Shield,
+  ShoppingBag,
+  ShoppingCart,
   User,
-  Heart,
-  Tag,
-  MoreHorizontal,
-  Star,
-  Users
-} from 'lucide-react';
-import { MenuSection, NavItemType } from './types';
+  Users,
+} from "lucide-react";
 
-// Buyer menu sections with organization and additional categories
-export const buyerMenuSections: MenuSection[] = [
+export const buyerMenuSections = [
   {
-    title: "Main Navigation",
+    title: "General",
     items: [
-      { path: "/dashboard", icon: <Home size={18} />, label: "Dashboard" },
-      { path: "/marketplace", icon: <Store size={18} />, label: "Marketplace", highlight: true },
-      { path: "/orders", icon: <Box size={18} />, label: "My Orders" },
-    ]
+      {
+        name: "Home",
+        path: "/",
+        icon: Home,
+        description: "Go to the marketplace home page",
+      },
+      {
+        name: "Dashboard",
+        path: "/dashboard",
+        icon: BarChart3,
+        description: "View your account dashboard",
+      },
+      {
+        name: "Profile",
+        path: "/profile",
+        icon: User,
+        description: "Manage your profile settings",
+      },
+    ],
   },
   {
-    title: "Shopping",
+    title: "Marketplace",
     items: [
-      { path: "/cart", icon: <ShoppingCart size={18} />, label: "Shopping Cart" },
-      { path: "/favorites", icon: <Heart size={18} />, label: "Saved Items" },
-      { path: "/deals", icon: <Tag size={18} />, label: "Special Deals" },
-    ]
+      {
+        name: "Marketplace",
+        path: "/marketplace",
+        icon: ShoppingCart,
+        description: "Browse available products",
+      },
+      {
+        name: "Cart",
+        path: "/cart",
+        icon: ShoppingCart,
+        description: "View your shopping cart",
+      },
+      {
+        name: "Orders",
+        path: "/orders",
+        icon: ShoppingBag,
+        description: "Track your order history",
+      },
+    ],
   },
   {
-    title: "User",
+    title: "Account",
     items: [
-      { path: "/profile", icon: <User size={18} />, label: "My Profile" },
-      { path: "/settings", icon: <Settings size={18} />, label: "Settings" },
-    ]
-  },
-  {
-    title: "More Options",
-    items: [
-      { path: "/chat", icon: <MessageSquare size={18} />, label: "Support Chat" },
-      { path: "/community", icon: <Users size={18} />, label: "Community" },
-      { path: "/advanced-features", icon: <Star size={18} />, label: "Premium Features", highlight: true },
-    ]
+      {
+        name: "Settings",
+        path: "/settings",
+        icon: Settings,
+        description: "Configure your account preferences",
+      },
+    ],
   },
 ];
 
-export const sellerMenuSections: MenuSection[] = [
+export const sellerMenuSections = [
   {
-    title: "Seller Dashboard",
+    title: "Dashboard",
     items: [
-      { path: "/seller/dashboard", icon: <LineChart size={18} />, label: "Analytics" },
-      { path: "/seller/products", icon: <Box size={18} />, label: "Products" },
-      { path: "/seller/orders", icon: <ShoppingCart size={18} />, label: "Orders" },
-      { path: "/seller/profile", icon: <Settings size={18} />, label: "Seller Profile" },
+      {
+        name: "Seller Dashboard", // Changed from "Analytics"
+        path: "/seller/dashboard",
+        icon: BarChart3,
+        description: "View your sales metrics and performance"
+      },
+      {
+        name: "Profile",
+        path: "/seller/profile",
+        icon: User,
+        description: "Manage your seller profile and settings"
+      },
+      {
+        name: "Products",
+        path: "/seller/products",
+        icon: Package,
+        description: "Manage your product listings"
+      },
+      {
+        name: "Orders",
+        path: "/seller/orders",
+        icon: ShoppingBag,
+        description: "View and manage orders"
+      },
+    ]
+  },
+  {
+    title: "Listings",
+    items: [
+      {
+        name: "Add Item",
+        path: "/items/add",
+        icon: Package,
+        description: "Add a new item for sale"
+      },
+    ]
+  },
+  {
+    title: "Account",
+    items: [
+      {
+        name: "Settings",
+        path: "/settings",
+        icon: Settings,
+        description: "Configure your account preferences"
+      },
     ]
   }
 ];
 
-export const adminMenuItems: NavItemType[] = [
-  { path: "/admin/panel", icon: <Shield size={18} />, label: "Admin Panel" }
+export const adminMenuItems = [
+  {
+    name: "User Management",
+    path: "/admin/users",
+    icon: Users,
+    description: "Manage user accounts and roles",
+  },
+  {
+    name: "Admin Panel",
+    path: "/admin/panel",
+    icon: Settings,
+    description: "Access admin settings and configurations",
+  },
 ];
