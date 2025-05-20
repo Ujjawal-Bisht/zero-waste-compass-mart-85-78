@@ -11,7 +11,6 @@ import CTASection from '@/components/landing/CTASection';
 import Footer from '@/components/landing/Footer';
 import FeaturesTabs from '@/components/landing/FeaturesTabs';
 import Header from '@/components/landing/Header';
-import ChatBot from '@/components/ChatBot';
 
 const Index: React.FC = () => {
   const navigate = useNavigate();
@@ -44,9 +43,6 @@ const Index: React.FC = () => {
 
       {/* Footer */}
       <Footer />
-
-      {/* ChatBot */}
-      <ChatBot />
     </div>
   );
 };

@@ -1,6 +1,5 @@
 
 import React from 'react';
-import ZeroBot5 from './ZeroBot5';
 
 interface SellerBotProps {
   initialPrompt?: string;
@@ -13,17 +12,8 @@ const SellerBot: React.FC<SellerBotProps> = ({
   showInitially = false,
   theme = 'auto'
 }) => {
-  return (
-    <ZeroBot5
-      initialPrompt={initialPrompt}
-      showInitially={showInitially}
-      enableVoice={true}
-      enableRealtime={true}
-      showAnalytics={true}
-      sellerMode={true}
-      theme={theme}
-    />
-  );
+  // This component has been disabled as requested
+  return null;
 };
 
 export default SellerBot;

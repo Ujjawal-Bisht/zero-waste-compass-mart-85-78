@@ -3,7 +3,6 @@ import { Navigate, Outlet } from "react-router-dom";
 import { useAuth } from "@/contexts/auth";
 import { Loader2 } from "lucide-react";
 import React from "react";
-import ChatBot from "@/components/ChatBot";
 
 interface PrivateRouteProps {
   children?: React.ReactNode;
@@ -30,7 +29,6 @@ const PrivateRoute: React.FC<PrivateRouteProps> = ({ children }) => {
   return (
     <>
       {children ? children : <Outlet />}
-      <ChatBot initialPrompt="Welcome back! How can I help you today?" />
     </>
   );
 };

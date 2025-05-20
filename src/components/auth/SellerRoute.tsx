@@ -3,7 +3,6 @@ import { Navigate, Outlet } from "react-router-dom";
 import { useAuth } from "@/contexts/auth";
 import { Loader2 } from "lucide-react";
 import React from "react";
-import SellerBot from "@/components/ai/SellerBot";
 
 interface SellerRouteProps {
   children?: React.ReactNode;
@@ -31,7 +30,6 @@ const SellerRoute: React.FC<SellerRouteProps> = ({ children }) => {
   return (
     <>
       {children ? children : <Outlet />}
-      <SellerBot initialPrompt="How can I help with your seller account today?" />
     </>
   );
 };
