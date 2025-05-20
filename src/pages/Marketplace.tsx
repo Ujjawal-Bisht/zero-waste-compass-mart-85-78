@@ -4,7 +4,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { ShoppingCart, Filter, PackageOpen, Clock, Star } from 'lucide-react';
+import { ShoppingCart, Filter, PackageOpen, Clock, Star, AlertTriangle } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useCart } from '@/hooks/useCart';
 import { supabase } from '@/integrations/supabase/client';
@@ -24,7 +24,7 @@ type Product = {
   inStock?: boolean;
 };
 
-// Expanded product list with more categories
+// Expanded product list with more categories and items
 const mockProducts: Product[] = [
   {
     id: uuidv4(),
@@ -171,6 +171,104 @@ const mockProducts: Product[] = [
     image: 'https://images.unsplash.com/photo-1600857544200-b2f666a9a2ec?q=80&w=100',
     expiryDate: '2026-03-10',
     inStock: true
+  },
+  
+  // Adding more diverse products
+  {
+    id: uuidv4(),
+    name: 'Organic Spinach',
+    price: 149,
+    category: 'Food',
+    seller: 'Fresh Farms',
+    sellerId: 'seller-1',
+    rating: 4.6,
+    image: 'https://images.unsplash.com/photo-1576045057995-568f588f82fb?q=80&w=100',
+    expiryDate: '2025-05-25',
+    inStock: true
+  },
+  {
+    id: uuidv4(),
+    name: 'Recycled Paper Notebooks (3-pack)',
+    price: 399,
+    category: 'Stationery',
+    seller: 'Green Office',
+    sellerId: 'seller-12',
+    rating: 4.7,
+    image: 'https://images.unsplash.com/photo-1572726729207-a78d6feb18d7?q=80&w=100',
+    expiryDate: '2026-12-31',
+    inStock: true
+  },
+  {
+    id: uuidv4(),
+    name: 'Bamboo Toothbrushes (4-pack)',
+    price: 299,
+    category: 'Household',
+    seller: 'Eco Living',
+    sellerId: 'seller-13',
+    rating: 4.8,
+    image: 'https://images.unsplash.com/photo-1607613009820-a29f7bb81c04?q=80&w=100',
+    expiryDate: '2026-12-31',
+    inStock: true
+  },
+  {
+    id: uuidv4(),
+    name: 'Reusable Stainless Steel Straws',
+    price: 199,
+    category: 'Household',
+    seller: 'Green Living',
+    sellerId: 'seller-7',
+    rating: 4.5,
+    image: 'https://images.unsplash.com/photo-1576011185442-9a96deacc87c?q=80&w=100',
+    expiryDate: '2026-12-31',
+    inStock: true
+  },
+  {
+    id: uuidv4(),
+    name: 'Organic Almond Milk',
+    price: 179,
+    category: 'Food',
+    seller: 'Dairy Alternatives',
+    sellerId: 'seller-14',
+    rating: 4.4,
+    image: 'https://images.unsplash.com/photo-1556881286-fc6915169721?q=80&w=100',
+    expiryDate: '2025-06-01',
+    inStock: true
+  },
+  {
+    id: uuidv4(),
+    name: 'Biodegradable Plant Pots (5-pack)',
+    price: 349,
+    category: 'Garden',
+    seller: 'Green Thumb',
+    sellerId: 'seller-10',
+    rating: 4.3,
+    image: 'https://images.unsplash.com/photo-1622507514852-577d4b632fde?q=80&w=100',
+    expiryDate: '2026-10-15',
+    inStock: true
+  },
+  {
+    id: uuidv4(),
+    name: 'Natural Organic Honey',
+    price: 499,
+    category: 'Food',
+    seller: 'Beekeepers Co-op',
+    sellerId: 'seller-15',
+    rating: 4.9,
+    image: 'https://images.unsplash.com/photo-1587049352851-8d4e89133924?q=80&w=100',
+    expiryDate: '2025-08-30',
+    inStock: true
+  },
+  {
+    id: uuidv4(),
+    name: 'Recycled Glass Water Bottle',
+    price: 599,
+    category: 'Household',
+    seller: 'Sustainable Living',
+    sellerId: 'seller-16',
+    rating: 4.7,
+    image: 'https://images.unsplash.com/photo-1602143407151-7111542de6e8?q=80&w=100',
+    expiryDate: '2026-12-31',
+    inStock: true
   }
 ];
 
@@ -180,6 +278,7 @@ const Marketplace: React.FC = () => {
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const { addToCart } = useCart();
+  const [showExpiryAlerts, setShowExpiryAlerts] = useState(true);
 
   // Get all unique categories from products
   const categories = ['all', ...Array.from(new Set(mockProducts.map(p => p.category.toLowerCase())))];
@@ -240,13 +339,28 @@ const Marketplace: React.FC = () => {
     return 0; // No discount for items with expiry date far away
   };
 
+  // AI-driven expiry alert generator
+  const getAiExpiryAlert = (daysRemaining: number): string => {
+    if (daysRemaining <= 3) {
+      return "Act fast! This item expires in just a few days. Perfect for immediate use.";
+    } else if (daysRemaining <= 7) {
+      return "Limited time offer: Use within a week for optimal quality.";
+    } else if (daysRemaining <= 14) {
+      return "Plan ahead: This product is best used within two weeks.";
+    } else if (daysRemaining <= 30) {
+      return "Good value: This product will remain fresh for about a month.";
+    }
+    return "";
+  };
+
   const handleAddToCart = (product: Product) => {
     const discountedPrice = product.discountPercentage 
       ? product.price - (product.price * product.discountPercentage / 100)
       : product.price;
       
     addToCart({
-      id: product.id,
+      id: `cart-${product.id}`,
+      product_id: product.id,
       name: product.name,
       price: discountedPrice,
       image: product.image,
@@ -261,6 +375,16 @@ const Marketplace: React.FC = () => {
     });
   };
 
+  const toggleExpiryAlerts = () => {
+    setShowExpiryAlerts(!showExpiryAlerts);
+    toast({
+      title: showExpiryAlerts ? "Expiry alerts disabled" : "Expiry alerts enabled",
+      description: showExpiryAlerts 
+        ? "You won't see AI-generated expiry recommendations" 
+        : "You'll now see AI-generated expiry recommendations"
+    });
+  };
+
   // Animation variants
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -269,15 +393,6 @@ const Marketplace: React.FC = () => {
       transition: { 
         staggerChildren: 0.1 
       }
-    }
-  };
-
-  const itemVariants = {
-    hidden: { y: 20, opacity: 0 },
-    visible: { 
-      y: 0, 
-      opacity: 1,
-      transition: { type: 'spring', stiffness: 100 }
     }
   };
 
@@ -315,14 +430,30 @@ const Marketplace: React.FC = () => {
         className="flex justify-between items-center mb-8"
       >
         <h1 className="text-3xl font-bold bg-gradient-to-r from-purple-600 to-indigo-600 bg-clip-text text-transparent">Marketplace</h1>
-        <motion.div
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.95 }}
-        >
-          <Button variant="outline" size="sm" className="filter-button">
-            <Filter className="mr-2 h-4 w-4" /> Filter
-          </Button>
-        </motion.div>
+        <div className="flex items-center gap-3">
+          <motion.div
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+          >
+            <Button 
+              variant="outline" 
+              size="sm" 
+              onClick={toggleExpiryAlerts}
+              className={`flex items-center gap-2 ${showExpiryAlerts ? 'bg-amber-100 text-amber-700 border-amber-300' : 'bg-gray-100'}`}
+            >
+              <AlertTriangle className={`h-4 w-4 ${showExpiryAlerts ? 'text-amber-500' : ''}`} /> 
+              {showExpiryAlerts ? "Expiry Alerts: ON" : "Expiry Alerts: OFF"}
+            </Button>
+          </motion.div>
+          <motion.div
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+          >
+            <Button variant="outline" size="sm" className="filter-button">
+              <Filter className="mr-2 h-4 w-4" /> Filter
+            </Button>
+          </motion.div>
+        </div>
       </motion.div>
       
       <Tabs defaultValue="all" className="mb-8">
@@ -332,6 +463,7 @@ const Marketplace: React.FC = () => {
               key={category}
               value={category} 
               className="tab-animate capitalize"
+              onClick={() => setActiveCategory(category)}
             >
               {category}
             </TabsTrigger>
@@ -349,7 +481,13 @@ const Marketplace: React.FC = () => {
               {products
                 .filter(p => category === 'all' || p.category.toLowerCase() === category)
                 .map(product => (
-                  <ProductCard key={product.id} product={product} onAddToCart={handleAddToCart} />
+                  <ProductCard 
+                    key={product.id} 
+                    product={product} 
+                    onAddToCart={handleAddToCart} 
+                    showExpiryAlerts={showExpiryAlerts}
+                    getAiExpiryAlert={getAiExpiryAlert}
+                  />
                 ))}
             </motion.div>
           </TabsContent>
@@ -362,9 +500,11 @@ const Marketplace: React.FC = () => {
 interface ProductCardProps {
   product: Product;
   onAddToCart: (product: Product) => void;
+  showExpiryAlerts: boolean;
+  getAiExpiryAlert: (days: number) => string;
 }
 
-const ProductCard: React.FC<ProductCardProps> = ({ product, onAddToCart }) => {
+const ProductCard: React.FC<ProductCardProps> = ({ product, onAddToCart, showExpiryAlerts, getAiExpiryAlert }) => {
   // Calculate discounted price
   const discountedPrice = product.discountPercentage 
     ? product.price - (product.price * product.discountPercentage / 100)
@@ -385,6 +525,10 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, onAddToCart }) => {
       transition: { type: 'spring', stiffness: 100 }
     }
   };
+
+  const remainingDays = daysUntilExpiry();
+  const aiExpiryAlert = getAiExpiryAlert(remainingDays);
+  const showAlert = showExpiryAlerts && aiExpiryAlert && remainingDays <= 30;
 
   return (
     <motion.div
@@ -410,7 +554,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, onAddToCart }) => {
           )}
         </div>
         <CardContent className="pt-4 flex-grow flex flex-col">
-          <div className="mb-4 flex-grow">
+          <div className="mb-3 flex-grow">
             <h3 className="font-medium">{product.name}</h3>
             <p className="text-sm text-gray-500">Sold by {product.seller}</p>
             <div className="flex items-center mt-1">
@@ -428,14 +572,35 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, onAddToCart }) => {
               <span className="text-xs ml-1 text-gray-500">{product.rating}</span>
             </div>
             
-            {daysUntilExpiry() <= 14 && (
+            {remainingDays <= 14 && (
               <div className="flex items-center mt-2 text-amber-600 text-xs">
                 <Clock className="h-3 w-3 mr-1" />
-                <span>Expires in {daysUntilExpiry()} days</span>
+                <span>Expires in {remainingDays} days</span>
               </div>
             )}
+
+            {showAlert && (
+              <motion.div 
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: 'auto' }}
+                transition={{ duration: 0.3 }}
+                className={`mt-2 p-2 text-xs rounded-md flex items-start gap-1.5
+                  ${remainingDays <= 3 ? 'bg-red-50 text-red-700' : 
+                  remainingDays <= 7 ? 'bg-orange-50 text-orange-700' : 
+                  remainingDays <= 14 ? 'bg-amber-50 text-amber-700' : 
+                  'bg-green-50 text-green-700'}`}
+              >
+                <div className="mt-0.5">
+                  <AlertTriangle className="h-3 w-3" />
+                </div>
+                <div>
+                  {aiExpiryAlert}
+                </div>
+              </motion.div>
+            )}
           </div>
-          <div className="mt-2 flex justify-between items-center">
+          
+          <div className="mt-auto pt-2 flex justify-between items-center border-t border-gray-100">
             <div>
               {product.discountPercentage > 0 ? (
                 <div className="flex flex-col">

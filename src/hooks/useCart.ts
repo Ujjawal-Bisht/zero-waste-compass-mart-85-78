@@ -85,13 +85,7 @@ export const useCart = () => {
   };
 
   const addToCart = async (item: CartItem | string, quantity: number = 1) => {
-    if (!currentUser && typeof item === 'string') {
-      toast.error("Please log in to add items to your cart");
-      return;
-    }
-    
     try {
-      // Check if the parameter is a string (product ID) or a CartItem object
       if (typeof item === 'string') {
         // Handle as product ID
         const productId = item;
@@ -129,8 +123,11 @@ export const useCart = () => {
         // Handle as CartItem object
         const cartItem = { ...item, quantity: quantity || 1 };
         
-        // Check if item already in cart
-        const existingItemIndex = cartItems.findIndex(i => i.id === cartItem.id);
+        // Check if item already in cart by product_id
+        const existingItemIndex = cartItems.findIndex(i => 
+          (i.product_id && cartItem.product_id && i.product_id === cartItem.product_id) || 
+          i.id === cartItem.id
+        );
         
         if (existingItemIndex >= 0) {
           // Update existing item
@@ -138,8 +135,12 @@ export const useCart = () => {
           updatedItems[existingItemIndex].quantity += cartItem.quantity;
           setCartItems(updatedItems);
         } else {
-          // Add new item
-          setCartItems([...cartItems, cartItem]);
+          // Add new item with a unique ID
+          const newItem = {
+            ...cartItem,
+            id: cartItem.id || `cart-item-${Date.now()}`
+          };
+          setCartItems([...cartItems, newItem]);
         }
         
         toast.success("Item added to cart");
