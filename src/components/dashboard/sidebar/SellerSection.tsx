@@ -1,99 +1,95 @@
 
 import React from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Button } from '@/components/ui/button';
-import { Store, Package, ShoppingCart, ShieldCheck } from 'lucide-react';
+import { Store, Package, ShoppingCart, User } from 'lucide-react';
 
 interface SellerSectionProps {
-  isSeller: boolean;
   onClose?: () => void;
 }
 
-export const SellerSection: React.FC<SellerSectionProps> = ({ isSeller, onClose }) => {
-  const location = useLocation();
-
-  if (!isSeller) {
-    return null;
-  }
+export const SellerSection: React.FC<SellerSectionProps> = ({ onClose }) => {
+  const handleClick = () => {
+    if (onClose) onClose();
+  };
+  
+  const itemVariants = {
+    initial: { opacity: 0, x: -5 },
+    animate: { opacity: 1, x: 0 },
+    hover: { x: 5, backgroundColor: "rgba(255, 255, 255, 0.1)" }
+  };
 
   return (
-    <>
-      <div className="mt-6 mb-2 px-4">
-        <h3 className="text-sm font-medium text-gray-300 border-b border-gray-600 pb-1">
-          Seller Options
-        </h3>
-      </div>
+    <div className="mb-4">
+      <h2 className="mb-2 px-4 text-lg font-semibold tracking-tight text-white">
+        Seller Options
+      </h2>
       <div className="space-y-1">
-        <motion.div whileHover={{ x: 5 }} whileTap={{ scale: 0.98 }}>
-          <Button
-            variant={location.pathname === '/seller/dashboard' ? "secondary" : "ghost"}
-            className={`w-full justify-start ${
-              location.pathname === '/seller/dashboard' 
-                ? 'bg-white bg-opacity-20 text-white' 
-                : 'text-gray-200 hover:bg-white hover:bg-opacity-10'
-            } transition-all duration-300 sidebar-menu-item`}
-            onClick={onClose}
-            asChild
+        <motion.div
+          variants={itemVariants}
+          initial="initial"
+          animate="animate"
+          whileHover="hover"
+          transition={{ duration: 0.2 }}
+        >
+          <Link
+            to="/seller/dashboard"
+            className="flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium text-white hover:bg-white hover:bg-opacity-10"
+            onClick={handleClick}
           >
-            <Link to="/seller/dashboard">
-              <Store className="mr-2 h-4 w-4" />
-              Seller Dashboard
-            </Link>
-          </Button>
+            <Store className="h-4 w-4" />
+            <span>Seller Dashboard</span>
+          </Link>
         </motion.div>
-        <motion.div whileHover={{ x: 5 }} whileTap={{ scale: 0.98 }}>
-          <Button
-            variant={location.pathname === '/seller/products' ? "secondary" : "ghost"}
-            className={`w-full justify-start ${
-              location.pathname === '/seller/products' 
-                ? 'bg-white bg-opacity-20 text-white' 
-                : 'text-gray-200 hover:bg-white hover:bg-opacity-10'
-            } transition-all duration-300 sidebar-menu-item`}
-            onClick={onClose}
-            asChild
+        <motion.div
+          variants={itemVariants}
+          initial="initial"
+          animate="animate"
+          whileHover="hover"
+          transition={{ duration: 0.2, delay: 0.05 }}
+        >
+          <Link
+            to="/seller/products"
+            className="flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium text-white hover:bg-white hover:bg-opacity-10"
+            onClick={handleClick}
           >
-            <Link to="/seller/products">
-              <Package className="mr-2 h-4 w-4" />
-              Products
-            </Link>
-          </Button>
+            <Package className="h-4 w-4" />
+            <span>Products</span>
+          </Link>
         </motion.div>
-        <motion.div whileHover={{ x: 5 }} whileTap={{ scale: 0.98 }}>
-          <Button
-            variant={location.pathname === '/seller/orders' ? "secondary" : "ghost"}
-            className={`w-full justify-start ${
-              location.pathname === '/seller/orders' 
-                ? 'bg-white bg-opacity-20 text-white' 
-                : 'text-gray-200 hover:bg-white hover:bg-opacity-10'
-            } transition-all duration-300 sidebar-menu-item`}
-            onClick={onClose}
-            asChild
+        <motion.div
+          variants={itemVariants}
+          initial="initial"
+          animate="animate"
+          whileHover="hover"
+          transition={{ duration: 0.2, delay: 0.1 }}
+        >
+          <Link
+            to="/seller/orders"
+            className="flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium text-white hover:bg-white hover:bg-opacity-10"
+            onClick={handleClick}
           >
-            <Link to="/seller/orders">
-              <ShoppingCart className="mr-2 h-4 w-4" />
-              Orders
-            </Link>
-          </Button>
+            <ShoppingCart className="h-4 w-4" />
+            <span>Orders</span>
+          </Link>
         </motion.div>
-        <motion.div whileHover={{ x: 5 }} whileTap={{ scale: 0.98 }}>
-          <Button
-            variant={location.pathname === '/seller/profile' ? "secondary" : "ghost"}
-            className={`w-full justify-start ${
-              location.pathname === '/seller/profile' 
-                ? 'bg-white bg-opacity-20 text-white' 
-                : 'text-gray-200 hover:bg-white hover:bg-opacity-10'
-            } transition-all duration-300 sidebar-menu-item`}
-            onClick={onClose}
-            asChild
+        <motion.div
+          variants={itemVariants}
+          initial="initial"
+          animate="animate"
+          whileHover="hover"
+          transition={{ duration: 0.2, delay: 0.15 }}
+        >
+          <Link
+            to="/seller/profile"
+            className="flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium text-white hover:bg-white hover:bg-opacity-10"
+            onClick={handleClick}
           >
-            <Link to="/seller/profile">
-              <ShieldCheck className="mr-2 h-4 w-4" />
-              Seller Profile
-            </Link>
-          </Button>
+            <User className="h-4 w-4" />
+            <span>Seller Profile</span>
+          </Link>
         </motion.div>
       </div>
-    </>
+    </div>
   );
 };

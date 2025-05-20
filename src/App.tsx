@@ -25,8 +25,7 @@ import Cart from './pages/cart/Cart';
 import MyOrders from './pages/orders/MyOrders';
 import AdvancedFeatures from './pages/services/AdvancedFeatures';
 import { Toaster } from '@/components/ui/sonner';
-import ZeroBot from '@/components/ai/ZeroBot'; // Import ZeroBot component
-import { AuthProvider } from '@/contexts/auth'; // Import AuthProvider
+import { AuthProvider } from '@/contexts/auth'; 
 
 function App() {
   return (
@@ -68,7 +67,6 @@ function App() {
           </Routes>
           
           <Toaster richColors />
-          <ZeroBot />
         </div>
       </BrowserRouter>
     </AuthProvider>

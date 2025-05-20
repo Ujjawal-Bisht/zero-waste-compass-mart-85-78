@@ -7,7 +7,7 @@ import { useAuth } from '@/contexts/auth';
 import { SidebarLogo } from './sidebar/SidebarLogo';
 import NavigationLinks from './sidebar/NavigationLinks';
 import { SellerSection } from './sidebar/SellerSection';
-import { LogoutButton } from './sidebar/LogoutButton';
+import LogoutButton from './sidebar/LogoutButton';
 
 interface SidebarNavProps extends React.HTMLAttributes<HTMLDivElement> {
   onClose?: () => void;
@@ -48,13 +48,12 @@ export const DashboardSidebar = ({ className, onClose, ...props }: SidebarNavPro
         />
         
         {/* Only show seller section if user is a seller */}
-        <SellerSection 
-          isSeller={Boolean(isSeller)} 
-          onClose={onClose} 
-        />
+        {isSeller && (
+          <SellerSection onClose={onClose} />
+        )}
         
         <div className="mt-auto px-3 py-2">
-          <LogoutButton className="" onLogout={handleLogout} />
+          <LogoutButton onLogout={handleLogout} />
         </div>
       </div>
     </Sidebar>

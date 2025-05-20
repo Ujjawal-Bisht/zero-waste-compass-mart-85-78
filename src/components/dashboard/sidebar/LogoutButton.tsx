@@ -12,7 +12,7 @@ interface LogoutButtonProps {
   onLogout?: () => void;
 }
 
-export const LogoutButton: React.FC<LogoutButtonProps> = ({ className, onLogout }) => {
+const LogoutButton: React.FC<LogoutButtonProps> = ({ className, onLogout }) => {
   const { logout } = useAuth();
   const navigate = useNavigate();
 
@@ -24,6 +24,7 @@ export const LogoutButton: React.FC<LogoutButtonProps> = ({ className, onLogout 
         onLogout();
       }
       
+      toast.success('Successfully logged out');
       navigate('/login');
     } catch (error) {
       console.error('Logout failed:', error);
@@ -33,22 +34,31 @@ export const LogoutButton: React.FC<LogoutButtonProps> = ({ className, onLogout 
 
   return (
     <motion.div
-      whileHover={{ x: 5, backgroundColor: "rgba(239, 68, 68, 0.2)" }}
-      whileTap={{ scale: 0.95 }}
-      className={className}
+      className={`${className} rounded-md overflow-hidden`}
+      initial={{ opacity: 0.9 }}
+      animate={{ opacity: 1 }}
+      whileHover={{ 
+        scale: 1.03,
+        backgroundColor: "rgba(239, 68, 68, 0.15)", 
+        transition: { duration: 0.2 }
+      }}
+      whileTap={{ scale: 0.97 }}
     >
       <Button 
-        className="w-full justify-start text-white hover:bg-white hover:bg-opacity-10 logout-button" 
+        className="w-full justify-start text-white group hover:bg-transparent" 
         variant="ghost" 
         onClick={handleLogout}
       >
         <motion.div
-          whileHover={{ rotate: 10 }}
           className="mr-2 flex items-center"
+          initial={{ rotate: 0 }}
+          whileHover={{ rotate: 15, transition: { duration: 0.3 } }}
         >
           <LogOut className="h-4 w-4 transition-transform duration-300" />
         </motion.div>
-        Logout
+        <span className="group-hover:translate-x-1 transition-transform duration-200">
+          Logout
+        </span>
       </Button>
     </motion.div>
   );
