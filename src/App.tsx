@@ -12,7 +12,7 @@ import Profile from './pages/Profile';
 import AdminPanel from './pages/AdminPanel';
 import AuthLayout from './components/layouts/AuthLayout';
 import DashboardLayout from './components/layouts/DashboardLayout';
-import Marketplace from './pages/Marketplace';
+import Marketplace from './pages/marketplace/Marketplace';
 import PrivateRoute from './components/auth/PrivateRoute';
 import SellerRoute from './components/auth/SellerRoute';
 import AdminRoute from './components/auth/AdminRoute';

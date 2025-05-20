@@ -1,79 +1,75 @@
 
 import React from 'react';
-import { motion } from 'framer-motion';
-import { Card, CardContent } from '@/components/ui/card';
+import { MinusCircle, PlusCircle, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Trash2, Plus, Minus } from 'lucide-react';
-import { CartItem as CartItemType } from '@/hooks/useCart';
+import { CartItem as CartItemType } from '@/hooks/cart/types';
 
 interface CartItemProps {
   item: CartItemType;
-  onRemove: (id: string) => void;
-  onUpdateQuantity: (id: string, delta: number) => void;
+  removeFromCart: (id: string) => void;
+  updateItemQuantity: (id: string, delta: number) => void;
 }
 
-const CartItem: React.FC<CartItemProps> = ({ item, onRemove, onUpdateQuantity }) => {
+const CartItem: React.FC<CartItemProps> = ({ item, removeFromCart, updateItemQuantity }) => {
   return (
-    <motion.div variants={{
-      hidden: { y: 20, opacity: 0 },
-      visible: { 
-        y: 0, 
-        opacity: 1,
-        transition: { type: "spring", stiffness: 100 }
-      }
-    }}>
-      <Card className="overflow-hidden border border-gray-200 hover:shadow-md transition-shadow">
-        <CardContent className="p-4">
-          <div className="flex items-center space-x-4">
-            <div className="h-20 w-20 rounded-md overflow-hidden flex-shrink-0 border border-gray-100">
-              <img 
-                src={item.image} 
-                alt={item.name} 
-                className="h-full w-full object-cover"
-              />
-            </div>
-            <div className="flex-grow">
-              <h3 className="font-medium">{item.name}</h3>
-              {item.expiryDate && (
-                <p className="text-sm text-gray-500">
-                  Expires: {new Date(item.expiryDate).toLocaleDateString()}
-                </p>
-              )}
-              <div className="flex items-center justify-between mt-2">
-                <p className="font-bold text-indigo-700">₹{item.price.toFixed(2)}</p>
-                <div className="flex items-center space-x-2">
-                  <Button 
-                    variant="outline" 
-                    size="icon" 
-                    className="h-7 w-7 border border-gray-200"
-                    onClick={() => onUpdateQuantity(item.id, -1)}
-                  >
-                    <Minus className="h-3 w-3" />
-                  </Button>
-                  <span className="w-8 text-center">{item.quantity}</span>
-                  <Button 
-                    variant="outline" 
-                    size="icon" 
-                    className="h-7 w-7 border border-gray-200"
-                    onClick={() => onUpdateQuantity(item.id, 1)}
-                  >
-                    <Plus className="h-3 w-3" />
-                  </Button>
-                  <Button 
-                    variant="ghost" 
-                    size="icon" 
-                    className="h-7 w-7 text-red-500 hover:text-red-700 hover:bg-red-50"
-                    onClick={() => onRemove(item.id)}
-                  >
-                    <Trash2 className="h-4 w-4" />
-                  </Button>
-                </div>
-              </div>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-    </motion.div>
+    <div className="flex items-center gap-4 py-4 border-b last:border-0">
+      {/* Product Image */}
+      <div className="h-20 w-20 flex-shrink-0 bg-gray-100 rounded-md overflow-hidden">
+        <img 
+          src={item.image} 
+          alt={item.name} 
+          className="h-full w-full object-cover"
+        />
+      </div>
+      
+      {/* Product Details */}
+      <div className="flex-1">
+        <h3 className="font-medium text-gray-900">{item.name}</h3>
+        <p className="text-sm text-gray-500">₹{item.price.toFixed(2)}</p>
+
+        {/* Item expiry date if available */}
+        {item.expiryDate && (
+          <p className="text-xs text-amber-600 mt-1">
+            Expires: {new Date(item.expiryDate).toLocaleDateString()}
+          </p>
+        )}
+      </div>
+
+      {/* Quantity Controls */}
+      <div className="flex items-center gap-2">
+        <Button 
+          variant="outline" 
+          size="icon" 
+          className="h-8 w-8 rounded-full"
+          onClick={() => updateItemQuantity(item.id, -1)}
+          disabled={item.quantity <= 1}
+        >
+          <MinusCircle className="h-4 w-4" />
+        </Button>
+        <span className="w-8 text-center">{item.quantity}</span>
+        <Button 
+          variant="outline" 
+          size="icon" 
+          className="h-8 w-8 rounded-full"
+          onClick={() => updateItemQuantity(item.id, 1)}
+        >
+          <PlusCircle className="h-4 w-4" />
+        </Button>
+      </div>
+
+      {/* Total & Remove */}
+      <div className="flex flex-col items-end gap-2">
+        <span className="font-medium">₹{(item.price * item.quantity).toFixed(2)}</span>
+        <Button 
+          variant="ghost" 
+          size="icon" 
+          onClick={() => removeFromCart(item.id)}
+          className="h-8 w-8 text-red-500 hover:text-red-700 hover:bg-red-50"
+        >
+          <Trash2 className="h-4 w-4" />
+        </Button>
+      </div>
+    </div>
   );
 };
 
