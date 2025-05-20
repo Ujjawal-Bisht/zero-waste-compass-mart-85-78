@@ -19,11 +19,9 @@ const LogoutButton: React.FC<LogoutButtonProps> = ({ className, onLogout }) => {
   const handleLogout = async () => {
     try {
       await logout();
-      
       if (onLogout) {
         onLogout();
       }
-      
       toast.success('Successfully logged out');
       navigate('/login');
     } catch (error) {
@@ -38,15 +36,16 @@ const LogoutButton: React.FC<LogoutButtonProps> = ({ className, onLogout }) => {
       initial={{ opacity: 0.9 }}
       animate={{ opacity: 1 }}
       whileHover={{ 
-        scale: 1.03,
-        backgroundColor: "rgba(239, 68, 68, 0.15)", 
+        scale: 1.04,
+        rotate: -2,
+        boxShadow: "0 0 18px 2px rgba(239,68,68,0.25)",
         transition: { duration: 0.2 }
       }}
-      whileTap={{ scale: 0.97 }}
+      whileTap={{ scale: 0.97, rotate: 0 }}
     >
       <Button 
-        className="w-full justify-start text-white group hover:bg-transparent" 
-        variant="ghost" 
+        className="w-full justify-start text-white group hover:bg-transparent transition-all duration-300"
+        variant="ghost"
         onClick={handleLogout}
       >
         <motion.div
@@ -54,7 +53,7 @@ const LogoutButton: React.FC<LogoutButtonProps> = ({ className, onLogout }) => {
           initial={{ rotate: 0 }}
           whileHover={{ rotate: 15, transition: { duration: 0.3 } }}
         >
-          <LogOut className="h-4 w-4 transition-transform duration-300" />
+          <LogOut className="h-4 w-4 animate-pulse text-rose-500 transition-transform duration-300" />
         </motion.div>
         <span className="group-hover:translate-x-1 transition-transform duration-200">
           Logout

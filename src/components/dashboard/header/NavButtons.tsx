@@ -33,20 +33,30 @@ const NavButtons: React.FC<NavButtonsProps> = ({ isSellerPortal }) => {
       </Button>
 
       {!isSellerPortal && (
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={goToCart}
-          className="hidden md:flex items-center gap-2 transition-colors cart-button cart-button-3d buyer-button-3d button-bounce button-shimmer
-            hover:bg-[#9b87f5] hover:text-white"
-          style={{
-            borderColor: '#9b87f5',
-            color: '#6E59A5'
+        <motion.div
+          whileHover={{
+            scale: 1.06,
+            boxShadow: "0 0 18px 2px #9b87f555",
+            transition: { duration: 0.2 }
           }}
+          whileTap={{ scale: 0.96 }}
+          className="h-full"
         >
-          <ShoppingCart className="h-4 w-4" />
-          <span className="relative">Cart</span>
-        </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={goToCart}
+            className="hidden md:flex items-center gap-2 transition-colors cart-button cart-button-3d buyer-button-3d button-bounce button-shimmer
+              hover:bg-[#9b87f5] hover:text-white"
+            style={{
+              borderColor: '#9b87f5',
+              color: '#6E59A5'
+            }}
+          >
+            <ShoppingCart className="h-4 w-4" />
+            <span className="relative">Cart</span>
+          </Button>
+        </motion.div>
       )}
     </div>
   );
