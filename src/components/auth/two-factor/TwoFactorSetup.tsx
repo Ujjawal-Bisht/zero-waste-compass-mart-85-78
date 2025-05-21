@@ -30,9 +30,9 @@ const TwoFactorSetup: React.FC = () => {
   const handleSetup = async () => {
     try {
       setIsLoading(true);
-      const { qrCode, secret } = await setupTwoFactor();
-      setQrCodeUrl(qrCode);
-      setSetupSecret(secret);
+      const result = await setupTwoFactor();
+      setQrCodeUrl(result.qrCode);
+      setSetupSecret(result.secret);
       setStep('setup');
     } catch (error) {
       toast.error('Failed to set up two-factor authentication');

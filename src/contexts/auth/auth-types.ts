@@ -18,9 +18,8 @@ export interface AuthContextType {
   resetPassword: (email: string) => Promise<void>;
   updateProfile: (data: Partial<User>) => Promise<void>;
   verifySellerAccount: (businessDocuments: File[]) => Promise<void>;
-  
-  // New 2FA methods
-  setupTwoFactor: () => Promise<{ qrCode: string }>;
+  // 2FA methods
+  setupTwoFactor: () => Promise<{ qrCode: string; secret: string }>;
   verifyTwoFactor: (token: string) => Promise<boolean>;
   disableTwoFactor: () => Promise<void>;
   isTwoFactorEnabled: boolean;
