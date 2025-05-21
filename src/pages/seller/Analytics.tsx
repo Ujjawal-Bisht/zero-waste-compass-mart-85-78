@@ -1,9 +1,9 @@
 
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import StatisticsTab from '@/components/seller/StatisticsTab';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { StatisticsTab } from '@/components/seller/analytics';
 
 const Analytics = () => {
   const [selectedTab, setSelectedTab] = useState('statistics');

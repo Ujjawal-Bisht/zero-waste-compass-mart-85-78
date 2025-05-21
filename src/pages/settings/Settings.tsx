@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { motion } from "framer-motion";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -18,11 +17,10 @@ import {
   Trash2,
   Save
 } from "lucide-react";
-import { useToast } from "sonner";
+import { toast } from "sonner";
 
 const Settings: React.FC = () => {
   const [activeTab, setActiveTab] = useState("general");
-  const toast = useToast();
   
   // State for settings
   const [notificationsEnabled, setNotificationsEnabled] = useState(true);
