@@ -119,7 +119,7 @@ const Profile: React.FC = () => {
           animate={{ y: 0, opacity: 1 }}
           transition={{ duration: 0.5 }}
         >
-          <Avatar className="h-24 w-24 border-4 border-zwm-primary mb-4">
+          <Avatar className="h-24 w-24 border-4 border-zwm-primary mb-4 profile-avatar">
             <AvatarImage src={profileImage || undefined} alt={currentUser.displayName || "Profile"} />
             <AvatarFallback>{currentUser.displayName?.[0] || "U"}</AvatarFallback>
           </Avatar>
@@ -147,13 +147,12 @@ const Profile: React.FC = () => {
                 custom={0}
                 variants={navItemVariants}
                 initial="initial"
-                animate="animate"
-                whileHover="hover"
                 animate={activeTab === "personal" ? "active" : "animate"}
+                whileHover="hover"
               >
                 <TabsTrigger 
                   value="personal" 
-                  className="justify-start text-left w-full transition-all duration-300 hover:bg-gray-50"
+                  className="justify-start text-left w-full transition-all duration-300 hover:bg-gray-50 profile-tab-active profile-nav-item"
                 >
                   <User className="mr-2 h-4 w-4" />
                   Personal Information
@@ -164,13 +163,12 @@ const Profile: React.FC = () => {
                 custom={1}
                 variants={navItemVariants}
                 initial="initial"
-                animate="animate"
-                whileHover="hover"
                 animate={activeTab === "security" ? "active" : "animate"}
+                whileHover="hover"
               >
                 <TabsTrigger 
                   value="security" 
-                  className="justify-start text-left w-full transition-all duration-300 hover:bg-gray-50"
+                  className="justify-start text-left w-full transition-all duration-300 hover:bg-gray-50 profile-nav-item"
                 >
                   <ShieldCheck className="mr-2 h-4 w-4" />
                   Security
@@ -181,13 +179,12 @@ const Profile: React.FC = () => {
                 custom={2}
                 variants={navItemVariants}
                 initial="initial"
-                animate="animate"
-                whileHover="hover"
                 animate={activeTab === "notifications" ? "active" : "animate"}
+                whileHover="hover"
               >
                 <TabsTrigger 
                   value="notifications" 
-                  className="justify-start text-left w-full transition-all duration-300 hover:bg-gray-50"
+                  className="justify-start text-left w-full transition-all duration-300 hover:bg-gray-50 profile-nav-item"
                 >
                   <Bell className="mr-2 h-4 w-4" />
                   Notifications
@@ -198,13 +195,12 @@ const Profile: React.FC = () => {
                 custom={3}
                 variants={navItemVariants}
                 initial="initial"
-                animate="animate"
-                whileHover="hover"
                 animate={activeTab === "social" ? "active" : "animate"}
+                whileHover="hover"
               >
                 <TabsTrigger 
                   value="social" 
-                  className="justify-start text-left w-full transition-all duration-300 hover:bg-gray-50"
+                  className="justify-start text-left w-full transition-all duration-300 hover:bg-gray-50 profile-nav-item"
                 >
                   <Link2 className="mr-2 h-4 w-4" />
                   Social Media
@@ -220,7 +216,7 @@ const Profile: React.FC = () => {
         <Tabs value={activeTab} className="w-full" onValueChange={setActiveTab}>
           <TabsContent value="personal" className="p-0 border-0">
             <motion.div 
-              className="bg-white rounded-lg shadow-md p-6"
+              className="bg-white rounded-lg shadow-md p-6 profile-section"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5 }}
@@ -255,7 +251,7 @@ const Profile: React.FC = () => {
           
           <TabsContent value="security" className="p-0 border-0">
             <motion.div 
-              className="bg-white rounded-lg shadow-md p-6"
+              className="bg-white rounded-lg shadow-md p-6 profile-section"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5 }}
@@ -274,7 +270,7 @@ const Profile: React.FC = () => {
           
           <TabsContent value="notifications" className="p-0 border-0">
             <motion.div 
-              className="bg-white rounded-lg shadow-md p-6"
+              className="bg-white rounded-lg shadow-md p-6 profile-section"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5 }}
@@ -288,7 +284,7 @@ const Profile: React.FC = () => {
           
           <TabsContent value="social" className="p-0 border-0">
             <motion.div 
-              className="bg-white rounded-lg shadow-md p-6"
+              className="bg-white rounded-lg shadow-md p-6 profile-section"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5 }}

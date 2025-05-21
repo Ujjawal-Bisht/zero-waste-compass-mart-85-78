@@ -3,6 +3,7 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { CheckCircle2 } from 'lucide-react';
+import VerificationForm from '../VerificationForm';
 
 interface PerformanceCardProps {
   trustScore: number;
@@ -73,14 +74,14 @@ const PerformanceCard: React.FC<PerformanceCardProps> = ({ trustScore, verified 
                   )}
                 </div>
                 {!verified && (
-                  <motion.p 
-                    className="text-sm text-muted-foreground mt-1"
+                  <motion.div 
+                    className="mt-8"
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     transition={{ delay: 0.9 }}
                   >
-                    Upload business documentation to get verified and increase your visibility.
-                  </motion.p>
+                    <VerificationForm />
+                  </motion.div>
                 )}
               </motion.div>
             </div>

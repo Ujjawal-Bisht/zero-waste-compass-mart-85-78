@@ -49,7 +49,7 @@ const NavButtons: React.FC<NavButtonsProps> = ({ isSellerPortal }) => {
             variant="outline"
             size="sm"
             onClick={goToCart}
-            className="hidden md:flex items-center gap-2 transition-colors cart-button cart-button-3d buyer-button-3d button-bounce button-shimmer
+            className="hidden md:flex items-center gap-2 transition-colors cart-button cart-button-3d cart-button-highlight buyer-button-3d button-bounce button-shimmer
               hover:bg-purple-500 hover:text-white group"
             style={{
               borderColor: '#8B5CF6',
@@ -82,14 +82,14 @@ const NavButtons: React.FC<NavButtonsProps> = ({ isSellerPortal }) => {
             variant="outline"
             size="sm"
             onClick={goToOrders}
-            className="hidden md:flex items-center gap-2 transition-colors order-button order-button-3d buyer-button-3d button-bounce
+            className="hidden md:flex items-center gap-2 transition-colors orders-button-animate orders-button-3d buyer-button-3d button-bounce
               hover:bg-indigo-500 hover:text-white group"
             style={{
               borderColor: '#4F46E5',
               color: '#4338CA'
             }}
           >
-            <Truck className="h-4 w-4 group-hover:animate-pulse" />
+            <Truck className="h-4 w-4 orders-icon group-hover:animate-pulse" />
             <motion.span 
               className="relative"
               initial={{ opacity: 0, width: 0 }}
