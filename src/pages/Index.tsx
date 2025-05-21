@@ -11,7 +11,6 @@ import CTASection from '@/components/landing/CTASection';
 import Footer from '@/components/landing/Footer';
 import FeaturesTabs from '@/components/landing/FeaturesTabs';
 import Header from '@/components/landing/Header';
-import ZeroBot4 from '@/components/ai/ZeroBot4';
 
 const Index: React.FC = () => {
   const navigate = useNavigate();
@@ -44,9 +43,8 @@ const Index: React.FC = () => {
 
       {/* Footer */}
       <Footer />
-
-      {/* Floating ZeroBot AI chat (v4) */}
-      <ZeroBot4 />
+      
+      {/* ZeroBot is now globally available via App.tsx */}
     </div>
   );
 };

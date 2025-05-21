@@ -15,26 +15,26 @@ const mockData = {
   isGrowthPositive: true,
   yearProgress: 42, // 42% of the year completed
   revenueData: [
-    { name: 'Jan', revenue: 65000, profit: 23000 },
-    { name: 'Feb', revenue: 72000, profit: 28000 },
-    { name: 'Mar', revenue: 85000, profit: 32000 },
-    { name: 'Apr', revenue: 78000, profit: 30000 },
-    { name: 'May', revenue: 92000, profit: 36000 },
-    { name: 'Jun', revenue: 98000, profit: 42000 },
+    { month: 'Jan', revenue: 65000, profit: 23000 },
+    { month: 'Feb', revenue: 72000, profit: 28000 },
+    { month: 'Mar', revenue: 85000, profit: 32000 },
+    { month: 'Apr', revenue: 78000, profit: 30000 },
+    { month: 'May', revenue: 92000, profit: 36000 },
+    { month: 'Jun', revenue: 98000, profit: 42000 },
   ],
   dailyRevenueData: [
-    { day: 'Mon', revenue: 12500 },
-    { day: 'Tue', revenue: 14200 },
-    { day: 'Wed', revenue: 15800 },
-    { day: 'Thu', revenue: 13200 },
-    { day: 'Fri', revenue: 16500 },
-    { day: 'Sat', revenue: 18000 },
-    { day: 'Sun', revenue: 11000 },
+    { date: 'Mon', revenue: 12500 },
+    { date: 'Tue', revenue: 14200 },
+    { date: 'Wed', revenue: 15800 },
+    { date: 'Thu', revenue: 13200 },
+    { date: 'Fri', revenue: 16500 },
+    { date: 'Sat', revenue: 18000 },
+    { date: 'Sun', revenue: 11000 },
   ],
   yearlyRevenueData: [
-    { year: '2022', q1: 180000, q2: 210000, q3: 240000, q4: 270000 },
-    { year: '2023', q1: 195000, q2: 230000, q3: 250000, q4: 290000 },
-    { year: '2024', q1: 220000, q2: 250000, q3: 0, q4: 0 }, // Current year (Q3 and Q4 not available yet)
+    { year: '2022', revenue: 900000, profit: 320000 },
+    { year: '2023', revenue: 965000, profit: 385000 },
+    { year: '2024', revenue: 470000, profit: 187000, projected: true },
   ]
 };
 
