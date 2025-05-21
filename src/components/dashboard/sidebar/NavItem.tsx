@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { NavItemType } from './types';
@@ -49,7 +49,7 @@ const NavItem: React.FC<NavItemProps> = ({ item, index, isActive, onItemClick })
         )}
         onClick={onItemClick}
       >
-        <span className="mr-3">{item.icon}</span>
+        {item.icon && <span className="mr-3">{item.icon}</span>}
         <span className="relative">
           {item.label}
           {item.highlight && !isActive(item.path) && (

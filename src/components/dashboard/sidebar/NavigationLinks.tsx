@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { useAuth } from '@/contexts/auth';
+import { useAuth } from '@/contexts/auth/use-auth';
 import MenuSectionGroup from './MenuSectionGroup';
 import { NavigationProps } from './types';
 import { 

@@ -2,10 +2,11 @@
 import { ReactNode } from 'react';
 
 export interface NavItemType {
+  label: string;
   path: string;
   icon: ReactNode;
-  label: string;
   highlight?: boolean;
+  description?: string;
 }
 
 export interface MenuSection {
@@ -14,6 +15,6 @@ export interface MenuSection {
 }
 
 export interface NavigationProps {
-  isSeller?: boolean;
+  isSeller: boolean;
   onItemClick?: () => void;
 }
