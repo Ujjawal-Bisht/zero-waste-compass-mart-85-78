@@ -75,6 +75,29 @@ const Profile: React.FC = () => {
     return <div>Loading...</div>;
   }
 
+  // Animation variants for navigation items
+  const navItemVariants = {
+    initial: { opacity: 0, x: -20 },
+    animate: (custom: number) => ({
+      opacity: 1,
+      x: 0,
+      transition: {
+        delay: 0.1 * custom,
+        duration: 0.4,
+        ease: "easeOut"
+      }
+    }),
+    hover: {
+      scale: 1.03,
+      backgroundColor: "rgba(99, 102, 241, 0.1)",
+      transition: { duration: 0.2 }
+    },
+    active: {
+      scale: 1.05,
+      backgroundColor: "rgba(99, 102, 241, 0.2)",
+    }
+  };
+
   return (
     <motion.div
       className="container mx-auto p-8 flex flex-col md:flex-row gap-8"
@@ -84,8 +107,18 @@ const Profile: React.FC = () => {
       transition={{ duration: 0.5 }}
     >
       {/* Profile Summary */}
-      <div className="w-full md:w-1/3 bg-white rounded-lg shadow-md p-6">
-        <div className="flex flex-col items-center">
+      <motion.div 
+        className="w-full md:w-1/3 bg-white rounded-lg shadow-md p-6"
+        initial={{ opacity: 0, scale: 0.95 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ duration: 0.4, delay: 0.2 }}
+      >
+        <motion.div 
+          className="flex flex-col items-center"
+          initial={{ y: -10, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ duration: 0.5 }}
+        >
           <Avatar className="h-24 w-24 border-4 border-zwm-primary mb-4">
             <AvatarImage src={profileImage || undefined} alt={currentUser.displayName || "Profile"} />
             <AvatarFallback>{currentUser.displayName?.[0] || "U"}</AvatarFallback>
@@ -102,53 +135,96 @@ const Profile: React.FC = () => {
               {currentUser.isAdmin ? 'Admin' : 'User'}
             </Button>
           </div>
-        </div>
+        </motion.div>
         
         <Separator className="my-6" />
         
         <div className="space-y-1">
           <h3 className="text-lg font-medium text-gray-700 mb-2">Profile Navigation</h3>
-          {/* The problem was here - TabsList needs to be inside a Tabs component */}
           <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
             <TabsList className="flex flex-col space-y-1 w-full justify-start bg-transparent">
-              <TabsTrigger 
-                value="personal" 
-                className={`justify-start text-left ${activeTab === "personal" ? "bg-gray-100 text-gray-900" : "bg-transparent text-gray-600"}`}
+              <motion.div
+                custom={0}
+                variants={navItemVariants}
+                initial="initial"
+                animate="animate"
+                whileHover="hover"
+                animate={activeTab === "personal" ? "active" : "animate"}
               >
-                <User className="mr-2 h-4 w-4" />
-                Personal Information
-              </TabsTrigger>
-              <TabsTrigger 
-                value="security" 
-                className={`justify-start text-left ${activeTab === "security" ? "bg-gray-100 text-gray-900" : "bg-transparent text-gray-600"}`}
+                <TabsTrigger 
+                  value="personal" 
+                  className="justify-start text-left w-full transition-all duration-300 hover:bg-gray-50"
+                >
+                  <User className="mr-2 h-4 w-4" />
+                  Personal Information
+                </TabsTrigger>
+              </motion.div>
+              
+              <motion.div
+                custom={1}
+                variants={navItemVariants}
+                initial="initial"
+                animate="animate"
+                whileHover="hover"
+                animate={activeTab === "security" ? "active" : "animate"}
               >
-                <ShieldCheck className="mr-2 h-4 w-4" />
-                Security
-              </TabsTrigger>
-              <TabsTrigger 
-                value="notifications" 
-                className={`justify-start text-left ${activeTab === "notifications" ? "bg-gray-100 text-gray-900" : "bg-transparent text-gray-600"}`}
+                <TabsTrigger 
+                  value="security" 
+                  className="justify-start text-left w-full transition-all duration-300 hover:bg-gray-50"
+                >
+                  <ShieldCheck className="mr-2 h-4 w-4" />
+                  Security
+                </TabsTrigger>
+              </motion.div>
+              
+              <motion.div
+                custom={2}
+                variants={navItemVariants}
+                initial="initial"
+                animate="animate"
+                whileHover="hover"
+                animate={activeTab === "notifications" ? "active" : "animate"}
               >
-                <Bell className="mr-2 h-4 w-4" />
-                Notifications
-              </TabsTrigger>
-              <TabsTrigger 
-                value="social" 
-                className={`justify-start text-left ${activeTab === "social" ? "bg-gray-100 text-gray-900" : "bg-transparent text-gray-600"}`}
+                <TabsTrigger 
+                  value="notifications" 
+                  className="justify-start text-left w-full transition-all duration-300 hover:bg-gray-50"
+                >
+                  <Bell className="mr-2 h-4 w-4" />
+                  Notifications
+                </TabsTrigger>
+              </motion.div>
+              
+              <motion.div
+                custom={3}
+                variants={navItemVariants}
+                initial="initial"
+                animate="animate"
+                whileHover="hover"
+                animate={activeTab === "social" ? "active" : "animate"}
               >
-                <Link2 className="mr-2 h-4 w-4" />
-                Social Media
-              </TabsTrigger>
+                <TabsTrigger 
+                  value="social" 
+                  className="justify-start text-left w-full transition-all duration-300 hover:bg-gray-50"
+                >
+                  <Link2 className="mr-2 h-4 w-4" />
+                  Social Media
+                </TabsTrigger>
+              </motion.div>
             </TabsList>
           </Tabs>
         </div>
-      </div>
+      </motion.div>
 
       {/* Profile Details */}
       <div className="w-full md:w-2/3 flex flex-col gap-6">
         <Tabs value={activeTab} className="w-full" onValueChange={setActiveTab}>
           <TabsContent value="personal" className="p-0 border-0">
-            <div className="bg-white rounded-lg shadow-md p-6">
+            <motion.div 
+              className="bg-white rounded-lg shadow-md p-6"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5 }}
+            >
               <div className="flex justify-between items-center mb-4">
                 <h2 className="text-xl font-semibold text-gray-800">Personal Information</h2>
                 {isEditing ? (
@@ -174,11 +250,16 @@ const Profile: React.FC = () => {
                 profileImage={profileImage}
                 handleProfileImageChange={handleProfileImageChange}
               />
-            </div>
+            </motion.div>
           </TabsContent>
           
           <TabsContent value="security" className="p-0 border-0">
-            <div className="bg-white rounded-lg shadow-md p-6">
+            <motion.div 
+              className="bg-white rounded-lg shadow-md p-6"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5 }}
+            >
               <h2 className="text-xl font-semibold text-gray-800 mb-4">Security Settings</h2>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
@@ -188,25 +269,35 @@ const Profile: React.FC = () => {
                   <TwoFactorSetup />
                 </div>
               </div>
-            </div>
+            </motion.div>
           </TabsContent>
           
           <TabsContent value="notifications" className="p-0 border-0">
-            <div className="bg-white rounded-lg shadow-md p-6">
+            <motion.div 
+              className="bg-white rounded-lg shadow-md p-6"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5 }}
+            >
               <h2 className="text-xl font-semibold text-gray-800 mb-4">Notification Preferences</h2>
               <NotificationPreferences
                 onSave={handleNotificationSave}
               />
-            </div>
+            </motion.div>
           </TabsContent>
           
           <TabsContent value="social" className="p-0 border-0">
-            <div className="bg-white rounded-lg shadow-md p-6">
+            <motion.div 
+              className="bg-white rounded-lg shadow-md p-6"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5 }}
+            >
               <h2 className="text-xl font-semibold text-gray-800 mb-4">Social Media Connections</h2>
               <SocialMediaConnections
                 onSave={handleSocialSave}
               />
-            </div>
+            </motion.div>
           </TabsContent>
         </Tabs>
       </div>

@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { 
   LayoutDashboard, 
@@ -11,7 +10,8 @@ import {
   BarChart4, 
   Users, 
   Shield,
-  ListOrdered
+  ListOrdered,
+  Truck
 } from 'lucide-react';
 import { MenuSection, NavItemType } from './types';
 
@@ -34,7 +34,7 @@ export const buyerMenuSections: MenuSection[] = [
       {
         label: "My Orders",
         path: "/orders",
-        icon: <Package size={18} />,
+        icon: <Truck size={18} />,
         description: "View your order history"
       }
     ]

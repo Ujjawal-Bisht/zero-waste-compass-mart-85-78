@@ -15,8 +15,10 @@
 @import './mobile.css';
 @import './particles.css';
 @import './product.css';
+@import './profile.css'; /* Added new profile animations */
 @import './register.css';
 @import './seller.css';
 @import './star.css';
 @import './tabs.css';
 @import './transitions.css';
+

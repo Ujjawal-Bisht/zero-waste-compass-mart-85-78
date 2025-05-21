@@ -2,7 +2,7 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { Home, ShoppingCart } from 'lucide-react';
+import { Home, ShoppingCart, Truck } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 interface NavButtonsProps {
@@ -20,8 +20,12 @@ const NavButtons: React.FC<NavButtonsProps> = ({ isSellerPortal }) => {
     navigate('/cart');
   };
 
+  const goToOrders = () => {
+    navigate('/orders');
+  };
+
   return (
-    <div className="flex gap-2">
+    <div className="flex gap-3">
       <Button
         variant="outline"
         size="sm"
@@ -37,7 +41,6 @@ const NavButtons: React.FC<NavButtonsProps> = ({ isSellerPortal }) => {
           whileHover={{
             scale: 1.06,
             boxShadow: "0 0 18px 2px #8B5CF6aa",
-            transition: { duration: 0.2 }
           }}
           whileTap={{ scale: 0.96 }}
           className="h-full"
@@ -47,14 +50,54 @@ const NavButtons: React.FC<NavButtonsProps> = ({ isSellerPortal }) => {
             size="sm"
             onClick={goToCart}
             className="hidden md:flex items-center gap-2 transition-colors cart-button cart-button-3d buyer-button-3d button-bounce button-shimmer
-              hover:bg-purple-500 hover:text-white"
+              hover:bg-purple-500 hover:text-white group"
             style={{
               borderColor: '#8B5CF6',
               color: '#7C3AED'
             }}
           >
-            <ShoppingCart className="h-4 w-4" />
-            <span className="relative">Cart</span>
+            <ShoppingCart className="h-4 w-4 group-hover:animate-bounce" />
+            <motion.span 
+              className="relative"
+              initial={{ opacity: 0, width: 0 }}
+              animate={{ opacity: 1, width: "auto" }}
+              transition={{ duration: 0.3 }}
+            >
+              Cart
+            </motion.span>
+          </Button>
+        </motion.div>
+      )}
+      
+      {!isSellerPortal && (
+        <motion.div
+          whileHover={{
+            scale: 1.06,
+            boxShadow: "0 0 12px 2px rgba(79, 70, 229, 0.4)",
+          }}
+          whileTap={{ scale: 0.96 }}
+          className="h-full"
+        >
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={goToOrders}
+            className="hidden md:flex items-center gap-2 transition-colors order-button order-button-3d buyer-button-3d button-bounce
+              hover:bg-indigo-500 hover:text-white group"
+            style={{
+              borderColor: '#4F46E5',
+              color: '#4338CA'
+            }}
+          >
+            <Truck className="h-4 w-4 group-hover:animate-pulse" />
+            <motion.span 
+              className="relative"
+              initial={{ opacity: 0, width: 0 }}
+              animate={{ opacity: 1, width: "auto" }}
+              transition={{ duration: 0.3 }}
+            >
+              Orders
+            </motion.span>
           </Button>
         </motion.div>
       )}
