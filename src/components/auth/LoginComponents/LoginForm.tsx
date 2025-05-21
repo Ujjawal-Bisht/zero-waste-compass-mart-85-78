@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
@@ -28,7 +27,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ onAccountTypeChange }) => {
       if (currentUser.isSeller) {
         navigate('/seller/dashboard');
       } else {
-        navigate('/dashboard');
+        navigate('/marketplace'); // FIX: Buyers go directly to marketplace
       }
     }
   }, [currentUser, navigate]);

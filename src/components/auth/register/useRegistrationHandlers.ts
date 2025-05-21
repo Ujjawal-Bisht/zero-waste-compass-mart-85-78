@@ -1,10 +1,9 @@
-
 import { useState } from 'react';
 import { useAuth } from '@/contexts/auth';
 import { toast } from 'sonner';
 import { useNavigate } from 'react-router-dom';
 import { z } from 'zod';
-import { registerSchema } from '../schemas/registerSchema';
+import { registerSchema } from '@/components/auth/schemas/registerSchema';
 
 export const useRegistrationHandlers = () => {
   const { register, googleLogin, phoneLogin } = useAuth();
@@ -16,21 +15,18 @@ export const useRegistrationHandlers = () => {
   const onSubmitBuyer = async (values: z.infer<typeof registerSchema>) => {
     try {
       setIsLoading(true);
-      
       if (!captchaValue) {
         toast.error("Please complete the captcha verification");
         setIsLoading(false);
         return;
       }
-      
       await register(
         values.email, 
         values.password, 
         values.name
       );
-      
       toast.success("Registration successful! Please check your email to verify your account.");
-      navigate('/login');
+      navigate('/marketplace');
     } catch (error: any) {
       console.error('Registration error:', error);
       toast.error(error.message || "Something went wrong during registration");
@@ -43,13 +39,11 @@ export const useRegistrationHandlers = () => {
   const onSubmitSeller = async (values: z.infer<typeof registerSchema>) => {
     try {
       setIsLoading(true);
-      
       if (!captchaValue) {
         toast.error("Please complete the captcha verification");
         setIsLoading(false);
         return;
       }
-      
       await register(
         values.email, 
         values.password, 
@@ -60,9 +54,8 @@ export const useRegistrationHandlers = () => {
           isSeller: true
         }
       );
-      
       toast.success("Seller registration successful! Please check your email to verify your account.");
-      navigate('/login');
+      navigate('/seller/dashboard');
     } catch (error: any) {
       console.error('Seller registration error:', error);
       toast.error(error.message || "Something went wrong during registration");
@@ -71,30 +64,32 @@ export const useRegistrationHandlers = () => {
     }
   };
 
-  // Fix the phone registration to return the function directly
-  const handlePhoneRegistration = (accountType: 'buyer' | 'seller') => async (phoneNumber: string) => {
-    try {
-      setIsLoading(true);
-      await phoneLogin(phoneNumber, accountType);
-      toast.success("OTP sent to your phone. Please verify to complete registration.");
-    } catch (error: any) {
-      toast.error(error.message || "Failed to send OTP");
-    } finally {
-      setIsLoading(false);
-    }
-  };
+  // Phone registration returns a handler function for usage in the UI
+  const handlePhoneRegistration = (accountType: 'buyer' | 'seller') => 
+    async (phoneNumber: string) => {
+      try {
+        setIsLoading(true);
+        await phoneLogin(phoneNumber, accountType);
+        toast.success("OTP sent to your phone. Please verify to complete registration.");
+      } catch (error: any) {
+        toast.error(error.message || "Failed to send OTP");
+      } finally {
+        setIsLoading(false);
+      }
+    };
 
-  // Fix the Google login to return the function directly
-  const handleGoogleLogin = (accountType: 'buyer' | 'seller') => async () => {
-    try {
-      setIsLoading(true);
-      await googleLogin(accountType);
-    } catch (error: any) {
-      toast.error(error.message || "Failed to authenticate with Google");
-    } finally {
-      setIsLoading(false); 
-    }
-  };
+  // Google login returns a handler function for usage in the UI
+  const handleGoogleLogin = (accountType: 'buyer' | 'seller') => 
+    async () => {
+      try {
+        setIsLoading(true);
+        await googleLogin(accountType);
+      } catch (error: any) {
+        toast.error(error.message || "Failed to authenticate with Google");
+      } finally {
+        setIsLoading(false); 
+      }
+    };
 
   return {
     isLoading,

@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Tabs, TabsContent } from '@/components/ui/tabs';
@@ -75,13 +74,11 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ onAccountTypeChange }) => {
           value={accountType} 
           onValueChange={(value) => {
             setAccountType(value as 'buyer' | 'seller');
-            // Reset captcha when switching account types
             setCaptchaValue(null);
           }} 
           className="mb-6"
         >
           <AccountTypeTabs accountType={accountType} />
-          
           <AnimatePresence mode="wait">
             <motion.div
               key={accountType}
@@ -93,14 +90,13 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ onAccountTypeChange }) => {
               <TabsContent value="buyer" className="mt-4 tab-transition">
                 <Tabs value={registrationMethod} onValueChange={(v) => setRegistrationMethod(v as 'email' | 'phone' | 'google')} className="mb-4">
                   <RegistrationMethodTabs accountType="buyer" />
-                  
                   <TabContent 
                     accountType="buyer"
                     registrationMethod={registrationMethod}
                     onSubmitBuyer={onSubmitBuyer}
                     onSubmitSeller={onSubmitSeller}
                     handlePhoneRegistration={handlePhoneRegistration('buyer')}
-                    handleGoogleLogin={() => handleGoogleLogin('buyer')}
+                    handleGoogleLogin={handleGoogleLogin('buyer')}
                     isLoading={isLoading}
                     setCaptchaValue={setCaptchaValue}
                     captchaValue={captchaValue}
@@ -111,14 +107,13 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ onAccountTypeChange }) => {
               <TabsContent value="seller" className="mt-4 tab-transition">
                 <Tabs value={registrationMethod} onValueChange={(v) => setRegistrationMethod(v as 'email' | 'phone' | 'google')} className="mb-4">
                   <RegistrationMethodTabs accountType="seller" />
-                  
                   <TabContent 
                     accountType="seller"
                     registrationMethod={registrationMethod}
                     onSubmitBuyer={onSubmitBuyer}
                     onSubmitSeller={onSubmitSeller}
                     handlePhoneRegistration={handlePhoneRegistration('seller')}
-                    handleGoogleLogin={() => handleGoogleLogin('seller')}
+                    handleGoogleLogin={handleGoogleLogin('seller')}
                     isLoading={isLoading}
                     setCaptchaValue={setCaptchaValue}
                     captchaValue={captchaValue}
