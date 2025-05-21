@@ -16,6 +16,7 @@ const SellerDashboard: React.FC = () => {
     });
   }, []);
 
+  // Pass currentUser as a prop to DashboardContainer
   return <DashboardContainer currentUser={currentUser} />;
 };
 
