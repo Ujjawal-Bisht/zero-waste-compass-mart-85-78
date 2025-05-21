@@ -7,7 +7,7 @@ import ItemCategoriesCard from './ItemCategoriesCard';
 import PerformanceCard from './PerformanceCard';
 import OrdersCard from './OrdersCard';
 import { generateSellerStats, generateCategoryStats } from './dashboardHelpers';
-import { useAuth } from '@/contexts/auth';
+import { User } from '@/types';
 
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -19,9 +19,11 @@ const containerVariants = {
   }
 };
 
-const DashboardContainer: React.FC = () => {
-  const { currentUser } = useAuth();
-  
+interface DashboardContainerProps {
+  currentUser: User | null;
+}
+
+const DashboardContainer: React.FC<DashboardContainerProps> = ({ currentUser }) => {
   const stats = generateSellerStats(currentUser);
   const categoryStats = generateCategoryStats();
 
@@ -33,9 +35,7 @@ const DashboardContainer: React.FC = () => {
       animate="visible"
     >
       <UserWelcome currentUser={currentUser} />
-      
       <StatCards stats={stats} />
-
       <div className="grid gap-4 md:grid-cols-2">
         <ItemCategoriesCard stats={categoryStats} />
         <PerformanceCard 
@@ -43,7 +43,6 @@ const DashboardContainer: React.FC = () => {
           verified={currentUser?.verified || false}
         />
       </div>
-      
       <OrdersCard />
     </motion.div>
   );

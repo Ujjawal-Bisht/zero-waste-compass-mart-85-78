@@ -9,7 +9,6 @@ const SellerDashboard: React.FC = () => {
   const { currentUser } = useAuth();
 
   useEffect(() => {
-    // Welcome toast when dashboard loads
     toast({
       title: "Welcome to your dashboard!",
       description: "View your latest seller statistics and performance metrics."
