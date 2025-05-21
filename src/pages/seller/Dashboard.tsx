@@ -1,12 +1,12 @@
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import { useToast } from '@/components/ui/use-toast';
 import DashboardContainer from '@/components/seller/dashboard/DashboardContainer';
 import { useAuth } from '@/contexts/auth';
 
 const SellerDashboard: React.FC = () => {
   const { toast } = useToast();
-  const { user } = useAuth();
+  const { currentUser } = useAuth();
 
   useEffect(() => {
     // Welcome toast when dashboard loads
@@ -16,7 +16,7 @@ const SellerDashboard: React.FC = () => {
     });
   }, []);
 
-  return <DashboardContainer currentUser={user} />;
+  return <DashboardContainer currentUser={currentUser} />;
 };
 
 export default SellerDashboard;

@@ -1,5 +1,5 @@
 
-export { default as AuthProvider } from './auth-context';
+export { AuthProvider } from './auth-context';
 export { useAuth } from './use-auth';
 
 // Mock implementation of 2FA functions that can be used until real implementation is added
