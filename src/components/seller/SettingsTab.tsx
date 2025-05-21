@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Switch } from '@/components/ui/switch';
 import { Button } from '@/components/ui/button';
@@ -26,6 +26,13 @@ import {
 } from '@/components/ui/select';
 import { useTheme } from 'next-themes';
 
+const COLOR_SCHEMES = [
+  { value: 'purple', label: 'Purple (Default)' },
+  { value: 'blue', label: 'Blue' },
+  { value: 'green', label: 'Green' },
+  { value: 'orange', label: 'Orange' }
+];
+
 const SettingsTab: React.FC = () => {
   // Notification settings
   const [emailNotifications, setEmailNotifications] = useState(true);
@@ -34,9 +41,15 @@ const SettingsTab: React.FC = () => {
   const [messageAlerts, setMessageAlerts] = useState(true);
 
   // Appearance settings
+  const { setTheme, theme: currentTheme, resolvedTheme } = useTheme();
   const [themeMode, setThemeMode] = useState<'system' | 'dark' | 'light'>('system');
   const [colorScheme, setColorScheme] = useState('purple');
-  const { setTheme, theme } = useTheme();
+
+  // Synchronize internal state with actual next-themes state for reliable dark mode switch
+  useEffect(() => {
+    // set system as default if currentTheme is undefined
+    setThemeMode((currentTheme as 'system' | 'dark' | 'light') || 'system');
+  }, [currentTheme]);
 
   // Regional settings
   const [language, setLanguage] = useState('english');
@@ -69,6 +82,12 @@ const SettingsTab: React.FC = () => {
   const handleSaveRegional = () => {
     toast.success('Regional settings saved successfully');
   };
+
+  useEffect(() => {
+    if (currentTheme !== themeMode) {
+      setTheme(themeMode);
+    }
+  }, [themeMode, setTheme, currentTheme]);
 
   return (
     <div className="space-y-6">
@@ -158,7 +177,7 @@ const SettingsTab: React.FC = () => {
           <CardContent className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label>Theme</Label>
+                <Label>Theme (Dark/Light)</Label>
                 <Select value={themeMode} onValueChange={(val) => setThemeMode(val as 'system' | 'dark' | 'light')}>
                   <SelectTrigger>
                     <SelectValue placeholder="Select theme" />
@@ -176,13 +195,20 @@ const SettingsTab: React.FC = () => {
                         Dark
                       </div>
                     </SelectItem>
-                    <SelectItem value="system">System Default</SelectItem>
+                    <SelectItem value="system">
+                      <div className="flex items-center gap-2">
+                        <Languages className="h-4 w-4" />
+                        System Default
+                      </div>
+                    </SelectItem>
                   </SelectContent>
                 </Select>
-                {/* Optional: live preview */}
+                {/* Current theme preview */}
                 <div className="mt-2 inline-flex gap-2 text-xs">
-                  <span>Preview&nbsp;</span>
-                  <span className="px-2 rounded bg-gray-50 dark:bg-gray-800 border">{themeMode}</span>
+                  <span>Preview:&nbsp;</span>
+                  <span className="px-2 rounded bg-gray-50 dark:bg-gray-800 border">
+                    {(themeMode === 'system' ? resolvedTheme : themeMode) || 'system'}
+                  </span>
                 </div>
               </div>
               
@@ -193,10 +219,11 @@ const SettingsTab: React.FC = () => {
                     <SelectValue placeholder="Select color scheme" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="purple">Purple (Default)</SelectItem>
-                    <SelectItem value="blue">Blue</SelectItem>
-                    <SelectItem value="green">Green</SelectItem>
-                    <SelectItem value="orange">Orange</SelectItem>
+                    {COLOR_SCHEMES.map(scheme =>
+                      <SelectItem key={scheme.value} value={scheme.value}>
+                        {scheme.label}
+                      </SelectItem>
+                    )}
                   </SelectContent>
                 </Select>
               </div>
