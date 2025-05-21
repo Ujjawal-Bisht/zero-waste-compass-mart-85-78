@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { 
   LayoutDashboard, 
@@ -31,12 +30,6 @@ export const buyerMenuSections: MenuSection[] = [
         path: "/marketplace",
         icon: <ShoppingBag size={18} />,
         description: "Browse available items"
-      },
-      {
-        label: "My Orders",
-        path: "/orders",
-        icon: <Truck size={18} />,
-        description: "View your order history"
       }
     ]
   },
