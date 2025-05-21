@@ -3,13 +3,16 @@ import React, { useState } from 'react';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import ProfileFormTab from '@/components/seller/ProfileFormTab';
-import StatisticsTab from '@/components/seller/StatisticsTab';
 import RecentItemsTab from '@/components/seller/RecentItemsTab';
 import { motion } from 'framer-motion';
 import '@/styles/animations/seller.css';
+import { useNavigate } from 'react-router-dom';
+import { Button } from '@/components/ui/button';
+import { LayoutDashboard } from 'lucide-react';
 
 const Profile = () => {
   const [selectedTab, setSelectedTab] = useState('profile');
+  const navigate = useNavigate();
 
   const handleTabChange = (value: string) => {
     setSelectedTab(value);
@@ -39,12 +42,24 @@ const Profile = () => {
       animate="visible"
       variants={containerVariants}
     >
-      <motion.h1 
-        className="text-2xl md:text-3xl font-bold text-gray-800 dark:text-gray-100 bg-gradient-to-r from-purple-600 to-indigo-600 bg-clip-text text-transparent"
+      <motion.div 
+        className="flex justify-between items-center"
         variants={itemVariants}
       >
-        Seller Profile
-      </motion.h1>
+        <h1 
+          className="text-2xl md:text-3xl font-bold text-gray-800 dark:text-gray-100 bg-gradient-to-r from-purple-600 to-indigo-600 bg-clip-text text-transparent"
+        >
+          Seller Profile
+        </h1>
+        <Button 
+          onClick={() => navigate('/seller/dashboard')}
+          variant="outline"
+          className="flex items-center gap-2"
+        >
+          <LayoutDashboard size={18} />
+          Seller Dashboard
+        </Button>
+      </motion.div>
 
       <motion.div variants={itemVariants}>
         <Card className="border-0 shadow-lg overflow-hidden profile-card">
@@ -60,18 +75,13 @@ const Profile = () => {
               onValueChange={handleTabChange} 
               className="w-full"
             >
-              <TabsList className="w-full bg-gray-50 dark:bg-gray-800 border-b border-gray-100 dark:border-gray-700 grid grid-cols-3 rounded-none">
+              <TabsList className="w-full bg-gray-50 dark:bg-gray-800 border-b border-gray-100 dark:border-gray-700 grid grid-cols-2 rounded-none">
                 <TabsTrigger value="profile" className="profile-tab">Profile</TabsTrigger>
-                <TabsTrigger value="statistics" className="profile-tab">Statistics</TabsTrigger>
                 <TabsTrigger value="recent" className="profile-tab">Recent Items</TabsTrigger>
               </TabsList>
               
               <AnimatedTabContent value="profile" currentTab={selectedTab}>
                 <ProfileFormTab />
-              </AnimatedTabContent>
-              
-              <AnimatedTabContent value="statistics" currentTab={selectedTab}>
-                <StatisticsTab />
               </AnimatedTabContent>
               
               <AnimatedTabContent value="recent" currentTab={selectedTab}>

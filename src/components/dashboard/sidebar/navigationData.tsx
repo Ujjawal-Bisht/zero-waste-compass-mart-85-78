@@ -69,7 +69,7 @@ export const sellerMenuSections: MenuSection[] = [
     title: "Seller Portal",
     items: [
       {
-        label: "Dashboard",
+        label: "Seller Dashboard",
         path: "/seller/dashboard",
         icon: <LayoutDashboard size={18} />,
         description: "Seller overview"
