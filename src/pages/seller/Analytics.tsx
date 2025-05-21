@@ -1,10 +1,13 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import StatisticsTab from '@/components/seller/StatisticsTab';
-import { Card, CardContent, CardHeader } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 const Analytics = () => {
+  const [selectedTab, setSelectedTab] = useState('statistics');
+  
   // Animation variants
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -43,12 +46,58 @@ const Analytics = () => {
               Performance Analytics
             </h2>
           </CardHeader>
-          <CardContent className="p-4">
-            <StatisticsTab />
+          <CardContent className="p-0">
+            <Tabs 
+              defaultValue="statistics" 
+              value={selectedTab}
+              onValueChange={setSelectedTab} 
+              className="w-full"
+            >
+              <TabsList className="w-full bg-gray-50 dark:bg-gray-800 border-b border-gray-100 dark:border-gray-700 grid grid-cols-2 rounded-none">
+                <TabsTrigger value="statistics" className="profile-tab">Statistics</TabsTrigger>
+                <TabsTrigger value="forecast" className="profile-tab">Sales Forecast</TabsTrigger>
+              </TabsList>
+              
+              <AnimatedTabContent value="statistics" currentTab={selectedTab}>
+                <div className="p-4">
+                  <StatisticsTab />
+                </div>
+              </AnimatedTabContent>
+              
+              <AnimatedTabContent value="forecast" currentTab={selectedTab}>
+                <div className="p-6">
+                  <h3 className="text-lg font-semibold mb-4">Sales Forecast</h3>
+                  <p className="text-muted-foreground mb-4">
+                    Projected sales based on historical data and market trends.
+                  </p>
+                  <div className="flex items-center justify-center h-64 bg-gray-50 dark:bg-gray-800 rounded-lg">
+                    <p className="text-muted-foreground">Coming soon: Advanced sales forecasting</p>
+                  </div>
+                </div>
+              </AnimatedTabContent>
+            </Tabs>
           </CardContent>
         </Card>
       </motion.div>
     </motion.div>
+  );
+};
+
+// AnimatedTabContent component for smooth tab transitions
+const AnimatedTabContent = ({ value, currentTab, children }: { value: string, currentTab: string, children: React.ReactNode }) => {
+  return (
+    <TabsContent value={value} className="m-0 p-0">
+      {value === currentTab && (
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.3 }}
+          className="profile-animate-in"
+        >
+          {children}
+        </motion.div>
+      )}
+    </TabsContent>
   );
 };
 
