@@ -48,11 +48,11 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   // Check if 2FA is enabled for the user in Supabase
   const fetchTwoFactorStatus = async (userId: string) => {
     const { data, error } = await supabase
-      .from<TwoFactorAuthRow>("two_factor_auth")
-      .select("is_enabled")
-      .eq("user_id", userId)
-      .single();
-    if (!error && data) {
+      .from('two_factor_auth')
+      .select('is_enabled')
+      .eq('user_id', userId)
+      .maybeSingle();
+    if (!error && data && typeof data.is_enabled === "boolean") {
       setIsTwoFactorEnabled(data.is_enabled);
     } else {
       setIsTwoFactorEnabled(false);
@@ -261,15 +261,15 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     if (!currentUser?.email || !currentUser?.id) throw new Error("No authenticated user");
 
     const { secret, otpauth } = generateTwoFactorSecret(currentUser.email);
-
+    // Use upsert for two_factor_auth, mapping fields directly (no generics)
     const { error } = await supabase
-      .from<TwoFactorAuthRow>("two_factor_auth")
+      .from('two_factor_auth')
       .upsert(
-        {
+        [{
           user_id: currentUser.id,
           secret,
           is_enabled: false,
-        },
+        }],
         { onConflict: "user_id" }
       );
     if (error) throw error;
@@ -284,30 +284,26 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   const verifyTwoFactor = async (code: string) => {
     if (!currentUser?.id) throw new Error("No authenticated user");
-
     let secret = sessionStorage.getItem("2fa_tmp_secret");
     if (!secret) {
       const { data, error } = await supabase
-        .from<TwoFactorAuthRow>("two_factor_auth")
-        .select("secret")
-        .eq("user_id", currentUser.id)
-        .single();
-      if (data && data.secret) {
+        .from('two_factor_auth')
+        .select('secret')
+        .eq('user_id', currentUser.id)
+        .maybeSingle();
+      if (data && typeof data.secret === "string") {
         secret = data.secret;
       } else {
         throw new Error("No setup secret found");
       }
     }
-
     const isValid = authenticator.check(code, secret);
-
     if (isValid) {
       const { error } = await supabase
-        .from<TwoFactorAuthRow>("two_factor_auth")
+        .from('two_factor_auth')
         .update({ is_enabled: true })
-        .eq("user_id", currentUser.id);
+        .eq('user_id', currentUser.id);
       if (error) throw error;
-
       setIsTwoFactorEnabled(true);
       sessionStorage.removeItem("2fa_tmp_secret");
       toast.success("Two-factor authentication enabled!");
@@ -319,14 +315,11 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   const disableTwoFactor = async () => {
     if (!currentUser?.id) throw new Error("No authenticated user");
-
     const { error } = await supabase
-      .from<TwoFactorAuthRow>("two_factor_auth")
+      .from('two_factor_auth')
       .update({ is_enabled: false })
-      .eq("user_id", currentUser.id);
-
+      .eq('user_id', currentUser.id);
     if (error) throw error;
-
     setIsTwoFactorEnabled(false);
     toast.success("Two-factor authentication disabled.");
   };

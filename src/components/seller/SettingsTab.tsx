@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Switch } from '@/components/ui/switch';
@@ -25,6 +24,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import { useTheme } from 'next-themes';
 
 const SettingsTab: React.FC = () => {
   // Notification settings
@@ -32,38 +32,40 @@ const SettingsTab: React.FC = () => {
   const [pushNotifications, setPushNotifications] = useState(true);
   const [orderAlerts, setOrderAlerts] = useState(true);
   const [messageAlerts, setMessageAlerts] = useState(true);
-  
+
   // Appearance settings
-  const [theme, setTheme] = useState('system');
+  const [themeMode, setThemeMode] = useState<'system' | 'dark' | 'light'>('system');
   const [colorScheme, setColorScheme] = useState('purple');
-  
+  const { setTheme, theme } = useTheme();
+
   // Regional settings
   const [language, setLanguage] = useState('english');
   const [timeZone, setTimeZone] = useState('UTC');
   const [dateFormat, setDateFormat] = useState('MM/DD/YYYY');
-  
+
   // API settings
   const [apiKey, setApiKey] = useState('');
   const [isGeneratingKey, setIsGeneratingKey] = useState(false);
-  
+
   const handleGenerateApiKey = () => {
     setIsGeneratingKey(true);
-    // Simulate API key generation
     setTimeout(() => {
       setApiKey(`sk_seller_${Math.random().toString(36).substring(2, 15)}`);
       setIsGeneratingKey(false);
       toast.success('New API key generated successfully');
     }, 1000);
   };
-  
+
   const handleSaveNotifications = () => {
     toast.success('Notification settings saved successfully');
   };
-  
+
   const handleSaveAppearance = () => {
+    // Apply to Tailwind/next-themes context for dark mode
+    setTheme(themeMode); // will be 'dark', 'light', or 'system'
     toast.success('Appearance settings saved successfully');
   };
-  
+
   const handleSaveRegional = () => {
     toast.success('Regional settings saved successfully');
   };
@@ -157,7 +159,7 @@ const SettingsTab: React.FC = () => {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label>Theme</Label>
-                <Select value={theme} onValueChange={setTheme}>
+                <Select value={themeMode} onValueChange={(val) => setThemeMode(val as 'system' | 'dark' | 'light')}>
                   <SelectTrigger>
                     <SelectValue placeholder="Select theme" />
                   </SelectTrigger>
@@ -177,6 +179,11 @@ const SettingsTab: React.FC = () => {
                     <SelectItem value="system">System Default</SelectItem>
                   </SelectContent>
                 </Select>
+                {/* Optional: live preview */}
+                <div className="mt-2 inline-flex gap-2 text-xs">
+                  <span>Preview&nbsp;</span>
+                  <span className="px-2 rounded bg-gray-50 dark:bg-gray-800 border">{themeMode}</span>
+                </div>
               </div>
               
               <div className="space-y-2">
