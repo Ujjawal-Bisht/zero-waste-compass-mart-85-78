@@ -36,7 +36,7 @@ const NavButtons: React.FC<NavButtonsProps> = ({ isSellerPortal }) => {
         <motion.div
           whileHover={{
             scale: 1.06,
-            boxShadow: "0 0 18px 2px #8B5CF6aa", // Changed shadow color to purple
+            boxShadow: "0 0 18px 2px #8B5CF6aa",
             transition: { duration: 0.2 }
           }}
           whileTap={{ scale: 0.96 }}
@@ -47,10 +47,10 @@ const NavButtons: React.FC<NavButtonsProps> = ({ isSellerPortal }) => {
             size="sm"
             onClick={goToCart}
             className="hidden md:flex items-center gap-2 transition-colors cart-button cart-button-3d buyer-button-3d button-bounce button-shimmer
-              hover:bg-purple-500 hover:text-white" // Changed hover color to purple
+              hover:bg-purple-500 hover:text-white"
             style={{
-              borderColor: '#8B5CF6', // Changed border color to purple
-              color: '#7C3AED' // Changed text color to darker purple for better contrast
+              borderColor: '#8B5CF6',
+              color: '#7C3AED'
             }}
           >
             <ShoppingCart className="h-4 w-4" />
