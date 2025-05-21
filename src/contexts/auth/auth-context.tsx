@@ -24,6 +24,16 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [isTwoFactorEnabled, setIsTwoFactorEnabled] = useState(false);
   const { fetchUserProfile } = useUserProfile();
 
+  // Types for two_factor_auth (since it's not in generated types)
+  type TwoFactorAuthRow = {
+    id: string;
+    user_id: string;
+    secret: string;
+    is_enabled: boolean;
+    created_at?: string;
+    updated_at?: string;
+  };
+
   // Generate a unique secret using otplib
   const generateTwoFactorSecret = (email: string) => {
     const secret = authenticator.generateSecret();
@@ -38,7 +48,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   // Check if 2FA is enabled for the user in Supabase
   const fetchTwoFactorStatus = async (userId: string) => {
     const { data, error } = await supabase
-      .from("two_factor_auth")
+      .from<TwoFactorAuthRow>("two_factor_auth")
       .select("is_enabled")
       .eq("user_id", userId)
       .single();
@@ -250,12 +260,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const setupTwoFactor = async () => {
     if (!currentUser?.email || !currentUser?.id) throw new Error("No authenticated user");
 
-    // Generate secret and keyuri (otpauth url for QR)
     const { secret, otpauth } = generateTwoFactorSecret(currentUser.email);
 
-    // Save to Supabase (user can only ever have one row)
     const { error } = await supabase
-      .from("two_factor_auth")
+      .from<TwoFactorAuthRow>("two_factor_auth")
       .upsert(
         {
           user_id: currentUser.id,
@@ -266,7 +274,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       );
     if (error) throw error;
 
-    // Store secret/temp in-memory for verified setup (not production secure; store in DB in real app)
     sessionStorage.setItem("2fa_tmp_secret", secret);
 
     return {
@@ -278,12 +285,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const verifyTwoFactor = async (code: string) => {
     if (!currentUser?.id) throw new Error("No authenticated user");
 
-    // Use secret from sessionStorage, fallback to Supabase record
     let secret = sessionStorage.getItem("2fa_tmp_secret");
     if (!secret) {
-      // fallback: fetch from Supabase (user re-verifying with old/valid secret)
       const { data, error } = await supabase
-        .from("two_factor_auth")
+        .from<TwoFactorAuthRow>("two_factor_auth")
         .select("secret")
         .eq("user_id", currentUser.id)
         .single();
@@ -294,19 +299,17 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       }
     }
 
-    // Verify code using OTP library
     const isValid = authenticator.check(code, secret);
 
     if (isValid) {
-      // Mark 2FA as enabled in Supabase
       const { error } = await supabase
-        .from("two_factor_auth")
+        .from<TwoFactorAuthRow>("two_factor_auth")
         .update({ is_enabled: true })
         .eq("user_id", currentUser.id);
       if (error) throw error;
 
       setIsTwoFactorEnabled(true);
-      sessionStorage.removeItem("2fa_tmp_secret"); // Remove temp secret
+      sessionStorage.removeItem("2fa_tmp_secret");
       toast.success("Two-factor authentication enabled!");
     } else {
       toast.error("Invalid verification code.");
@@ -318,7 +321,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     if (!currentUser?.id) throw new Error("No authenticated user");
 
     const { error } = await supabase
-      .from("two_factor_auth")
+      .from<TwoFactorAuthRow>("two_factor_auth")
       .update({ is_enabled: false })
       .eq("user_id", currentUser.id);
 
