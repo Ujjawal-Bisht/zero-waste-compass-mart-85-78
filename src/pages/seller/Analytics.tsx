@@ -5,6 +5,8 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { StatisticsTab } from '@/components/seller/analytics';
 import ForecastTab from '@/components/seller/analytics/ForecastTab';
+import ExportAnalyticsButton from '@/components/seller/analytics/ExportAnalyticsButton';
+import { revenueData, inventoryForecastData } from '@/components/seller/analytics/mockData';
 
 const Analytics = () => {
   const [selectedTab, setSelectedTab] = useState('statistics');
@@ -33,12 +35,18 @@ const Analytics = () => {
       animate="visible"
       variants={containerVariants}
     >
-      <motion.h1 
-        className="text-2xl md:text-3xl font-bold text-gray-800 dark:text-gray-100 bg-gradient-to-r from-purple-600 to-indigo-600 bg-clip-text text-transparent"
+      <motion.div 
+        className="flex justify-between items-center"
         variants={itemVariants}
       >
-        Seller Analytics
-      </motion.h1>
+        <h1 className="text-2xl md:text-3xl font-bold text-gray-800 dark:text-gray-100 bg-gradient-to-r from-purple-600 to-indigo-600 bg-clip-text text-transparent">
+          Seller Analytics
+        </h1>
+        <ExportAnalyticsButton 
+          data={selectedTab === 'statistics' ? revenueData : inventoryForecastData} 
+          type={selectedTab as 'statistics' | 'forecast'} 
+        />
+      </motion.div>
 
       <motion.div variants={itemVariants}>
         <Card className="border-0 shadow-lg overflow-hidden profile-card">
