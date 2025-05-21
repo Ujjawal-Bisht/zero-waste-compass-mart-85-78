@@ -17,8 +17,18 @@ interface ProfileContentProps {
   loading: boolean;
   profileImage: string | null;
   handleProfileImageChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
-  handleNotificationSave: (preferences: any) => void;
-  handleSocialSave: (connections: any) => void;
+  handleNotificationSave: (preferences: {
+    email?: boolean;
+    push?: boolean; 
+    sms?: boolean;
+    marketingEmails?: boolean;
+  }) => Promise<void>;
+  handleSocialSave: (connections: {
+    twitter?: string;
+    facebook?: string;
+    instagram?: string;
+    linkedin?: string;
+  }) => Promise<void>;
 }
 
 const ProfileContent: React.FC<ProfileContentProps> = ({

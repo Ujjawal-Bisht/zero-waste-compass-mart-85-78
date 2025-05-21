@@ -53,14 +53,34 @@ const Profile: React.FC = () => {
     }
   };
 
-  const handleNotificationSave = async (preferences: any) => {
+  const handleNotificationSave = async (preferences: {
+    email?: boolean;
+    push?: boolean; 
+    sms?: boolean;
+    marketingEmails?: boolean;
+  }) => {
     // Placeholder for saving notification preferences
-    toast.success("Notification preferences saved!");
+    await new Promise<void>(resolve => {
+      setTimeout(() => {
+        toast.success("Notification preferences saved!");
+        resolve();
+      }, 500);
+    });
   };
 
-  const handleSocialSave = async (connections: any) => {
+  const handleSocialSave = async (connections: {
+    twitter?: string;
+    facebook?: string;
+    instagram?: string;
+    linkedin?: string;
+  }) => {
     // Placeholder for saving social media connections
-    toast.success("Social media connections saved!");
+    await new Promise<void>(resolve => {
+      setTimeout(() => {
+        toast.success("Social media connections saved!");
+        resolve();
+      }, 500);
+    });
   };
 
   if (!currentUser) {
