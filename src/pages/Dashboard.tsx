@@ -1,8 +1,8 @@
-
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useToast } from "@/components/ui/use-toast";
 import { Item, ItemCategory, ItemStatus } from '@/types';
+import { useAuth } from '@/contexts/auth/use-auth';
 
 // Dashboard Components
 import StatusCards from '@/components/dashboard/dashboard-components/StatusCards';
@@ -64,6 +64,8 @@ const Dashboard = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(10);
 
+  const { currentUser } = useAuth();
+
   const filterItems = (items: Item[]) => {
     // Filter by status if not 'all'
     const statusFiltered = selectedStatus === 'all' 
@@ -94,9 +96,15 @@ const Dashboard = () => {
     setCurrentPage(pageNumber);
   };
 
-  // Handler to navigate to item "view" page
+  // Handler to navigate to item "view" page (with buyer redirect)
   const handleView = (item: Item) => {
-    navigate(`/items/${item.id}`);
+    if (currentUser && !currentUser.isSeller) {
+      // If buyer, redirect to marketplace
+      navigate('/marketplace');
+    } else {
+      // Seller or unknown, go to item detail
+      navigate(`/items/${item.id}`);
+    }
   };
 
   // Handler to navigate to item "edit" page
