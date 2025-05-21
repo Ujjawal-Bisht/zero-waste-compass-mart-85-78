@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Menu } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { useAuth } from '@/contexts/auth';
+import { useAuth } from '@/contexts/auth/use-auth';
 import NotificationsPopover from './NotificationsPopover';
 import UserMenu from './UserMenu';
 

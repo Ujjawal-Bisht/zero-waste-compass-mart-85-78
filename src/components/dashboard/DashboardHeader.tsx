@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { motion } from 'framer-motion';
-import { useAuth } from '@/contexts/auth';
+import { useAuth } from '@/contexts/auth/use-auth';
 import LogoSection from './header/LogoSection';
 import NavButtons from './header/NavButtons';
 import SellerButtons from './header/SellerButtons';

@@ -3,7 +3,7 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 import { Sidebar } from '@/components/ui/sidebar';
-import { useAuth } from '@/contexts/auth';
+import { useAuth } from '@/contexts/auth/use-auth';
 import { SidebarLogo } from './sidebar/SidebarLogo';
 import NavigationLinks from './sidebar/NavigationLinks';
 import LogoutButton from './sidebar/LogoutButton';
@@ -30,7 +30,7 @@ export const DashboardSidebar = ({ className, onClose, ...props }: SidebarNavPro
 
   return (
     <Sidebar
-      className={cn("pb-4 pt-16 bg-navy-blue w-64 flex flex-col", className)} // More flexible vertical layout and reduced padding-bottom
+      className={cn("pb-4 pt-16 bg-navy-blue w-64 flex flex-col", className)}
       {...props}
     >
       <div className="px-3 flex flex-col h-full">
