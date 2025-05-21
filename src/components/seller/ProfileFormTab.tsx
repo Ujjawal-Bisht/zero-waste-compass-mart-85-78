@@ -1,96 +1,11 @@
 
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
-import { z } from 'zod';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { toast } from 'sonner';
 import { motion } from 'framer-motion';
-import { Building, User, Shield } from 'lucide-react';
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from '@/components/ui/form';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { useAuth } from '@/contexts/auth';
-import TwoFactorSetup from '@/components/auth/two-factor/TwoFactorSetup';
-import { Separator } from '@/components/ui/separator';
-
-const profileSchema = z.object({
-  displayName: z.string().min(2, { message: 'Name must be at least 2 characters' }),
-  email: z.string().email({ message: 'Please enter a valid email' }),
-  businessName: z.string().min(1, { message: 'Business name is required' }),
-  businessType: z.enum(['retailer', 'distributor', 'manufacturer', 'individual'], { 
-    required_error: 'Please select a business type' 
-  }),
-});
-
-const passwordSchema = z.object({
-  currentPassword: z.string().min(6, { message: 'Password must be at least 6 characters' }),
-  newPassword: z.string().min(6, { message: 'Password must be at least 6 characters' }),
-  confirmPassword: z.string(),
-}).refine((data) => data.newPassword === data.confirmPassword, {
-  message: "Passwords don't match",
-  path: ["confirmPassword"],
-});
-
-type ProfileFormValues = z.infer<typeof profileSchema>;
-type PasswordFormValues = z.infer<typeof passwordSchema>;
+import BusinessInfoForm from './profile/BusinessInfoForm';
+import SecuritySection from './profile/SecuritySection';
 
 const ProfileFormTab: React.FC = () => {
-  const { currentUser, updateProfile } = useAuth();
-  const [isChangingPassword, setIsChangingPassword] = React.useState(false);
-  
-  const form = useForm<ProfileFormValues>({
-    resolver: zodResolver(profileSchema),
-    defaultValues: {
-      displayName: currentUser?.displayName || '',
-      email: currentUser?.email || '',
-      businessName: currentUser?.businessName || '',
-      businessType: currentUser?.businessType || 'retailer',
-    },
-  });
-  
-  const passwordForm = useForm<PasswordFormValues>({
-    resolver: zodResolver(passwordSchema),
-    defaultValues: {
-      currentPassword: '',
-      newPassword: '',
-      confirmPassword: '',
-    },
-  });
-  
-  const onSubmit = async (values: ProfileFormValues) => {
-    try {
-      await updateProfile(values);
-      toast.success('Profile updated successfully!');
-    } catch (error) {
-      console.error('Profile update error:', error);
-      toast.error('Failed to update profile. Please try again.');
-    }
-  };
-  
-  const onChangePassword = async (data: PasswordFormValues) => {
-    try {
-      setIsChangingPassword(true);
-      // Simulate password change
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      toast.success('Password changed successfully!');
-      passwordForm.reset();
-    } catch (error) {
-      console.error('Password change error:', error);
-      toast.error('Failed to change password. Please try again.');
-    } finally {
-      setIsChangingPassword(false);
-    }
-  };
-
   return (
     <>
       <motion.div
@@ -104,95 +19,7 @@ const ProfileFormTab: React.FC = () => {
             <CardDescription>Manage your business details</CardDescription>
           </CardHeader>
           <CardContent>
-            <Form {...form}>
-              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <FormField
-                    control={form.control}
-                    name="displayName"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Contact Person</FormLabel>
-                        <FormControl>
-                          <div className="relative">
-                            <User className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                            <Input {...field} className="pl-10" />
-                          </div>
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  
-                  <FormField
-                    control={form.control}
-                    name="email"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Email</FormLabel>
-                        <FormControl>
-                          <Input {...field} disabled className="bg-muted" />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  
-                  <FormField
-                    control={form.control}
-                    name="businessName"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Business Name</FormLabel>
-                        <FormControl>
-                          <div className="relative">
-                            <Building className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                            <Input {...field} className="pl-10" />
-                          </div>
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  
-                  <FormField
-                    control={form.control}
-                    name="businessType"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Business Type</FormLabel>
-                        <FormControl>
-                          <Select 
-                            value={field.value} 
-                            onValueChange={(value: 'retailer' | 'distributor' | 'manufacturer' | 'individual') => field.onChange(value)}
-                          >
-                            <SelectTrigger>
-                              <SelectValue placeholder="Select business type" />
-                            </SelectTrigger>
-                            <SelectContent>
-                              <SelectItem value="retailer">Retailer</SelectItem>
-                              <SelectItem value="distributor">Distributor</SelectItem>
-                              <SelectItem value="manufacturer">Manufacturer</SelectItem>
-                              <SelectItem value="individual">Individual</SelectItem>
-                            </SelectContent>
-                          </Select>
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
-                
-                <div className="flex gap-2 justify-end">
-                  <Button 
-                    type="submit" 
-                    className="zwm-gradient-hover"
-                  >
-                    Save Changes
-                  </Button>
-                </div>
-              </form>
-            </Form>
+            <BusinessInfoForm />
           </CardContent>
         </Card>
       </motion.div>
@@ -208,75 +35,7 @@ const ProfileFormTab: React.FC = () => {
             <CardDescription>Manage your account security</CardDescription>
           </CardHeader>
           <CardContent>
-            <Form {...passwordForm}>
-              <form onSubmit={passwordForm.handleSubmit(onChangePassword)} className="space-y-4">
-                <FormField
-                  control={passwordForm.control}
-                  name="currentPassword"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Current Password</FormLabel>
-                      <FormControl>
-                        <div className="relative">
-                          <Shield className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                          <Input id="current-password" type="password" className="pl-10" {...field} />
-                        </div>
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                
-                <FormField
-                  control={passwordForm.control}
-                  name="newPassword"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>New Password</FormLabel>
-                      <FormControl>
-                        <div className="relative">
-                          <Shield className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                          <Input id="new-password" type="password" className="pl-10" {...field} />
-                        </div>
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                
-                <FormField
-                  control={passwordForm.control}
-                  name="confirmPassword"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Confirm Password</FormLabel>
-                      <FormControl>
-                        <div className="relative">
-                          <Shield className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                          <Input id="confirm-password" type="password" className="pl-10" {...field} />
-                        </div>
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                
-                <Button 
-                  type="submit" 
-                  className="zwm-gradient-hover"
-                  disabled={isChangingPassword}
-                >
-                  {isChangingPassword ? 'Changing Password...' : 'Change Password'}
-                </Button>
-              </form>
-            </Form>
-            
-            <Separator className="my-6" />
-            
-            <div className="mt-6">
-              <h3 className="text-lg font-semibold mb-4">Two-Factor Authentication</h3>
-              <TwoFactorSetup />
-            </div>
+            <SecuritySection />
           </CardContent>
         </Card>
       </motion.div>
