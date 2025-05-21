@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { 
   LayoutDashboard, 
@@ -48,6 +49,12 @@ export const buyerMenuSections: MenuSection[] = [
         icon: <ShoppingCart size={18} />,
         description: "View your shopping cart",
         highlight: true
+      },
+      {
+        label: "My Orders",
+        path: "/orders",
+        icon: <Truck size={18} />,
+        description: "Track your orders"
       },
       {
         label: "Settings",
