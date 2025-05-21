@@ -8,7 +8,6 @@ import { Edit, Check, User, Bell, Link2, Save, ShieldCheck } from 'lucide-react'
 import { motion } from 'framer-motion';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Separator } from "@/components/ui/separator";
-// FIXED IMPORTS:
 import PersonalInfoForm from './profile/PersonalInfoForm';
 import NotificationPreferences from './profile/NotificationPreferences';
 import SocialMediaConnections from './profile/SocialMediaConnections';
@@ -109,40 +108,39 @@ const Profile: React.FC = () => {
         
         <div className="space-y-1">
           <h3 className="text-lg font-medium text-gray-700 mb-2">Profile Navigation</h3>
-          <TabsList className="flex flex-col space-y-1 w-full justify-start bg-transparent">
-            <TabsTrigger 
-              value="personal" 
-              onClick={() => setActiveTab("personal")}
-              className={`justify-start text-left ${activeTab === "personal" ? "bg-gray-100 text-gray-900" : "bg-transparent text-gray-600"}`}
-            >
-              <User className="mr-2 h-4 w-4" />
-              Personal Information
-            </TabsTrigger>
-            <TabsTrigger 
-              value="security" 
-              onClick={() => setActiveTab("security")}
-              className={`justify-start text-left ${activeTab === "security" ? "bg-gray-100 text-gray-900" : "bg-transparent text-gray-600"}`}
-            >
-              <ShieldCheck className="mr-2 h-4 w-4" />
-              Security
-            </TabsTrigger>
-            <TabsTrigger 
-              value="notifications" 
-              onClick={() => setActiveTab("notifications")}
-              className={`justify-start text-left ${activeTab === "notifications" ? "bg-gray-100 text-gray-900" : "bg-transparent text-gray-600"}`}
-            >
-              <Bell className="mr-2 h-4 w-4" />
-              Notifications
-            </TabsTrigger>
-            <TabsTrigger 
-              value="social" 
-              onClick={() => setActiveTab("social")}
-              className={`justify-start text-left ${activeTab === "social" ? "bg-gray-100 text-gray-900" : "bg-transparent text-gray-600"}`}
-            >
-              <Link2 className="mr-2 h-4 w-4" />
-              Social Media
-            </TabsTrigger>
-          </TabsList>
+          {/* The problem was here - TabsList needs to be inside a Tabs component */}
+          <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+            <TabsList className="flex flex-col space-y-1 w-full justify-start bg-transparent">
+              <TabsTrigger 
+                value="personal" 
+                className={`justify-start text-left ${activeTab === "personal" ? "bg-gray-100 text-gray-900" : "bg-transparent text-gray-600"}`}
+              >
+                <User className="mr-2 h-4 w-4" />
+                Personal Information
+              </TabsTrigger>
+              <TabsTrigger 
+                value="security" 
+                className={`justify-start text-left ${activeTab === "security" ? "bg-gray-100 text-gray-900" : "bg-transparent text-gray-600"}`}
+              >
+                <ShieldCheck className="mr-2 h-4 w-4" />
+                Security
+              </TabsTrigger>
+              <TabsTrigger 
+                value="notifications" 
+                className={`justify-start text-left ${activeTab === "notifications" ? "bg-gray-100 text-gray-900" : "bg-transparent text-gray-600"}`}
+              >
+                <Bell className="mr-2 h-4 w-4" />
+                Notifications
+              </TabsTrigger>
+              <TabsTrigger 
+                value="social" 
+                className={`justify-start text-left ${activeTab === "social" ? "bg-gray-100 text-gray-900" : "bg-transparent text-gray-600"}`}
+              >
+                <Link2 className="mr-2 h-4 w-4" />
+                Social Media
+              </TabsTrigger>
+            </TabsList>
+          </Tabs>
         </div>
       </div>
 
