@@ -1,6 +1,5 @@
 
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Menu, X } from 'lucide-react';
 import { DashboardSidebar } from '@/components/dashboard/DashboardSidebar';
@@ -10,7 +9,6 @@ import { SidebarProvider } from '@/components/ui/sidebar';
 import { useIsMobile } from '@/hooks/use-mobile';
 
 const DashboardLayout: React.FC = () => {
-  const navigate = useNavigate();
   const isMobile = useIsMobile();
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
@@ -46,7 +44,7 @@ const DashboardLayout: React.FC = () => {
 
         {/* Main Content */}
         <div className="flex-1 flex flex-col overflow-hidden">
-          {/* Header */}
+          {/* Header - Only include DashboardHeader, remove TopNavbar */}
           <DashboardHeader />
 
           {/* Page Content */}
