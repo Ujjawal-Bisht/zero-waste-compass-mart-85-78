@@ -35,8 +35,8 @@ const SecuritySection: React.FC = () => {
           
           <TabsContent value="2fa" className="space-y-4">
             <div className="rounded-lg border p-4 bg-card">
-              <h3 className="text-lg font-semibold mb-4">Two-Factor Authentication</h3>
-              <p className="text-sm text-muted-foreground mb-6">
+              <h3 className="text-lg font-semibold mb-2">Two-Factor Authentication</h3>
+              <p className="text-sm text-muted-foreground mb-4">
                 Enhance your account security with two-factor authentication using an authenticator app
               </p>
               <TwoFactorSetup />

@@ -11,7 +11,9 @@ interface PerformanceCardProps {
 }
 
 const PerformanceCard: React.FC<PerformanceCardProps> = ({ trustScore, verified }) => {
-  const trustScorePercentage = (trustScore / 5) * 100;
+  // Fix: Ensure trust score is a valid number, using a default if not
+  const validTrustScore = trustScore || 0;
+  const trustScorePercentage = (validTrustScore / 5) * 100;
   
   return (
     <div className="col-span-2 md:col-span-1 seller-card-enter seller-card-delay-2">
@@ -36,7 +38,7 @@ const PerformanceCard: React.FC<PerformanceCardProps> = ({ trustScore, verified 
                     animate={{ opacity: 1 }}
                     transition={{ delay: 0.5 }}
                   >
-                    {trustScore.toFixed(1)}/5.0
+                    {validTrustScore.toFixed(1)}/5.0
                   </motion.div>
                 </div>
                 <div className="mt-1 h-2 w-full bg-slate-200 rounded-full overflow-hidden">
