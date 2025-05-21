@@ -8,7 +8,9 @@ import { motion } from 'framer-motion';
 import '@/styles/animations/seller.css';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { LayoutDashboard } from 'lucide-react';
+import { LayoutDashboard, BarChart4, Settings } from 'lucide-react';
+import StatisticsTab from '@/components/seller/StatisticsTab';
+import SettingsTab from '@/components/seller/SettingsTab';
 
 const Profile = () => {
   const [selectedTab, setSelectedTab] = useState('profile');
@@ -75,9 +77,21 @@ const Profile = () => {
               onValueChange={handleTabChange} 
               className="w-full"
             >
-              <TabsList className="w-full bg-gray-50 dark:bg-gray-800 border-b border-gray-100 dark:border-gray-700 grid grid-cols-2 rounded-none">
+              <TabsList className="w-full bg-gray-50 dark:bg-gray-800 border-b border-gray-100 dark:border-gray-700 grid grid-cols-4 rounded-none">
                 <TabsTrigger value="profile" className="profile-tab">Profile</TabsTrigger>
                 <TabsTrigger value="recent" className="profile-tab">Recent Items</TabsTrigger>
+                <TabsTrigger value="statistics" className="profile-tab">
+                  <span className="flex items-center gap-1">
+                    <BarChart4 size={16} />
+                    Statistics
+                  </span>
+                </TabsTrigger>
+                <TabsTrigger value="settings" className="profile-tab">
+                  <span className="flex items-center gap-1">
+                    <Settings size={16} />
+                    Settings
+                  </span>
+                </TabsTrigger>
               </TabsList>
               
               <AnimatedTabContent value="profile" currentTab={selectedTab}>
@@ -86,6 +100,14 @@ const Profile = () => {
               
               <AnimatedTabContent value="recent" currentTab={selectedTab}>
                 <RecentItemsTab />
+              </AnimatedTabContent>
+
+              <AnimatedTabContent value="statistics" currentTab={selectedTab}>
+                <StatisticsTab />
+              </AnimatedTabContent>
+
+              <AnimatedTabContent value="settings" currentTab={selectedTab}>
+                <SettingsTab />
               </AnimatedTabContent>
             </Tabs>
           </CardContent>

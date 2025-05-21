@@ -10,7 +10,8 @@ import {
   Settings, 
   BarChart4, 
   Users, 
-  Shield
+  Shield,
+  ListOrdered
 } from 'lucide-react';
 import { MenuSection, NavItemType } from './types';
 
@@ -81,10 +82,10 @@ export const sellerMenuSections: MenuSection[] = [
         description: "Manage your items"
       },
       {
-        label: "Orders",
+        label: "Orders Received",
         path: "/seller/orders",
-        icon: <Package size={18} />,
-        description: "View customer orders"
+        icon: <ListOrdered size={18} />,
+        description: "Manage customer orders"
       },
       {
         label: "Analytics",
@@ -102,12 +103,6 @@ export const sellerMenuSections: MenuSection[] = [
         path: "/seller/profile",
         icon: <User size={18} />,
         description: "Manage seller profile"
-      },
-      {
-        label: "Settings",
-        path: "/settings",
-        icon: <Settings size={18} />,
-        description: "Change preferences"
       }
     ]
   }

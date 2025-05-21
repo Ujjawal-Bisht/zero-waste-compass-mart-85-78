@@ -19,6 +19,8 @@ import {
 } from '@/components/ui/form';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useAuth } from '@/contexts/auth';
+import TwoFactorSetup from '@/components/auth/two-factor/TwoFactorSetup';
+import { Separator } from '@/components/ui/separator';
 
 const profileSchema = z.object({
   displayName: z.string().min(2, { message: 'Name must be at least 2 characters' }),
@@ -198,7 +200,7 @@ const ProfileFormTab: React.FC = () => {
       <motion.div
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
-        transition={{ duration: 0.3, delay: 0.2 }}
+        transition={{ duration: 0.3, delay: 0.1 }}
       >
         <Card className="shadow-pop hover:shadow-lg transition-all duration-300 mt-6">
           <CardHeader>
@@ -268,6 +270,13 @@ const ProfileFormTab: React.FC = () => {
                 </Button>
               </form>
             </Form>
+            
+            <Separator className="my-6" />
+            
+            <div className="mt-6">
+              <h3 className="text-lg font-semibold mb-4">Two-Factor Authentication</h3>
+              <TwoFactorSetup />
+            </div>
           </CardContent>
         </Card>
       </motion.div>
