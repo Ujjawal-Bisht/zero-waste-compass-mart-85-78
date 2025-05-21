@@ -4,6 +4,7 @@ import { motion } from 'framer-motion';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { StatisticsTab } from '@/components/seller/analytics';
+import ForecastTab from '@/components/seller/analytics/ForecastTab';
 
 const Analytics = () => {
   const [selectedTab, setSelectedTab] = useState('statistics');
@@ -65,14 +66,8 @@ const Analytics = () => {
               </AnimatedTabContent>
               
               <AnimatedTabContent value="forecast" currentTab={selectedTab}>
-                <div className="p-6">
-                  <h3 className="text-lg font-semibold mb-4">Sales Forecast</h3>
-                  <p className="text-muted-foreground mb-4">
-                    Projected sales based on historical data and market trends.
-                  </p>
-                  <div className="flex items-center justify-center h-64 bg-gray-50 dark:bg-gray-800 rounded-lg">
-                    <p className="text-muted-foreground">Coming soon: Advanced sales forecasting</p>
-                  </div>
+                <div className="p-4">
+                  <ForecastTab />
                 </div>
               </AnimatedTabContent>
             </Tabs>

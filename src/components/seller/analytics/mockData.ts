@@ -33,6 +33,16 @@ export const yearlyRevenueData = [
   { year: '2024', revenue: 10200000, profit: 3100000, projected: true },
 ];
 
+// Inventory forecast data for the next 6 months
+export const inventoryForecastData = [
+  { month: 'Jul', currentStock: 450, projectedStock: 380, reorderPoint: 200 },
+  { month: 'Aug', currentStock: 380, projectedStock: 310, reorderPoint: 200 },
+  { month: 'Sep', currentStock: 310, projectedStock: 240, reorderPoint: 200 },
+  { month: 'Oct', currentStock: 240, projectedStock: 170, reorderPoint: 200 },
+  { month: 'Nov', currentStock: 350, projectedStock: 280, reorderPoint: 200 },
+  { month: 'Dec', currentStock: 280, projectedStock: 210, reorderPoint: 200 },
+];
+
 export const todayCollection = 28500;
 export const yearToDateRevenue = 4580000;
 export const lastYearRevenue = 3750000;
