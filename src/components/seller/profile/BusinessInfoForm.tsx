@@ -12,12 +12,14 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
+  FormDescription,
 } from '@/components/ui/form';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { toast } from 'sonner';
 import { motion } from 'framer-motion';
-import { Building, User } from 'lucide-react';
+import { Building, User, MapPin, BadgeCheck } from 'lucide-react';
 import { useAuth } from '@/contexts/auth';
+import { Textarea } from '@/components/ui/textarea';
 
 const profileSchema = z.object({
   displayName: z.string().min(2, { message: 'Name must be at least 2 characters' }),
@@ -26,6 +28,8 @@ const profileSchema = z.object({
   businessType: z.enum(['retailer', 'distributor', 'manufacturer', 'individual'], { 
     required_error: 'Please select a business type' 
   }),
+  gstin: z.string().optional(),
+  businessAddress: z.string().optional(),
 });
 
 type ProfileFormValues = z.infer<typeof profileSchema>;
@@ -40,6 +44,8 @@ const BusinessInfoForm: React.FC = () => {
       email: currentUser?.email || '',
       businessName: currentUser?.businessName || '',
       businessType: currentUser?.businessType || 'retailer',
+      gstin: currentUser?.gstin || '',
+      businessAddress: currentUser?.businessAddress || '',
     },
   });
   
@@ -131,6 +137,52 @@ const BusinessInfoForm: React.FC = () => {
               </FormItem>
             )}
           />
+
+          <FormField
+            control={form.control}
+            name="gstin"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>GSTIN Number</FormLabel>
+                <FormControl>
+                  <div className="relative">
+                    <BadgeCheck className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                    <Input {...field} className="pl-10" placeholder="Example: 29AADCB2230M1ZT" />
+                  </div>
+                </FormControl>
+                <FormDescription>
+                  Your GST Identification Number for tax purposes
+                </FormDescription>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          
+          <div className="md:col-span-2">
+            <FormField
+              control={form.control}
+              name="businessAddress"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Business Address</FormLabel>
+                  <FormControl>
+                    <div className="relative">
+                      <MapPin className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                      <Textarea 
+                        {...field} 
+                        className="pl-10 min-h-[100px]" 
+                        placeholder="Enter your full business address"
+                      />
+                    </div>
+                  </FormControl>
+                  <FormDescription>
+                    Address used for GST registration and business correspondence
+                  </FormDescription>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
         </div>
         
         <div className="flex gap-2 justify-end">

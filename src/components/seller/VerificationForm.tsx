@@ -32,6 +32,7 @@ const VerificationForm: React.FC = () => {
   // Track current verification status
   const [isVerifying, setIsVerifying] = useState(false);
   const [trustScoreGained, setTrustScoreGained] = useState(0);
+  const [showTrustScorePopup, setShowTrustScorePopup] = useState(false);
   
   // Handle file input click
   const handleFileInputClick = (documentId: string) => {
@@ -44,11 +45,17 @@ const VerificationForm: React.FC = () => {
   const handleFileChange = (documentId: string, event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
+      const document = documents.find(doc => doc.id === documentId);
       const updatedDocuments = documents.map(doc => {
         if (doc.id === documentId) {
           if (!doc.uploaded) {
             // Only add the trust score if the document wasn't already uploaded
-            setTrustScoreGained(prev => prev + doc.trustScoreValue);
+            const newTrustScore = doc.trustScoreValue;
+            setTrustScoreGained(prev => prev + newTrustScore);
+            
+            // Show trust score popup
+            setShowTrustScorePopup(true);
+            setTimeout(() => setShowTrustScorePopup(false), 3000);
           }
           return { ...doc, uploaded: true, fileName: file.name };
         }
@@ -59,7 +66,7 @@ const VerificationForm: React.FC = () => {
       
       toast({
         title: "Document Uploaded",
-        description: `${file.name} has been uploaded and will be reviewed. Your trust score has increased by +${documents.find(d => d.id === documentId)?.trustScoreValue.toFixed(1)}.`,
+        description: `${file.name} has been uploaded and will be reviewed. Your trust score has increased by +${document?.trustScoreValue.toFixed(1)}.`,
         duration: 5000,
       });
     }
@@ -184,6 +191,29 @@ const VerificationForm: React.FC = () => {
           transition={{ duration: 0.5, delay: 0.3 }}
         >
           Your verification is in process. Current trust score increase: +{trustScoreGained.toFixed(1)} points
+        </motion.div>
+      )}
+
+      {/* Trust Score Popup */}
+      {showTrustScorePopup && (
+        <motion.div
+          className="fixed top-4 right-4 bg-white dark:bg-gray-800 p-4 rounded-lg shadow-lg border border-green-300 z-50"
+          initial={{ opacity: 0, y: -20, scale: 0.8 }}
+          animate={{ opacity: 1, y: 0, scale: 1 }}
+          exit={{ opacity: 0, y: -20, scale: 0.8 }}
+          transition={{ type: "spring", stiffness: 500, damping: 30 }}
+        >
+          <div className="flex items-center gap-3">
+            <div className="bg-green-100 dark:bg-green-900 p-2 rounded-full">
+              <Check className="h-5 w-5 text-green-600 dark:text-green-300" />
+            </div>
+            <div>
+              <h4 className="font-medium">Trust Score Updated</h4>
+              <div className="text-sm text-gray-600 dark:text-gray-300">
+                New Score: {trustScoreGained.toFixed(1)}/5.0
+              </div>
+            </div>
+          </div>
         </motion.div>
       )}
     </form>
