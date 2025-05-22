@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Form, FormField, FormItem, FormLabel, FormControl, FormMessage } from '@/components/ui/form';
@@ -44,8 +43,8 @@ const PhoneNumberForm: React.FC<PhoneNumberFormProps> = ({
     // Filter countries based on search query
     if (searchQuery) {
       const filtered = COUNTRY_CODES.filter(country => 
-        country.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
-        country.dialCode.includes(searchQuery)
+        country.label.toLowerCase().includes(searchQuery.toLowerCase()) || 
+        country.code.includes(searchQuery)
       );
       setFilteredCountries(filtered);
     } else {
@@ -71,12 +70,20 @@ const PhoneNumberForm: React.FC<PhoneNumberFormProps> = ({
                       className="w-full justify-between"
                     >
                       {field.value ? 
-                        `${field.value} ${COUNTRY_CODES.find(country => country.dialCode === field.value)?.name || ''}` : 
-                        "Select country code"}
+                        <>
+                          <span className="mr-2">
+                            {COUNTRY_CODES.find(country => country.code === field.value)?.flag}
+                          </span>
+                          {field.value + ' '}
+                          <span className="text-muted-foreground ml-2">
+                            {COUNTRY_CODES.find(country => country.code === field.value)?.label}
+                          </span>
+                        </>
+                        : "Select country code"}
                     </Button>
                   </FormControl>
                 </PopoverTrigger>
-                <PopoverContent className="w-full p-0" align="start">
+                <PopoverContent className="w-full p-0 z-50 bg-white" align="start">
                   <Command>
                     <CommandInput 
                       placeholder="Search country..." 
@@ -89,15 +96,16 @@ const PhoneNumberForm: React.FC<PhoneNumberFormProps> = ({
                       <CommandGroup>
                         {filteredCountries.map((country) => (
                           <CommandItem
-                            key={country.code}
-                            value={`${country.dialCode}-${country.name}`}
+                            key={country.code + country.label}
+                            value={`${country.code}-${country.label}`}
                             onSelect={() => {
-                              field.onChange(country.dialCode);
+                              field.onChange(country.code);
                               setOpen(false);
                             }}
                           >
-                            <span className="font-medium">{country.dialCode}</span>
-                            <span className="ml-2 text-muted-foreground">{country.name}</span>
+                            <span className="mr-2">{country.flag}</span>
+                            <span className="font-medium">{country.code}</span>
+                            <span className="ml-2 text-muted-foreground">{country.label}</span>
                           </CommandItem>
                         ))}
                       </CommandGroup>
@@ -122,6 +130,7 @@ const PhoneNumberForm: React.FC<PhoneNumberFormProps> = ({
                   {...field}
                   className="w-full" 
                   type="tel"
+                  inputMode="tel"
                 />
               </FormControl>
               <FormMessage />
