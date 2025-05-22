@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useAuth } from '@/contexts/auth';
 import { motion } from 'framer-motion';
@@ -17,6 +16,7 @@ import TwoFactorForm from './TwoFactorForm';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import QRCode from './QRCode';
+import TwoFactorMobileOtpSetup from './TwoFactorMobileOtpSetup';
 
 const TwoFactorSetup: React.FC = () => {
   const { setupTwoFactor, verifyTwoFactor, disableTwoFactor, isTwoFactorEnabled } = useAuth();
@@ -26,6 +26,11 @@ const TwoFactorSetup: React.FC = () => {
   const [verificationCode, setVerificationCode] = useState('');
   const [verificationMethod, setVerificationMethod] = useState<'app' | 'qr' | 'otp'>('app');
   const [setupSecret, setSetupSecret] = useState<string | null>(null);
+  const [mobileOtpStep, setMobileOtpStep] = useState<'setup' | 'otp'>('setup');
+  const [otpNumber, setOtpNumber] = useState<string>('');
+  const [otpSent, setOtpSent] = useState<boolean>(false);
+  const [otpInputValue, setOtpInputValue] = useState('');
+  const [otpVerificationLoading, setOtpVerificationLoading] = useState(false);
 
   const handleSetup = async () => {
     try {
@@ -67,6 +72,39 @@ const TwoFactorSetup: React.FC = () => {
       toast.error('Failed to disable two-factor authentication');
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const handleRequestOtp = async (fullNumber: string) => {
+    setIsLoading(true);
+    try {
+      // Simulate API call - a real system should call backend!
+      await new Promise(res => setTimeout(res, 1000));
+      toast.success(`OTP sent to ${fullNumber}`);
+      setOtpNumber(fullNumber);
+      setOtpSent(true);
+      setMobileOtpStep('otp');
+    } catch (err) {
+      toast.error("Failed to send OTP");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleOtpVerify = async () => {
+    setOtpVerificationLoading(true);
+    try {
+      // In reality, should call backend API/service to verify
+      if (otpInputValue.length === 6 /* and regex for digits */) {
+        toast.success("Phone number verified and 2FA enabled!");
+        setOtpSent(false);
+        setOtpInputValue('');
+        setStep('intro');
+      } else {
+        toast.error("Invalid OTP. Please try again.");
+      }
+    } finally {
+      setOtpVerificationLoading(false);
     }
   };
 
@@ -112,7 +150,7 @@ const TwoFactorSetup: React.FC = () => {
                   </TabsTrigger>
                   <TabsTrigger value="otp" onClick={() => setVerificationMethod('otp')}>
                     <Smartphone className="h-4 w-4 mr-2" />
-                    Manual Setup
+                    Mobile OTP
                   </TabsTrigger>
                 </TabsList>
                 
@@ -141,23 +179,37 @@ const TwoFactorSetup: React.FC = () => {
                 </TabsContent>
 
                 <TabsContent value="otp" className="space-y-4">
-                  <div className="bg-blue-50 rounded-md p-4 text-sm text-blue-700">
-                    <p className="font-medium mb-2">Manual Setup Instructions:</p>
-                    <ol className="list-decimal ml-4 space-y-2">
-                      <li>Open your authenticator app</li>
-                      <li>Choose "Enter setup key" or "Enter manually"</li>
-                      <li>Enter your email as the account name</li>
-                      <li>Enter the following secret key:</li>
-                    </ol>
-                    
-                    {setupSecret && (
-                      <div className="mt-3 p-3 bg-white border border-blue-200 rounded font-mono text-center select-all break-all">
-                        {setupSecret}
+                  {mobileOtpStep === 'setup' && (
+                    <TwoFactorMobileOtpSetup
+                      onRequestOtp={handleRequestOtp}
+                      isLoading={isLoading}
+                    />
+                  )}
+                  {mobileOtpStep === 'otp' && (
+                    <div className="space-y-4">
+                      <div className="bg-blue-50 rounded-md p-3 text-blue-700">
+                        Enter the 6-digit code sent to <span className="font-medium">{otpNumber}</span>
                       </div>
-                    )}
-                    
-                    <p className="mt-3 text-xs">This key will only be shown once. Store it securely if needed.</p>
-                  </div>
+                      <div className="flex justify-center py-2">
+                        <Input
+                          type="text"
+                          maxLength={6}
+                          pattern="\d*"
+                          className="text-center text-lg tracking-widest px-4 py-2 border rounded-md"
+                          value={otpInputValue}
+                          onChange={e => setOtpInputValue(e.target.value.replace(/\D/g, ''))}
+                          placeholder="------"
+                        />
+                      </div>
+                      <Button
+                        className="w-full zwm-gradient-hover"
+                        disabled={otpVerificationLoading || otpInputValue.length !== 6}
+                        onClick={handleOtpVerify}
+                      >
+                        {otpVerificationLoading ? "Verifying..." : "Verify"}
+                      </Button>
+                    </div>
+                  )}
                 </TabsContent>
               </Tabs>
               
