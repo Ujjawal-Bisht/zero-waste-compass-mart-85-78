@@ -1,6 +1,7 @@
 
-import { Order } from '@/types';
+import { Order, Item } from '@/types';
 import { generateInvoicePdf } from './invoiceGenerator';
+import { formatIndianRupees } from './invoice/formatUtils';
 
 /**
  * Generate an invoice for an order
@@ -20,6 +21,61 @@ export const generateInvoice = (order: Order): boolean => {
     return true;
   } catch (error) {
     console.error('Error generating invoice:', error);
+    return false;
+  }
+};
+
+/**
+ * Export products data to CSV file
+ * @param products - Array of products to export
+ * @returns boolean - Whether the export was successful
+ */
+export const exportProducts = (products: Item[]): boolean => {
+  try {
+    if (!products || products.length === 0) {
+      console.error('No products to export');
+      return false;
+    }
+
+    // Create CSV header row
+    const headers = ['ID', 'Name', 'Category', 'Status', 'Quantity', 'Price', 'Original Price', 'Expiry Date'];
+    
+    // Create CSV data rows from products
+    const rows = products.map(product => [
+      product.id,
+      product.name,
+      product.category,
+      product.status,
+      product.quantity.toString(),
+      formatIndianRupees(product.currentPrice).replace('₹', ''),
+      formatIndianRupees(product.originalPrice).replace('₹', ''),
+      product.expiryDate ? new Date(product.expiryDate).toLocaleDateString() : 'N/A'
+    ]);
+    
+    // Combine header and data rows
+    const csvContent = [
+      headers.join(','),
+      ...rows.map(row => row.join(','))
+    ].join('\n');
+    
+    // Create a blob and download link
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    
+    // Set up link for download
+    link.setAttribute('href', url);
+    link.setAttribute('download', `products_export_${new Date().toISOString().split('T')[0]}.csv`);
+    link.style.visibility = 'hidden';
+    
+    // Add to document, click to download, then clean up
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    
+    return true;
+  } catch (error) {
+    console.error('Error exporting products:', error);
     return false;
   }
 };
