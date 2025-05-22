@@ -79,3 +79,57 @@ export const exportProducts = (products: Item[]): boolean => {
     return false;
   }
 };
+
+/**
+ * Export orders data to CSV file
+ * @param orders - Array of orders to export
+ * @returns boolean - Whether the export was successful
+ */
+export const exportOrders = (orders: Order[]): boolean => {
+  try {
+    if (!orders || orders.length === 0) {
+      console.error('No orders to export');
+      return false;
+    }
+
+    // Create CSV header row
+    const headers = ['Order ID', 'Buyer Name', 'Date', 'Status', 'Payment Status', 'Items', 'Total Amount'];
+    
+    // Create CSV data rows from orders
+    const rows = orders.map(order => [
+      order.id,
+      order.buyerName || 'Unknown',
+      new Date(order.createdAt).toLocaleDateString(),
+      order.status,
+      order.paymentStatus,
+      order.items.length.toString(),
+      formatIndianRupees(order.totalAmount).replace('₹', '')
+    ]);
+    
+    // Combine header and data rows
+    const csvContent = [
+      headers.join(','),
+      ...rows.map(row => row.join(','))
+    ].join('\n');
+    
+    // Create a blob and download link
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    
+    // Set up link for download
+    link.setAttribute('href', url);
+    link.setAttribute('download', `orders_export_${new Date().toISOString().split('T')[0]}.csv`);
+    link.style.visibility = 'hidden';
+    
+    // Add to document, click to download, then clean up
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    
+    return true;
+  } catch (error) {
+    console.error('Error exporting orders:', error);
+    return false;
+  }
+};
