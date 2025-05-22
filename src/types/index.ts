@@ -99,4 +99,5 @@ export interface Task {
   userId: string;
   createdAt: string;
   updatedAt: string;
+  parameters?: Record<string, any>;
 }

@@ -34,6 +34,28 @@
   100% { box-shadow: 0 0 5px 0 rgba(99, 102, 241, 0.3); }
 }
 
+/* Gradient border animation */
+@keyframes borderGradient {
+  0% { border-image-source: linear-gradient(45deg, #4f46e5, #8b5cf6); }
+  25% { border-image-source: linear-gradient(45deg, #8b5cf6, #2dd4bf); }
+  50% { border-image-source: linear-gradient(45deg, #2dd4bf, #4f46e5); }
+  75% { border-image-source: linear-gradient(45deg, #4f46e5, #8b5cf6); }
+  100% { border-image-source: linear-gradient(45deg, #8b5cf6, #4f46e5); }
+}
+
+/* Glow effect animation */
+@keyframes softGlow {
+  0% { box-shadow: 0 0 5px rgba(99, 102, 241, 0.2); }
+  50% { box-shadow: 0 0 20px rgba(99, 102, 241, 0.4); }
+  100% { box-shadow: 0 0 5px rgba(99, 102, 241, 0.2); }
+}
+
+/* Bounce animation for active indicators */
+@keyframes activeBounce {
+  0%, 100% { transform: translateX(0); }
+  50% { transform: translateX(3px); }
+}
+
 /* Apply animations */
 .profile-tab-active {
   animation: profileTabActive 0.5s ease;
@@ -43,6 +65,9 @@
 
 .profile-nav-item {
   transition: all 0.3s ease;
+  position: relative;
+  padding: 0.75rem 1rem;
+  overflow: hidden;
 }
 
 .profile-nav-item:hover {
@@ -55,26 +80,38 @@
 }
 
 .profile-avatar {
-  animation: avatarPulse 2s infinite;
+  animation: avatarPulse 3s infinite;
+  transition: all 0.3s ease;
 }
 
-/* Cart button animations */
-.cart-button-highlight {
-  animation: glowPulse 2s infinite;
+.profile-avatar:hover {
+  animation: softGlow 2s infinite;
+  transform: scale(1.05);
 }
 
-.cart-button-3d:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 15px -3px rgba(139, 92, 246, 0.3);
+.gradient-border {
+  border: 3px solid;
+  border-image-slice: 1;
+  animation: borderGradient 6s infinite linear;
+  border-image-source: linear-gradient(45deg, #4f46e5, #8b5cf6);
 }
 
-/* Orders button specifics */
-.orders-button-animate:hover .orders-icon {
-  animation: shake 0.5s ease-in-out;
+.active-nav-indicator {
+  position: absolute;
+  left: 0;
+  top: 0;
+  height: 100%;
+  width: 4px;
+  background: linear-gradient(to bottom, #4f46e5, #8b5cf6);
+  animation: activeBounce 1s infinite;
 }
 
-@keyframes shake {
-  0%, 100% { transform: translateX(0); }
-  25% { transform: translateX(-3px); }
-  75% { transform: translateX(3px); }
+/* Enhanced tab styling */
+.profile-tab-content {
+  opacity: 0;
+  transform: translateY(10px);
+}
+
+.profile-tab-content-active {
+  animation: fadeSlideIn 0.4s forwards;
 }
