@@ -13,12 +13,10 @@ import {
 import { ShieldCheck } from 'lucide-react';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import StatusTabContent from './tabs/StatusTabContent';
-import QRCode from './QRCode';
-import TwoFactorForm from './TwoFactorForm';
-import { Button } from '@/components/ui/button';
-import { InputOTP, InputOTPGroup, InputOTPSlot } from '@/components/ui/input-otp';
-import CardBox from './components/CardBox';
 import OptionsTabContent from './tabs/OptionsTabContent';
+import VerifyStep from './steps/VerifyStep';
+import MobilePhoneEntryStep from './steps/MobilePhoneEntryStep';
+import MobileOtpEntryStep from './steps/MobileOtpEntryStep';
 
 const TwoFactorSetup: React.FC = () => {
   const { setupTwoFactor, verifyTwoFactor, disableTwoFactor, isTwoFactorEnabled } = useAuth();
@@ -83,7 +81,7 @@ const TwoFactorSetup: React.FC = () => {
     setIsLoading(true);
     try {
       const result = await verifyTwoFactor(verificationCode);
-      if (result) { // Changed from result.success to just result
+      if (result) {
         toast.success("Two-factor authentication enabled successfully!");
         setStep("intro");
         setActiveTab("status");
@@ -131,96 +129,33 @@ const TwoFactorSetup: React.FC = () => {
     switch (step) {
       case "setup":
         return (
-          <div className="space-y-6">
-            <p className="text-sm text-gray-600">
-              Scan this QR code with your authenticator app (like Google Authenticator or Authy)
-            </p>
-            <div className="flex justify-center py-4">
-              {qrCodeUrl && <QRCode url={qrCodeUrl} />}
-            </div>
-            <TwoFactorForm
-              onSubmit={handleVerify}
-              onChange={setVerificationCode}
-              isLoading={isLoading}
-              onCancel={() => setStep("intro")}
-            />
-          </div>
+          <VerifyStep 
+            qrCodeUrl={qrCodeUrl}
+            onSubmit={handleVerify}
+            onChange={setVerificationCode}
+            onCancel={() => setStep("intro")}
+            isLoading={isLoading}
+          />
         );
       case "mobileEnter":
         return (
-          <div className="space-y-6">
-            <div className="text-sm text-gray-600 mb-4">
-              Enter your mobile number to receive verification codes via SMS:
-            </div>
-            <input 
-              type="tel" 
-              placeholder="+91 9876543210"
-              className="w-full px-4 py-2 border rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-              value={mobileOtpPhone}
-              onChange={(e) => setMobileOtpPhone(e.target.value)}
-            />
-            <div className="flex justify-between pt-4">
-              <Button
-                variant="outline"
-                onClick={() => setStep("intro")}
-                className="px-4 py-2"
-              >
-                Back
-              </Button>
-              <Button
-                onClick={() => handleSendMobileOtp(mobileOtpPhone)}
-                disabled={!mobileOtpPhone || mobileOtpPhone.length < 10 || isLoading}
-                className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white"
-              >
-                {isLoading ? "Sending..." : "Send Code"}
-              </Button>
-            </div>
-          </div>
+          <MobilePhoneEntryStep
+            mobileOtpPhone={mobileOtpPhone}
+            setMobileOtpPhone={setMobileOtpPhone}
+            handleSendMobileOtp={handleSendMobileOtp}
+            handleBack={() => setStep("intro")}
+            isLoading={isLoading}
+          />
         );
       case "mobileOtp":
         return (
-          <div className="space-y-6">
-            <p className="text-sm text-gray-600 mb-2">
-              Enter the 6-digit code sent to your phone:
-            </p>
-            <div className="flex justify-center py-4">
-              <InputOTP 
-                maxLength={6}
-                value={mobileOtpValue} 
-                onChange={setMobileOtpValue}
-                autoFocus={true} 
-                render={({ slots }) => (
-                  <InputOTPGroup>
-                    {slots.map((slot, index) => (
-                      <InputOTPSlot 
-                        key={index} 
-                        {...slot}
-                        index={index}
-                        className="transition-all border-gray-300 focus:border-zwm-primary input-otp-slot"
-                      />
-                    ))}
-                  </InputOTPGroup>
-                )}
-              />
-            </div>
-            <div className="flex justify-between pt-4">
-              <Button
-                variant="outline"
-                onClick={() => setStep("mobileEnter")}
-                className="px-4 py-2"
-                disabled={isLoading}
-              >
-                Back
-              </Button>
-              <Button
-                onClick={handleVerifyMobileOtp}
-                disabled={mobileOtpValue.length !== 6 || isLoading}
-                className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white"
-              >
-                {isLoading ? "Verifying..." : "Verify"}
-              </Button>
-            </div>
-          </div>
+          <MobileOtpEntryStep
+            mobileOtpValue={mobileOtpValue}
+            setMobileOtpValue={setMobileOtpValue}
+            handleVerifyMobileOtp={handleVerifyMobileOtp}
+            handleBack={() => setStep("mobileEnter")}
+            isLoading={isLoading}
+          />
         );
       default:
         return (

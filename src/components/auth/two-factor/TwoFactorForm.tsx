@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { InputOTP, InputOTPGroup, InputOTPSlot } from '@/components/ui/input-otp';
 import { motion } from 'framer-motion';
@@ -18,7 +18,6 @@ const TwoFactorForm: React.FC<TwoFactorFormProps> = ({
   isLoading
 }) => {
   const [value, setValue] = useState('');
-  const inputRef = useRef<HTMLInputElement>(null);
 
   const handleChange = (newValue: string) => {
     setValue(newValue);
@@ -67,7 +66,7 @@ const TwoFactorForm: React.FC<TwoFactorFormProps> = ({
                     key={index} 
                     {...slot}
                     index={index}
-                    className="transition-all border-gray-300 focus:border-zwm-primary input-otp-slot"
+                    className="transition-all border-gray-300 focus:border-zwm-primary input-otp-slot w-10 h-10"
                   />
                 ))}
               </InputOTPGroup>
@@ -88,7 +87,7 @@ const TwoFactorForm: React.FC<TwoFactorFormProps> = ({
         </Button>
         <Button 
           type="submit" 
-          className="flex-1 zwm-gradient-hover"
+          className="flex-1 zwm-gradient-hover bg-blue-600 hover:bg-blue-700"
           disabled={isLoading || value.length !== 6}
         >
           {isLoading ? (

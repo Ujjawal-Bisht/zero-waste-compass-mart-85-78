@@ -7,7 +7,7 @@ import { format } from 'date-fns';
 /**
  * Format a number as Indian Rupees
  */
-export const formatIndianRupees = (amount: number) => {
+export const formatIndianRupees = (amount: number): string => {
   return new Intl.NumberFormat('en-IN', {
     style: 'currency',
     currency: 'INR',
@@ -22,7 +22,7 @@ export const formatIndianRupees = (amount: number) => {
  * @param gstRate - The GST rate (default: 18%)
  * @returns The GST amount
  */
-export const calculateGST = (price: number, gstRate: number = 18) => {
+export const calculateGST = (price: number, gstRate: number = 18): number => {
   return (price * gstRate) / 100;
 };
 
@@ -50,8 +50,8 @@ export const generateInvoicePdf = (order: Order) => {
   const currentDate = format(new Date(), 'yyyy-MM-dd');
   const invoiceNumber = `INV-${order.id.substring(0, 8).toUpperCase()}`;
   
-  // Header section
-  doc.setFillColor(148, 87, 235, 0.1); // Light purple background
+  // Header section with light purple background
+  doc.setFillColor(148, 87, 235, 0.1);
   doc.rect(0, 0, pageWidth, 40, 'F');
   
   // Add logo and header
@@ -59,7 +59,7 @@ export const generateInvoicePdf = (order: Order) => {
   doc.setFillColor(148, 87, 235);
   doc.circle(20, 20, 10, 'F');
   
-  // Add logo content (Leaf would be here in a real implementation)
+  // Add logo content
   doc.setTextColor(255, 255, 255);
   doc.setFontSize(12);
   doc.text('ZWM', 20, 20, { align: 'center' });
@@ -87,7 +87,7 @@ export const generateInvoicePdf = (order: Order) => {
   doc.text(`Customer: ${order.buyerName || 'Customer'}`, 15, 50);
   doc.text(`Shipping Address: ${order.shippingAddress || 'Not specified'}`, 15, 57);
   
-  doc.text(`Payment Method: ${order.paymentMethod || 'Not specified'}`, pageWidth - 15, 50, { align: 'right' });
+  doc.text(`Payment Method: ${order.paymentMethod || 'Online Payment'}`, pageWidth - 15, 50, { align: 'right' });
   
   // Table headers for items
   const tableColumn = ['Item', 'Quantity', 'Unit Price', 'Total'];
@@ -111,13 +111,18 @@ export const generateInvoicePdf = (order: Order) => {
     },
     styles: { 
       fontSize: 10,
-      cellPadding: 5
+      cellPadding: 5,
+      font: 'helvetica',
+      lineColor: [200, 200, 200]
     },
     columnStyles: {
       0: { cellWidth: 'auto' },
       1: { cellWidth: 'auto', halign: 'center' },
       2: { cellWidth: 'auto', halign: 'right' },
       3: { cellWidth: 'auto', halign: 'right' },
+    },
+    alternateRowStyles: {
+      fillColor: [248, 248, 255]
     }
   });
   
@@ -130,7 +135,7 @@ export const generateInvoicePdf = (order: Order) => {
   const sgst = subtotalBeforeTax * 0.09; // 9% SGST
   const totalGST = cgst + sgst;
   
-  // Pricing summary
+  // Pricing summary - improve number formatting
   doc.setFontSize(10);
   doc.text('Subtotal (before tax):', pageWidth - 70, finalY);
   doc.text(formatIndianRupees(subtotalBeforeTax), pageWidth - 15, finalY, { align: 'right' });

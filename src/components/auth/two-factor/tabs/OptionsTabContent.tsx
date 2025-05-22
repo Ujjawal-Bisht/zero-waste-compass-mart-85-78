@@ -15,10 +15,6 @@ const OptionsTabContent: React.FC<OptionsTabContentProps> = ({
   onMethodSelect,
   onProceed 
 }) => {
-  const handleMethodSelect = (selectedMethod: 'app' | 'sms') => {
-    onMethodSelect(selectedMethod);
-  };
-
   return (
     <div className="space-y-6">
       <h3 className="text-lg font-medium">Choose Verification Method</h3>
@@ -29,7 +25,7 @@ const OptionsTabContent: React.FC<OptionsTabContentProps> = ({
           }`}
           whileHover={{ scale: 1.02 }}
           whileTap={{ scale: 0.98 }}
-          onClick={() => handleMethodSelect('app')}
+          onClick={() => onMethodSelect('app')}
         >
           <div className="flex items-start">
             <div className={`p-2 rounded-full ${
@@ -52,7 +48,7 @@ const OptionsTabContent: React.FC<OptionsTabContentProps> = ({
           }`}
           whileHover={{ scale: 1.02 }}
           whileTap={{ scale: 0.98 }}
-          onClick={() => handleMethodSelect('sms')}
+          onClick={() => onMethodSelect('sms')}
         >
           <div className="flex items-start">
             <div className={`p-2 rounded-full ${
