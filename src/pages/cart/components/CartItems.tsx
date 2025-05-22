@@ -3,7 +3,7 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import CartItem from './CartItem';
 import EmptyCart from './EmptyCart';
-import { CartItem as CartItemType } from '@/hooks/useCart';
+import { CartItem as CartItemType } from '@/hooks/cart/types';
 
 interface CartItemsProps {
   cartItems: CartItemType[];
@@ -42,7 +42,7 @@ const CartItems: React.FC<CartItemsProps> = ({
         <CartItem 
           key={item.id}
           item={item}
-          onRemove={removeFromCart}
+          removeFromCart={removeFromCart}
           onUpdateQuantity={updateItemQuantity}
         />
       ))}

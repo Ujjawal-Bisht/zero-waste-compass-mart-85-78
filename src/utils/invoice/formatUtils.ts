@@ -8,7 +8,6 @@ export const formatIndianRupees = (amount: number): string => {
     currency: 'INR',
     maximumFractionDigits: 2,
     minimumFractionDigits: 2,
-    // Use INR symbol instead of ₹ for better readability
     currencyDisplay: 'code'
   }).format(amount).replace('INR', 'INR '); // Add space after symbol for better readability
 };
@@ -21,4 +20,44 @@ export const formatIndianRupees = (amount: number): string => {
  */
 export const calculateGST = (price: number, gstRate: number = 18): number => {
   return (price * gstRate) / 100;
+};
+
+/**
+ * Export orders to CSV format
+ */
+export const exportOrders = (orders: any[]): void => {
+  if (!orders || orders.length === 0) {
+    console.warn('No orders to export');
+    return;
+  }
+
+  // Create CSV content
+  const headers = ['Order ID', 'Customer', 'Date', 'Amount (INR)', 'Status', 'Payment Status'];
+  
+  const rows = orders.map(order => [
+    order.id,
+    order.buyerName,
+    new Date(order.createdAt).toLocaleDateString(),
+    order.totalAmount.toFixed(2),
+    order.status,
+    order.paymentStatus
+  ]);
+  
+  const csvContent = [
+    headers.join(','),
+    ...rows.map(row => row.join(','))
+  ].join('\n');
+  
+  // Create a blob and download
+  const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+  const link = document.createElement('a');
+  const url = URL.createObjectURL(blob);
+  
+  link.setAttribute('href', url);
+  link.setAttribute('download', `orders-export-${new Date().toISOString().slice(0, 10)}.csv`);
+  link.style.visibility = 'hidden';
+  
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
 };

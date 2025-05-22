@@ -7,10 +7,10 @@ import { CartItem as CartItemType } from '@/hooks/cart/types';
 interface CartItemProps {
   item: CartItemType;
   removeFromCart: (id: string) => void;
-  updateItemQuantity: (id: string, delta: number) => void;
+  onUpdateQuantity: (id: string, delta: number) => void;
 }
 
-const CartItem: React.FC<CartItemProps> = ({ item, removeFromCart, updateItemQuantity }) => {
+const CartItem: React.FC<CartItemProps> = ({ item, removeFromCart, onUpdateQuantity }) => {
   return (
     <div className="flex items-center gap-4 py-4 border-b last:border-0">
       {/* Product Image */}
@@ -25,7 +25,7 @@ const CartItem: React.FC<CartItemProps> = ({ item, removeFromCart, updateItemQua
       {/* Product Details */}
       <div className="flex-1">
         <h3 className="font-medium text-gray-900">{item.name}</h3>
-        <p className="text-sm text-gray-500">₹{item.price.toFixed(2)}</p>
+        <p className="text-sm text-gray-500">INR {item.price.toFixed(2)}</p>
 
         {/* Item expiry date if available */}
         {item.expiryDate && (
@@ -41,7 +41,7 @@ const CartItem: React.FC<CartItemProps> = ({ item, removeFromCart, updateItemQua
           variant="outline" 
           size="icon" 
           className="h-8 w-8 rounded-full"
-          onClick={() => updateItemQuantity(item.id, -1)}
+          onClick={() => onUpdateQuantity(item.id, -1)}
           disabled={item.quantity <= 1}
         >
           <MinusCircle className="h-4 w-4" />
@@ -51,7 +51,7 @@ const CartItem: React.FC<CartItemProps> = ({ item, removeFromCart, updateItemQua
           variant="outline" 
           size="icon" 
           className="h-8 w-8 rounded-full"
-          onClick={() => updateItemQuantity(item.id, 1)}
+          onClick={() => onUpdateQuantity(item.id, 1)}
         >
           <PlusCircle className="h-4 w-4" />
         </Button>
@@ -59,7 +59,7 @@ const CartItem: React.FC<CartItemProps> = ({ item, removeFromCart, updateItemQua
 
       {/* Total & Remove */}
       <div className="flex flex-col items-end gap-2">
-        <span className="font-medium">₹{(item.price * item.quantity).toFixed(2)}</span>
+        <span className="font-medium">INR {(item.price * item.quantity).toFixed(2)}</span>
         <Button 
           variant="ghost" 
           size="icon" 
