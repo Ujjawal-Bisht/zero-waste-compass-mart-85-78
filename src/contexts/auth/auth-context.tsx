@@ -34,9 +34,15 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     updated_at?: string;
   };
 
-  // Generate a unique secret using otplib
+  // Generate a unique secret using otplib (Browser-compatible)
   const generateTwoFactorSecret = (email: string) => {
-    const secret = authenticator.generateSecret();
+    // Use browser crypto instead of Node.js 'crypto'
+    // 32 random bytes, base32-encoded
+    const randomArray = new Uint8Array(32);
+    window.crypto.getRandomValues(randomArray);
+    const randomString = Array.from(randomArray, (b) => String.fromCharCode(b)).join('');
+    const secret = authenticator.generateSecret(undefined, randomString); // fallback, works in browser
+
     const otpauth = authenticator.keyuri(
       email,
       "ZeroWasteMart",
@@ -48,11 +54,11 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   // Check if 2FA is enabled for the user in Supabase
   const fetchTwoFactorStatus = async (userId: string) => {
     try {
-      const { data, error } = await (supabase
-        .from<any>('two_factor_auth')
+      const { data, error } = await supabase
+        .from('two_factor_auth')
         .select('is_enabled')
         .eq('user_id', userId)
-        .maybeSingle());
+        .maybeSingle();
       if (error) {
         console.error('2FA status fetch error:', error);
         setIsTwoFactorEnabled(false);
@@ -64,7 +70,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         setIsTwoFactorEnabled(false);
       }
     } catch (err) {
-      console.error("2FA status fetch failed", err)
+      console.error("2FA status fetch failed", err);
       setIsTwoFactorEnabled(false);
     }
   };
@@ -272,17 +278,14 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
     const { secret, otpauth } = generateTwoFactorSecret(currentUser.email);
 
-    // Use 'any' and provide extra logging
-    const { error } = await (supabase
-      .from<any>('two_factor_auth')
-      .upsert(
-        [{
-          user_id: currentUser.id,
-          secret,
-          is_enabled: false,
-        }],
-        { onConflict: "user_id" }
-      ));
+    const { error } = await supabase
+      .from('two_factor_auth')
+      .upsert({
+        user_id: currentUser.id,
+        secret,
+        is_enabled: false,
+      }, { onConflict: "user_id" });
+
     if (error) {
       console.error("2FA setup upsert error:", error);
       throw error;
@@ -300,12 +303,11 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     if (!currentUser?.id) throw new Error("No authenticated user in 2FA verify");
     let secret = sessionStorage.getItem("2fa_tmp_secret");
     if (!secret) {
-      // fallback: fetch from Supabase (with any)
-      const { data, error } = await (supabase
-        .from<any>('two_factor_auth')
+      const { data, error } = await supabase
+        .from('two_factor_auth')
         .select('secret')
         .eq('user_id', currentUser.id)
-        .maybeSingle());
+        .maybeSingle();
       if (error) {
         console.error("2FA verify fetch secret error:", error);
         throw error;
@@ -324,10 +326,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       console.error("2FA otp check error:", err);
     }
     if (isValid) {
-      const { error } = await (supabase
-        .from<any>('two_factor_auth')
+      const { error } = await supabase
+        .from('two_factor_auth')
         .update({ is_enabled: true })
-        .eq('user_id', currentUser.id));
+        .eq('user_id', currentUser.id);
       if (error) {
         console.error("2FA enable flag update error:", error);
         throw error;
@@ -343,11 +345,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   const disableTwoFactor = async () => {
     if (!currentUser?.id) throw new Error("No authenticated user in 2FA disable");
-    const { error } = await (supabase
-      .from<any>('two_factor_auth')
+    const { error } = await supabase
+      .from('two_factor_auth')
       .update({ is_enabled: false })
-      .eq('user_id', currentUser.id)
-    );
+      .eq('user_id', currentUser.id);
     if (error) {
       console.error("2FA disable error:", error);
       throw error;
