@@ -2,7 +2,7 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { motion } from 'framer-motion';
-import { Truck, X, FileDown } from 'lucide-react';
+import { Truck, X, FileDown, IndianRupee } from 'lucide-react';
 import { generateInvoice } from '@/utils/exportUtils';
 import { Order } from '@/types';
 import { useToast } from '@/components/ui/use-toast';
@@ -27,25 +27,17 @@ export const OrderActionButtons: React.FC<OrderActionButtonsProps> = ({
     
     if (!order) return;
     
-    if (status === 'out-for-delivery' || status === 'delivered') {
-      generateInvoice(order);
-      toast({
-        title: "Invoice Downloaded",
-        description: `Invoice for order #${order.id.split('-')[1]} has been downloaded.`,
-      });
-    } else {
-      toast({
-        title: "Invoice Not Available",
-        description: "Invoices are only available for orders that are out for delivery or delivered.",
-        variant: "destructive",
-      });
-    }
+    generateInvoice(order);
+    toast({
+      title: "Invoice Downloaded",
+      description: `Invoice for order #${order.id.split('-')[1] || order.id} has been downloaded.`,
+    });
   };
 
   return (
     <div className="flex space-x-2 justify-end">
-      {/* Show Download Invoice button only for out-for-delivery or delivered orders */}
-      {(status === 'out-for-delivery' || status === 'delivered') && order && (
+      {/* Always show Download Invoice button for any order */}
+      {order && (
         <motion.div 
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}

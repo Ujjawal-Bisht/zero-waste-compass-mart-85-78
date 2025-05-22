@@ -24,7 +24,8 @@ const SellerOrders: React.FC = () => {
           price: 299.99, 
           productId: 'product1', 
           orderId: 'ORD001',
-          imageUrl: undefined
+          imageUrl: undefined,
+          category: 'groceries' // Added category
         },
       ],
       status: 'pending',
@@ -48,7 +49,8 @@ const SellerOrders: React.FC = () => {
           price: 2499.00, 
           productId: 'product2', 
           orderId: 'ORD002',
-          imageUrl: undefined
+          imageUrl: undefined,
+          category: 'clothing' // Added category
         },
       ],
       status: 'shipped',
@@ -72,7 +74,8 @@ const SellerOrders: React.FC = () => {
           price: 1999.00, 
           productId: 'product3', 
           orderId: 'ORD003',
-          imageUrl: undefined
+          imageUrl: undefined,
+          category: 'electronics' // Added category
         },
       ],
       status: 'out-for-delivery',
@@ -117,17 +120,16 @@ const SellerOrders: React.FC = () => {
   const handlePrintInvoice = (orderId: string) => {
     const order = orders.find(o => o.id === orderId);
     if (order) {
-      if (order.status === 'out-for-delivery' || order.status === 'delivered') {
-        generateInvoice(order);
+      if (generateInvoice(order)) {
         toast({
           title: "Invoice Generated",
-          description: `Invoice for order ${orderId} has been generated.`,
+          description: `Invoice for order ${orderId} has been generated and downloaded.`,
           duration: 3000,
         });
       } else {
         toast({
-          title: "Cannot Generate Invoice",
-          description: "Invoices can only be generated for orders that are out for delivery or delivered.",
+          title: "Invoice Generation Failed",
+          description: "There was a problem generating the invoice. Please try again.",
           variant: "destructive",
           duration: 3000,
         });

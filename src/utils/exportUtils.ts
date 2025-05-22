@@ -1,34 +1,18 @@
 
 import { Order, OrderItem, Item } from '@/types';
 import { format } from 'date-fns';
+import { generateInvoicePdf, formatIndianRupees } from './invoiceGenerator';
 
 export const generateInvoice = (order: Order) => {
-  // Mock implementation for invoice generation
-  
-  // Create a formatted order summary
-  const orderDetails = {
-    invoiceNumber: `INV-${order.id}`,
-    date: format(new Date(), 'yyyy-MM-dd'),
-    customerName: order.buyerName || 'Customer',
-    orderItems: order.items.map(item => ({
-      productId: item.productId,
-      name: item.name,
-      quantity: item.quantity,
-      price: item.price,
-      total: item.quantity * item.price
-    })),
-    totalAmount: order.totalAmount,
-    shippingAddress: order.shippingAddress || 'Not provided',
-    paymentMethod: order.paymentMethod || 'Not specified'
-  };
-  
-  console.log('Generating invoice for order:', orderDetails);
-  
-  // In a real app, this would generate a PDF or other document
-  // Mock PDF generation - just logging to console for now
-  console.log('Invoice generated successfully!');
-  
-  return true;
+  try {
+    // Use our enhanced PDF invoice generator
+    generateInvoicePdf(order);
+    console.log('Invoice generated successfully!');
+    return true;
+  } catch (error) {
+    console.error('Error generating invoice:', error);
+    return false;
+  }
 };
 
 // Add the missing export functions
@@ -40,7 +24,7 @@ export const exportProducts = (products: Item[]) => {
     product.id,
     product.name,
     product.category,
-    product.currentPrice.toString(),
+    formatIndianRupees(product.currentPrice),
     product.quantity.toString(),
     product.status,
     product.expiryDate
@@ -70,7 +54,7 @@ export const exportOrders = (orders: Order[]) => {
     format(new Date(order.createdAt), 'yyyy-MM-dd'),
     order.buyerName || order.buyerId,
     order.items.length.toString(),
-    order.totalAmount.toString(),
+    formatIndianRupees(order.totalAmount),
     order.status,
     order.paymentStatus || 'unknown'
   ]);
@@ -97,13 +81,13 @@ const downloadCSV = (content: string, filename: string) => {
   console.log(`Downloading ${filename} with content:`, content);
   
   // In a real app, this would be:
-  // const blob = new Blob([content], { type: 'text/csv;charset=utf-8;' });
-  // const link = document.createElement('a');
-  // const url = URL.createObjectURL(blob);
-  // link.setAttribute('href', url);
-  // link.setAttribute('download', filename);
-  // link.style.visibility = 'hidden';
-  // document.body.appendChild(link);
-  // link.click();
-  // document.body.removeChild(link);
+  const blob = new Blob([content], { type: 'text/csv;charset=utf-8;' });
+  const link = document.createElement('a');
+  const url = URL.createObjectURL(blob);
+  link.setAttribute('href', url);
+  link.setAttribute('download', filename);
+  link.style.visibility = 'hidden';
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
 };
