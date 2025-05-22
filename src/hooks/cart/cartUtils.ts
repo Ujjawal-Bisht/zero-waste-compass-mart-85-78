@@ -41,8 +41,9 @@ export const generateMockCartItems = (userId?: string): CartItem[] => {
       user_id: userId,
       quantity: 2,
       name: "Organic Apples",
-      price: 5.99,
-      image: "https://images.unsplash.com/photo-1570913149827-d2ac84ab3f9a?auto=format&fit=crop&q=80&w=100&h=100"
+      price: 299,
+      image: "https://images.unsplash.com/photo-1570913149827-d2ac84ab3f9a?auto=format&fit=crop&q=80&w=100&h=100",
+      expiryDate: "2025-05-30"
     },
     {
       id: "mock-cart-item-2",
@@ -50,8 +51,9 @@ export const generateMockCartItems = (userId?: string): CartItem[] => {
       user_id: userId,
       quantity: 1,
       name: "Free-Range Eggs",
-      price: 3.49,
-      image: "https://images.unsplash.com/photo-1598965766601-5f2c89c2a1ad?auto=format&fit=crop&q=80&w=100&h=100"
+      price: 349,
+      image: "https://images.unsplash.com/photo-1598965766601-5f2c89c2a1ad?auto=format&fit=crop&q=80&w=100&h=100",
+      expiryDate: "2025-05-25"
     }
   ];
 };
@@ -61,7 +63,22 @@ export const findCartItemByProductId = (cartItems: CartItem[], productId: string
   return cartItems.find(item => item.product_id === productId);
 };
 
-// Create a new mock product for cart (used when adding by ID with limited info)
+// Convert marketplace product to cart item
+export const convertMarketplaceProductToCartItem = (product: any, userId?: string): CartItem => {
+  return {
+    id: `cart-item-${Date.now()}`,
+    product_id: product.id,
+    user_id: userId,
+    quantity: 1,
+    name: product.name,
+    price: product.price || 999,
+    image: product.image || "https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&q=80&w=100&h=100",
+    expiryDate: product.expiryDate,
+    sellerId: product.sellerId
+  };
+};
+
+// Create a new mock cart item for a product
 export const createMockCartProduct = (productId: string, userId?: string): CartItem => {
   return {
     id: `mock-cart-item-${Date.now()}`,
@@ -69,7 +86,7 @@ export const createMockCartProduct = (productId: string, userId?: string): CartI
     user_id: userId,
     quantity: 1,
     name: "New Product",
-    price: 9.99,
+    price: 999,
     image: "https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&q=80&w=100&h=100"
   };
 };

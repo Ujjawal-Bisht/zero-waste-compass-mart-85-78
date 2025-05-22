@@ -3,6 +3,7 @@ import React from 'react';
 import { MinusCircle, PlusCircle, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { CartItem as CartItemType } from '@/hooks/cart/types';
+import { formatIndianRupees } from '@/utils/invoice/formatUtils';
 
 interface CartItemProps {
   item: CartItemType;

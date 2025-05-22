@@ -4,7 +4,8 @@ import { toast } from 'sonner';
 import { CartItem, CartOperations } from './types';
 import { 
   findCartItemByProductId,
-  createMockCartProduct
+  createMockCartProduct,
+  convertMarketplaceProductToCartItem
 } from './cartUtils';
 
 /**

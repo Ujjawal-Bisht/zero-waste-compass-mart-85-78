@@ -8,6 +8,7 @@ import ProductsHeader from '@/components/products/headers/ProductsHeader';
 import CategoryFilters from '@/components/products/filters/CategoryFilters';
 import ProductTable from '@/components/products/ProductTable';
 import { useToast } from '@/components/ui/use-toast';
+import { generateMockSellerProducts } from '@/utils/seller/mockProducts';
 
 const SellerProducts: React.FC = () => {
   const navigate = useNavigate();
@@ -16,79 +17,11 @@ const SellerProducts: React.FC = () => {
   const [activeFilter, setActiveFilter] = useState<string>('all');
   const [loading, setLoading] = useState<boolean>(true);
   
-  // Mock products for demonstration
+  // Use the enhanced mock products
   useEffect(() => {
     // Simulate API call
     setTimeout(() => {
-      const mockProducts: Item[] = [
-        {
-          id: 'prod-1',
-          name: 'Organic Tomatoes',
-          description: 'Fresh organic tomatoes from local farms.',
-          category: 'food',
-          status: 'available',
-          imageUrl: 'https://images.unsplash.com/photo-1582284540020-8acbe03f4924?q=80&w=300',
-          quantity: 50,
-          currentPrice: 5.99,
-          originalPrice: 7.99,
-          createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString(),
-          expiryDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
-          userId: 'seller-123',
-          userName: 'John Seller',
-          userPhoto: null,
-          location: {
-            lat: 28.6139,
-            lng: 77.2090,
-            address: '123 Market St, Delhi, India',
-          }
-        },
-        {
-          id: 'prod-2',
-          name: 'Cotton T-shirts (5-pack)',
-          description: 'Pack of 5 cotton t-shirts, assorted colors.',
-          category: 'clothing',
-          status: 'available',
-          imageUrl: 'https://images.unsplash.com/photo-1576566588028-4147f3842f27?q=80&w=300',
-          quantity: 25,
-          currentPrice: 1299.00,
-          originalPrice: 1599.00,
-          createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString(),
-          expiryDate: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString(),
-          userId: 'seller-123',
-          userName: 'John Seller',
-          userPhoto: null,
-          location: {
-            lat: 28.6139,
-            lng: 77.2090,
-            address: '123 Market St, Delhi, India',
-          }
-        },
-        {
-          id: 'prod-3',
-          name: 'Bluetooth Headphones',
-          description: 'Wireless Bluetooth headphones with noise cancellation.',
-          category: 'electronics',
-          status: 'available',
-          imageUrl: 'https://images.unsplash.com/photo-1578319439584-104c94d37305?q=80&w=300',
-          quantity: 10,
-          currentPrice: 2499.00,
-          originalPrice: 2999.00,
-          createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString(),
-          expiryDate: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString(),
-          userId: 'seller-123',
-          userName: 'John Seller',
-          userPhoto: null,
-          location: {
-            lat: 28.6139,
-            lng: 77.2090,
-            address: '123 Market St, Delhi, India',
-          }
-        }
-      ];
-      
+      const mockProducts = generateMockSellerProducts();
       setProducts(mockProducts);
       setLoading(false);
     }, 800);
@@ -118,6 +51,8 @@ const SellerProducts: React.FC = () => {
       books: 'bg-cyan-100 text-cyan-800 border-cyan-200',
       toys: 'bg-pink-100 text-pink-800 border-pink-200',
       medicine: 'bg-red-100 text-red-800 border-red-200',
+      beauty: 'bg-rose-100 text-rose-800 border-rose-200',
+      sports: 'bg-teal-100 text-teal-800 border-teal-200',
       other: 'bg-gray-100 text-gray-800 border-gray-200',
     };
     return colorMap[category] || 'bg-gray-100 text-gray-800 border-gray-200';

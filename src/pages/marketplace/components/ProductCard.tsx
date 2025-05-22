@@ -1,10 +1,12 @@
 
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Clock, AlertTriangle, ShoppingCart } from 'lucide-react';
-import { Card, CardContent } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
+import { ShoppingCart, Star, Clock, AlertCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { useCart } from '@/hooks/cart';
+import { toast } from 'sonner';
+import { convertMarketplaceProductToCartItem } from '@/hooks/cart/cartUtils';
+import { formatIndianRupees } from '@/utils/invoice/formatUtils';
 
 interface Product {
   id: string;
@@ -30,128 +32,108 @@ interface ProductCardProps {
 const ProductCard: React.FC<ProductCardProps> = ({ 
   product, 
   onAddToCart, 
-  showExpiryAlerts, 
+  showExpiryAlerts,
   getAiExpiryAlert 
 }) => {
-  // Calculate discounted price
-  const discountedPrice = product.discountPercentage 
-    ? product.price - (product.price * product.discountPercentage / 100)
-    : product.price;
-
-  const daysUntilExpiry = () => {
+  const { addToCart } = useCart();
+  
+  const calculateDaysToExpiry = (expiryDate: string): number => {
     const today = new Date();
-    const expiry = new Date(product.expiryDate);
-    return Math.floor((expiry.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
+    const expiry = new Date(expiryDate);
+    const diffTime = expiry.getTime() - today.getTime();
+    return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
   };
 
-  // Define the itemVariants here
-  const cardItemVariants = {
-    hidden: { y: 20, opacity: 0 },
-    visible: { 
-      y: 0, 
-      opacity: 1,
-      transition: { type: 'spring', stiffness: 100 }
-    }
+  const daysToExpiry = product.expiryDate ? calculateDaysToExpiry(product.expiryDate) : null;
+  const showAlert = showExpiryAlerts && daysToExpiry !== null && daysToExpiry <= 7;
+
+  const handleAddToCart = () => {
+    const cartItem = convertMarketplaceProductToCartItem(product);
+    addToCart(cartItem);
+    toast.success(`${product.name} added to cart`);
+    onAddToCart(product);
   };
 
-  const remainingDays = daysUntilExpiry();
-  const aiExpiryAlert = getAiExpiryAlert(remainingDays);
-  const showAlert = showExpiryAlerts && aiExpiryAlert && remainingDays <= 30;
+  const getExpiryAlertColor = (): string => {
+    if (!daysToExpiry || daysToExpiry > 5) return 'bg-amber-50 text-amber-800';
+    if (daysToExpiry > 2) return 'bg-orange-50 text-orange-800';
+    return 'bg-red-50 text-red-800';
+  };
+
+  // Animation variants
+  const cardVariants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: { opacity: 1, y: 0, transition: { duration: 0.4 } }
+  };
 
   return (
     <motion.div
-      variants={cardItemVariants}
-      whileHover={{ y: -10, transition: { duration: 0.3 } }}
-      className="h-full"
+      className="rounded-lg overflow-hidden shadow-md bg-white hover:shadow-lg transition-shadow"
+      variants={cardVariants}
     >
-      <Card className="overflow-hidden h-full flex flex-col shadow-lg hover:shadow-xl transition-shadow duration-300">
-        <div className="h-40 bg-gray-100 relative overflow-hidden">
-          <motion.img 
-            src={product.image} 
-            alt={product.name}
-            className="w-full h-full object-cover"
-            whileHover={{ scale: 1.1 }}
-            transition={{ duration: 0.3 }}
-          />
-          <Badge className="absolute top-2 right-2 category-badge bg-gradient-to-r from-indigo-500 to-purple-500 text-white">{product.category}</Badge>
+      {/* Product Image */}
+      <div className="relative w-full h-48 overflow-hidden">
+        <img 
+          src={product.image} 
+          alt={product.name} 
+          className="w-full h-full object-cover"
+        />
+        
+        {/* Discount Tag */}
+        {product.discountPercentage && (
+          <div className="absolute top-2 right-2 bg-red-500 text-white text-xs font-semibold px-2 py-1 rounded">
+            {product.discountPercentage}% OFF
+          </div>
+        )}
+      </div>
+      
+      {/* Product Info */}
+      <div className="p-4">
+        <h3 className="font-medium text-gray-900 truncate">{product.name}</h3>
+        
+        <div className="flex justify-between items-center mt-1">
+          <div>
+            <span className="text-lg font-semibold">INR {product.price}</span>
+          </div>
           
-          {product.discountPercentage > 0 && (
-            <Badge className="absolute top-2 left-2 bg-red-500 text-white animate-pulse">
-              {product.discountPercentage}% OFF
-            </Badge>
-          )}
+          <div className="flex items-center">
+            <Star className="h-4 w-4 text-yellow-500 mr-1" />
+            <span className="text-sm text-gray-600">{product.rating.toFixed(1)}</span>
+          </div>
         </div>
-        <CardContent className="pt-4 flex-grow flex flex-col">
-          <div className="mb-3 flex-grow">
-            <h3 className="font-medium">{product.name}</h3>
-            <p className="text-sm text-gray-500">Sold by {product.seller}</p>
-            <div className="flex items-center mt-1">
-              {[...Array(5)].map((_, i) => (
-                <motion.span 
-                  key={i} 
-                  className={`text-sm ${i < Math.floor(product.rating) ? 'text-yellow-500' : 'text-gray-300'}`}
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  transition={{ delay: i * 0.1 }}
-                >
-                  ★
-                </motion.span>
-              ))}
-              <span className="text-xs ml-1 text-gray-500">{product.rating}</span>
-            </div>
-            
-            {remainingDays <= 14 && (
-              <div className="flex items-center mt-2 text-amber-600 text-xs">
-                <Clock className="h-3 w-3 mr-1" />
-                <span>Expires in {remainingDays} days</span>
-              </div>
-            )}
-
-            {showAlert && (
-              <motion.div 
-                initial={{ opacity: 0, height: 0 }}
-                animate={{ opacity: 1, height: 'auto' }}
-                transition={{ duration: 0.3 }}
-                className={`mt-2 p-2 text-xs rounded-md flex items-start gap-1.5
-                  ${remainingDays <= 3 ? 'bg-red-50 text-red-700' : 
-                  remainingDays <= 7 ? 'bg-orange-50 text-orange-700' : 
-                  remainingDays <= 14 ? 'bg-amber-50 text-amber-700' : 
-                  'bg-green-50 text-green-700'}`}
-              >
-                <div className="mt-0.5">
-                  <AlertTriangle className="h-3 w-3" />
-                </div>
-                <div>
-                  {aiExpiryAlert}
-                </div>
-              </motion.div>
-            )}
+        
+        <p className="text-sm text-gray-500 mt-1">{product.seller}</p>
+        
+        {/* Expiry Alert */}
+        {showAlert && (
+          <div className={`mt-3 p-2 rounded-md ${getExpiryAlertColor()} flex items-center text-xs`}>
+            <Clock className="h-3 w-3 mr-1" />
+            <span>
+              {daysToExpiry === 0 ? "Expires today!" : 
+               daysToExpiry === 1 ? "Expires tomorrow!" :
+               `Expires in ${daysToExpiry} days`}
+            </span>
           </div>
-          
-          <div className="mt-auto pt-2 flex justify-between items-center border-t border-gray-100">
-            <div>
-              {product.discountPercentage > 0 ? (
-                <div className="flex flex-col">
-                  <span className="text-xs text-gray-500 line-through">₹{product.price.toFixed(2)}</span>
-                  <p className="font-bold text-green-600">₹{discountedPrice.toFixed(2)}</p>
-                </div>
-              ) : (
-                <p className="font-bold">₹{product.price.toFixed(2)}</p>
-              )}
-            </div>
-            <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}>
-              <Button 
-                size="sm" 
-                onClick={() => onAddToCart(product)} 
-                disabled={!product.inStock}
-                className="bg-gradient-to-r from-indigo-500 to-purple-500 hover:from-indigo-600 hover:to-purple-600 text-white"
-              >
-                <ShoppingCart className="h-4 w-4 mr-1" /> Add
-              </Button>
-            </motion.div>
-          </div>
-        </CardContent>
-      </Card>
+        )}
+        
+        {/* AI-generated expiry insight */}
+        {showAlert && daysToExpiry !== null && (
+          <p className="text-xs italic text-gray-500 mt-1">
+            {getAiExpiryAlert(daysToExpiry)}
+          </p>
+        )}
+        
+        {/* Add to Cart Button */}
+        <Button 
+          className="w-full mt-4 flex items-center justify-center"
+          variant="default"
+          onClick={handleAddToCart}
+          disabled={product.inStock === false}
+        >
+          <ShoppingCart className="h-4 w-4 mr-2" />
+          {product.inStock === false ? 'Out of Stock' : 'Add to Cart'}
+        </Button>
+      </div>
     </motion.div>
   );
 };

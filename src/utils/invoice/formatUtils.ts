@@ -8,8 +8,7 @@ export const formatIndianRupees = (amount: number): string => {
     currency: 'INR',
     maximumFractionDigits: 2,
     minimumFractionDigits: 2,
-    currencyDisplay: 'code'
-  }).format(amount).replace('INR', 'INR '); // Add space after symbol for better readability
+  }).format(amount).replace('₹', 'INR '); // Add space after symbol for better readability
 };
 
 /**
