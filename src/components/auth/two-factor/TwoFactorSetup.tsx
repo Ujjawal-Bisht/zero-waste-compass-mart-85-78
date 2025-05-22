@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/auth';
 import { motion } from 'framer-motion';
 import { toast } from 'sonner';
@@ -68,11 +68,14 @@ const TwoFactorSetup: React.FC = () => {
     setIsLoading(true);
     try {
       if (mobileOtpValue === mobileOtpSentCode && mobileOtpValue.length === 6) {
-        // "Enable" 2FA for mobile
+        // Mark 2FA as enabled for demo
         toast.success("2FA enabled by mobile OTP successfully!");
-        setStep("intro"); // Move back to intro so user sees status
+        setStep("intro");
         setActiveTab("status");
-        // In production, update user db/flag here.
+        // In production: set the flag in user DB
+        if (typeof window !== "undefined") {
+          window.localStorage.setItem("zwm_2fa_enabled", "true");
+        }
       } else {
         toast.error("Incorrect or missing code!");
       }
@@ -103,8 +106,16 @@ const TwoFactorSetup: React.FC = () => {
     }
   };
 
-  // handle OTP input
+  // --- OTP input value change handler ---
   const handleMobileOtpInput = (code: string) => setMobileOtpValue(code);
+
+  //--- Read 2FA status for demo mobile flow from localStorage (simulated database flag)
+  const [localOtpEnabled, setLocalOtpEnabled] = useState(false);
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      setLocalOtpEnabled(window.localStorage.getItem("zwm_2fa_enabled") === "true");
+    }
+  }, [step, activeTab]);
 
   // --- UI RENDER ---
   return (
@@ -170,7 +181,7 @@ const TwoFactorSetup: React.FC = () => {
                   </button>
                 </div>
               )}
-              {/* QR code Verify Flow */}
+              {/* QR code Verify Flow (app method) */}
               {step === "verify" && verificationMethod === "app" && (
                 <div className="my-8">
                   <TwoFactorForm
@@ -197,7 +208,7 @@ const TwoFactorSetup: React.FC = () => {
                   />
                 </div>
               )}
-              {/* Mobile OTP (SMS) flow */}
+              {/* Mobile OTP (SMS) flow entry form */}
               {step === 'mobileEnter' && verificationMethod === 'otp' && (
                 <TwoFactorMobileOtpSetup
                   onRequestOtp={handleSendMobileOtp}
@@ -209,7 +220,10 @@ const TwoFactorSetup: React.FC = () => {
                 <div className="my-8">
                   <div className="mb-4 text-center text-blue-700">Enter the OTP sent to <span className="font-bold">{mobileOtpPhone}</span></div>
                   <TwoFactorForm
-                    onSubmit={handleVerifyMobileOtp}
+                    onSubmit={async () => {
+                      await handleVerifyMobileOtp();
+                      setMobileOtpValue("");
+                    }}
                     onChange={handleMobileOtpInput}
                     isLoading={isLoading}
                     onCancel={() => setStep("mobileEnter")}
@@ -221,15 +235,28 @@ const TwoFactorSetup: React.FC = () => {
             <TabsContent value="status" forceMount className="space-y-6">
               <div className="bg-gray-50 rounded-md p-5 text-center">
                 <ShieldCheck className="mx-auto mb-2 text-3xl text-blue-500" />
-                <div className="font-bold text-lg">{isTwoFactorEnabled ? "2FA Enabled!" : "Not Yet Enabled"}</div>
-                <p className="text-gray-600">{isTwoFactorEnabled
+                <div className="font-bold text-lg">
+                  {/* Show app/db 2FA status OR fallback to demo localStorage-flag */}
+                  {(isTwoFactorEnabled || localOtpEnabled)
+                    ? "2FA Enabled!"
+                    : "Not Yet Enabled"}
+                </div>
+                <p className="text-gray-600">{(isTwoFactorEnabled || localOtpEnabled)
                   ? "Your account is protected with an extra layer of authentication."
                   : "Enable two-factor authentication for improved account security."}
                 </p>
-                {isTwoFactorEnabled && (
+                {(isTwoFactorEnabled || localOtpEnabled) && (
                   <button
                     className="mt-5 px-5 py-2 rounded-md border border-red-300 text-red-600 bg-red-50 hover:bg-red-100 font-medium transition-all"
-                    onClick={disableTwoFactor}
+                    onClick={() => {
+                      // For demo mobile OTP, clear local flag too
+                      if (typeof window !== "undefined") {
+                        window.localStorage.removeItem("zwm_2fa_enabled");
+                        setLocalOtpEnabled(false);
+                      }
+                      // Try to call real disabling too
+                      disableTwoFactor();
+                    }}
                   >
                     Disable 2FA
                   </button>
