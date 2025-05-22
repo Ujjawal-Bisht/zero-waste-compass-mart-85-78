@@ -126,10 +126,10 @@ export const generateInvoicePdf = (order: Order) => {
     alternateRowStyles: {
       fillColor: [248, 248, 255]
     },
-    margin: { left: 15, right: 15 },
+    margin: { left: 15, right: 15, top: 10, bottom: 10 },
     didDrawPage: (data) => {
       // Reset margins on each page
-      data.settings.margin = { left: 15, right: 15 };
+      data.settings.margin = { left: 15, right: 15, top: 10, bottom: 10 };
     }
   });
   
