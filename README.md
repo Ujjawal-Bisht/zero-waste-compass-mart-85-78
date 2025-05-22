@@ -1,18 +1,13 @@
-# Welcome to your Lovable project
+# Welcome to Zero waste mart
 
 ## Project info
 
-**URL**: https://lovable.dev/projects/4fea3b42-01e4-49fc-b271-ba8e8c0db3fc
-
+**URL**: https://zero-waste-mart2025.vercel.app/
 ## How can I edit this code?
 
-There are several ways of editing your application.
+Simply visit the https://zero-waste-mart2025.vercel.app/
 
-**Use Lovable**
-
-Simply visit the [Lovable Project](https://lovable.dev/projects/4fea3b42-01e4-49fc-b271-ba8e8c0db3fc) and start prompting.
-
-Changes made via Lovable will be committed automatically to this repo.
+Changes made via github will be committed automatically to this repo.
 
 **Use your preferred IDE**
 
@@ -60,11 +55,6 @@ This project is built with:
 - shadcn-ui
 - Tailwind CSS
 
-## How can I deploy this project?
-
-Simply open [Lovable](https://lovable.dev/projects/4fea3b42-01e4-49fc-b271-ba8e8c0db3fc) and click on Share -> Publish.
-
-## Can I connect a custom domain to my Lovable project?
 
 Yes, you can!
 
