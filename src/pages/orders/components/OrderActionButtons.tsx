@@ -27,6 +27,16 @@ export const OrderActionButtons: React.FC<OrderActionButtonsProps> = ({
     
     if (!order) return;
     
+    // Only allow invoice generation for out-for-delivery orders for buyers
+    if (status !== 'out-for-delivery' && status !== 'delivered') {
+      toast({
+        title: "Cannot Generate Invoice",
+        description: "Invoices can only be generated for orders that are out for delivery or delivered.",
+        variant: "destructive",
+      });
+      return;
+    }
+    
     generateInvoice(order);
     toast({
       title: "Invoice Downloaded",
@@ -34,9 +44,11 @@ export const OrderActionButtons: React.FC<OrderActionButtonsProps> = ({
     });
   };
 
+  const canGenerateInvoice = status === 'out-for-delivery' || status === 'delivered';
+
   return (
     <div className="flex space-x-2 justify-end">
-      {/* Always show Download Invoice button for any order */}
+      {/* Show Download Invoice button for any order */}
       {order && (
         <motion.div 
           whileHover={{ scale: 1.05 }}
@@ -44,9 +56,12 @@ export const OrderActionButtons: React.FC<OrderActionButtonsProps> = ({
         >
           <Button
             size="sm"
-            variant="outline"
-            className="flex items-center text-indigo-700 border-indigo-200 hover:bg-indigo-50"
+            variant={canGenerateInvoice ? "outline" : "ghost"}
+            className={`flex items-center ${canGenerateInvoice 
+              ? 'text-indigo-700 border-indigo-200 hover:bg-indigo-50' 
+              : 'text-gray-400 border-gray-200 cursor-not-allowed'}`}
             onClick={handleDownloadInvoice}
+            disabled={!canGenerateInvoice}
           >
             <FileDown className="h-4 w-4 mr-1" />
             Invoice

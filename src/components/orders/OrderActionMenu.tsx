@@ -51,6 +51,8 @@ const OrderActionMenu: React.FC<OrderActionMenuProps> = ({
     }
   };
 
+  const canGenerateInvoice = order.status === 'out-for-delivery' || order.status === 'delivered';
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -78,7 +80,8 @@ const OrderActionMenu: React.FC<OrderActionMenuProps> = ({
         
         <DropdownMenuItem 
           onClick={handleGenerateInvoice}
-          className="flex items-center cursor-pointer"
+          className={`flex items-center ${canGenerateInvoice ? 'cursor-pointer' : 'cursor-not-allowed text-gray-400'}`}
+          disabled={!canGenerateInvoice}
         >
           <FileDown className="h-4 w-4 mr-2" />
           Generate Invoice
@@ -142,7 +145,8 @@ const OrderActionMenu: React.FC<OrderActionMenuProps> = ({
         </DropdownMenuItem>
         <DropdownMenuItem 
           onClick={() => onPrintInvoice(order.id)}
-          className="cursor-pointer"
+          className={`${canGenerateInvoice ? 'cursor-pointer' : 'cursor-not-allowed text-gray-400'}`}
+          disabled={!canGenerateInvoice}
         >
           <Printer className="h-4 w-4 mr-2" />
           Print invoice

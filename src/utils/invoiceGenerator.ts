@@ -1,30 +1,19 @@
 
 import { jsPDF } from 'jspdf';
 import autoTable from 'jspdf-autotable';
-import { Order, OrderItem } from '@/types';
+import { Order } from '@/types';
 import { format } from 'date-fns';
+import { formatIndianRupees, calculateGST } from './invoice/formatUtils';
+import { 
+  setupHeaderStyle, 
+  setupCompanyHeader, 
+  setupCustomerInfo,
+  addGSTInfoBox,
+  addZeroWasteCertifiedStamp,
+  addFooterText
+} from './invoice/invoiceStyles';
 
-/**
- * Format a number as Indian Rupees
- */
-export const formatIndianRupees = (amount: number): string => {
-  return new Intl.NumberFormat('en-IN', {
-    style: 'currency',
-    currency: 'INR',
-    maximumFractionDigits: 2,
-    minimumFractionDigits: 2
-  }).format(amount);
-};
-
-/**
- * Calculate GST for an item price
- * @param price - The price of the item
- * @param gstRate - The GST rate (default: 18%)
- * @returns The GST amount
- */
-export const calculateGST = (price: number, gstRate: number = 18): number => {
-  return (price * gstRate) / 100;
-};
+export { formatIndianRupees, calculateGST };
 
 /**
  * Generate a PDF invoice for an order
@@ -50,44 +39,14 @@ export const generateInvoicePdf = (order: Order) => {
   const currentDate = format(new Date(), 'yyyy-MM-dd');
   const invoiceNumber = `INV-${order.id.substring(0, 8).toUpperCase()}`;
   
-  // Header section with light purple background
-  doc.setFillColor(148, 87, 235, 0.1);
-  doc.rect(0, 0, pageWidth, 40, 'F');
+  // Apply header and logo styling
+  setupHeaderStyle(doc, pageWidth);
   
-  // Add logo and header
-  // Logo circle
-  doc.setFillColor(148, 87, 235);
-  doc.circle(20, 20, 10, 'F');
+  // Add company header with invoice number
+  setupCompanyHeader(doc, companyInfo.name, invoiceNumber, currentDate, pageWidth);
   
-  // Add logo content
-  doc.setTextColor(255, 255, 255);
-  doc.setFontSize(12);
-  doc.text('ZWM', 20, 20, { align: 'center' });
-  
-  // Company name and invoice header
-  doc.setTextColor(148, 87, 235);
-  doc.setFontSize(16);
-  doc.setFont('helvetica', 'bold');
-  doc.text(companyInfo.name, 35, 15);
-  
-  doc.setFontSize(14);
-  doc.text('INVOICE', 35, 23);
-  
-  doc.setFontSize(10);
-  doc.setFont('helvetica', 'normal');
-  doc.text(invoiceNumber, 35, 30);
-  
-  // Date on the right
-  doc.setFontSize(10);
-  doc.text(`Date: ${currentDate}`, pageWidth - 15, 15, { align: 'right' });
-  
-  // Customer and payment info
-  doc.setFontSize(11);
-  doc.setTextColor(60, 60, 60);
-  doc.text(`Customer: ${order.buyerName || 'Customer'}`, 15, 50);
-  doc.text(`Shipping Address: ${order.shippingAddress || 'Not specified'}`, 15, 57);
-  
-  doc.text(`Payment Method: ${order.paymentMethod || 'Online Payment'}`, pageWidth - 15, 50, { align: 'right' });
+  // Add customer and payment info
+  setupCustomerInfo(doc, order.buyerName || "Customer", order.shippingAddress || "Not specified", order.paymentMethod || "Online Payment", pageWidth);
   
   // Table headers for items - improved alignment
   const tableColumn = ['Item', 'Quantity', 'Unit Price', 'Total'];
@@ -168,41 +127,18 @@ export const generateInvoicePdf = (order: Order) => {
   doc.text('Total Amount (inc. GST):', summaryX, finalY + 33, { align: 'left' });
   doc.text(formatIndianRupees(order.totalAmount), valueX, finalY + 33, { align: 'right' });
   
-  // GST Information box - improved layout
-  doc.setFillColor(245, 245, 255);
-  doc.rect(15, finalY + 40, 95, 35, 'F');
+  // Add GST Information box
+  addGSTInfoBox(doc, {
+    gstin: companyInfo.gstin,
+    hsn: companyInfo.hsn,
+    state: companyInfo.state
+  }, finalY);
   
-  doc.setFontSize(11);
-  doc.setFont('helvetica', 'bold');
-  doc.setTextColor(148, 87, 235);
-  doc.text('GST Information', 20, finalY + 50);
+  // Add Zero Waste Certified stamp
+  addZeroWasteCertifiedStamp(doc, finalY, pageWidth);
   
-  doc.setFontSize(9);
-  doc.setFont('helvetica', 'normal');
-  doc.setTextColor(60, 60, 60);
-  doc.text(`GSTIN: ${companyInfo.gstin}`, 20, finalY + 57);
-  doc.text(`HSN Code: ${companyInfo.hsn}`, 20, finalY + 63);
-  doc.text(`Place of Supply: ${companyInfo.state}`, 20, finalY + 69);
-  
-  // Zero Waste Certified stamp - improved visibility
-  // Stamp border
-  doc.setDrawColor(75, 181, 67);
-  doc.setLineWidth(1.5);
-  doc.roundedRect(pageWidth - 95, finalY + 45, 80, 25, 4, 4, 'S');
-  
-  // Stamp text
-  doc.setTextColor(75, 181, 67);
-  doc.setFontSize(12);
-  doc.setFont('helvetica', 'bold');
-  doc.text('ZERO WASTE CERTIFIED', pageWidth - 55, finalY + 60, { align: 'center' });
-  
-  // Footer text - improved alignment and spacing
-  doc.setFontSize(8);
-  doc.setFont('helvetica', 'normal');
-  doc.setTextColor(100, 100, 100);
-  doc.text('Thank you for your business! Your contribution helps reduce waste.', pageWidth / 2, finalY + 85, { align: 'center' });
-  doc.text('Payment made in India - All prices are inclusive of GST', pageWidth / 2, finalY + 90, { align: 'center' });
-  doc.text('For any queries related to this invoice, please contact support@zerowastemart.com', pageWidth / 2, finalY + 95, { align: 'center' });
+  // Add footer text
+  addFooterText(doc, finalY, pageWidth);
   
   // Save the PDF
   doc.save(`invoice-${order.id}.pdf`);
