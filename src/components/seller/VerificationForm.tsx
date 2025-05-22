@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -13,10 +13,12 @@ interface DocumentType {
   required: boolean;
   trustScoreValue: number;
   uploaded: boolean;
+  fileName?: string;
 }
 
 const VerificationForm: React.FC = () => {
   const { toast } = useToast();
+  const fileInputRefs = useRef<Record<string, HTMLInputElement | null>>({});
   
   // List of verification documents with their trust score values
   const [documents, setDocuments] = useState<DocumentType[]>([
@@ -31,28 +33,36 @@ const VerificationForm: React.FC = () => {
   const [isVerifying, setIsVerifying] = useState(false);
   const [trustScoreGained, setTrustScoreGained] = useState(0);
   
-  // Handle document upload
-  const handleDocumentUpload = (documentId: string) => {
-    // In a real implementation, this would handle actual file upload
-    // For this demo, we'll just mark the document as uploaded
-    const updatedDocuments = documents.map(doc => {
-      if (doc.id === documentId) {
-        if (!doc.uploaded) {
-          // Only add the trust score if the document wasn't already uploaded
-          setTrustScoreGained(prev => prev + doc.trustScoreValue);
+  // Handle file input click
+  const handleFileInputClick = (documentId: string) => {
+    if (fileInputRefs.current[documentId]) {
+      fileInputRefs.current[documentId]?.click();
+    }
+  };
+  
+  // Handle file change
+  const handleFileChange = (documentId: string, event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      const updatedDocuments = documents.map(doc => {
+        if (doc.id === documentId) {
+          if (!doc.uploaded) {
+            // Only add the trust score if the document wasn't already uploaded
+            setTrustScoreGained(prev => prev + doc.trustScoreValue);
+          }
+          return { ...doc, uploaded: true, fileName: file.name };
         }
-        return { ...doc, uploaded: true };
-      }
-      return doc;
-    });
-    
-    setDocuments(updatedDocuments);
-    
-    toast({
-      title: "Document Uploaded",
-      description: `Your document has been uploaded and will be reviewed. Your trust score has been increased.`,
-      duration: 5000,
-    });
+        return doc;
+      });
+      
+      setDocuments(updatedDocuments);
+      
+      toast({
+        title: "Document Uploaded",
+        description: `${file.name} has been uploaded and will be reviewed. Your trust score has increased by +${documents.find(d => d.id === documentId)?.trustScoreValue.toFixed(1)}.`,
+        duration: 5000,
+      });
+    }
   };
   
   // Submit verification request
@@ -117,19 +127,29 @@ const VerificationForm: React.FC = () => {
                   <p className="text-xs text-muted-foreground">
                     {doc.required ? "Required" : "Optional"} • +{doc.trustScoreValue.toFixed(1)} trust score
                   </p>
+                  {doc.fileName && (
+                    <p className="text-xs text-green-600">{doc.fileName}</p>
+                  )}
                 </div>
               </div>
               
               <div>
+                <input
+                  type="file"
+                  className="hidden"
+                  ref={el => fileInputRefs.current[doc.id] = el}
+                  onChange={(e) => handleFileChange(doc.id, e)}
+                  accept=".pdf,.jpg,.jpeg,.png,.doc,.docx"
+                />
                 {doc.uploaded ? (
                   <Button
                     variant="outline" 
                     size="sm"
                     className="flex items-center text-emerald-600 border-emerald-600"
                     type="button"
-                    disabled
+                    onClick={() => handleFileInputClick(doc.id)}
                   >
-                    <Check className="h-4 w-4 mr-1" /> Uploaded
+                    <Upload className="h-4 w-4 mr-1" /> Change
                   </Button>
                 ) : (
                   <Button
@@ -137,9 +157,9 @@ const VerificationForm: React.FC = () => {
                     size="sm"
                     className="flex items-center"
                     type="button"
-                    onClick={() => handleDocumentUpload(doc.id)}
+                    onClick={() => handleFileInputClick(doc.id)}
                   >
-                    <Upload className="h-4 w-4 mr-1" /> Upload
+                    <Upload className="h-4 w-4 mr-1" /> Browse
                   </Button>
                 )}
               </div>
@@ -155,6 +175,17 @@ const VerificationForm: React.FC = () => {
       >
         {isVerifying ? "Processing..." : "Submit for Verification"}
       </Button>
+
+      {trustScoreGained > 0 && (
+        <motion.div 
+          className="text-center text-sm text-green-600 font-medium"
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.3 }}
+        >
+          Your verification is in process. Current trust score increase: +{trustScoreGained.toFixed(1)} points
+        </motion.div>
+      )}
     </form>
   );
 };

@@ -8,9 +8,9 @@ export const formatIndianRupees = (amount: number): string => {
     currency: 'INR',
     maximumFractionDigits: 2,
     minimumFractionDigits: 2,
-    // Use the correct symbol for Indian Rupees (₹)
+    // Directly use the ₹ symbol instead of relying on currency display
     currencyDisplay: 'symbol'
-  }).format(amount);
+  }).format(amount).replace('₹', '₹ '); // Add space after symbol for better readability
 };
 
 /**
