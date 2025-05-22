@@ -36,144 +36,158 @@ export const generateInvoicePdf = (order: Order) => {
   
   // Set company info
   const companyInfo = {
-    name: 'Zerowaste Mart',
+    name: 'ZERO WASTE MART',
     address: '123 Green Street, Eco City',
     pincode: '400001',
-    state: 'Maharashtra',
-    gstin: 'GSTIN: 27AADCZ1234A1ZP',
+    state: 'Karnataka',
+    gstin: '29AADCB2230M1ZT',
+    hsn: '9973',
     email: 'support@zerowastemart.com',
     phone: '+91 9876543210'
   };
   
   // Current date formatting
-  const currentDate = format(new Date(), 'dd/MM/yyyy');
+  const currentDate = format(new Date(), 'yyyy-MM-dd');
   const invoiceNumber = `INV-${order.id.substring(0, 8).toUpperCase()}`;
   
-  // Add logo (this would be a placeholder path, needs to be replaced with actual logo)
-  const logoPath = '/logo.png'; // Replace with actual logo path
-  doc.setFillColor(240, 248, 240); // Light green background
+  // Header section
+  doc.setFillColor(148, 87, 235, 0.1); // Light purple background
   doc.rect(0, 0, pageWidth, 40, 'F');
-  doc.setDrawColor(76, 175, 80); // Green border
-  doc.setLineWidth(0.5);
-  doc.rect(10, 10, pageWidth - 20, 30);
   
-  // Header with company details
-  doc.setFontSize(20);
-  doc.setTextColor(0, 100, 0);
-  doc.text('ZEROWASTE MART', pageWidth / 2, 15, { align: 'center' });
-  doc.setFontSize(10);
-  doc.setTextColor(0, 0, 0);
-  doc.text('(Sustainable Products Marketplace)', pageWidth / 2, 20, { align: 'center' });
-  doc.text(`${companyInfo.address}, ${companyInfo.state} - ${companyInfo.pincode}`, pageWidth / 2, 25, { align: 'center' });
-  doc.text(`${companyInfo.email} | ${companyInfo.phone}`, pageWidth / 2, 30, { align: 'center' });
-  doc.text(companyInfo.gstin, pageWidth / 2, 35, { align: 'center' });
-
-  // Invoice details
-  doc.setLineWidth(0.1);
-  doc.line(10, 45, pageWidth - 10, 45);
+  // Add logo and header
+  // Logo circle
+  doc.setFillColor(148, 87, 235);
+  doc.circle(20, 20, 10, 'F');
+  
+  // Add logo content (Leaf would be here in a real implementation)
+  doc.setTextColor(255, 255, 255);
   doc.setFontSize(12);
-  doc.text('TAX INVOICE', pageWidth / 2, 50, { align: 'center' });
-  doc.line(10, 52, pageWidth - 10, 52);
+  doc.text('ZWM', 20, 20, { align: 'center' });
   
-  // Invoice number and date
+  // Company name and invoice header
+  doc.setTextColor(148, 87, 235);
+  doc.setFontSize(16);
+  doc.setFont('helvetica', 'bold');
+  doc.text(companyInfo.name, 35, 15);
+  
+  doc.setFontSize(14);
+  doc.text('INVOICE', 35, 23);
+  
   doc.setFontSize(10);
-  doc.text(`Invoice Number: ${invoiceNumber}`, 15, 60);
-  doc.text(`Date: ${currentDate}`, 15, 65);
+  doc.setFont('helvetica', 'normal');
+  doc.text(invoiceNumber, 35, 30);
   
-  // Customer details  
-  doc.text('Bill To:', pageWidth - 70, 60);
-  doc.text(`${order.buyerName || 'Customer'}`, pageWidth - 70, 65);
-  doc.text(`Order ID: ${order.id}`, pageWidth - 70, 70);
+  // Date on the right
+  doc.setFontSize(10);
+  doc.text(`Date: ${currentDate}`, pageWidth - 15, 15, { align: 'right' });
   
-  // Use shippingAddress if buyerAddress is undefined
-  const addressToUse = order.buyerAddress || order.shippingAddress;
-  if (addressToUse) {
-    doc.text(`${addressToUse}`, pageWidth - 70, 75, { maxWidth: 60 });
-  }
+  // Customer and payment info
+  doc.setFontSize(11);
+  doc.setTextColor(60, 60, 60);
+  doc.text(`Customer: ${order.buyerName || 'Customer'}`, 15, 50);
+  doc.text(`Shipping Address: ${order.shippingAddress || 'Not specified'}`, 15, 57);
   
-  // Calculate item totals with GST
-  const orderItemsWithGST = order.items.map(item => {
-    const itemSubtotal = item.price * item.quantity;
-    const gst = calculateGST(itemSubtotal);
-    return {
-      ...item,
-      subtotal: itemSubtotal,
-      gst: gst,
-      total: itemSubtotal + gst
-    };
-  });
+  doc.text(`Payment Method: ${order.paymentMethod || 'Not specified'}`, pageWidth - 15, 50, { align: 'right' });
   
-  // Calculate totals
-  const subtotal = orderItemsWithGST.reduce((sum, item) => sum + item.subtotal, 0);
-  const totalGST = orderItemsWithGST.reduce((sum, item) => sum + item.gst, 0);
-  const grandTotal = subtotal + totalGST;
-  
-  // Table headers and data for items
-  const tableColumn = ['#', 'Item', 'Qty', 'Rate', 'Subtotal', 'GST (18%)', 'Total'];
-  const tableRows = orderItemsWithGST.map((item, index) => [
-    (index + 1).toString(),
+  // Table headers for items
+  const tableColumn = ['Item', 'Quantity', 'Unit Price', 'Total'];
+  const tableRows = order.items.map(item => [
     item.name,
     item.quantity.toString(),
     formatIndianRupees(item.price),
-    formatIndianRupees(item.subtotal),
-    formatIndianRupees(item.gst),
-    formatIndianRupees(item.total)
+    formatIndianRupees(item.quantity * item.price)
   ]);
   
   // Generate the items table
   autoTable(doc, {
     head: [tableColumn],
     body: tableRows,
-    startY: 85,
-    theme: 'striped',
-    headStyles: { fillColor: [76, 175, 80], textColor: [255, 255, 255] },
-    styles: { fontSize: 8, cellPadding: 2 },
+    startY: 65,
+    theme: 'grid',
+    headStyles: { 
+      fillColor: [148, 87, 235], 
+      textColor: [255, 255, 255],
+      fontStyle: 'bold'
+    },
+    styles: { 
+      fontSize: 10,
+      cellPadding: 5
+    },
     columnStyles: {
-      0: { cellWidth: 10 },
-      1: { cellWidth: 60 },
-      2: { cellWidth: 15 },
-      3: { cellWidth: 25 },
-      4: { cellWidth: 25 },
-      5: { cellWidth: 25 },
-      6: { cellWidth: 25 },
+      0: { cellWidth: 'auto' },
+      1: { cellWidth: 'auto', halign: 'center' },
+      2: { cellWidth: 'auto', halign: 'right' },
+      3: { cellWidth: 'auto', halign: 'right' },
     }
   });
   
   // Get the final Y position after the table
   const finalY = (doc as any).lastAutoTable.finalY + 10;
   
-  // Summary of totals
+  // Calculate GST values
+  const subtotalBeforeTax = order.totalAmount / 1.18; // Remove 18% GST
+  const cgst = subtotalBeforeTax * 0.09; // 9% CGST
+  const sgst = subtotalBeforeTax * 0.09; // 9% SGST
+  const totalGST = cgst + sgst;
+  
+  // Pricing summary
   doc.setFontSize(10);
-  doc.text('Summary:', pageWidth - 70, finalY);
-  doc.text(`Subtotal: ${formatIndianRupees(subtotal)}`, pageWidth - 70, finalY + 5);
-  doc.text(`GST (18%): ${formatIndianRupees(totalGST)}`, pageWidth - 70, finalY + 10);
+  doc.text('Subtotal (before tax):', pageWidth - 70, finalY);
+  doc.text(formatIndianRupees(subtotalBeforeTax), pageWidth - 15, finalY, { align: 'right' });
+  
+  doc.text('CGST (9%):', pageWidth - 70, finalY + 7);
+  doc.text(formatIndianRupees(cgst), pageWidth - 15, finalY + 7, { align: 'right' });
+  
+  doc.text('SGST (9%):', pageWidth - 70, finalY + 14);
+  doc.text(formatIndianRupees(sgst), pageWidth - 15, finalY + 14, { align: 'right' });
+  
+  doc.setLineWidth(0.5);
+  doc.line(pageWidth - 70, finalY + 17, pageWidth - 15, finalY + 17);
+  
+  doc.text('Total GST (18%):', pageWidth - 70, finalY + 23);
+  doc.text(formatIndianRupees(totalGST), pageWidth - 15, finalY + 23, { align: 'right' });
+  
   doc.setFontSize(12);
-  doc.setFont(undefined, 'bold');
-  doc.text(`Grand Total: ${formatIndianRupees(grandTotal)}`, pageWidth - 70, finalY + 18);
-  doc.setFont(undefined, 'normal');
+  doc.setFont('helvetica', 'bold');
+  doc.setTextColor(148, 87, 235);
+  doc.text('Total Amount (inc. GST):', pageWidth - 70, finalY + 33);
+  doc.text(formatIndianRupees(order.totalAmount), pageWidth - 15, finalY + 33, { align: 'right' });
   
-  // Payment information
-  doc.setFontSize(10);
-  doc.text('Payment Status:', 15, finalY);
-  doc.text(`${order.paymentStatus || 'Pending'}`, 50, finalY);
-  doc.text('Payment Method:', 15, finalY + 5);
-  doc.text(`${order.paymentMethod || 'Online'}`, 50, finalY + 5);
+  // GST Information box
+  doc.setFillColor(245, 245, 255);
+  doc.rect(15, finalY + 40, 95, 35, 'F');
   
-  // Terms and conditions
+  doc.setFontSize(11);
+  doc.setFont('helvetica', 'bold');
+  doc.setTextColor(148, 87, 235);
+  doc.text('GST Information', 20, finalY + 50);
+  
+  doc.setFontSize(9);
+  doc.setFont('helvetica', 'normal');
+  doc.setTextColor(60, 60, 60);
+  doc.text(`GSTIN: ${companyInfo.gstin}`, 20, finalY + 57);
+  doc.text(`HSN Code: ${companyInfo.hsn}`, 20, finalY + 63);
+  doc.text(`Place of Supply: ${companyInfo.state}`, 20, finalY + 69);
+  
+  // Zero Waste Certified stamp
+  // Stamp border
+  doc.setDrawColor(75, 181, 67);
+  doc.setLineWidth(1);
+  doc.roundedRect(pageWidth - 90, finalY + 45, 70, 25, 4, 4, 'S');
+  
+  // Stamp text
+  doc.setTextColor(75, 181, 67);
+  doc.setFontSize(12);
+  doc.setFont('helvetica', 'bold');
+  doc.text('ZERO WASTE CERTIFIED', pageWidth - 55, finalY + 60, { align: 'center' });
+  
+  // Footer text
   doc.setFontSize(8);
-  doc.text('Terms & Conditions:', 15, finalY + 25);
-  doc.text('1. All items once sold cannot be returned unless defective.', 15, finalY + 30);
-  doc.text('2. This is a computer-generated invoice and does not require a signature.', 15, finalY + 35);
-  
-  // Final footer with stamp
-  doc.setFillColor(240, 248, 240); // Light green background for stamp
-  doc.circle(pageWidth - 35, finalY + 35, 15, 'F');
-  doc.setTextColor(0, 100, 0);
-  doc.setFontSize(6);
-  doc.text('CERTIFIED BY', pageWidth - 35, finalY + 32, { align: 'center' });
-  doc.setFontSize(8);
-  doc.text('ZEROWASTE', pageWidth - 35, finalY + 36, { align: 'center' });
-  doc.text('MART', pageWidth - 35, finalY + 40, { align: 'center' });
+  doc.setFont('helvetica', 'normal');
+  doc.setTextColor(100, 100, 100);
+  doc.text('Thank you for your business! Your contribution helps reduce waste.', pageWidth / 2, finalY + 85, { align: 'center' });
+  doc.text('Payment made in India - All prices are inclusive of GST', pageWidth / 2, finalY + 90, { align: 'center' });
+  doc.text('For any queries related to this invoice, please contact support@zerowastemart.com', pageWidth / 2, finalY + 95, { align: 'center' });
   
   // Save the PDF
   doc.save(`invoice-${order.id}.pdf`);
