@@ -7,6 +7,8 @@ export interface OrderItem {
   price: number;
   productId?: string;
   orderId?: string;
+  imageUrl?: string;
+  category?: string; // Added category as optional
 }
 
 export interface Order {
@@ -22,6 +24,7 @@ export interface Order {
   createdAt: string;
   updatedAt: string;
   shippingAddress?: string;
+  buyerAddress?: string; // Added this field to fix invoice generation
   trackingInfo?: {
     carrier?: string;
     trackingNumber?: string;

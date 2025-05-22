@@ -9,6 +9,7 @@ interface CardBoxProps {
   desc: string;
   onClick: () => void;
   active: boolean;
+  children?: React.ReactNode;
 }
 
 const CardBox: React.FC<CardBoxProps> = ({ 

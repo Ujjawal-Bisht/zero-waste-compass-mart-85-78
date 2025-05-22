@@ -1,130 +1,94 @@
 
-import React from 'react';
-import { AppWindow, Smartphone } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import React, { useState } from 'react';
+import { Smartphone, Check, Key } from 'lucide-react';
 import CardBox from '../components/CardBox';
-import QRCode from '../QRCode';
-import TwoFactorForm from '../TwoFactorForm';
-import TwoFactorMobileOtpSetup from '../TwoFactorMobileOtpSetup';
-import { toast } from 'sonner';
 
 interface OptionsTabContentProps {
-  activeOption: 'app' | 'otp';
-  step: 'intro' | 'setup' | 'verify' | 'mobileEnter' | 'mobileOtp';
-  qrCodeUrl: string | null;
-  handleSelectMethod: (method: 'app' | 'otp') => Promise<void>;
-  handleVerifyMobileOtp: () => Promise<void>;
-  handleSendMobileOtp: (fullNumber: string) => Promise<void>;
-  isLoading: boolean;
-  setStep: (step: 'intro' | 'setup' | 'verify' | 'mobileEnter' | 'mobileOtp') => void;
-  mobileOtpPhone: string;
-  setMobileOtpValue: (value: string) => void;
-  verifyTwoFactor: (code: string) => Promise<boolean>;
-  setActiveTab: (tab: 'options' | 'status') => void;
+  method: "app" | "sms";
+  setMethod: (method: "app" | "sms") => void;
+  onProceed: () => void;
 }
 
-const OptionsTabContent: React.FC<OptionsTabContentProps> = ({
-  activeOption,
-  step,
-  qrCodeUrl,
-  handleSelectMethod,
-  handleVerifyMobileOtp,
-  handleSendMobileOtp,
-  isLoading,
-  setStep,
-  mobileOtpPhone,
-  setMobileOtpValue,
-  verifyTwoFactor,
-  setActiveTab
+const OptionsTabContent: React.FC<OptionsTabContentProps> = ({ 
+  method, 
+  setMethod,
+  onProceed
 }) => {
+  const [isLoading, setIsLoading] = useState(false);
+
+  const handleMethodSelect = (selectedMethod: "app" | "sms") => {
+    setMethod(selectedMethod);
+  };
+
+  // Function to simulate the process of setting up 2FA
+  const handleProceed = async () => {
+    setIsLoading(true);
+    
+    try {
+      // Simulate API call
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      onProceed();
+    } catch (error) {
+      console.error('Error setting up 2FA:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   return (
-    <div className="flex flex-col gap-2">
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <CardBox
-          icon={AppWindow}
-          title="Authenticator App"
-          desc="Use Google or Microsoft Authenticator"
-          onClick={() => handleSelectMethod('app')}
-          active={activeOption === 'app'}
-        />
-        <CardBox
-          icon={Smartphone}
-          title="Mobile OTP"
-          desc="Receive OTP via SMS to your phone"
-          onClick={() => handleSelectMethod('otp')}
-          active={activeOption === 'otp'}
-        />
+    <div className="space-y-4">
+      <div className="text-sm text-gray-600 mb-6">
+        Choose your preferred method for two-factor authentication:
       </div>
-      
-      {/* Authenticator App flow */}
-      {step === 'setup' && activeOption === 'app' && qrCodeUrl && (
-        <div className="my-8">
-          <div className="text-center mb-4 text-blue-800 text-sm">
-            Scan this QR code with your authenticator app and enter the 6-digit code it generates.
+
+      <CardBox
+        icon={Key}
+        title="Authenticator App"
+        desc="Use an app like Google Authenticator or Authy to generate verification codes"
+        onClick={() => handleMethodSelect("app")}
+        active={method === "app"}
+      >
+        {method === "app" && (
+          <div className="mt-3 flex items-center text-xs text-green-600">
+            <Check className="mr-1 h-3.5 w-3.5" />
+            <span>Selected</span>
           </div>
-          <div className="flex justify-center mb-4">
-            <QRCode url={qrCodeUrl} />
+        )}
+      </CardBox>
+
+      <CardBox
+        icon={Smartphone}
+        title="SMS Verification"
+        desc="Receive a verification code via SMS to your registered mobile number"
+        onClick={() => handleMethodSelect("sms")}
+        active={method === "sms"}
+      >
+        {method === "sms" && (
+          <div className="mt-3 flex items-center text-xs text-green-600">
+            <Check className="mr-1 h-3.5 w-3.5" />
+            <span>Selected</span>
           </div>
-          <Button
-            className="w-full p-3 rounded-xl bg-gradient-to-tr from-violet-500 to-blue-500 text-white font-semibold hover:shadow-lg transition-all"
-            onClick={() => setStep('verify')}
-          >
-            Continue to Verification
-          </Button>
-        </div>
-      )}
-      
-      {/* QR code Verify Flow (app method) */}
-      {step === "verify" && activeOption === "app" && (
-        <div className="my-8">
-          <TwoFactorForm
-            onSubmit={async () => {
-              setIsLoading(true);
-              try {
-                const code = (document.querySelector("input[type='tel']") as HTMLInputElement)?.value ?? "";
-                if (!code || code.length !== 6) {
-                  toast.error("Please enter your 6-digit code");
-                  return;
-                }
-                const ok = await verifyTwoFactor(code);
-                if (ok) {
-                  setActiveTab("status");
-                  setStep("intro");
-                }
-              } finally {
-                setIsLoading(false);
-              }
-            }}
-            onChange={() => {}}
-            onCancel={() => setStep("setup")}
-            isLoading={isLoading}
-          />
-        </div>
-      )}
-      
-      {/* Mobile OTP (SMS) flow entry form */}
-      {step === 'mobileEnter' && activeOption === 'otp' && (
-        <TwoFactorMobileOtpSetup
-          onRequestOtp={handleSendMobileOtp}
-          isLoading={isLoading}
-        />
-      )}
-      
-      {/* Mobile OTP ENTRY FORM */}
-      {step === "mobileOtp" && (
-        <div className="my-8">
-          <div className="mb-4 text-center text-blue-700">Enter the OTP sent to <span className="font-bold">{mobileOtpPhone}</span></div>
-          <TwoFactorForm
-            onSubmit={async () => {
-              await handleVerifyMobileOtp();
-              setMobileOtpValue("");
-            }}
-            onChange={setMobileOtpValue}
-            isLoading={isLoading}
-            onCancel={() => setStep("mobileEnter")}
-          />
-        </div>
-      )}
+        )}
+      </CardBox>
+
+      <div className="flex justify-end mt-6">
+        <button
+          onClick={handleProceed}
+          disabled={isLoading}
+          className="px-4 py-2 rounded-md border border-blue-500 bg-blue-50 text-blue-700 
+          hover:bg-blue-100 transition-colors font-medium focus:outline-none focus:ring-2 
+          focus:ring-blue-500 focus:ring-opacity-50"
+        >
+          {isLoading ? (
+            <>
+              <span className="inline-block mr-2 animate-spin">⏳</span> 
+              Setting up...
+            </>
+          ) : (
+            'Continue'
+          )}
+        </button>
+      </div>
     </div>
   );
 };

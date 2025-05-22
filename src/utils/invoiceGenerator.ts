@@ -84,8 +84,11 @@ export const generateInvoicePdf = (order: Order) => {
   doc.text('Bill To:', pageWidth - 70, 60);
   doc.text(`${order.buyerName || 'Customer'}`, pageWidth - 70, 65);
   doc.text(`Order ID: ${order.id}`, pageWidth - 70, 70);
-  if (order.buyerAddress) {
-    doc.text(`${order.buyerAddress}`, pageWidth - 70, 75, { maxWidth: 60 });
+  
+  // Use shippingAddress if buyerAddress is undefined
+  const addressToUse = order.buyerAddress || order.shippingAddress;
+  if (addressToUse) {
+    doc.text(`${addressToUse}`, pageWidth - 70, 75, { maxWidth: 60 });
   }
   
   // Calculate item totals with GST
