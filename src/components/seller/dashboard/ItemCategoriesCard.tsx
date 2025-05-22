@@ -28,14 +28,14 @@ const ItemCategoriesCard: React.FC<ItemCategoriesCardProps> = ({ stats }) => {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {stats.map((stat, index) => (
                 <motion.div 
                   key={index} 
                   className="flex justify-between items-center"
                   initial={{ x: -20, opacity: 0 }}
                   animate={{ x: 0, opacity: 1 }}
-                  transition={{ delay: 0.5 + index * 0.2 }}
+                  transition={{ delay: 0.2 + index * 0.1 }}
                 >
                   <div className="flex items-center">
                     <motion.div
@@ -51,10 +51,10 @@ const ItemCategoriesCard: React.FC<ItemCategoriesCardProps> = ({ stats }) => {
                     </div>
                   </div>
                   <motion.div 
-                    className="text-2xl font-bold"
+                    className="ml-2 text-xl font-bold"
                     initial={{ scale: 0.5, opacity: 0 }}
                     animate={{ scale: 1, opacity: 1 }}
-                    transition={{ delay: 0.7 + index * 0.2, type: "spring" }}
+                    transition={{ delay: 0.3 + index * 0.1, type: "spring" }}
                   >
                     {stat.value}
                   </motion.div>

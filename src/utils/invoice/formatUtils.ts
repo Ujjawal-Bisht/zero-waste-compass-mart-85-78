@@ -7,7 +7,9 @@ export const formatIndianRupees = (amount: number): string => {
     style: 'currency',
     currency: 'INR',
     maximumFractionDigits: 2,
-    minimumFractionDigits: 2
+    minimumFractionDigits: 2,
+    // Use the correct symbol for Indian Rupees (₹)
+    currencyDisplay: 'symbol'
   }).format(amount);
 };
 

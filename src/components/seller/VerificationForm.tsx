@@ -1,192 +1,161 @@
 
 import React, { useState } from 'react';
-import { useAuth } from '@/contexts/auth';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { 
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
-import { toast } from 'sonner';
-import { Shield, Upload } from 'lucide-react';
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { useToast } from '@/components/ui/use-toast';
+import { Check, Upload, FileText } from 'lucide-react';
+import { motion } from 'framer-motion';
+
+interface DocumentType {
+  id: string;
+  name: string;
+  required: boolean;
+  trustScoreValue: number;
+  uploaded: boolean;
+}
 
 const VerificationForm: React.FC = () => {
-  const { currentUser, verifySellerAccount, updateProfile } = useAuth();
-  const [isLoading, setIsLoading] = useState(false);
-  const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
-  const [businessInfo, setBusinessInfo] = useState({
-    businessName: currentUser?.businessName || '',
-    businessType: currentUser?.businessType || 'retailer',
-  });
-
-  if (currentUser?.verified) {
-    return (
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center">
-            <Shield className="mr-2 h-5 w-5 text-green-500" />
-            Verified Seller
-          </CardTitle>
-          <CardDescription>
-            Your account has been verified
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="p-4 bg-green-50 rounded-md border border-green-100">
-            <div className="text-sm text-green-800">
-              <p className="font-medium">Your business is verified!</p>
-              <p className="mt-1">You now have full access to all seller features and your trust score has been increased.</p>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-    );
-  }
-
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files) {
-      const filesArray = Array.from(e.target.files);
-      setSelectedFiles(filesArray);
-    }
+  const { toast } = useToast();
+  
+  // List of verification documents with their trust score values
+  const [documents, setDocuments] = useState<DocumentType[]>([
+    { id: 'business-registration', name: 'Business Registration Certificate', required: true, trustScoreValue: 1.5, uploaded: false },
+    { id: 'tax-certificate', name: 'Tax Registration Certificate', required: true, trustScoreValue: 1.2, uploaded: false },
+    { id: 'identity-proof', name: 'Identity Proof (Aadhar/PAN)', required: true, trustScoreValue: 0.8, uploaded: false },
+    { id: 'address-proof', name: 'Business Address Proof', required: false, trustScoreValue: 0.5, uploaded: false },
+    { id: 'quality-certifications', name: 'Quality/Sustainability Certifications', required: false, trustScoreValue: 1.0, uploaded: false }
+  ]);
+  
+  // Track current verification status
+  const [isVerifying, setIsVerifying] = useState(false);
+  const [trustScoreGained, setTrustScoreGained] = useState(0);
+  
+  // Handle document upload
+  const handleDocumentUpload = (documentId: string) => {
+    // In a real implementation, this would handle actual file upload
+    // For this demo, we'll just mark the document as uploaded
+    const updatedDocuments = documents.map(doc => {
+      if (doc.id === documentId) {
+        if (!doc.uploaded) {
+          // Only add the trust score if the document wasn't already uploaded
+          setTrustScoreGained(prev => prev + doc.trustScoreValue);
+        }
+        return { ...doc, uploaded: true };
+      }
+      return doc;
+    });
+    
+    setDocuments(updatedDocuments);
+    
+    toast({
+      title: "Document Uploaded",
+      description: `Your document has been uploaded and will be reviewed. Your trust score has been increased.`,
+      duration: 5000,
+    });
   };
-
-  const handleBusinessInfoChange = (field: string, value: string) => {
-    setBusinessInfo(prev => ({
-      ...prev,
-      [field]: value
-    }));
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
+  
+  // Submit verification request
+  const handleVerificationSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!businessInfo.businessName) {
-      toast.error('Please enter your business name');
+    // Check if all required documents are uploaded
+    const requiredDocsUploaded = documents
+      .filter(doc => doc.required)
+      .every(doc => doc.uploaded);
+    
+    if (!requiredDocsUploaded) {
+      toast({
+        title: "Missing Required Documents",
+        description: "Please upload all required documents to complete verification.",
+        variant: "destructive",
+        duration: 5000,
+      });
       return;
     }
     
-    if (selectedFiles.length === 0) {
-      toast.error('Please upload at least one document for verification');
-      return;
-    }
-
-    try {
-      setIsLoading(true);
-      
-      // First update the business info
-      await updateProfile({
-        businessName: businessInfo.businessName,
-        businessType: businessInfo.businessType as any,
-        isSeller: true
+    setIsVerifying(true);
+    
+    // Simulate verification process
+    setTimeout(() => {
+      setIsVerifying(false);
+      toast({
+        title: "Verification Submitted",
+        description: "Your verification documents have been submitted for review. This process typically takes 1-2 business days.",
+        duration: 5000,
       });
-      
-      // Then submit verification documents
-      await verifySellerAccount(selectedFiles);
-      
-      toast.success('Verification completed successfully!');
-    } catch (error) {
-      console.error('Verification error:', error);
-      toast.error('Failed to verify your account. Please try again.');
-    } finally {
-      setIsLoading(false);
-    }
+    }, 2000);
   };
-
+  
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Seller Verification</CardTitle>
-        <CardDescription>
-          Verify your business to increase your trust score and unlock all seller features
-        </CardDescription>
-      </CardHeader>
-      <CardContent>
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="space-y-2">
-            <Label htmlFor="businessName">Business Name</Label>
-            <Input
-              id="businessName"
-              value={businessInfo.businessName}
-              onChange={(e) => handleBusinessInfoChange('businessName', e.target.value)}
-              placeholder="Your business name"
-              disabled={isLoading}
-            />
-          </div>
-          
-          <div className="space-y-2">
-            <Label htmlFor="businessType">Business Type</Label>
-            <Select
-              value={businessInfo.businessType}
-              onValueChange={(value) => handleBusinessInfoChange('businessType', value)}
-              disabled={isLoading}
+    <form onSubmit={handleVerificationSubmit} className="space-y-4">
+      <div className="space-y-4">
+        <div className="mb-4">
+          <h3 className="text-sm font-medium text-muted-foreground">Upload verification documents to increase your trust score</h3>
+          {trustScoreGained > 0 && (
+            <motion.div 
+              className="text-sm text-green-600 font-medium mt-1"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.5 }}
             >
-              <SelectTrigger id="businessType">
-                <SelectValue placeholder="Select business type" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="retailer">Retailer</SelectItem>
-                <SelectItem value="distributor">Distributor</SelectItem>
-                <SelectItem value="manufacturer">Manufacturer</SelectItem>
-                <SelectItem value="individual">Individual Seller</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-          
-          <div className="space-y-2">
-            <Label htmlFor="documents">Business Documents</Label>
-            <div className="border-2 border-dashed rounded-md p-6 text-center">
-              <Upload className="h-8 w-8 mx-auto text-gray-400 mb-2" />
-              <p className="text-sm text-gray-500 mb-1">
-                Upload business registration, permits, or other verification documents
-              </p>
-              <p className="text-xs text-gray-400 mb-4">
-                Supported formats: PDF, JPEG, PNG (Max 10MB)
-              </p>
-              <Input
-                id="documents"
-                type="file"
-                multiple
-                onChange={handleFileChange}
-                className="hidden"
-                disabled={isLoading}
-              />
-              <Button
-                type="button"
-                variant="outline"
-                className="w-full sm:w-auto"
-                onClick={() => document.getElementById('documents')?.click()}
-                disabled={isLoading}
-              >
-                Select Files
-              </Button>
-            </div>
-            {selectedFiles.length > 0 && (
-              <div className="mt-2">
-                <p className="text-sm font-medium">{selectedFiles.length} file(s) selected:</p>
-                <ul className="mt-1 text-xs text-gray-500">
-                  {selectedFiles.map((file, index) => (
-                    <li key={index}>{file.name}</li>
-                  ))}
-                </ul>
+              <span className="flex items-center">
+                <Check className="h-4 w-4 mr-1" />
+                Trust score increased by {trustScoreGained.toFixed(1)} points
+              </span>
+            </motion.div>
+          )}
+        </div>
+        
+        <div className="space-y-3">
+          {documents.map((doc) => (
+            <div key={doc.id} className="flex items-center justify-between rounded-lg border p-3">
+              <div className="flex items-center">
+                <FileText className="h-5 w-5 text-muted-foreground mr-2" />
+                <div>
+                  <p className="text-sm font-medium">{doc.name}</p>
+                  <p className="text-xs text-muted-foreground">
+                    {doc.required ? "Required" : "Optional"} • +{doc.trustScoreValue.toFixed(1)} trust score
+                  </p>
+                </div>
               </div>
-            )}
-          </div>
-          
-          <Button
-            type="submit"
-            className="w-full zwm-gradient hover:opacity-90 transition-opacity"
-            disabled={isLoading}
-          >
-            {isLoading ? 'Submitting...' : 'Submit for Verification'}
-          </Button>
-        </form>
-      </CardContent>
-    </Card>
+              
+              <div>
+                {doc.uploaded ? (
+                  <Button
+                    variant="outline" 
+                    size="sm"
+                    className="flex items-center text-emerald-600 border-emerald-600"
+                    type="button"
+                    disabled
+                  >
+                    <Check className="h-4 w-4 mr-1" /> Uploaded
+                  </Button>
+                ) : (
+                  <Button
+                    variant="outline" 
+                    size="sm"
+                    className="flex items-center"
+                    type="button"
+                    onClick={() => handleDocumentUpload(doc.id)}
+                  >
+                    <Upload className="h-4 w-4 mr-1" /> Upload
+                  </Button>
+                )}
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+      
+      <Button 
+        type="submit" 
+        className="w-full"
+        disabled={isVerifying || !documents.some(doc => doc.uploaded)}
+      >
+        {isVerifying ? "Processing..." : "Submit for Verification"}
+      </Button>
+    </form>
   );
 };
 

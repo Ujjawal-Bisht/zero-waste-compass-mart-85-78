@@ -1,5 +1,5 @@
 
-import { Package, ShoppingCart, IndianRupee, Users, PillBottle } from 'lucide-react';
+import { Package, ShoppingCart, IndianRupee, Users, PillBottle, Leaf, Home, Coffee, ShoppingBag, Sun, Wind, Recycle } from 'lucide-react';
 import React from 'react';
 import { User } from '@/types';
 
@@ -45,6 +45,30 @@ export const generateCategoryStats = () => {
       value: "4",
       icon: <PillBottle className="h-8 w-8 text-zwm-primary icon-float" />,
       description: "Healthcare items listed"
+    },
+    {
+      title: "Eco-Friendly Products",
+      value: "5",
+      icon: <Leaf className="h-8 w-8 text-green-500 icon-float" />,
+      description: "Sustainable products"
+    },
+    {
+      title: "Home Essentials",
+      value: "6",
+      icon: <Home className="h-8 w-8 text-amber-500 icon-float" />,
+      description: "Home and kitchen items"
+    },
+    {
+      title: "Reusable Items",
+      value: "3",
+      icon: <Recycle className="h-8 w-8 text-blue-500 icon-float" />,
+      description: "Reusable alternatives"
+    },
+    {
+      title: "Organic Products",
+      value: "2",
+      icon: <Sun className="h-8 w-8 text-orange-500 icon-float" />,
+      description: "Certified organic items"
     }
   ];
 };
