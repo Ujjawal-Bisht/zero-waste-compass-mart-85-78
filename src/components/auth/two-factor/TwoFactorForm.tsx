@@ -87,7 +87,7 @@ const TwoFactorForm: React.FC<TwoFactorFormProps> = ({
         </Button>
         <Button 
           type="submit" 
-          className="flex-1 zwm-gradient-hover bg-blue-600 hover:bg-blue-700"
+          className="flex-1 bg-blue-600 hover:bg-blue-700 text-white"
           disabled={isLoading || value.length !== 6}
         >
           {isLoading ? (

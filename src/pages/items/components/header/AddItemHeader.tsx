@@ -11,7 +11,7 @@ const AddItemHeader: React.FC = () => {
       transition={{ delay: 0.2, duration: 0.5, type: "spring" }}
     >
       <motion.div
-        className="header-gradient mb-3 mx-auto inline-flex justify-center"
+        className="mb-3 mx-auto inline-flex justify-center bg-gradient-to-r from-blue-600 to-indigo-600 px-6 py-2 rounded-lg shadow-md"
         whileHover={{ y: -2, boxShadow: '0 8px 25px rgba(99, 102, 241, 0.3)' }}
         transition={{ type: "spring", stiffness: 400, damping: 10 }}
       >

@@ -89,7 +89,7 @@ export const generateInvoicePdf = (order: Order) => {
   
   doc.text(`Payment Method: ${order.paymentMethod || 'Online Payment'}`, pageWidth - 15, 50, { align: 'right' });
   
-  // Table headers for items
+  // Table headers for items - improved alignment
   const tableColumn = ['Item', 'Quantity', 'Unit Price', 'Total'];
   const tableRows = order.items.map(item => [
     item.name,
@@ -98,7 +98,7 @@ export const generateInvoicePdf = (order: Order) => {
     formatIndianRupees(item.quantity * item.price)
   ]);
   
-  // Generate the items table
+  // Generate the items table with improved alignment
   autoTable(doc, {
     head: [tableColumn],
     body: tableRows,
@@ -107,22 +107,29 @@ export const generateInvoicePdf = (order: Order) => {
     headStyles: { 
       fillColor: [148, 87, 235], 
       textColor: [255, 255, 255],
-      fontStyle: 'bold'
+      fontStyle: 'bold',
+      halign: 'left',
     },
     styles: { 
       fontSize: 10,
       cellPadding: 5,
       font: 'helvetica',
-      lineColor: [200, 200, 200]
+      lineColor: [200, 200, 200],
+      overflow: 'linebreak',
     },
     columnStyles: {
-      0: { cellWidth: 'auto' },
-      1: { cellWidth: 'auto', halign: 'center' },
-      2: { cellWidth: 'auto', halign: 'right' },
-      3: { cellWidth: 'auto', halign: 'right' },
+      0: { cellWidth: 'auto', halign: 'left' },
+      1: { cellWidth: 40, halign: 'center' },
+      2: { cellWidth: 60, halign: 'right' },
+      3: { cellWidth: 60, halign: 'right' },
     },
     alternateRowStyles: {
       fillColor: [248, 248, 255]
+    },
+    margin: { left: 15, right: 15 },
+    didDrawPage: (data) => {
+      // Reset margins on each page
+      data.settings.margin = { left: 15, right: 15 };
     }
   });
   
@@ -135,30 +142,33 @@ export const generateInvoicePdf = (order: Order) => {
   const sgst = subtotalBeforeTax * 0.09; // 9% SGST
   const totalGST = cgst + sgst;
   
-  // Pricing summary - improve number formatting
+  // Pricing summary - improve number formatting and alignment
+  const summaryX = pageWidth - 110; // Start position for summary section
+  const valueX = pageWidth - 15;   // Position for values
+  
   doc.setFontSize(10);
-  doc.text('Subtotal (before tax):', pageWidth - 70, finalY);
-  doc.text(formatIndianRupees(subtotalBeforeTax), pageWidth - 15, finalY, { align: 'right' });
+  doc.text('Subtotal (before tax):', summaryX, finalY, { align: 'left' });
+  doc.text(formatIndianRupees(subtotalBeforeTax), valueX, finalY, { align: 'right' });
   
-  doc.text('CGST (9%):', pageWidth - 70, finalY + 7);
-  doc.text(formatIndianRupees(cgst), pageWidth - 15, finalY + 7, { align: 'right' });
+  doc.text('CGST (9%):', summaryX, finalY + 7, { align: 'left' });
+  doc.text(formatIndianRupees(cgst), valueX, finalY + 7, { align: 'right' });
   
-  doc.text('SGST (9%):', pageWidth - 70, finalY + 14);
-  doc.text(formatIndianRupees(sgst), pageWidth - 15, finalY + 14, { align: 'right' });
+  doc.text('SGST (9%):', summaryX, finalY + 14, { align: 'left' });
+  doc.text(formatIndianRupees(sgst), valueX, finalY + 14, { align: 'right' });
   
   doc.setLineWidth(0.5);
-  doc.line(pageWidth - 70, finalY + 17, pageWidth - 15, finalY + 17);
+  doc.line(summaryX, finalY + 17, valueX, finalY + 17);
   
-  doc.text('Total GST (18%):', pageWidth - 70, finalY + 23);
-  doc.text(formatIndianRupees(totalGST), pageWidth - 15, finalY + 23, { align: 'right' });
+  doc.text('Total GST (18%):', summaryX, finalY + 23, { align: 'left' });
+  doc.text(formatIndianRupees(totalGST), valueX, finalY + 23, { align: 'right' });
   
   doc.setFontSize(12);
   doc.setFont('helvetica', 'bold');
   doc.setTextColor(148, 87, 235);
-  doc.text('Total Amount (inc. GST):', pageWidth - 70, finalY + 33);
-  doc.text(formatIndianRupees(order.totalAmount), pageWidth - 15, finalY + 33, { align: 'right' });
+  doc.text('Total Amount (inc. GST):', summaryX, finalY + 33, { align: 'left' });
+  doc.text(formatIndianRupees(order.totalAmount), valueX, finalY + 33, { align: 'right' });
   
-  // GST Information box
+  // GST Information box - improved layout
   doc.setFillColor(245, 245, 255);
   doc.rect(15, finalY + 40, 95, 35, 'F');
   
@@ -174,11 +184,11 @@ export const generateInvoicePdf = (order: Order) => {
   doc.text(`HSN Code: ${companyInfo.hsn}`, 20, finalY + 63);
   doc.text(`Place of Supply: ${companyInfo.state}`, 20, finalY + 69);
   
-  // Zero Waste Certified stamp
+  // Zero Waste Certified stamp - improved visibility
   // Stamp border
   doc.setDrawColor(75, 181, 67);
-  doc.setLineWidth(1);
-  doc.roundedRect(pageWidth - 90, finalY + 45, 70, 25, 4, 4, 'S');
+  doc.setLineWidth(1.5);
+  doc.roundedRect(pageWidth - 95, finalY + 45, 80, 25, 4, 4, 'S');
   
   // Stamp text
   doc.setTextColor(75, 181, 67);
@@ -186,7 +196,7 @@ export const generateInvoicePdf = (order: Order) => {
   doc.setFont('helvetica', 'bold');
   doc.text('ZERO WASTE CERTIFIED', pageWidth - 55, finalY + 60, { align: 'center' });
   
-  // Footer text
+  // Footer text - improved alignment and spacing
   doc.setFontSize(8);
   doc.setFont('helvetica', 'normal');
   doc.setTextColor(100, 100, 100);
