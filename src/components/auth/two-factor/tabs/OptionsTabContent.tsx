@@ -1,93 +1,82 @@
 
-import React, { useState } from 'react';
-import { Smartphone, Check, Key } from 'lucide-react';
-import CardBox from '../components/CardBox';
+import React from 'react';
+import { motion } from 'framer-motion';
+import { Button } from '@/components/ui/button';
+import { Key, Smartphone } from 'lucide-react';
 
 interface OptionsTabContentProps {
-  method: "app" | "sms";
-  setMethod: (method: "app" | "sms") => void;
+  method: 'app' | 'sms';
+  onMethodSelect: (method: 'app' | 'sms') => void;
   onProceed: () => void;
 }
 
 const OptionsTabContent: React.FC<OptionsTabContentProps> = ({ 
   method, 
-  setMethod,
-  onProceed
+  onMethodSelect,
+  onProceed 
 }) => {
-  const [isLoading, setIsLoading] = useState(false);
-
-  const handleMethodSelect = (selectedMethod: "app" | "sms") => {
-    setMethod(selectedMethod);
-  };
-
-  // Function to simulate the process of setting up 2FA
-  const handleProceed = async () => {
-    setIsLoading(true);
-    
-    try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      onProceed();
-    } catch (error) {
-      console.error('Error setting up 2FA:', error);
-    } finally {
-      setIsLoading(false);
-    }
+  const handleMethodSelect = (selectedMethod: 'app' | 'sms') => {
+    onMethodSelect(selectedMethod);
   };
 
   return (
-    <div className="space-y-4">
-      <div className="text-sm text-gray-600 mb-6">
-        Choose your preferred method for two-factor authentication:
+    <div className="space-y-6">
+      <h3 className="text-lg font-medium">Choose Verification Method</h3>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <motion.div
+          className={`p-4 border rounded-lg cursor-pointer ${
+            method === 'app' ? 'border-blue-500 bg-blue-50' : 'border-gray-200'
+          }`}
+          whileHover={{ scale: 1.02 }}
+          whileTap={{ scale: 0.98 }}
+          onClick={() => handleMethodSelect('app')}
+        >
+          <div className="flex items-start">
+            <div className={`p-2 rounded-full ${
+              method === 'app' ? 'bg-blue-500' : 'bg-gray-200'
+            }`}>
+              <Key className={`h-5 w-5 ${method === 'app' ? 'text-white' : 'text-gray-500'}`} />
+            </div>
+            <div className="ml-3">
+              <h4 className="font-medium">Authenticator App</h4>
+              <p className="text-sm text-gray-500 mt-1">
+                Use Google Authenticator, Authy, or any other authenticator app to generate codes
+              </p>
+            </div>
+          </div>
+        </motion.div>
+
+        <motion.div
+          className={`p-4 border rounded-lg cursor-pointer ${
+            method === 'sms' ? 'border-blue-500 bg-blue-50' : 'border-gray-200'
+          }`}
+          whileHover={{ scale: 1.02 }}
+          whileTap={{ scale: 0.98 }}
+          onClick={() => handleMethodSelect('sms')}
+        >
+          <div className="flex items-start">
+            <div className={`p-2 rounded-full ${
+              method === 'sms' ? 'bg-blue-500' : 'bg-gray-200'
+            }`}>
+              <Smartphone className={`h-5 w-5 ${method === 'sms' ? 'text-white' : 'text-gray-500'}`} />
+            </div>
+            <div className="ml-3">
+              <h4 className="font-medium">SMS Verification</h4>
+              <p className="text-sm text-gray-500 mt-1">
+                Receive verification codes via text message on your phone
+              </p>
+            </div>
+          </div>
+        </motion.div>
       </div>
 
-      <CardBox
-        icon={Key}
-        title="Authenticator App"
-        desc="Use an app like Google Authenticator or Authy to generate verification codes"
-        onClick={() => handleMethodSelect("app")}
-        active={method === "app"}
-      >
-        {method === "app" && (
-          <div className="mt-3 flex items-center text-xs text-green-600">
-            <Check className="mr-1 h-3.5 w-3.5" />
-            <span>Selected</span>
-          </div>
-        )}
-      </CardBox>
-
-      <CardBox
-        icon={Smartphone}
-        title="SMS Verification"
-        desc="Receive a verification code via SMS to your registered mobile number"
-        onClick={() => handleMethodSelect("sms")}
-        active={method === "sms"}
-      >
-        {method === "sms" && (
-          <div className="mt-3 flex items-center text-xs text-green-600">
-            <Check className="mr-1 h-3.5 w-3.5" />
-            <span>Selected</span>
-          </div>
-        )}
-      </CardBox>
-
       <div className="flex justify-end mt-6">
-        <button
-          onClick={handleProceed}
-          disabled={isLoading}
-          className="px-4 py-2 rounded-md border border-blue-500 bg-blue-50 text-blue-700 
-          hover:bg-blue-100 transition-colors font-medium focus:outline-none focus:ring-2 
-          focus:ring-blue-500 focus:ring-opacity-50"
+        <Button 
+          onClick={onProceed}
+          className="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white"
         >
-          {isLoading ? (
-            <>
-              <span className="inline-block mr-2 animate-spin">⏳</span> 
-              Setting up...
-            </>
-          ) : (
-            'Continue'
-          )}
-        </button>
+          Continue with {method === 'app' ? 'Authenticator App' : 'SMS Verification'}
+        </Button>
       </div>
     </div>
   );

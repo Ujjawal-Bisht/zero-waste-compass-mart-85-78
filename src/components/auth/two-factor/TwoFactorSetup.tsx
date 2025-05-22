@@ -13,7 +13,7 @@ import {
 import { ShieldCheck } from 'lucide-react';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import StatusTabContent from './tabs/StatusTabContent';
-import { QRCode } from './QRCode';
+import QRCode from './QRCode';
 import TwoFactorForm from './TwoFactorForm';
 import { Button } from '@/components/ui/button';
 import { InputOTP, InputOTPGroup, InputOTPSlot } from '@/components/ui/input-otp';
@@ -83,7 +83,7 @@ const TwoFactorSetup: React.FC = () => {
     setIsLoading(true);
     try {
       const result = await verifyTwoFactor(verificationCode);
-      if (result.success) {
+      if (result) { // Changed from result.success to just result
         toast.success("Two-factor authentication enabled successfully!");
         setStep("intro");
         setActiveTab("status");
@@ -136,7 +136,7 @@ const TwoFactorSetup: React.FC = () => {
               Scan this QR code with your authenticator app (like Google Authenticator or Authy)
             </p>
             <div className="flex justify-center py-4">
-              {qrCodeUrl && <QRCode value={qrCodeUrl} size={200} />}
+              {qrCodeUrl && <QRCode url={qrCodeUrl} />}
             </div>
             <TwoFactorForm
               onSubmit={handleVerify}
@@ -226,7 +226,7 @@ const TwoFactorSetup: React.FC = () => {
         return (
           <OptionsTabContent
             method={verificationMethod}
-            setMethod={setVerificationMethod}
+            onMethodSelect={setVerificationMethod}
             onProceed={() => handleSelectMethod(verificationMethod)}
           />
         );
