@@ -36,7 +36,10 @@ const TwoFactorSetup: React.FC = () => {
     handleVerifyMobileOtp,
     handleVerify,
     handleSelectMethod,
-    disableTwoFactor
+    disableTwoFactor,
+    manualEntryCode,
+    showManualEntry,
+    toggleManualEntry
   } = useTwoFactorSetup();
 
   return (
@@ -94,6 +97,9 @@ const TwoFactorSetup: React.FC = () => {
                 handleVerifyMobileOtp={handleVerifyMobileOtp}
                 handleSelectMethod={handleSelectMethod}
                 setStep={setStep}
+                manualEntryCode={manualEntryCode}
+                showManualEntry={showManualEntry}
+                toggleManualEntry={toggleManualEntry}
               />
             </TabsContent>
             

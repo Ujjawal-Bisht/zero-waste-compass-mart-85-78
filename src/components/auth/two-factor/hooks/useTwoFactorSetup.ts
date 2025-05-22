@@ -15,6 +15,8 @@ export const useTwoFactorSetup = () => {
   const [mobileOtpValue, setMobileOtpValue] = useState<string>("");
   const [mobileOtpSentCode, setMobileOtpSentCode] = useState<string>("");
   const [activeTab, setActiveTab] = useState<'options' | 'status'>('options');
+  const [manualEntryCode, setManualEntryCode] = useState<string>('');
+  const [showManualEntry, setShowManualEntry] = useState(false);
 
   // --- For simulating OTP send & check (for demo) ---
   const handleSendMobileOtp = async (fullNumber: string) => {
@@ -89,6 +91,7 @@ export const useTwoFactorSetup = () => {
       try {
         const result = await setupTwoFactor();
         setQrCodeUrl(result.qrCode);
+        setManualEntryCode(result.secret);
       } catch (error) {
         toast.error('Failed to set up two-factor authentication');
       } finally {
@@ -98,6 +101,11 @@ export const useTwoFactorSetup = () => {
       setStep("mobileEnter");
       setQrCodeUrl(null); // in case user goes back and forth
     }
+  };
+
+  // --- Toggle manual entry code visibility ---
+  const toggleManualEntry = () => {
+    setShowManualEntry(prevState => !prevState);
   };
 
   // --- Read 2FA status for demo mobile flow from localStorage (simulated database flag) ---
@@ -130,6 +138,9 @@ export const useTwoFactorSetup = () => {
     handleVerifyMobileOtp,
     handleVerify,
     handleSelectMethod,
-    disableTwoFactor
+    disableTwoFactor,
+    manualEntryCode,
+    showManualEntry,
+    toggleManualEntry
   };
 };

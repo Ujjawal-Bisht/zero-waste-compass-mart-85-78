@@ -22,6 +22,9 @@ interface TwoFactorStepContentProps {
   handleVerifyMobileOtp: () => Promise<void>;
   handleSelectMethod: (method: 'app' | 'sms') => Promise<void>;
   setStep: (step: 'intro' | 'setup' | 'verify' | 'mobileEnter' | 'mobileOtp') => void;
+  manualEntryCode?: string;
+  showManualEntry?: boolean;
+  toggleManualEntry?: () => void;
 }
 
 const TwoFactorStepContent: React.FC<TwoFactorStepContentProps> = ({
@@ -40,7 +43,10 @@ const TwoFactorStepContent: React.FC<TwoFactorStepContentProps> = ({
   handleSendMobileOtp,
   handleVerifyMobileOtp,
   handleSelectMethod,
-  setStep
+  setStep,
+  manualEntryCode,
+  showManualEntry,
+  toggleManualEntry
 }) => {
   switch (step) {
     case "setup":
@@ -51,6 +57,9 @@ const TwoFactorStepContent: React.FC<TwoFactorStepContentProps> = ({
           onChange={setVerificationCode}
           onCancel={() => setStep("intro")}
           isLoading={isLoading}
+          manualEntryCode={manualEntryCode}
+          showManualEntry={showManualEntry}
+          toggleManualEntry={toggleManualEntry}
         />
       );
     case "mobileEnter":
