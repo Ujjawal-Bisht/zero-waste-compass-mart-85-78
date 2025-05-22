@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { InputOTP, InputOTPGroup, InputOTPSlot } from '@/components/ui/input-otp';
 import { motion } from 'framer-motion';
@@ -18,6 +18,7 @@ const TwoFactorForm: React.FC<TwoFactorFormProps> = ({
   isLoading
 }) => {
   const [value, setValue] = useState('');
+  const inputRef = useRef<HTMLInputElement>(null);
 
   const handleChange = (newValue: string) => {
     setValue(newValue);
@@ -31,10 +32,13 @@ const TwoFactorForm: React.FC<TwoFactorFormProps> = ({
 
   // Focus the first input slot when the component mounts
   useEffect(() => {
-    const firstInput = document.querySelector('.input-otp-slot') as HTMLInputElement;
-    if (firstInput) {
-      setTimeout(() => firstInput.focus(), 100);
-    }
+    // Small delay to ensure component is fully rendered
+    setTimeout(() => {
+      const firstInput = document.querySelector('.input-otp-slot') as HTMLInputElement;
+      if (firstInput) {
+        firstInput.focus();
+      }
+    }, 100);
   }, []);
 
   return (

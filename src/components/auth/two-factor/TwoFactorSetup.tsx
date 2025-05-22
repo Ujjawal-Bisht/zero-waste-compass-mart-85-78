@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/auth';
 import { motion } from 'framer-motion';
@@ -9,27 +10,10 @@ import {
   CardDescription,
   CardContent,
 } from '@/components/ui/card';
-import { ShieldCheck, Smartphone, QrCode, AppWindow } from 'lucide-react';
-import QRCode from './QRCode';
-import TwoFactorMobileOtpSetup from './TwoFactorMobileOtpSetup';
-import TwoFactorForm from './TwoFactorForm';
-
+import { ShieldCheck } from 'lucide-react';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
-
-//--- New: Custom simple animated CardBox for the 2FA option cards ---
-const CardBox = ({ children, icon: Icon, title, desc, onClick, active }: any) => (
-  <motion.div
-    whileHover={{ scale: 1.02, boxShadow: '0 0 12px #a0a0ff55' }}
-    animate={active ? { borderColor: "#5b4fff" } : { borderColor: "#eeeeee" }}
-    className={`flex flex-col items-center justify-center p-8 rounded-xl border-2 mb-2 bg-white cursor-pointer transition-all shadow-md min-h-[160px] ${active ? "shadow-blue-100 border-zwm-primary" : "border-gray-100"}`}
-    onClick={onClick}
-    tabIndex={0}
-  >
-    <Icon size={32} className={active ? 'text-blue-500 mb-3' : 'mb-3 text-gray-400'} />
-    <div className={`font-semibold text-base ${active ? "text-blue-700" : "text-gray-900"}`}>{title}</div>
-    <div className="text-xs mt-1 text-gray-500 text-center">{desc}</div>
-  </motion.div>
-)
+import OptionsTabContent from './tabs/OptionsTabContent';
+import StatusTabContent from './tabs/StatusTabContent';
 
 const TwoFactorSetup: React.FC = () => {
   const { setupTwoFactor, verifyTwoFactor, disableTwoFactor, isTwoFactorEnabled } = useAuth();
@@ -106,9 +90,6 @@ const TwoFactorSetup: React.FC = () => {
     }
   };
 
-  // --- OTP input value change handler ---
-  const handleMobileOtpInput = (code: string) => setMobileOtpValue(code);
-
   //--- Read 2FA status for demo mobile flow from localStorage (simulated database flag)
   const [localOtpEnabled, setLocalOtpEnabled] = useState(false);
   useEffect(() => {
@@ -117,7 +98,6 @@ const TwoFactorSetup: React.FC = () => {
     }
   }, [step, activeTab]);
 
-  // --- UI RENDER ---
   return (
     <motion.div
       initial={{ opacity: 0, scale: 0.95 }}
@@ -147,121 +127,29 @@ const TwoFactorSetup: React.FC = () => {
               <TabsTrigger value="status" className={`flex-1 py-2 text-base ${activeTab === "status" ? "!bg-violet-500 text-white" : ""}`} onClick={() => setActiveTab("status")}>Current Status</TabsTrigger>
             </TabsList>
 
-            <TabsContent value="options" forceMount className="flex flex-col gap-2">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <CardBox
-                  icon={AppWindow}
-                  title="Authenticator App"
-                  desc="Use Google or Microsoft Authenticator"
-                  onClick={() => handleSelectMethod('app')}
-                  active={activeOption === 'app'}
-                />
-                <CardBox
-                  icon={Smartphone}
-                  title="Mobile OTP"
-                  desc="Receive OTP via SMS to your phone"
-                  onClick={() => handleSelectMethod('otp')}
-                  active={activeOption === 'otp'}
-                />
-              </div>
-              {/* Authenticator App flow */}
-              {step === 'setup' && verificationMethod === 'app' && qrCodeUrl && (
-                <div className="my-8">
-                  <div className="text-center mb-4 text-blue-800 text-sm">
-                    Scan this QR code with your authenticator app and enter the 6-digit code it generates.
-                  </div>
-                  <div className="flex justify-center mb-4">
-                    <QRCode url={qrCodeUrl} />
-                  </div>
-                  <button
-                    className="w-full p-3 rounded-xl bg-gradient-to-tr from-violet-500 to-blue-500 text-white font-semibold hover:shadow-lg transition-all"
-                    onClick={() => setStep('verify')}
-                  >
-                    Continue to Verification
-                  </button>
-                </div>
-              )}
-              {/* QR code Verify Flow (app method) */}
-              {step === "verify" && verificationMethod === "app" && (
-                <div className="my-8">
-                  <TwoFactorForm
-                    onSubmit={async () => {
-                      setIsLoading(true);
-                      try {
-                        const code = (document.querySelector("input[type='tel']") as HTMLInputElement)?.value ?? "";
-                        if (!code || code.length !== 6) {
-                          toast.error("Please enter your 6-digit code");
-                          return;
-                        }
-                        const ok = await verifyTwoFactor(code);
-                        if (ok) {
-                          setActiveTab("status");
-                          setStep("intro");
-                        }
-                      } finally {
-                        setIsLoading(false);
-                      }
-                    }}
-                    onChange={() => {}}
-                    onCancel={() => setStep("setup")}
-                    isLoading={isLoading}
-                  />
-                </div>
-              )}
-              {/* Mobile OTP (SMS) flow entry form */}
-              {step === 'mobileEnter' && verificationMethod === 'otp' && (
-                <TwoFactorMobileOtpSetup
-                  onRequestOtp={handleSendMobileOtp}
-                  isLoading={isLoading}
-                />
-              )}
-              {/* Mobile OTP ENTRY FORM */}
-              {step === "mobileOtp" && (
-                <div className="my-8">
-                  <div className="mb-4 text-center text-blue-700">Enter the OTP sent to <span className="font-bold">{mobileOtpPhone}</span></div>
-                  <TwoFactorForm
-                    onSubmit={async () => {
-                      await handleVerifyMobileOtp();
-                      setMobileOtpValue("");
-                    }}
-                    onChange={handleMobileOtpInput}
-                    isLoading={isLoading}
-                    onCancel={() => setStep("mobileEnter")}
-                  />
-                </div>
-              )}
+            <TabsContent value="options" forceMount>
+              <OptionsTabContent
+                activeOption={activeOption}
+                step={step}
+                qrCodeUrl={qrCodeUrl}
+                handleSelectMethod={handleSelectMethod}
+                handleVerifyMobileOtp={handleVerifyMobileOtp}
+                handleSendMobileOtp={handleSendMobileOtp}
+                isLoading={isLoading}
+                setStep={setStep}
+                mobileOtpPhone={mobileOtpPhone}
+                setMobileOtpValue={setMobileOtpValue}
+                verifyTwoFactor={verifyTwoFactor}
+                setActiveTab={setActiveTab}
+              />
             </TabsContent>
-            {/* Status Tab */}
-            <TabsContent value="status" forceMount className="space-y-6">
-              <div className="bg-gray-50 rounded-md p-5 text-center">
-                <ShieldCheck className="mx-auto mb-2 text-3xl text-blue-500" />
-                <div className="font-bold text-lg">
-                  {/* Show app/db 2FA status OR fallback to demo localStorage-flag */}
-                  {(isTwoFactorEnabled || localOtpEnabled)
-                    ? "2FA Enabled!"
-                    : "Not Yet Enabled"}
-                </div>
-                <p className="text-gray-600">{(isTwoFactorEnabled || localOtpEnabled)
-                  ? "Your account is protected with an extra layer of authentication."
-                  : "Enable two-factor authentication for improved account security."}
-                </p>
-                {(isTwoFactorEnabled || localOtpEnabled) && (
-                  <button
-                    className="mt-5 px-5 py-2 rounded-md border border-red-300 text-red-600 bg-red-50 hover:bg-red-100 font-medium transition-all"
-                    onClick={() => {
-                      // For demo mobile OTP, clear local flag too
-                      if (typeof window !== "undefined") {
-                        window.localStorage.removeItem("zwm_2fa_enabled");
-                        setLocalOtpEnabled(false);
-                      }
-                      // Try to call real disabling too
-                      disableTwoFactor();
-                    }}
-                  >
-                    Disable 2FA
-                  </button>
-                )}
-              </div>
+            
+            <TabsContent value="status" forceMount>
+              <StatusTabContent
+                isTwoFactorEnabled={isTwoFactorEnabled}
+                localOtpEnabled={localOtpEnabled}
+                disableTwoFactor={disableTwoFactor}
+              />
             </TabsContent>
           </Tabs>
         </CardContent>
